@@ -282,6 +282,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     dvcRoot: string,
     subProjects: string[],
     pipeline: WorkspacePipeline,
+    setup: Setup,
     resourceLocator: ResourceLocator
   ) {
     const experiments = this.dispose.track(
@@ -297,6 +298,14 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     )
 
     this.setRepository(dvcRoot, experiments)
+
+    void experiments.setStudioBaseUrl(setup.getStudioAccessToken())
+
+    experiments.dispose.track(
+      setup.onDidChangeStudioConnection(() => {
+        void experiments.setStudioBaseUrl(setup.getStudioAccessToken())
+      })
+    )
 
     experiments.dispose.track(
       experiments.onDidChangeIsWebviewFocused(

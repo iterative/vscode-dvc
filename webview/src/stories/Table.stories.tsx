@@ -57,6 +57,7 @@ const tableData = getTableState({
   hasMoreCommits: { main: true },
   hasRunningWorkspaceExperiment: true,
   isShowingMoreCommits: { main: true },
+  isStudioConnected: true,
   rows: rowsFixture,
   selectedBranches: [],
   selectedForPlotsCount: 2,

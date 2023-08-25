@@ -1,6 +1,7 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
 import { join, resolve } from 'path'
 import { after, afterEach, beforeEach, describe, it, suite } from 'mocha'
+import * as Fetch from 'node-fetch'
 import { expect } from 'chai'
 import { stub, spy, restore, SinonStub } from 'sinon'
 import {
@@ -677,6 +678,48 @@ suite('Experiments Test Suite', () => {
           "Experiment major-lamb is up to date on Git remote 'origin'.\nView your experiments in [Studio](https://studio.iterative.ai/user/mattseddon/projects/vscode-dvc-demo-ynm6t3jxdx)"
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it("should handle a message to copy an experiment's Studio link", async () => {
+      const { mockMessageReceived, experiments } =
+        await buildExperimentsWebview({ disposer: disposable })
+
+      const viewUrl =
+        'https://studio.iterative.ai/user/demo-user/projects/demo-ynm6t3jxdx'
+
+      stub(Fetch, 'default').resolves({
+        json: () =>
+          Promise.resolve({
+            url: viewUrl
+          })
+      } as unknown as Fetch.Response)
+
+      await experiments.setStudioBaseUrl('isat_BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB')
+      const mockWriteToClipboard = stub(Clipboard, 'writeToClipboard')
+      const writeToClipboardCalled = new Promise(resolve =>
+        mockWriteToClipboard.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(undefined)
+        })
+      )
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.COPY_STUDIO_LINK,
+        payload: 'exp-e7a67'
+      })
+
+      await writeToClipboardCalled
+      const link =
+        viewUrl +
+        '?showOnlySelected=1' +
+        '&experimentReferences=4fb124aebddb2adf1545030907687fa9a4c80e70' +
+        '&activeExperimentReferences=4fb124aebddb2adf1545030907687fa9a4c80e70%3Aprimary'
+
+      expect(mockWriteToClipboard).to.be.calledOnce
+      expect(mockWriteToClipboard).to.be.calledWithExactly(
+        link,
+        `[Studio link](${link})`
+      )
+    })
 
     it('should be able to handle a message to modify the workspace params and queue an experiment', async () => {
       const { experiments, dvcExecutor, mockMessageReceived } =

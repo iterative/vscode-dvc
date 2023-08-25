@@ -106,6 +106,7 @@ export type TableData = {
   hasConfig: boolean
   hasMoreCommits: Record<string, boolean>
   hasRunningWorkspaceExperiment: boolean
+  isStudioConnected: boolean
   isShowingMoreCommits: Record<string, boolean>
   rows: Commit[]
   showOnlyChanged: boolean

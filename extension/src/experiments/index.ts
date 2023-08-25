@@ -28,6 +28,7 @@ import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { ColumnsModel } from './columns/model'
 import { ExperimentsData } from './data'
 import { stopWorkspaceExperiment } from './processExecution'
+import { Studio } from './studio'
 import { Experiment, ColumnType, TableData, Column } from './webview/contract'
 import { WebviewMessages } from './webview/messages'
 import { DecorationProvider } from './model/decorationProvider'
@@ -72,6 +73,7 @@ export class Experiments extends BaseRepository<TableData> {
   private readonly data: ExperimentsData
   private readonly experiments: ExperimentsModel
   private readonly columns: ColumnsModel
+  private readonly studio: Studio
 
   private readonly experimentsFileFocused = this.dispose.track(
     new EventEmitter<string | undefined>()
@@ -144,6 +146,8 @@ export class Experiments extends BaseRepository<TableData> {
         this.columnsOrderOrStatusChanged
       )
     )
+
+    this.studio = this.dispose.track(new Studio(this.dvcRoot, internalCommands))
 
     this.data = this.dispose.track(
       data ||
@@ -589,6 +593,12 @@ export class Experiments extends BaseRepository<TableData> {
     return this.data.update()
   }
 
+  public async setStudioBaseUrl(studioToken: string | undefined) {
+    await this.isReady()
+    await this.studio.setBaseUrl(studioToken)
+    return this.webviewMessages.sendWebviewMessage()
+  }
+
   protected sendInitialWebviewData() {
     return this.webviewMessages.sendWebviewMessage()
   }
@@ -630,6 +640,7 @@ export class Experiments extends BaseRepository<TableData> {
       this.experiments,
       this.columns,
       this.pipeline,
+      this.studio,
       () => this.getWebview(),
       () => this.notifyChanged(),
       () => this.selectColumns(),

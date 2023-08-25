@@ -79,6 +79,8 @@ export class Setup
   public readonly initialize: () => Promise<void[]>
   public readonly resetMembers: () => void
 
+  public readonly onDidChangeStudioConnection: Event<void>
+
   private dvcRoots: string[] = []
   private subProjects: { [dvcRoot: string]: string[] } = {}
 
@@ -100,6 +102,9 @@ export class Setup
   private readonly workspaceChanged: EventEmitter<void> = this.dispose.track(
     new EventEmitter()
   )
+
+  private readonly studioConnectionChanged: EventEmitter<void> =
+    this.dispose.track(new EventEmitter())
 
   private readonly onDidChangeWorkspace: Event<void> =
     this.workspaceChanged.event
@@ -150,6 +155,7 @@ export class Setup
     }
 
     this.collectWorkspaceScale = collectWorkspaceScale
+    this.onDidChangeStudioConnection = this.studioConnectionChanged.event
 
     this.setCommandsAvailability(false)
     this.setProjectAvailability()
@@ -759,16 +765,29 @@ export class Setup
   private async setStudioValues() {
     const cwd = this.getCwd()
 
+    const previousStudioAccessToken = this.studioAccessToken
+
     if (!cwd) {
       this.studioAccessToken = undefined
       this.shareLiveToStudio = undefined
+
+      if (previousStudioAccessToken) {
+        this.studioConnectionChanged.fire()
+      }
       return
     }
 
-    ;[this.studioAccessToken, this.shareLiveToStudio] = await Promise.all([
+    const [studioAccessToken, shareLiveToStudio] = await Promise.all([
       this.accessConfig(cwd, ConfigKey.STUDIO_TOKEN),
       (await this.accessConfig(cwd, ConfigKey.STUDIO_OFFLINE)) !== 'true'
     ])
+
+    this.studioAccessToken = studioAccessToken
+    this.shareLiveToStudio = shareLiveToStudio
+
+    if (previousStudioAccessToken !== this.studioAccessToken) {
+      this.studioConnectionChanged.fire()
+    }
   }
 
   private async updateStudioOffline(shareLive: boolean) {

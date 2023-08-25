@@ -289,6 +289,7 @@ class Extension extends Disposable {
       dvcRoots,
       subProjects,
       this.pipelines,
+      this.setup,
       this.resourceLocator
     )
     this.plots.create(

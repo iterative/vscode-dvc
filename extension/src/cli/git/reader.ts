@@ -71,7 +71,10 @@ export class GitReader extends GitCli {
   }
 
   public async getRemoteUrl(cwd: string): Promise<string> {
-    const options = getOptions({ args: [Command.LS_REMOTE, Flag.GET_URL], cwd })
+    const options = getOptions({
+      args: [Command.LS_REMOTE, Flag.GET_URL, DEFAULT_REMOTE],
+      cwd
+    })
     try {
       return await this.executeProcess(options)
     } catch {

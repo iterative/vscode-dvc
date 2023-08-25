@@ -15,6 +15,7 @@ const tableDataFixture: TableData = {
   hasMoreCommits: { main: true },
   hasRunningWorkspaceExperiment: true,
   isShowingMoreCommits: { main: true },
+  isStudioConnected: false,
   rows: rowsFixture,
   selectedBranches: [],
   selectedForPlotsCount: 2,

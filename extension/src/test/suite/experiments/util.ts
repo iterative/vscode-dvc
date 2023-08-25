@@ -1,4 +1,5 @@
 import { spy, stub } from 'sinon'
+import { EventEmitter } from 'vscode'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { Experiments } from '../../../experiments'
 import { Disposer } from '../../../extension'
@@ -129,6 +130,14 @@ export const buildExperiments = ({
   }
 }
 
+const buildMockSetup = (disposer: Disposer): Setup => {
+  const studioConnectionChanged = disposer.track(new EventEmitter())
+  return {
+    getStudioAccessToken: () => Promise.resolve(undefined),
+    onDidChangeStudioConnection: studioConnectionChanged.event
+  } as unknown as Setup
+}
+
 export const buildExperimentsWebview = async (inputs: {
   availableNbCommits?: { [branch: string]: number }
   disposer: Disposer
@@ -188,6 +197,7 @@ export const buildMultiRepoExperiments = (disposer: SafeWatcherDisposer) => {
     [dvcDemoPath],
     { [dvcDemoPath]: [] },
     { getRepository: () => pipeline },
+    buildMockSetup(disposer),
     resourceLocator
   )
 
@@ -214,6 +224,7 @@ export const buildSingleRepoExperiments = (disposer: SafeWatcherDisposer) => {
     [dvcDemoPath],
     { [dvcDemoPath]: [] },
     { getRepository: () => pipeline },
+    buildMockSetup(disposer),
     resourceLocator
   )
 
