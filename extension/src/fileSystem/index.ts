@@ -279,18 +279,17 @@ export const getPidFromFile = async (
   return pid
 }
 
-export const getDetailFromFile = (
+export const getEntryFromJsonFile = (
   path: string,
   key: string
 ): string | undefined => {
-  if (!exists(path)) {
+  const json = loadJson(path)
+  if (!json) {
     return
   }
 
-  const contents = readFileSync(path).toString()
-
   try {
-    return (JSON.parse(contents) as { [key: string]: string })[key]
+    return (json as { [key: string]: string })[key]
   } catch {}
 }
 

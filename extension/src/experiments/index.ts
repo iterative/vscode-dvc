@@ -45,7 +45,7 @@ import { Toast } from '../vscode/toast'
 import { ConfigKey, getConfigValue, setUserConfigValue } from '../vscode/config'
 import {
   checkSignalFile,
-  getDetailFromFile,
+  getEntryFromJsonFile,
   pollSignalFileForProcess
 } from '../fileSystem'
 import { DVCLIVE_ONLY_RUNNING_SIGNAL_FILE } from '../cli/dvc/constants'
@@ -603,8 +603,12 @@ export class Experiments extends BaseRepository<TableData> {
     return this.webviewMessages.sendWebviewMessage()
   }
 
-  public checkDvcLiveOnly(fetched: string[]) {
-    const updated = this.experiments.checkDvcLiveOnly(fetched)
+  public hasDvcLiveOnlyRunning() {
+    return this.experiments.hasDvcLiveOnlyRunning()
+  }
+
+  public checkWorkspaceDuplicated(fetched: string[]) {
+    const updated = this.experiments.checkWorkspaceDuplicated(fetched)
     if (!updated) {
       return
     }
@@ -711,7 +715,7 @@ export class Experiments extends BaseRepository<TableData> {
         }
       })
     }
-    const expName = getDetailFromFile(this.dvcLiveOnlySignalFile, 'exp_name')
+    const expName = getEntryFromJsonFile(this.dvcLiveOnlySignalFile, 'exp_name')
 
     return { expName, running }
   }

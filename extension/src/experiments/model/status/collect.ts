@@ -17,6 +17,18 @@ const canAssign = (
   unassignedColors: Color[]
 ): boolean => canSelect(coloredStatus) && definedAndNonEmpty(unassignedColors)
 
+const isWorkspaceSelected = (acc: ColoredStatus) =>
+  !!acc[EXPERIMENT_WORKSPACE_ID]
+
+const isFinishedDvcLiveOnlyExp = (
+  id: string,
+  dvcLiveOnlyExpName: string | undefined
+): boolean => id === dvcLiveOnlyExpName
+
+const duplicateWorkspaceColor = (acc: ColoredStatus, id: string) => {
+  acc[id] = acc[EXPERIMENT_WORKSPACE_ID]
+}
+
 const collectStatus = (
   acc: ColoredStatus,
   experiment: Experiment,
@@ -27,9 +39,11 @@ const collectStatus = (
     return
   }
 
-  if (acc[EXPERIMENT_WORKSPACE_ID] && id === dvcLiveOnlyExpName) {
-    acc[id] = acc[EXPERIMENT_WORKSPACE_ID]
-    return
+  if (
+    isWorkspaceSelected(acc) &&
+    isFinishedDvcLiveOnlyExp(id, dvcLiveOnlyExpName)
+  ) {
+    return duplicateWorkspaceColor(acc, id)
   }
 
   acc[id] = UNSELECTED

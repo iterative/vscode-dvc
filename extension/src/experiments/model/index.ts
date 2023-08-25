@@ -539,15 +539,21 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.availableBranchesToSelect
   }
 
-  public checkDvcLiveOnly(fetched: string[]) {
+  public hasDvcLiveOnlyRunning() {
+    return !!this.dvcLiveOnlyExpName
+  }
+
+  public checkWorkspaceDuplicated(fetched: string[]) {
     if (!this.dvcLiveOnlyExpName) {
       return false
     }
-    if (
-      fetched.includes(this.dvcLiveOnlyExpName) &&
+
+    const newExperimentFetched = fetched.includes(this.dvcLiveOnlyExpName)
+    const workspaceSelectionDuplicated =
       this.coloredStatus[EXPERIMENT_WORKSPACE_ID] ===
-        this.coloredStatus[this.dvcLiveOnlyExpName]
-    ) {
+      this.coloredStatus[this.dvcLiveOnlyExpName]
+
+    if (newExperimentFetched && workspaceSelectionDuplicated) {
       this.coloredStatus[EXPERIMENT_WORKSPACE_ID] = UNSELECTED
       this.dvcLiveOnlyExpName = undefined
       this.persistStatus()

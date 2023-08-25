@@ -248,4 +248,45 @@ describe('collectColoredStatus', () => {
       colors.filter(color => color !== selectedColor)
     )
   })
+
+  it("should duplicate the workspace's color when a new experiment is provided that has the same name as found in the DVCLive only signal file", () => {
+    const colors = copyOriginalColors()
+    const selectedColor = colors[2]
+    const { availableColors, coloredStatus } = collectColoredStatus(
+      [
+        {
+          executor: null,
+          executorStatus: ExecutorStatus.SUCCESS,
+          id: 'exp-1'
+        },
+        {
+          id: EXPERIMENT_WORKSPACE_ID
+        },
+        { id: 'main' },
+        {
+          executor: null,
+          executorStatus: ExecutorStatus.SUCCESS,
+          id: 'exp-2'
+        }
+      ] as Experiment[],
+      new Map(),
+      {
+        'exp-1': UNSELECTED,
+        workspace: selectedColor
+      },
+      colors,
+      new Set(),
+      'exp-2'
+    )
+    expect(coloredStatus).toStrictEqual({
+      [EXPERIMENT_WORKSPACE_ID]: selectedColor,
+      'exp-1': UNSELECTED,
+      'exp-2': selectedColor,
+      main: UNSELECTED
+    })
+
+    expect(availableColors).toStrictEqual(
+      colors.filter(color => color !== selectedColor)
+    )
+  })
 })
