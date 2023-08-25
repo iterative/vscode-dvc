@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.47] - 2023-08-25
+
+### 🚀 New Features and Enhancements
+
+- Add copy shareable Studio link to experiments table [#4557](https://github.com/iterative/vscode-dvc/pull/4557) by [@mattseddon](https://github.com/mattseddon)
+- Plot finished DVCLive only experiments [#4566](https://github.com/iterative/vscode-dvc/pull/4566) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Create watcher specifically for temp queue directories [#4571](https://github.com/iterative/vscode-dvc/pull/4571) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.46] - 2023-08-24
 
 ### 🐛 Bug Fixes
