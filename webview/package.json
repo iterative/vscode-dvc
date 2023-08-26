@@ -74,7 +74,7 @@
     "jest-environment-jsdom": "29.6.2",
     "lint-staged": "14.0.0",
     "raw-loader": "4.0.2",
-    "sass": "1.66.0",
+    "sass": "1.66.1",
     "sass-loader": "13.3.2",
     "storybook": "7.3.2",
     "storybook-addon-themes": "6.1.0",
