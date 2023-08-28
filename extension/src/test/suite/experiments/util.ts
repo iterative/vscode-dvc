@@ -38,7 +38,7 @@ export const buildExperiments = ({
   dvcRoot = dvcDemoPath,
   expShow = expShowFixture,
   gitLog = gitLogFixture,
-  remoteExpRefs = remoteExpRefsFixture,
+  lsRemoteOutput = remoteExpRefsFixture,
   rowOrder = rowOrderFixture,
   stageList = 'train'
 }: {
@@ -47,7 +47,7 @@ export const buildExperiments = ({
   dvcRoot?: string
   expShow?: ExpShowOutput
   gitLog?: string
-  remoteExpRefs?: string
+  lsRemoteOutput?: string
   rowOrder?: { branch: string; sha: string }[]
   stageList?: string | null
 }) => {
@@ -103,7 +103,7 @@ export const buildExperiments = ({
       gitLog,
       rowOrder
     }),
-    experiments.setState({ remoteExpRefs })
+    experiments.setState({ lsRemoteOutput })
   ])
 
   return {
@@ -144,7 +144,7 @@ export const buildExperimentsWebview = async (inputs: {
   dvcRoot?: string
   expShow?: ExpShowOutput
   gitLog?: string
-  remoteExpRefs?: string
+  lsRemoteOutput?: string
   rowOrder?: { branch: string; sha: string }[]
   stageList?: string | null
 }) => {

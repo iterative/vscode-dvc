@@ -19,7 +19,10 @@ export class Studio extends Disposable {
     return !!this.baseUrl
   }
 
-  public async setBaseUrl(studioToken: string | undefined) {
+  public async setBaseUrl(
+    studioToken: string | undefined,
+    remoteExpRefs: string[]
+  ) {
     if (!studioToken) {
       this.baseUrl = undefined
       return
@@ -30,7 +33,7 @@ export class Studio extends Disposable {
       this.dvcRoot
     )
 
-    this.baseUrl = await this.getBaseUrl(studioToken, gitRemote)
+    this.baseUrl = await this.getBaseUrl(studioToken, gitRemote, remoteExpRefs)
   }
 
   public getLink(sha: string) {
@@ -40,12 +43,16 @@ export class Studio extends Disposable {
     return `${this.baseUrl}?showOnlySelected=1&experimentReferences=${sha}&activeExperimentReferences=${sha}%3Aprimary`
   }
 
-  private async getBaseUrl(studioToken: string, gitRemoteUrl: string) {
+  private async getBaseUrl(
+    studioToken: string,
+    gitRemoteUrl: string,
+    remoteExpRefs: string[]
+  ) {
     try {
       const response = await fetch(`${STUDIO_URL}/webhook/dvc`, {
         body: JSON.stringify({
           client: 'vscode',
-          refs: [null],
+          refs: { pushed: remoteExpRefs },
           repo_url: gitRemoteUrl
         }),
         headers: {

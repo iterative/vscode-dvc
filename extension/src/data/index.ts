@@ -16,14 +16,14 @@ type LocalExperimentsOutput = {
   rowOrder: { branch: string; sha: string }[]
 }
 
-type RemoteExperimentsOutput = { remoteExpRefs: string }
+type RemoteExperimentsOutput = { lsRemoteOutput: string }
 
 export type ExperimentsOutput = LocalExperimentsOutput | RemoteExperimentsOutput
 
 export const isRemoteExperimentsOutput = (
   data: ExperimentsOutput
 ): data is RemoteExperimentsOutput =>
-  (data as RemoteExperimentsOutput).remoteExpRefs !== undefined
+  (data as RemoteExperimentsOutput).lsRemoteOutput !== undefined
 
 export abstract class BaseData<
   T extends

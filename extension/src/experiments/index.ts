@@ -184,8 +184,8 @@ export class Experiments extends BaseRepository<TableData> {
 
   public async setState(data: ExperimentsOutput) {
     if (isRemoteExperimentsOutput(data)) {
-      const { remoteExpRefs } = data
-      this.experiments.transformAndSetRemote(remoteExpRefs)
+      const { lsRemoteOutput } = data
+      this.experiments.transformAndSetRemote(lsRemoteOutput)
       return this.webviewMessages.sendWebviewMessage()
     }
 
@@ -598,8 +598,11 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public async setStudioBaseUrl(studioToken: string | undefined) {
-    await this.isReady()
-    await this.studio.setBaseUrl(studioToken)
+    await Promise.all([this.isReady(), this.experiments.isReady()])
+    await this.studio.setBaseUrl(
+      studioToken,
+      this.experiments.getRemoteExpRefs()
+    )
     return this.webviewMessages.sendWebviewMessage()
   }
 

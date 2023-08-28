@@ -6,7 +6,7 @@ import {
   collectAddRemoveCommitsDetails,
   collectExperiments,
   collectOrderedCommitsAndExperiments,
-  collectRemoteExpShas,
+  collectRemoteExpDetails,
   collectRunningInQueue,
   collectRunningInWorkspace
 } from './collect'
@@ -80,6 +80,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   private filters: Map<string, FilterDefinition> = new Map()
 
   private remoteExpShas?: Set<string>
+  private remoteExpRefs: string[] = []
   private pushing = new Set<string>()
 
   private currentSorts: SortDefinition[]
@@ -174,9 +175,12 @@ export class ExperimentsModel extends ModelWithPersistence {
     this.setColoredStatus(runningExperiments)
   }
 
-  public transformAndSetRemote(remoteExpRefs: string) {
-    const remoteExpShas = collectRemoteExpShas(remoteExpRefs)
+  public transformAndSetRemote(lsRemoteOutput: string) {
+    const { remoteExpShas, remoteExpRefs } =
+      collectRemoteExpDetails(lsRemoteOutput)
     this.remoteExpShas = remoteExpShas
+    this.remoteExpRefs = remoteExpRefs
+    this.deferred.resolve()
   }
 
   public toggleStars(ids: string[]) {
@@ -537,6 +541,10 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   public getAvailableBranchesToSelect() {
     return this.availableBranchesToSelect
+  }
+
+  public getRemoteExpRefs() {
+    return this.remoteExpRefs
   }
 
   public hasDvcLiveOnlyRunning() {
