@@ -10,10 +10,14 @@ export const TEMP_PLOTS_DIR = join(DOT_DVC, 'tmp', 'plots')
 export const FIELD_SEPARATOR = '::'
 
 export const TEMP_EXP_DIR = join(DOT_DVC, 'tmp', 'exps')
+const TEMP_EXP_RUN_DIR = join(TEMP_EXP_DIR, 'run')
 export const DVCLIVE_ONLY_RUNNING_SIGNAL_FILE = join(
-  TEMP_EXP_DIR,
-  'run',
+  TEMP_EXP_RUN_DIR,
   'DVCLIVE_ONLY'
+)
+export const DVCLIVE_STEP_COMPLETED_SIGNAL_FILE = join(
+  TEMP_EXP_RUN_DIR,
+  'DVCLIVE_STEP_COMPLETED'
 )
 export const EXP_RWLOCK_FILE = join(TEMP_EXP_DIR, 'rwlock.lock')
 
