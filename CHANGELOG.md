@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.48] - 2023-08-28
+
+### 🚀 New Features and Enhancements
+
+- Add "Matrix Pipeline Stage" dvc snippet [#4577](https://github.com/iterative/vscode-dvc/pull/4577) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Call Studio API will all refs available on the Git remote [#4580](https://github.com/iterative/vscode-dvc/pull/4580) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.47] - 2023-08-25
 
 ### 🚀 New Features and Enhancements
