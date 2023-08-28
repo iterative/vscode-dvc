@@ -191,7 +191,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
   }
 
   private async updateRemoteExpRefs() {
-    const [remoteExpRefs] = await Promise.all([
+    const [lsRemoteOutput] = await Promise.all([
       this.internalCommands.executeCommand(
         AvailableCommands.GIT_GET_REMOTE_EXPERIMENT_REFS,
         this.dvcRoot
@@ -199,7 +199,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
       this.isReady()
     ])
 
-    this.notifyChanged({ remoteExpRefs })
+    this.notifyChanged({ lsRemoteOutput })
   }
 
   private waitForInitialLocalData() {

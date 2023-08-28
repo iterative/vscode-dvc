@@ -483,11 +483,15 @@ export const collectRunningInWorkspace = (
   }
 }
 
-export const collectRemoteExpShas = (remoteExpRefs: string): Set<string> => {
+export const collectRemoteExpDetails = (
+  lsRemoteOutput: string
+): { remoteExpShas: Set<string>; remoteExpRefs: string[] } => {
+  const remoteExpRefs: string[] = []
   const remoteExpShas = new Set<string>()
-  for (const ref of trimAndSplit(remoteExpRefs)) {
-    const [sha] = ref.split(/\s/)
+  for (const shaAndRef of trimAndSplit(lsRemoteOutput)) {
+    const [sha, ref] = shaAndRef.split(/\s+/)
     remoteExpShas.add(sha)
+    remoteExpRefs.push(ref.trim())
   }
-  return remoteExpShas
+  return { remoteExpRefs, remoteExpShas }
 }

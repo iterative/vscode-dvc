@@ -94,6 +94,7 @@ import { MAX_SELECTED_EXPERIMENTS } from '../../../experiments/model/status'
 import { Pipeline } from '../../../pipeline'
 import { ColumnLike } from '../../../experiments/columns/like'
 import * as Clipboard from '../../../vscode/clipboard'
+import { STUDIO_URL } from '../../../setup/webview/contract'
 
 const { openFileInEditor } = FileSystem
 
@@ -680,20 +681,23 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it("should handle a message to copy an experiment's Studio link", async () => {
-      const { mockMessageReceived, experiments } =
+      const { mockMessageReceived, experiments, gitReader } =
         await buildExperimentsWebview({ disposer: disposable })
 
       const viewUrl =
         'https://studio.iterative.ai/user/demo-user/projects/demo-ynm6t3jxdx'
 
-      stub(Fetch, 'default').resolves({
+      const mockGitRemoteUrl = 'git@github.com:iterative/vscode-dvc-demo.git'
+      stub(gitReader, 'getRemoteUrl').resolves(mockGitRemoteUrl)
+      const mockStudioToken = 'isat_BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
+      const mockFetch = stub(Fetch, 'default').resolves({
         json: () =>
           Promise.resolve({
             url: viewUrl
           })
       } as unknown as Fetch.Response)
 
-      await experiments.setStudioBaseUrl('isat_BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB')
+      await experiments.setStudioBaseUrl(mockStudioToken)
       const mockWriteToClipboard = stub(Clipboard, 'writeToClipboard')
       const writeToClipboardCalled = new Promise(resolve =>
         mockWriteToClipboard.callsFake(() => {
@@ -705,6 +709,23 @@ suite('Experiments Test Suite', () => {
       mockMessageReceived.fire({
         type: MessageFromWebviewType.COPY_STUDIO_LINK,
         payload: 'exp-e7a67'
+      })
+
+      expect(mockFetch).to.be.calledWith(`${STUDIO_URL}/webhook/dvc`, {
+        body: JSON.stringify({
+          client: 'vscode',
+          refs: {
+            pushed: [
+              'refs/exps/a9/b32d14966b9be1396f2211d9eb743359708a07/test-branch'
+            ]
+          },
+          repo_url: mockGitRemoteUrl
+        }),
+        headers: {
+          Authorization: `token ${mockStudioToken}`,
+          'Content-Type': 'application/json'
+        },
+        method: 'POST'
       })
 
       await writeToClipboardCalled
