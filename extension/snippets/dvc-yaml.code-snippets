@@ -43,11 +43,11 @@
     "body": [
       "  ${1:train}:",
       "    matrix:",
-      "      model: [${2:cnn}, ${3:xgb}]",
-      "      feature: [${4:feature1}, ${5:feature2}, ${6:feature3}]",
-      "    cmd: ${7:./train.py} --feature \\${item.feature}} \\${item.model}",
+      "      ${2:model: [cnn, xgb]}",
+      "      ${3:feature: [feature1, feature2, feature3]}",
+      "    cmd:  ${4:./train.py --feature \\${item.feature\\} \\${item.model\\}}",
       "    outs:",
-      "      - \\${item.model}.pkl"
+      "      - ${5:\\${item.model.pkl\\}}"
     ],
     "description": "Matrix stage template for dvc.yaml pipeline"
   },
