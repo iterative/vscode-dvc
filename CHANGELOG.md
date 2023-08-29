@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.49] - 2023-08-29
+
+### 🐛 Bug Fixes
+
+- Use DVCLive step completed signal file events to trigger experiments and plots data updates [#4579](https://github.com/iterative/vscode-dvc/pull/4579) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.48] - 2023-08-28
 
 ### 🚀 New Features and Enhancements
