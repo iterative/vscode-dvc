@@ -18,9 +18,9 @@ import {
   removeSync,
   writeFileSync
 } from 'fs-extra'
-import { load } from 'js-yaml'
+import { load, dump } from 'js-yaml'
 import { Uri, workspace, window, commands, ViewColumn } from 'vscode'
-import { json2csv } from 'json-2-csv'
+import { csv2json, json2csv } from 'json-2-csv'
 import { standardizePath } from './path'
 import { definedAndNonEmpty, sortCollectedArray } from '../util/array'
 import { Logger } from '../common/logger'
@@ -222,6 +222,26 @@ export const loadJson = <T>(path: string): T | undefined => {
   }
 }
 
+export const loadCsv = (path: string) => {
+  try {
+    const content = readFileSync(path).toString()
+
+    return csv2json(content)
+  } catch {
+    Logger.error(`failed to load CSV from ${path}`)
+  }
+}
+
+export const loadTsv = (path: string) => {
+  try {
+    const content = readFileSync(path).toString()
+
+    return csv2json(content, { delimiter: { field: '\t' } })
+  } catch {
+    Logger.error(`failed to load TSV from ${path}`)
+  }
+}
+
 export const writeJson = <
   T extends Record<string, unknown> | Array<Record<string, unknown>>
 >(
@@ -250,6 +270,14 @@ export const writeTsv = async (
   ensureFileSync(path)
   const csv = await json2csv(arr, { delimiter: { field: '\t' } })
   return writeFileSync(path, csv)
+}
+
+export const writeYaml = <T extends Record<string, unknown>>(
+  path: string,
+  obj: T
+) => {
+  const yaml = dump(obj)
+  return writeFileSync(path, yaml)
 }
 
 const getPid = (contents: string): number | undefined => {

@@ -1,11 +1,15 @@
-import { Uri, window } from 'vscode'
+import { OpenDialogOptions, Uri, window } from 'vscode'
 import { Title } from './title'
 
-export const pickFile = async (title: Title): Promise<string | undefined> => {
+export const pickFile = async (
+  title: Title,
+  opts?: OpenDialogOptions
+): Promise<string | undefined> => {
   const uris = await window.showOpenDialog({
     canSelectFolders: false,
     canSelectMany: false,
-    title
+    title,
+    ...opts
   })
 
   if (uris) {

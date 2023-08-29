@@ -63,6 +63,16 @@ export class WorkspacePipeline extends BaseWorkspace<Pipeline> {
     )
   }
 
+  public async addTopLevelPlot() {
+    const cwd = this.focusedProject || (await this.getOnlyOrPickProject())
+
+    if (!cwd) {
+      return
+    }
+
+    void this.getRepository(cwd).addTopLevelPlot()
+  }
+
   private renderDagAsMermaid() {
     for (const dvcRoot of this.getDvcRoots()) {
       void this.getRepository(dvcRoot).forceRerender()

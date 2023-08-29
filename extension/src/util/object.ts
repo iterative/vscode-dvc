@@ -11,3 +11,6 @@ export const createTypedAccumulator = <T extends string>(
   }
   return acc
 }
+
+export const isObject = (value: unknown): value is Record<string, unknown> =>
+  !!(value && !Array.isArray(value) && typeof value === 'object')
