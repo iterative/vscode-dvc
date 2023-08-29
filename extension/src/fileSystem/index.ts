@@ -276,7 +276,7 @@ export const writeYaml = <T extends Record<string, unknown>>(
   path: string,
   obj: T
 ) => {
-  const yaml = dump(obj)
+  const yaml = dump(obj, { noCompatMode: true })
   return writeFileSync(path, yaml)
 }
 
