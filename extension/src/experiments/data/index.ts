@@ -17,6 +17,7 @@ import {
 import {
   Args,
   DOT_DVC,
+  DVCLIVE_STEP_COMPLETED_SIGNAL_FILE,
   ExperimentFlag,
   TEMP_EXP_DIR
 } from '../../cli/dvc/constants'
@@ -38,7 +39,13 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
       internalCommands,
       [{ name: 'update', process: () => this.update() }],
       subProjects,
-      ['dvc.lock', 'dvc.yaml', 'params.yaml', DOT_DVC]
+      [
+        'dvc.lock',
+        'dvc.yaml',
+        'params.yaml',
+        DOT_DVC,
+        DVCLIVE_STEP_COMPLETED_SIGNAL_FILE
+      ]
     )
 
     this.experiments = experiments
