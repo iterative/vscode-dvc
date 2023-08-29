@@ -56,7 +56,7 @@
     "@testing-library/jest-dom": "6.0.1",
     "@testing-library/react": "14.0.0",
     "@types/jest": "29.5.4",
-    "@types/jsdom": "21.1.1",
+    "@types/jsdom": "21.1.2",
     "@types/node": "16.x",
     "@types/react": "18.2.20",
     "@types/react-dom": "18.2.7",
