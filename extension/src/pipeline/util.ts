@@ -43,7 +43,7 @@ export const pickDataFile = () => {
 
 // TBD for now, lets check for two formats:
 // 1. array: first val is an object
-// 2. object: first key value pair is an array like described above
+// 2. object: first key value is an array like described above
 
 export const getFieldOptions = (data: unknown): string[] => {
   const isArray = Array.isArray(data)
@@ -65,21 +65,6 @@ export const getFieldOptions = (data: unknown): string[] => {
 export const pickTemplateAndFields = async (
   fields: string[]
 ): Promise<{ x: string; y: string; template: string } | undefined> => {
-  const x = await quickPickOne(fields, 'Pick A Metric for X')
-
-  if (!x) {
-    return
-  }
-
-  const y = await quickPickOne(
-    fields.filter(field => x !== field),
-    'Pick A Metric for Y'
-  )
-
-  if (!y) {
-    return
-  }
-
   const template = await quickPickOne(
     [
       'simple',
@@ -96,6 +81,21 @@ export const pickTemplateAndFields = async (
   )
 
   if (!template) {
+    return
+  }
+
+  const x = await quickPickOne(fields, 'Pick A Metric for X')
+
+  if (!x) {
+    return
+  }
+
+  const y = await quickPickOne(
+    fields.filter(field => x !== field),
+    'Pick A Metric for Y'
+  )
+
+  if (!y) {
     return
   }
 
@@ -125,10 +125,11 @@ export const addNewPlotToDvcYaml = (
     dvcYamlJs.plots = []
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-  ;(dvcYamlJs.plots as Array<object>).push({
-    [relative(cwd, dataFile)]: plot
-  })
+  if (Array.isArray(dvcYamlJs.plots)) {
+    dvcYamlJs.plots.push({
+      [relative(cwd, dataFile)]: plot
+    })
+  }
 
   return writeYaml(dvcYamlFile, dvcYamlJs)
 }
