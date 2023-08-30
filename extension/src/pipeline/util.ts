@@ -1,11 +1,13 @@
 import { relative } from 'path'
+import { YAMLSeq, stringify } from 'yaml'
+import { readFileSync, writeFileSync } from 'fs-extra'
 import {
   getFileExtension,
   loadJson,
   loadCsv,
   loadTsv,
-  loadYaml,
-  writeYaml
+  loadYamlAsJs,
+  loadYamlAsDoc
 } from '../fileSystem'
 import { quickPickOne } from '../vscode/quickPick'
 import { pickFile } from '../vscode/resourcePicker'
@@ -28,7 +30,7 @@ export const parseDataFile = (file: string) => {
   }
 
   if (ext === '.yaml') {
-    return loadYaml<Record<string, unknown>>(file)
+    return loadYamlAsJs<Record<string, unknown>>(file)
   }
 }
 
@@ -101,35 +103,34 @@ export const pickTemplateAndFields = async (
 
   return { template, x, y }
 }
-
-// TBD I don't think using "dump" will work since
-// 1. completely erases comments in the yaml file
-// 2. wraps certain keys in strings...
-
-// we either need to look into using our own functions
-// to insert new lines into the yaml file
-// or look into a different library
+// TBD move to file utils
 export const addNewPlotToDvcYaml = (
   cwd: string,
   dataFile: string,
   plot: { template: string; x: string; y: string }
 ) => {
   const dvcYamlFile = `${cwd}/dvc.yaml`
-  const dvcYamlJs = loadYaml<Record<string, unknown>>(dvcYamlFile)
+  const dvcYamlDoc = loadYamlAsDoc(dvcYamlFile)
 
-  if (!dvcYamlJs) {
+  if (!dvcYamlDoc) {
     return
   }
 
-  if (!dvcYamlJs.plots) {
-    dvcYamlJs.plots = []
+  const { doc, lineCounter } = dvcYamlDoc
+  const plotName = relative(cwd, dataFile)
+  const plotYaml = stringify({ plots: [{ [plotName]: plot }] }).split('\n')
+  const yamlsContentLines = readFileSync(dvcYamlFile, 'utf8').split('\n')
+
+  const plots = doc.get('plots', true) as YAMLSeq | undefined
+
+  if (!plots?.range) {
+    yamlsContentLines.push(...plotYaml)
+    writeFileSync(dvcYamlFile, yamlsContentLines.join('\n'))
+    return
   }
 
-  if (Array.isArray(dvcYamlJs.plots)) {
-    dvcYamlJs.plots.push({
-      [relative(cwd, dataFile)]: plot
-    })
-  }
+  const insertLineNum = lineCounter.linePos(plots.range[2])
+  yamlsContentLines.splice(insertLineNum.line - 1, 0, ...plotYaml.slice(1))
 
-  return writeYaml(dvcYamlFile, dvcYamlJs)
+  writeFileSync(dvcYamlFile, yamlsContentLines.join('\n'))
 }

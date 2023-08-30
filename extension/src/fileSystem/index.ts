@@ -18,9 +18,9 @@ import {
   removeSync,
   writeFileSync
 } from 'fs-extra'
-import { load, dump } from 'js-yaml'
 import { Uri, workspace, window, commands, ViewColumn } from 'vscode'
 import { csv2json, json2csv } from 'json-2-csv'
+import yaml from 'yaml'
 import { standardizePath } from './path'
 import { definedAndNonEmpty, sortCollectedArray } from '../util/array'
 import { Logger } from '../common/logger'
@@ -206,9 +206,23 @@ export const relativeWithUri = (dvcRoot: string, uri: Uri) =>
 
 export const removeDir = (path: string): void => removeSync(path)
 
-export const loadYaml = <T>(path: string): T | undefined => {
+export const loadYamlAsJs = <T>(path: string): T | undefined => {
   try {
-    return load(readFileSync(path, 'utf8')) as T
+    return yaml.parse(readFileSync(path, 'utf8')) as T
+  } catch {
+    Logger.error(`failed to load yaml ${path}`)
+  }
+}
+
+export const loadYamlAsDoc = (
+  path: string
+): { doc: yaml.Document; lineCounter: yaml.LineCounter } | undefined => {
+  try {
+    const lineCounter = new yaml.LineCounter()
+    return {
+      doc: yaml.parseDocument(readFileSync(path, 'utf8'), { lineCounter }),
+      lineCounter
+    }
   } catch {
     Logger.error(`failed to load yaml ${path}`)
   }
@@ -270,14 +284,6 @@ export const writeTsv = async (
   ensureFileSync(path)
   const csv = await json2csv(arr, { delimiter: { field: '\t' } })
   return writeFileSync(path, csv)
-}
-
-export const writeYaml = <T extends Record<string, unknown>>(
-  path: string,
-  obj: T
-) => {
-  const yaml = dump(obj, { noCompatMode: true })
-  return writeFileSync(path, yaml)
 }
 
 const getPid = (contents: string): number | undefined => {
