@@ -30,6 +30,7 @@ import { processExists } from '../process/execution'
 import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
 import { DOT_DVC } from '../cli/dvc/constants'
 import { delay } from '../util/time'
+import { PlotConfigData } from '../pipeline/util'
 
 export const exists = (path: string): boolean => existsSync(path)
 
@@ -199,6 +200,48 @@ stages:
   return appendFileSync(dvcYamlPath, pipeline)
 }
 
+const loadYamlAsDoc = (
+  path: string
+): { doc: yaml.Document; lineCounter: yaml.LineCounter } | undefined => {
+  try {
+    const lineCounter = new yaml.LineCounter()
+    return {
+      doc: yaml.parseDocument(readFileSync(path, 'utf8'), { lineCounter }),
+      lineCounter
+    }
+  } catch {
+    Logger.error(`failed to load yaml ${path}`)
+  }
+}
+
+export const addPlotToDvcYamlFile = (cwd: string, plotObj: PlotConfigData) => {
+  const dvcYamlFile = `${cwd}/dvc.yaml`
+  const dvcYamlDoc = loadYamlAsDoc(dvcYamlFile)
+
+  if (!dvcYamlDoc) {
+    return
+  }
+
+  const { doc, lineCounter } = dvcYamlDoc
+  const { dataFile, ...plot } = plotObj
+  const plotName = relative(cwd, dataFile)
+  const plotYaml = yaml.stringify({ plots: [{ [plotName]: plot }] }).split('\n')
+  const yamlsContentLines = readFileSync(dvcYamlFile, 'utf8').split('\n')
+
+  const plots = doc.get('plots', true) as yaml.YAMLSeq | undefined
+
+  if (!plots?.range) {
+    yamlsContentLines.push(...plotYaml)
+    writeFileSync(dvcYamlFile, yamlsContentLines.join('\n'))
+    return
+  }
+
+  const insertLineNum = lineCounter.linePos(plots.range[2])
+  yamlsContentLines.splice(insertLineNum.line - 1, 0, ...plotYaml.slice(1))
+
+  writeFileSync(dvcYamlFile, yamlsContentLines.join('\n'))
+}
+
 export const getFileExtension = (filePath: string) => parse(filePath).ext
 
 export const relativeWithUri = (dvcRoot: string, uri: Uri) =>
@@ -209,20 +252,6 @@ export const removeDir = (path: string): void => removeSync(path)
 export const loadYamlAsJs = <T>(path: string): T | undefined => {
   try {
     return yaml.parse(readFileSync(path, 'utf8')) as T
-  } catch {
-    Logger.error(`failed to load yaml ${path}`)
-  }
-}
-
-export const loadYamlAsDoc = (
-  path: string
-): { doc: yaml.Document; lineCounter: yaml.LineCounter } | undefined => {
-  try {
-    const lineCounter = new yaml.LineCounter()
-    return {
-      doc: yaml.parseDocument(readFileSync(path, 'utf8'), { lineCounter }),
-      lineCounter
-    }
   } catch {
     Logger.error(`failed to load yaml ${path}`)
   }

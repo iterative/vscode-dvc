@@ -1,20 +1,17 @@
-import { relative } from 'path'
-import { YAMLSeq, stringify } from 'yaml'
-import { readFileSync, writeFileSync } from 'fs-extra'
 import {
   getFileExtension,
   loadJson,
   loadCsv,
   loadTsv,
-  loadYamlAsJs,
-  loadYamlAsDoc
+  loadYamlAsJs
 } from '../fileSystem'
 import { quickPickOne } from '../vscode/quickPick'
 import { pickFile } from '../vscode/resourcePicker'
 import { Title } from '../vscode/title'
 import { isObject } from '../util/object'
+import { Toast } from '../vscode/toast'
 
-export const parseDataFile = (file: string) => {
+const parseDataFile = (file: string) => {
   const ext = getFileExtension(file)
 
   if (ext === '.json') {
@@ -34,7 +31,7 @@ export const parseDataFile = (file: string) => {
   }
 }
 
-export const pickDataFile = () => {
+const pickDataFile = () => {
   return pickFile(Title.SELECT_PLOT_DATA, {
     filters: {
       'Data Formats': ['json', 'csv', 'tsv', 'yaml']
@@ -43,11 +40,7 @@ export const pickDataFile = () => {
   })
 }
 
-// TBD for now, lets check for two formats:
-// 1. array: first val is an object
-// 2. object: first key value is an array like described above
-
-export const getFieldOptions = (data: unknown): string[] => {
+const getFieldOptions = (data: unknown): string[] => {
   const isArray = Array.isArray(data)
   const isObj = isObject(data)
   if (!isArray && !isObj) {
@@ -64,7 +57,7 @@ export const getFieldOptions = (data: unknown): string[] => {
   return isObject(maybeFieldsObj) ? Object.keys(maybeFieldsObj) : []
 }
 
-export const pickTemplateAndFields = async (
+const pickTemplateAndFields = async (
   fields: string[]
 ): Promise<{ x: string; y: string; template: string } | undefined> => {
   const template = await quickPickOne(
@@ -103,34 +96,43 @@ export const pickTemplateAndFields = async (
 
   return { template, x, y }
 }
-// TBD move to file utils
-export const addNewPlotToDvcYaml = (
-  cwd: string,
-  dataFile: string,
-  plot: { template: string; x: string; y: string }
-) => {
-  const dvcYamlFile = `${cwd}/dvc.yaml`
-  const dvcYamlDoc = loadYamlAsDoc(dvcYamlFile)
 
-  if (!dvcYamlDoc) {
+export type PlotConfigData = {
+  dataFile: string
+  template: string
+  x: string
+  y: string
+}
+
+export const pickPlotConfiguration = async (): Promise<
+  PlotConfigData | undefined
+> => {
+  const file = await pickDataFile()
+
+  if (!file) {
     return
   }
 
-  const { doc, lineCounter } = dvcYamlDoc
-  const plotName = relative(cwd, dataFile)
-  const plotYaml = stringify({ plots: [{ [plotName]: plot }] }).split('\n')
-  const yamlsContentLines = readFileSync(dvcYamlFile, 'utf8').split('\n')
+  const data = parseDataFile(file)
 
-  const plots = doc.get('plots', true) as YAMLSeq | undefined
+  if (!data) {
+    // TBD maybe we could add an action to toasts that lets you try again?
+    return Toast.showError('Failed to parse data from file.')
+  }
 
-  if (!plots?.range) {
-    yamlsContentLines.push(...plotYaml)
-    writeFileSync(dvcYamlFile, yamlsContentLines.join('\n'))
+  const keys = getFieldOptions(data)
+
+  if (keys.length === 0) {
+    return Toast.showError(
+      'Failed to find field options for plot data. Is your file following DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
+    )
+  }
+
+  const templateAndFields = await pickTemplateAndFields(keys)
+
+  if (!templateAndFields) {
     return
   }
 
-  const insertLineNum = lineCounter.linePos(plots.range[2])
-  yamlsContentLines.splice(insertLineNum.line - 1, 0, ...plotYaml.slice(1))
-
-  writeFileSync(dvcYamlFile, yamlsContentLines.join('\n'))
+  return { ...templateAndFields, dataFile: file }
 }

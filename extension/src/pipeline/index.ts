@@ -4,22 +4,19 @@ import { appendFileSync, writeFileSync } from 'fs-extra'
 import { setContextForEditorTitleIcons } from './context'
 import { PipelineData } from './data'
 import { PipelineModel } from './model'
-import {
-  addNewPlotToDvcYaml,
-  getFieldOptions,
-  parseDataFile,
-  pickDataFile,
-  pickTemplateAndFields
-} from './util'
+import { pickPlotConfiguration } from './util'
 import { DeferredDisposable } from '../class/deferred'
 import { InternalCommands } from '../commands/internal'
 import { TEMP_DAG_FILE } from '../cli/dvc/constants'
-import { findOrCreateDvcYamlFile, getFileExtension } from '../fileSystem'
+import {
+  addPlotToDvcYamlFile,
+  findOrCreateDvcYamlFile,
+  getFileExtension
+} from '../fileSystem'
 import { getInput, getValidInput } from '../vscode/inputBox'
 import { Title } from '../vscode/title'
 import { quickPickOne, quickPickOneOrInput } from '../vscode/quickPick'
 import { pickFile } from '../vscode/resourcePicker'
-import { Toast } from '../vscode/toast'
 
 export enum ScriptCommand {
   JUPYTER = 'jupyter nbconvert --to notebook --inplace --execute',
@@ -115,8 +112,6 @@ export class Pipeline extends DeferredDisposable {
     return this.addPipeline()
   }
 
-  // TBD we're going to want to move more of this code into utils
-  // for easier testing
   public async addTopLevelPlot() {
     const cwd = await this.getCwd()
 
@@ -124,34 +119,13 @@ export class Pipeline extends DeferredDisposable {
       return
     }
 
-    const file = await pickDataFile()
+    const plotConfiguration = await pickPlotConfiguration()
 
-    if (!file) {
+    if (!plotConfiguration) {
       return
     }
 
-    const data = parseDataFile(file)
-
-    if (!data) {
-      // TBD maybe we could add an action to toasts that lets you try again?
-      return Toast.showError('Failed to parse data from file.')
-    }
-
-    const keys = getFieldOptions(data)
-
-    if (keys.length === 0) {
-      return Toast.showError(
-        'Failed to find field options for plot data. Is your file following DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
-      )
-    }
-
-    const templateAndFields = await pickTemplateAndFields(keys)
-
-    if (!templateAndFields) {
-      return
-    }
-
-    addNewPlotToDvcYaml(cwd, file, templateAndFields)
+    addPlotToDvcYamlFile(cwd, plotConfiguration)
   }
 
   public forceRerender() {
