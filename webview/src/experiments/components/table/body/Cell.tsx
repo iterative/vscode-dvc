@@ -50,7 +50,7 @@ export const StubCell: React.FC<
     }
   } = cell
   const {
-    original: { error, executorStatus, gitRemoteStatus, id }
+    original: { error, executorStatus, gitRemoteStatus, id, studioLinkType }
   } = row
 
   return (
@@ -62,6 +62,7 @@ export const StubCell: React.FC<
           id={id}
           executorStatus={executorStatus}
           gitRemoteStatus={gitRemoteStatus}
+          studioLinkType={studioLinkType}
         />
 
         {getIsPlaceholder() ? null : (

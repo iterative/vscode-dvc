@@ -1,9 +1,10 @@
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
+import { StudioLinkType } from 'dvc/src/experiments/webview/contract'
 import { sendMessage } from '../../shared/vscode'
 
-export const copyStudioLink = (id: string) =>
+export const copyStudioLink = (id: string, type: StudioLinkType) =>
   sendMessage({
-    payload: id,
+    payload: { id, type },
     type: MessageFromWebviewType.COPY_STUDIO_LINK
   })
 

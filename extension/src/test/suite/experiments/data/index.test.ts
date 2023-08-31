@@ -29,6 +29,7 @@ import { ExperimentsModel } from '../../../../experiments/model'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
 import expShowFixture from '../../../fixtures/expShow/base/output'
 import { isRemoteExperimentsOutput } from '../../../../data'
+import { Studio } from '../../../../experiments/studio'
 
 const MOCK_WORKSPACE_GIT_FOLDER = join(dvcDemoPath, '.mock-git')
 
@@ -126,6 +127,7 @@ suite('Experiments Data Test Suite', () => {
             }),
             setBranches: stub()
           } as unknown as ExperimentsModel,
+          { getAccessToken: () => Promise.resolve('') } as unknown as Studio,
           []
         )
       )
@@ -187,6 +189,7 @@ suite('Experiments Data Test Suite', () => {
             }),
             setBranches: stub()
           } as unknown as ExperimentsModel,
+          { getAccessToken: () => Promise.resolve('') } as unknown as Studio,
           []
         )
       )

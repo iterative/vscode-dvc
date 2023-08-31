@@ -299,11 +299,11 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
 
     this.setRepository(dvcRoot, experiments)
 
-    void experiments.setStudioBaseUrl(setup.getStudioAccessToken())
+    void experiments.setStudioAccessToken(setup.getStudioAccessToken())
 
     experiments.dispose.track(
       setup.onDidChangeStudioConnection(() => {
-        void experiments.setStudioBaseUrl(setup.getStudioAccessToken())
+        void experiments.setStudioAccessToken(setup.getStudioAccessToken())
       })
     )
 

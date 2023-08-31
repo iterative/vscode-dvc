@@ -9,7 +9,8 @@ import {
   ExecutorStatus,
   isQueued,
   isRunning,
-  isRunningInQueue
+  isRunningInQueue,
+  StudioLinkType
 } from 'dvc/src/experiments/webview/contract'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import { RowProp } from '../../../util/interfaces'
@@ -222,7 +223,8 @@ const getSingleSelectMenuOptions = (
   depth: number,
   executorStatus?: ExecutorStatus,
   starred?: boolean,
-  executor?: string | null
+  executor?: string | null,
+  studioLinkType?: StudioLinkType
 ) => {
   const isNotExperiment = isQueued(executorStatus) || isWorkspace || depth <= 0
 
@@ -285,6 +287,15 @@ const getSingleSelectMenuOptions = (
         type: MessageFromWebviewType.COPY_TO_CLIPBOARD
       } as MessageFromWebview
     },
+    {
+      disabled: !studioLinkType,
+      id: MessageFromWebviewType.COPY_STUDIO_LINK,
+      label: 'Copy Studio Link',
+      message: {
+        payload: { id, type: studioLinkType },
+        type: MessageFromWebviewType.COPY_STUDIO_LINK
+      } as MessageFromWebview
+    },
     experimentMenuOption(
       [id],
       'Push',
@@ -333,7 +344,8 @@ const getContextMenuOptions = (
   selectedRows: Record<string, SelectedRow | undefined>,
   executorStatus?: ExecutorStatus,
   starred?: boolean,
-  executor?: string | null
+  executor?: string | null,
+  studioLinkType?: StudioLinkType
 ) => {
   const isFromSelection = !!selectedRows[getCompositeId(id, branch)]
   const selectedRowsList = Object.values(selectedRows).filter(
@@ -357,14 +369,23 @@ const getContextMenuOptions = (
         depth,
         executorStatus,
         starred,
-        executor
+        executor,
+        studioLinkType
       )
   )
 }
 
 export const RowContextMenu: React.FC<RowProp> = ({
   row: {
-    original: { branch, executorStatus, starred, id, executor, label },
+    original: {
+      branch,
+      executorStatus,
+      starred,
+      id,
+      executor,
+      label,
+      studioLinkType
+    },
     depth
   }
 }) => {
@@ -391,7 +412,8 @@ export const RowContextMenu: React.FC<RowProp> = ({
       selectedRows,
       executorStatus,
       starred,
-      executor
+      executor,
+      studioLinkType
     )
   }, [
     branch,
@@ -404,6 +426,7 @@ export const RowContextMenu: React.FC<RowProp> = ({
     label,
     projectHasCheckpoints,
     selectedRows,
+    studioLinkType,
     hasRunningWorkspaceExperiment
   ])
 

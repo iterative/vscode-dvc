@@ -24,6 +24,7 @@ import { PersistenceKey } from '../../../persistence/constants'
 import { ExpShowOutput } from '../../../cli/dvc/contract'
 import { buildExperimentsPipeline } from '../pipeline/util'
 import { Setup } from '../../../setup'
+import { Studio } from '../../../experiments/studio'
 
 export const DEFAULT_EXPERIMENTS_OUTPUT = {
   availableNbCommits: { main: 5 },
@@ -285,6 +286,7 @@ export const buildExperimentsData = (
         getNbOfCommitsToShow: () => DEFAULT_CURRENT_BRANCH_COMMITS_TO_SHOW,
         setBranches: mockSetBranches
       } as unknown as ExperimentsModel,
+      { getAccessToken: () => Promise.resolve('') } as unknown as Studio,
       []
     )
   )

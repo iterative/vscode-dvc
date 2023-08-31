@@ -262,7 +262,7 @@ const collectExpRange = (
   const expState = revs[0]
 
   const { name, rev } = expState
-  const { id: baselineId } = baseline
+  const { id: baselineId, sha: baselineSha } = baseline
 
   const label =
     rev === EXPERIMENT_WORKSPACE_ID
@@ -291,6 +291,8 @@ const collectExpRange = (
   if (name) {
     experiment.description = `[${name}]`
   }
+
+  experiment.baselineSha = baselineSha
 
   collectExecutorInfo(experiment, executor)
   collectRunningExperiment(acc, experiment)

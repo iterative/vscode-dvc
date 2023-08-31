@@ -39,6 +39,7 @@ import {
   Column,
   ColumnType,
   Commit,
+  StudioLinkType,
   TableData
 } from '../../../experiments/webview/contract'
 import {
@@ -697,7 +698,7 @@ suite('Experiments Test Suite', () => {
           })
       } as unknown as Fetch.Response)
 
-      await experiments.setStudioBaseUrl(mockStudioToken)
+      await experiments.setStudioAccessToken(mockStudioToken)
       const mockWriteToClipboard = stub(Clipboard, 'writeToClipboard')
       const writeToClipboardCalled = new Promise(resolve =>
         mockWriteToClipboard.callsFake(() => {
@@ -708,7 +709,7 @@ suite('Experiments Test Suite', () => {
 
       mockMessageReceived.fire({
         type: MessageFromWebviewType.COPY_STUDIO_LINK,
-        payload: 'exp-e7a67'
+        payload: { id: 'exp-e7a67', type: StudioLinkType.PUSHED }
       })
 
       expect(mockFetch).to.be.calledWith(`${STUDIO_URL}/webhook/dvc`, {
