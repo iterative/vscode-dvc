@@ -1,6 +1,7 @@
 import { sep, parse } from 'path'
 
-export const getPathArray = (path: string): string[] => path.split(sep)
+export const getPathArray = (path: string): string[] =>
+  path.replace(/\\/g, '/').split('/')
 
 export const getPath = (pathArray: string[], idx: number) =>
   pathArray.slice(0, idx).join(sep)
