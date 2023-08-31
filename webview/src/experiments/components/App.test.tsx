@@ -1484,6 +1484,31 @@ describe('App', () => {
       advanceTimersByTime(100)
       expect(selectedRows().length).toBe(0)
     })
+
+    it("should allow the user to copy an experiment's Studio link", () => {
+      renderTable()
+
+      const target = screen.getByText('42b8736')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      advanceTimersByTime(100)
+      const menuitems = screen.getAllByRole('menuitem')
+
+      const copyLinkOption = menuitems.find(
+        item =>
+          item.textContent?.includes('Copy Studio Link') &&
+          !item.className.includes('disabled')
+      )
+
+      expect(copyLinkOption).toBeDefined()
+
+      copyLinkOption && fireEvent.click(copyLinkOption)
+
+      expect(sendMessage).toHaveBeenCalledWith({
+        payload: { id: 'test-branch', type: StudioLinkType.PUSHED },
+        type: MessageFromWebviewType.COPY_STUDIO_LINK
+      })
+    })
   })
 
   describe('Star', () => {
@@ -2078,13 +2103,22 @@ describe('App', () => {
       })
     })
 
-    // it('should not allow copying a Studio link when an experiment exists on the remote and Studio is not connected', () => {
-    //   renderTable({ ...tableStateFixture }) // needs update
+    it('should not allow copying a Studio link when an experiment exists on the remote but not on Studio', () => {
+      renderTable({
+        ...tableStateFixture,
+        rows: tableDataFixture.rows.map(row => ({
+          ...row,
+          subRows: row.subRows?.map(exp => ({
+            ...exp,
+            studioLinkType: undefined
+          }))
+        }))
+      })
 
-    //   expect(
-    //     within(getRow('42b8736')).queryByLabelText('Copy Experiment Link')
-    //   ).not.toBeInTheDocument()
-    // })
+      expect(
+        within(getRow('42b8736')).queryByLabelText('Copy Experiment Link')
+      ).not.toBeInTheDocument()
+    })
 
     it('should not allow copying a Studio link when an experiment does not exist on the remote or Studio', () => {
       renderTable()
