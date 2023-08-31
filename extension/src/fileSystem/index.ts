@@ -226,20 +226,20 @@ export const addPlotToDvcYamlFile = (cwd: string, plotObj: PlotConfigData) => {
   const { dataFile, ...plot } = plotObj
   const plotName = relative(cwd, dataFile)
   const plotYaml = yaml.stringify({ plots: [{ [plotName]: plot }] }).split('\n')
-  const yamlsContentLines = readFileSync(dvcYamlFile, 'utf8').split('\n')
+  const dvcYamlLines = readFileSync(dvcYamlFile, 'utf8').split('\n')
 
   const plots = doc.get('plots', true) as yaml.YAMLSeq | undefined
 
   if (!plots?.range) {
-    yamlsContentLines.push(...plotYaml)
-    writeFileSync(dvcYamlFile, yamlsContentLines.join('\n'))
+    dvcYamlLines.push(...plotYaml)
+    writeFileSync(dvcYamlFile, dvcYamlLines.join('\n'))
     return
   }
 
   const insertLineNum = lineCounter.linePos(plots.range[2])
-  yamlsContentLines.splice(insertLineNum.line - 1, 0, ...plotYaml.slice(1))
+  dvcYamlLines.splice(insertLineNum.line - 1, 0, ...plotYaml.slice(1))
 
-  writeFileSync(dvcYamlFile, yamlsContentLines.join('\n'))
+  writeFileSync(dvcYamlFile, dvcYamlLines.join('\n'))
 }
 
 export const getFileExtension = (filePath: string) => parse(filePath).ext
