@@ -2989,7 +2989,7 @@
     jest-util "^29.6.3"
     slash "^3.0.0"
 
-"@jest/core@^29.6.3", "@jest/core@^29.6.4":
+"@jest/core@^29.6.4":
   version "29.6.4"
   resolved "https://registry.yarnpkg.com/@jest/core/-/core-29.6.4.tgz#265ebee05ec1ff3567757e7a327155c8d6bdb126"
   integrity sha512-U/vq5ccNTSVgYH7mHnodHmCffGWHJnz/E1BEWlLuK5pM4FZmGfBn/nrJGLjUsSmyx3otCeqc1T31F4y08AMDLg==
@@ -3030,7 +3030,7 @@
   dependencies:
     "@jest/types" "^27.5.1"
 
-"@jest/environment@^29.6.3", "@jest/environment@^29.6.4":
+"@jest/environment@^29.6.4":
   version "29.6.4"
   resolved "https://registry.yarnpkg.com/@jest/environment/-/environment-29.6.4.tgz#78ec2c9f8c8829a37616934ff4fea0c028c79f4f"
   integrity sha512-sQ0SULEjA1XUTHmkBRl7A1dyITM9yb1yb3ZNKPX3KlTd6IG7mWUe3e2yfExtC2Zz1Q+mMckOLHmL/qLiuQJrBQ==
@@ -3069,7 +3069,7 @@
     expect "^29.6.4"
     jest-snapshot "^29.6.4"
 
-"@jest/fake-timers@^29.6.3", "@jest/fake-timers@^29.6.4":
+"@jest/fake-timers@^29.6.4":
   version "29.6.4"
   resolved "https://registry.yarnpkg.com/@jest/fake-timers/-/fake-timers-29.6.4.tgz#45a27f093c43d5d989362a3e7a8c70c83188b4f6"
   integrity sha512-6UkCwzoBK60edXIIWb0/KWkuj7R7Qq91vVInOe3De6DSpaEiqjKcJw4F7XUet24Wupahj9J6PlR09JqJ5ySDHw==
@@ -14776,7 +14776,7 @@ jest-circus@^29.6.4:
     slash "^3.0.0"
     stack-utils "^2.0.3"
 
-jest-cli@^29.6.3:
+jest-cli@^29.6.4:
   version "29.6.4"
   resolved "https://registry.yarnpkg.com/jest-cli/-/jest-cli-29.6.4.tgz#ad52f2dfa1b0291de7ec7f8d7c81ac435521ede0"
   integrity sha512-+uMCQ7oizMmh8ZwRfZzKIEszFY9ksjjEQnTEMTaL7fYiL3Kw4XhqT9bYh+A4DQKUb67hZn2KbtEnDuHvcgK4pQ==
@@ -14870,13 +14870,13 @@ jest-each@^29.6.3:
     jest-util "^29.6.3"
     pretty-format "^29.6.3"
 
-jest-environment-jsdom@29.6.3:
-  version "29.6.3"
-  resolved "https://registry.yarnpkg.com/jest-environment-jsdom/-/jest-environment-jsdom-29.6.3.tgz#c9f394f5a89f399532c794d09bd3a746d9b3e0df"
-  integrity sha512-nMJz/i27Moit9bv8Z323/13Melj4FEQH93yRu7GnilvBmPBMH4EGEkEfBTJXYuubyzhMO7w/VHzljIDV+Q/SeQ==
+jest-environment-jsdom@29.6.4:
+  version "29.6.4"
+  resolved "https://registry.yarnpkg.com/jest-environment-jsdom/-/jest-environment-jsdom-29.6.4.tgz#0daf44454041f9e1ef7fa82eb1bd43426a82eb1c"
+  integrity sha512-K6wfgUJ16DoMs02JYFid9lOsqfpoVtyJxpRlnTxUHzvZWBnnh2VNGRB9EC1Cro96TQdq5TtSjb3qUjNaJP9IyA==
   dependencies:
-    "@jest/environment" "^29.6.3"
-    "@jest/fake-timers" "^29.6.3"
+    "@jest/environment" "^29.6.4"
+    "@jest/fake-timers" "^29.6.4"
     "@jest/types" "^29.6.3"
     "@types/jsdom" "^20.0.0"
     "@types/node" "*"
@@ -14884,19 +14884,7 @@ jest-environment-jsdom@29.6.3:
     jest-util "^29.6.3"
     jsdom "^20.0.0"
 
-jest-environment-node@29.6.3:
-  version "29.6.3"
-  resolved "https://registry.yarnpkg.com/jest-environment-node/-/jest-environment-node-29.6.3.tgz#72217a00db2c26755406241c70ad73c334917e28"
-  integrity sha512-PKl7upfPJXMYbWpD+60o4HP86KvFO2c9dZ+Zr6wUzsG5xcPx/65o3ArNgHW5M0RFvLYdW4/aieR4JSooD0a2ew==
-  dependencies:
-    "@jest/environment" "^29.6.3"
-    "@jest/fake-timers" "^29.6.3"
-    "@jest/types" "^29.6.3"
-    "@types/node" "*"
-    jest-mock "^29.6.3"
-    jest-util "^29.6.3"
-
-jest-environment-node@^29.6.4:
+jest-environment-node@29.6.4, jest-environment-node@^29.6.4:
   version "29.6.4"
   resolved "https://registry.yarnpkg.com/jest-environment-node/-/jest-environment-node-29.6.4.tgz#4ce311549afd815d3cafb49e60a1e4b25f06d29f"
   integrity sha512-i7SbpH2dEIFGNmxGCpSc2w9cA4qVD+wfvg2ZnfQ7XVrKL0NA5uDVBIiGH8SR4F0dKEv/0qI5r+aDomDf04DpEQ==
@@ -15271,15 +15259,15 @@ jest-worker@^29.6.4:
     merge-stream "^2.0.0"
     supports-color "^8.0.0"
 
-jest@29.6.3:
-  version "29.6.3"
-  resolved "https://registry.yarnpkg.com/jest/-/jest-29.6.3.tgz#118cf081d440d31b21989f61bfcd8b7797ca6a01"
-  integrity sha512-alueLuoPCDNHFcFGmgETR4KpQ+0ff3qVaiJwxQM4B5sC0CvXcgg4PEi7xrDkxuItDmdz/FVc7SSit4KEu8GRvw==
+jest@29.6.4:
+  version "29.6.4"
+  resolved "https://registry.yarnpkg.com/jest/-/jest-29.6.4.tgz#7c48e67a445ba264b778253b5d78d4ebc9d0a622"
+  integrity sha512-tEFhVQFF/bzoYV1YuGyzLPZ6vlPrdfvDmmAxudA1dLEuiztqg2Rkx20vkKY32xiDROcD2KXlgZ7Cu8RPeEHRKw==
   dependencies:
-    "@jest/core" "^29.6.3"
+    "@jest/core" "^29.6.4"
     "@jest/types" "^29.6.3"
     import-local "^3.0.2"
-    jest-cli "^29.6.3"
+    jest-cli "^29.6.4"
 
 "js-tokens@^3.0.0 || ^4.0.0", js-tokens@^4.0.0:
   version "4.0.0"
