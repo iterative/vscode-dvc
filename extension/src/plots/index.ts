@@ -20,6 +20,9 @@ import { pickPaths } from '../path/selection/quickPick'
 import { ErrorDecorationProvider } from '../tree/decorationProvider/error'
 import { DecoratableTreeItemScheme } from '../tree'
 import { Title } from '../vscode/title'
+import { PlotsOutput, PlotsOutputOrError } from '../cli/dvc/contract'
+import { isDvcError } from '../cli/dvc/reader'
+import { standardisePath } from '../fileSystem/util'
 
 export class Plots extends BaseRepository<TPlotsData> {
   public readonly viewKey = ViewKey.PLOTS
@@ -289,13 +292,41 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.dispose.track(this.data.onDidTrigger(() => sendCachedDataToWebview()))
   }
 
+  private standardisePlotsDataPaths(
+    plotsData: PlotsOutputOrError
+  ): PlotsOutputOrError {
+    if (isDvcError(plotsData)) {
+      return plotsData
+    }
+    const standardisedData: PlotsOutput = { data: {} }
+    const { data, errors } = plotsData
+
+    for (const path of Object.keys(data)) {
+      standardisedData.data[standardisePath(path)] = data[path]
+    }
+
+    if (!errors) {
+      return standardisedData
+    }
+    standardisedData.errors = errors.map(error => {
+      if (!error.name) {
+        return error
+      }
+
+      return { ...error, name: standardisePath(error.name) }
+    })
+
+    return standardisedData
+  }
+
   private onDidUpdateData() {
     this.dispose.track(
       this.data.onDidUpdate(async ({ data, revs }) => {
+        const standardisedData = this.standardisePlotsDataPaths(data)
         await Promise.all([
-          this.plots.transformAndSet(data, revs),
-          this.paths.transformAndSet(data, revs),
-          this.errors.transformAndSet(data, revs)
+          this.plots.transformAndSet(standardisedData, revs),
+          this.paths.transformAndSet(standardisedData, revs),
+          this.errors.transformAndSet(standardisedData, revs)
         ])
         this.notifyChanged()
       })
