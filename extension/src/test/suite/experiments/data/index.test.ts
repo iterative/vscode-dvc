@@ -83,7 +83,7 @@ suite('Experiments Data Test Suite', () => {
       await data.isReady()
 
       expect(mockExpShow).to.be.calledOnce
-      expect(mockCreateFileSystemWatcher).to.be.calledTwice
+      expect(mockCreateFileSystemWatcher).to.be.calledOnce
 
       expect(getArgOfCall(mockCreateFileSystemWatcher, 0, 2)).to.deep.equal(
         new RelativePattern(getTestWorkspaceFolder(), '**')

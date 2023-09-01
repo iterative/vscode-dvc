@@ -82,7 +82,7 @@ export abstract class BaseData<
     )
   }
 
-  protected listener(path: string) {
+  private listener(path: string) {
     const relPath = relative(this.dvcRoot, path)
     if (
       this.getWatchedFiles().some(
