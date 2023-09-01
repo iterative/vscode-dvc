@@ -14,7 +14,8 @@ import { ExpShowOutput } from '../../cli/dvc/contract'
 import {
   BaseData,
   ExperimentsOutput,
-  isRemoteExperimentsOutput
+  isRemoteExperimentsOutput,
+  isStudioExperimentsOutput
 } from '../../data'
 import {
   Args,
@@ -116,23 +117,24 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
   }
 
   private async doStudio(shas: string[]) {
-    // return if studio not ready yet as we will call when it becomes ready
     await this.studio.isReady()
 
     const studioAccessToken = this.studio.getAccessToken()
 
     if (!studioAccessToken) {
       this.notifyChanged({ baseUrl: null, live: [], pushed: [] })
+      return
     }
 
     const gitRemoteUrl = this.studio.getGitRemoteUrl()
 
     if (shas.length === 0) {
       this.notifyChanged({ live: [], pushed: [] })
+      return
     }
 
     const params = querystring.stringify({
-      commits: [...shas, 'a9d8057e088d46842f15c3b6d1bb2e4befd5f677'],
+      commits: shas,
       git_remote_url: gitRemoteUrl
     })
 
@@ -274,8 +276,10 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
   private waitForInitialLocalData() {
     const waitForInitialData = this.dispose.track(
       this.onDidUpdate(data => {
-        if (isRemoteExperimentsOutput(data)) {
-          // return early if Studio
+        if (
+          isRemoteExperimentsOutput(data) ||
+          isStudioExperimentsOutput(data)
+        ) {
           return
         }
         this.dispose.untrack(waitForInitialData)

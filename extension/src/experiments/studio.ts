@@ -10,6 +10,8 @@ export class Studio extends DeferredDisposable {
   private studioAccessToken: string | undefined
   private gitRemoteUrl?: string
 
+  private accessTokenSet = false
+
   constructor(dvcRoot: string, internalCommands: InternalCommands) {
     super()
     this.dvcRoot = dvcRoot
@@ -17,10 +19,7 @@ export class Studio extends DeferredDisposable {
 
     void this.internalCommands
       .executeCommand(AvailableCommands.GIT_GET_REMOTE_URL, this.dvcRoot)
-      .then(gitRemoteUrl => {
-        this.gitRemoteUrl = gitRemoteUrl
-        this.deferred.resolve()
-      })
+      .then(gitRemoteUrl => (this.gitRemoteUrl = gitRemoteUrl))
   }
 
   public getGitRemoteUrl() {
@@ -29,6 +28,12 @@ export class Studio extends DeferredDisposable {
 
   public setAccessToken(studioAccessToken: string | undefined) {
     this.studioAccessToken = studioAccessToken
+    this.accessTokenSet = true
+    this.deferred.resolve()
+  }
+
+  public isAccessTokenSet() {
+    return this.accessTokenSet
   }
 
   public getAccessToken() {

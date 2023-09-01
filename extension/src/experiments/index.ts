@@ -612,11 +612,13 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public setStudioAccessToken(studioAccessToken: string | undefined) {
-    if (this.studio.getAccessToken() === studioAccessToken) {
+    const oldAccessToken = this.studio.getAccessToken()
+    const accessTokenInitialized = this.studio.isAccessTokenSet()
+    this.studio.setAccessToken(studioAccessToken)
+
+    if (!accessTokenInitialized || oldAccessToken === studioAccessToken) {
       return
     }
-
-    this.studio.setAccessToken(studioAccessToken)
     return this.data.managedUpdate()
   }
 

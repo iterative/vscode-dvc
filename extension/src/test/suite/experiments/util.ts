@@ -35,20 +35,26 @@ export const DEFAULT_EXPERIMENTS_OUTPUT = {
 
 export const buildExperiments = ({
   availableNbCommits = { main: 5 },
+  baseUrl = 'https://studio.iterative.ai/user/olivaw/projects/vscode-dvc-demo-ynm6t3jxdx',
   disposer,
   dvcRoot = dvcDemoPath,
   expShow = expShowFixture,
   gitLog = gitLogFixture,
+  live = [],
   lsRemoteOutput = remoteExpRefsFixture,
+  pushed = ['42b8736b08170529903cd203a1f40382a4b4a8cd'],
   rowOrder = rowOrderFixture,
   stageList = 'train'
 }: {
   availableNbCommits?: { [branch: string]: number }
   disposer: Disposer
+  baseUrl?: string
   dvcRoot?: string
   expShow?: ExpShowOutput
   gitLog?: string
+  live?: { baseline_sha: string; name: string }[]
   lsRemoteOutput?: string
+  pushed?: string[]
   rowOrder?: { branch: string; sha: string }[]
   stageList?: string | null
 }) => {
@@ -104,7 +110,8 @@ export const buildExperiments = ({
       gitLog,
       rowOrder
     }),
-    experiments.setState({ lsRemoteOutput })
+    experiments.setState({ lsRemoteOutput }),
+    experiments.setState({ baseUrl, live, pushed })
   ])
 
   return {
@@ -286,7 +293,12 @@ export const buildExperimentsData = (
         getNbOfCommitsToShow: () => DEFAULT_CURRENT_BRANCH_COMMITS_TO_SHOW,
         setBranches: mockSetBranches
       } as unknown as ExperimentsModel,
-      { getAccessToken: () => Promise.resolve('') } as unknown as Studio,
+      {
+        getAccessToken: () => Promise.resolve(''),
+        getGitRemoteUrl: () =>
+          Promise.resolve('git@github.com:iterative/vscode-dvc-demo.git'),
+        isReady: () => Promise.resolve(undefined)
+      } as unknown as Studio,
       []
     )
   )

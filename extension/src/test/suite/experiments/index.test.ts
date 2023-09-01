@@ -1,7 +1,6 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
 import { join, resolve } from 'path'
 import { after, afterEach, beforeEach, describe, it, suite } from 'mocha'
-import * as Fetch from 'node-fetch'
 import { expect } from 'chai'
 import { stub, spy, restore, SinonStub } from 'sinon'
 import {
@@ -95,7 +94,6 @@ import { MAX_SELECTED_EXPERIMENTS } from '../../../experiments/model/status'
 import { Pipeline } from '../../../pipeline'
 import { ColumnLike } from '../../../experiments/columns/like'
 import * as Clipboard from '../../../vscode/clipboard'
-import { STUDIO_URL } from '../../../setup/webview/contract'
 
 const { openFileInEditor } = FileSystem
 
@@ -682,23 +680,10 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it("should handle a message to copy an experiment's Studio link", async () => {
-      const { mockMessageReceived, experiments, gitReader } =
-        await buildExperimentsWebview({ disposer: disposable })
+      const { mockMessageReceived } = await buildExperimentsWebview({
+        disposer: disposable
+      })
 
-      const viewUrl =
-        'https://studio.iterative.ai/user/demo-user/projects/demo-ynm6t3jxdx'
-
-      const mockGitRemoteUrl = 'git@github.com:iterative/vscode-dvc-demo.git'
-      stub(gitReader, 'getRemoteUrl').resolves(mockGitRemoteUrl)
-      const mockStudioToken = 'isat_BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
-      const mockFetch = stub(Fetch, 'default').resolves({
-        json: () =>
-          Promise.resolve({
-            url: viewUrl
-          })
-      } as unknown as Fetch.Response)
-
-      await experiments.setStudioAccessToken(mockStudioToken)
       const mockWriteToClipboard = stub(Clipboard, 'writeToClipboard')
       const writeToClipboardCalled = new Promise(resolve =>
         mockWriteToClipboard.callsFake(() => {
@@ -712,36 +697,18 @@ suite('Experiments Test Suite', () => {
         payload: { id: 'exp-e7a67', type: StudioLinkType.PUSHED }
       })
 
-      expect(mockFetch).to.be.calledWith(`${STUDIO_URL}/webhook/dvc`, {
-        body: JSON.stringify({
-          client: 'vscode',
-          refs: {
-            pushed: [
-              'refs/exps/a9/b32d14966b9be1396f2211d9eb743359708a07/test-branch'
-            ]
-          },
-          repo_url: mockGitRemoteUrl
-        }),
-        headers: {
-          Authorization: `token ${mockStudioToken}`,
-          'Content-Type': 'application/json'
-        },
-        method: 'POST'
-      })
-
       await writeToClipboardCalled
       const link =
-        viewUrl +
+        'https://studio.iterative.ai/user/olivaw/projects/vscode-dvc-demo-ynm6t3jxdx' +
         '?showOnlySelected=1' +
-        '&experimentReferences=4fb124aebddb2adf1545030907687fa9a4c80e70' +
-        '&activeExperimentReferences=4fb124aebddb2adf1545030907687fa9a4c80e70%3Aprimary'
+        '&experimentReferences=4fb124aebddb2adf1545030907687fa9a4c80e70'
 
       expect(mockWriteToClipboard).to.be.calledOnce
       expect(mockWriteToClipboard).to.be.calledWithExactly(
         link,
         `[Studio link](${link})`
       )
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to modify the workspace params and queue an experiment', async () => {
       const { experiments, dvcExecutor, mockMessageReceived } =
