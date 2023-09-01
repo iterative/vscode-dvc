@@ -91,13 +91,12 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
     }
 
     const branchLogs = await Promise.all(promises)
-    const { args, gitLog, rowOrder } = this.collectGitLogAndOrder(branchLogs)
+    const { args, gitLog, rowOrder, shas } =
+      this.collectGitLogAndOrder(branchLogs)
 
     return Promise.all([
       this.updateExpShow(args, availableNbCommits, gitLog, rowOrder),
-      this.requestStudioData(
-        args.filter(arg => (arg as ExperimentFlag) !== ExperimentFlag.REV)
-      )
+      this.requestStudioData(shas)
     ])
   }
 
@@ -193,6 +192,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
   ) {
     const rowOrder: { branch: string; sha: string }[] = []
     const args: Args = []
+    const shas = []
     const gitLog: string[] = []
 
     for (const { branch, branchLog } of branchLogs) {
@@ -204,9 +204,10 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
           continue
         }
         args.push(ExperimentFlag.REV, sha)
+        shas.push(sha)
       }
     }
-    return { args, gitLog: gitLog.join(COMMITS_SEPARATOR), rowOrder }
+    return { args, gitLog: gitLog.join(COMMITS_SEPARATOR), rowOrder, shas }
   }
 
   private async updateBranches() {
