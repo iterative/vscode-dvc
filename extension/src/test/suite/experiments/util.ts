@@ -1,5 +1,6 @@
 import { spy, stub } from 'sinon'
 import { EventEmitter } from 'vscode'
+import * as Fetch from 'node-fetch'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { Experiments } from '../../../experiments'
 import { Disposer } from '../../../extension'
@@ -33,9 +34,12 @@ export const DEFAULT_EXPERIMENTS_OUTPUT = {
   rowOrder: rowOrderFixture
 }
 
+export const mockBaseStudioUrl =
+  'https://studio.iterative.ai/user/olivaw/projects/vscode-dvc-demo-ynm6t3jxdx'
+
 export const buildExperiments = ({
   availableNbCommits = { main: 5 },
-  baseUrl = 'https://studio.iterative.ai/user/olivaw/projects/vscode-dvc-demo-ynm6t3jxdx',
+  baseUrl = mockBaseStudioUrl,
   disposer,
   dvcRoot = dvcDemoPath,
   expShow = expShowFixture,
@@ -266,7 +270,8 @@ const buildExperimentsDataDependencies = (disposer: Disposer) => {
 export const buildExperimentsData = (
   disposer: SafeWatcherDisposer,
   currentBranch = '* main',
-  commitOutput = gitLogFixture
+  commitOutput = gitLogFixture,
+  studioAccessToken = ''
 ) => {
   const {
     internalCommands,
@@ -281,6 +286,14 @@ export const buildExperimentsData = (
     commitOutput
   )
   const mockGetNumCommits = stub(gitReader, 'getNumCommits').resolves(404)
+  const mockFetch = stub(Fetch, 'default').resolves({
+    json: () =>
+      Promise.resolve({
+        live: [],
+        pushed: [],
+        view_url: mockBaseStudioUrl
+      })
+  } as Fetch.Response)
 
   const mockGetBranchesToShow = stub().returns(['main'])
   const mockSetBranches = stub()
@@ -294,11 +307,10 @@ export const buildExperimentsData = (
         setBranches: mockSetBranches
       } as unknown as ExperimentsModel,
       {
-        getAccessToken: () => Promise.resolve(''),
-        getGitRemoteUrl: () =>
-          Promise.resolve('git@github.com:iterative/vscode-dvc-demo.git'),
+        getAccessToken: () => studioAccessToken,
+        getGitRemoteUrl: () => 'git@github.com:iterative/vscode-dvc-demo.git',
         isReady: () => Promise.resolve(undefined)
-      } as unknown as Studio,
+      } as Studio,
       []
     )
   )
@@ -307,6 +319,7 @@ export const buildExperimentsData = (
     data,
     mockCreateFileSystemWatcher,
     mockExpShow,
+    mockFetch,
     mockGetBranchesToShow,
     mockGetCommitMessages,
     mockGetNumCommits,
