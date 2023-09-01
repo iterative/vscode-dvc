@@ -6,7 +6,7 @@ import {
   collectAddRemoveCommitsDetails,
   collectExperiments,
   collectOrderedCommitsAndExperiments,
-  collectRemoteExpDetails,
+  collectRemoteExpRefs,
   collectRunningInQueue,
   collectRunningInWorkspace
 } from './collect'
@@ -181,9 +181,8 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public transformAndSetRemote(lsRemoteOutput: string) {
-    const { remoteExpShas } = collectRemoteExpDetails(lsRemoteOutput)
+    const remoteExpShas = collectRemoteExpRefs(lsRemoteOutput)
     this.remoteExpShas = remoteExpShas
-    this.deferred.resolve()
   }
 
   public toggleStars(ids: string[]) {
