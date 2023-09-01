@@ -33,7 +33,6 @@ import { STUDIO_URL } from '../../setup/webview/contract'
 export class ExperimentsData extends BaseData<ExperimentsOutput> {
   private readonly experiments: ExperimentsModel
   private readonly studio: Studio
-  // needs Studio as well but make the request here
 
   constructor(
     dvcRoot: string,
@@ -70,10 +69,13 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
   }
 
   public async update(): Promise<void> {
-    await Promise.all([this.updateExpShow(), this.updateRemoteExpRefs()])
+    await Promise.all([
+      this.updateExpShowAndStudio(),
+      this.updateRemoteExpRefs()
+    ])
   }
 
-  private async updateExpShow() {
+  private async updateExpShowAndStudio() {
     await this.updateBranches()
     const [currentBranch, ...branches] = this.experiments.getBranchesToShow()
     const availableNbCommits: { [branch: string]: number } = {}
@@ -92,14 +94,14 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
     const { args, gitLog, rowOrder } = this.collectGitLogAndOrder(branchLogs)
 
     return Promise.all([
-      this.doExpShow(args, availableNbCommits, gitLog, rowOrder),
-      this.doStudio(
+      this.updateExpShow(args, availableNbCommits, gitLog, rowOrder),
+      this.requestStudioData(
         args.filter(arg => (arg as ExperimentFlag) !== ExperimentFlag.REV)
       )
     ])
   }
 
-  private async doExpShow(
+  private async updateExpShow(
     args: Args,
     availableNbCommits: { [branch: string]: number },
     gitLog: string,
@@ -116,26 +118,21 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
     this.collectFiles({ expShow })
   }
 
-  private async doStudio(shas: string[]) {
+  private async requestStudioData(shas: string[]) {
     await this.studio.isReady()
+
+    const defaultData = { baseUrl: undefined, live: [], pushed: [] }
 
     const studioAccessToken = this.studio.getAccessToken()
 
-    if (!studioAccessToken) {
-      this.notifyChanged({ baseUrl: null, live: [], pushed: [] })
-      return
-    }
-
-    const gitRemoteUrl = this.studio.getGitRemoteUrl()
-
-    if (shas.length === 0) {
-      this.notifyChanged({ live: [], pushed: [] })
+    if (!studioAccessToken || shas.length === 0) {
+      this.notifyChanged(defaultData)
       return
     }
 
     const params = querystring.stringify({
       commits: shas,
-      git_remote_url: gitRemoteUrl
+      git_remote_url: this.studio.getGitRemoteUrl()
     })
 
     try {
@@ -151,9 +148,16 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
         pushed: string[]
         view_url: string
       }
-      this.notifyChanged({ baseUrl: view_url, live, pushed })
+      this.notifyChanged({
+        baseUrl: view_url,
+        live: live.map(({ baseline_sha, name }) => ({
+          baselineSha: baseline_sha,
+          name
+        })),
+        pushed
+      })
     } catch {
-      this.notifyChanged({ live: [], pushed: [] })
+      this.notifyChanged(defaultData)
     }
   }
 

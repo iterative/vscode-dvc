@@ -81,10 +81,9 @@ export class ExperimentsModel extends ModelWithPersistence {
   private filters: Map<string, FilterDefinition> = new Map()
 
   private remoteExpShas?: Set<string>
-  private remoteExpRefs: string[] = []
   private pushing = new Set<string>()
 
-  private studioLiveOnlyExperiments: { baseline_sha: string; name: string }[] =
+  private studioLiveOnlyExperiments: { baselineSha: string; name: string }[] =
     []
 
   private studioPushedExperiments: string[] = []
@@ -182,10 +181,8 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public transformAndSetRemote(lsRemoteOutput: string) {
-    const { remoteExpShas, remoteExpRefs } =
-      collectRemoteExpDetails(lsRemoteOutput)
+    const { remoteExpShas } = collectRemoteExpDetails(lsRemoteOutput)
     this.remoteExpShas = remoteExpShas
-    this.remoteExpRefs = remoteExpRefs
     this.deferred.resolve()
   }
 
@@ -559,13 +556,8 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.availableBranchesToSelect
   }
 
-  // to be deleted
-  public getRemoteExpRefs() {
-    return this.remoteExpRefs
-  }
-
   public setStudioData(
-    live: { baseline_sha: string; name: string }[],
+    live: { baselineSha: string; name: string }[],
     pushed: string[]
   ) {
     this.studioLiveOnlyExperiments = live
@@ -670,8 +662,8 @@ export class ExperimentsModel extends ModelWithPersistence {
 
     if (
       this.studioLiveOnlyExperiments.some(
-        ({ baseline_sha, name }) =>
-          baselineSha === baseline_sha && experiment.id === name
+        ({ baselineSha: expBaselineSha, name }) =>
+          baselineSha === expBaselineSha && experiment.id === name
       )
     ) {
       experiment.studioLinkType = StudioLinkType.LIVE

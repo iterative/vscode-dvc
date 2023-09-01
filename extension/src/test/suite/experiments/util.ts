@@ -52,7 +52,7 @@ export const buildExperiments = ({
   dvcRoot?: string
   expShow?: ExpShowOutput
   gitLog?: string
-  live?: { baseline_sha: string; name: string }[]
+  live?: { baselineSha: string; name: string }[]
   lsRemoteOutput?: string
   pushed?: string[]
   rowOrder?: { branch: string; sha: string }[]

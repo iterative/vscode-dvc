@@ -198,8 +198,6 @@ export class Experiments extends BaseRepository<TableData> {
       const { live, pushed, baseUrl } = data
       this.studio.setBaseUrl(baseUrl)
       this.experiments.setStudioData(live, pushed)
-      // set url into studio + set available data into experiments
-      // -> need list of live only for getLink - set that into Studio
       return
     }
 
