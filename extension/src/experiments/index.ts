@@ -198,7 +198,7 @@ export class Experiments extends BaseRepository<TableData> {
       const { live, pushed, baseUrl } = data
       this.studio.setBaseUrl(baseUrl)
       this.experiments.setStudioData(live, pushed)
-      return
+      return this.webviewMessages.sendWebviewMessage()
     }
 
     const { expShow, gitLog, rowOrder, availableNbCommits } = data
