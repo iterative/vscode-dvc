@@ -364,7 +364,7 @@ const getContextMenuOptions = (
 
 export const RowContextMenu: React.FC<RowProp> = ({
   row: {
-    original: { branch, executorStatus, starred, id, executor, label },
+    original: { branch, executorStatus, starred, id, executor, sha },
     depth
   }
 }) => {
@@ -382,7 +382,7 @@ export const RowContextMenu: React.FC<RowProp> = ({
   const contextMenuOptions = useMemo(() => {
     return getContextMenuOptions(
       id,
-      label,
+      sha as string,
       branch,
       isWorkspace,
       projectHasCheckpoints,
@@ -401,7 +401,7 @@ export const RowContextMenu: React.FC<RowProp> = ({
     isWorkspace,
     depth,
     id,
-    label,
+    sha,
     projectHasCheckpoints,
     selectedRows,
     hasRunningWorkspaceExperiment
