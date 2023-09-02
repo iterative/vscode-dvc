@@ -129,6 +129,11 @@ const registerExperimentInputCommands = (
   )
 
   internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.EXPERIMENT_RENAME,
+    () => experiments.renameExperiment()
+  )
+
+  internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_VIEW_BRANCH,
     ({ dvcRoot, id }: ExperimentDetails) =>
       experiments.getInputAndRun(

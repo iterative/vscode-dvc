@@ -35,6 +35,7 @@ export enum MessageFromWebviewType {
   REMOVE_COLUMN_FILTERS = 'remove-column-filters',
   REMOVE_COLUMN_SORT = 'remove-column-sort',
   REMOVE_EXPERIMENT = 'remove-experiment',
+  RENAME_EXPERIMENT = 'rename-experiment',
   REORDER_COLUMNS = 'reorder-columns',
   REORDER_PLOTS_COMPARISON = 'reorder-plots-comparison',
   REORDER_PLOTS_COMPARISON_ROWS = 'reorder-plots-comparison-rows',
@@ -171,6 +172,10 @@ export type MessageFromWebview =
     }
   | {
       type: MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT
+      payload: string
+    }
+  | {
+      type: MessageFromWebviewType.RENAME_EXPERIMENT
       payload: string
     }
   | {

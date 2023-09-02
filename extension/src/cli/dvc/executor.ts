@@ -21,6 +21,7 @@ export const autoRegisteredCommands = {
   EXP_QUEUE: 'expRunQueue',
   EXP_REMOVE: 'expRemove',
   EXP_REMOVE_QUEUE: 'expRemoveQueue',
+  EXP_RENAME: 'expRename',
   INIT: 'init',
   IS_SCM_COMMAND_RUNNING: 'isScmCommandRunning',
   MOVE: 'move',
@@ -88,6 +89,15 @@ export class DvcExecutor extends DvcCli {
 
   public expRemoveQueue(cwd: string) {
     return this.expRemove(cwd, ExperimentFlag.QUEUE)
+  }
+
+  public expRename(cwd: string, experimentName: string, newName: string) {
+    return this.executeExperimentProcess(
+      cwd,
+      ExperimentSubCommand.RENAME,
+      experimentName,
+      newName
+    )
   }
 
   public expRunQueue(cwd: string, ...args: Args) {
