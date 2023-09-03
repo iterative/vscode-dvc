@@ -1133,7 +1133,6 @@ describe('App', () => {
       expect(getEnabledOptions()).toStrictEqual([
         'Apply to Workspace',
         'Create new Branch',
-        'Rename Experiment',
         'Copy Sha',
         'Star'
       ])
@@ -1148,7 +1147,6 @@ describe('App', () => {
       expect(getEnabledOptions()).toStrictEqual([
         'Apply to Workspace',
         'Create new Branch',
-        'Rename Experiment',
         'Copy Sha',
         'Star'
       ])

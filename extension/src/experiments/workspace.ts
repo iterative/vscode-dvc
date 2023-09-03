@@ -3,8 +3,7 @@ import isEmpty from 'lodash.isempty'
 import { Experiments, ModifiedExperimentAndRunCommandId } from '.'
 import {
   getBranchExperimentCommand,
-  getPushExperimentCommand,
-  getRenameExperimentCommand
+  getPushExperimentCommand
 } from './commands'
 import { TableData } from './webview/contract'
 import { Args } from '../cli/dvc/constants'
@@ -238,25 +237,6 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       `${experimentId}-branch`,
       cwd,
       experimentId
-    )
-  }
-
-  public async renameExperiment() {
-    const cwd = await this.getCwd()
-    if (!cwd) {
-      return
-    }
-
-    const experimentName = await this.pickCommitOrExperiment(cwd)
-    if (!experimentName) {
-      return
-    }
-
-    return this.getInputAndRun(
-      getRenameExperimentCommand(this),
-      Title.ENTER_RENAME_NAME,
-      experimentName,
-      experimentName
     )
   }
 

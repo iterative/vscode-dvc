@@ -146,11 +146,6 @@
         "category": "DVC"
       },
       {
-        "title": "Rename an Experiment",
-        "command": "dvc.renameExperiment",
-        "category": "DVC"
-      },
-      {
         "title": "Checkout",
         "command": "dvc.checkout",
         "category": "DVC",
@@ -521,12 +516,6 @@
         "icon": "$(source-control)"
       },
       {
-        "title": "Rename Experiment",
-        "command": "dvc.views.experiments.renameExperiment",
-        "category": "DVC",
-        "icon": "$(source-control)"
-      },
-      {
         "title": "Modify Param(s) and Queue",
         "command": "dvc.views.experiments.queueExperiment",
         "category": "DVC",
@@ -733,10 +722,6 @@
         },
         {
           "command": "dvc.branchExperiment",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running.workspace"
-        },
-        {
-          "command": "dvc.renameExperiment",
           "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running.workspace"
         },
         {
@@ -961,10 +946,6 @@
         },
         {
           "command": "dvc.views.experiments.branchExperiment",
-          "when": "false"
-        },
-        {
-          "command": "dvc.views.experiments.renameExperiment",
           "when": "false"
         },
         {
@@ -1243,11 +1224,6 @@
           "when": "view == dvc.views.trackedExplorerTree"
         },
         {
-          "command": "dvc.renameTarget",
-          "group": "7_modification@1",
-          "when": "view == dvc.views.trackedExplorerTree && viewItem =~ /^.*Data$/"
-        },
-        {
           "command": "dvc.deleteTarget",
           "group": "7_modification@2",
           "when": "view == dvc.views.trackedExplorerTree && viewItem != virtual"
@@ -1279,11 +1255,6 @@
         },
         {
           "command": "dvc.views.experiments.branchExperiment",
-          "group": "inline@2",
-          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(experiment|commit)$/ && !dvc.experiment.running.workspace"
-        },
-        {
-          "command": "dvc.views.experiments.renameExperiment",
           "group": "inline@2",
           "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(experiment|commit)$/ && !dvc.experiment.running.workspace"
         },

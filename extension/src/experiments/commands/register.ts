@@ -1,4 +1,8 @@
-import { getBranchExperimentCommand, getPushExperimentCommand } from '.'
+import {
+  getBranchExperimentCommand,
+  getPushExperimentCommand,
+  getRenameExperimentCommand
+} from '.'
 import { WorkspaceExperiments } from '../workspace'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import {
@@ -130,7 +134,14 @@ const registerExperimentInputCommands = (
 
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_RENAME,
-    () => experiments.renameExperiment()
+    ({ dvcRoot, id }: ExperimentDetails) =>
+      experiments.getInputAndRun(
+        getRenameExperimentCommand(experiments),
+        Title.ENTER_RENAME_NAME,
+        id,
+        dvcRoot,
+        id
+      )
   )
 
   internalCommands.registerExternalCliCommand(
