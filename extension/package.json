@@ -1224,6 +1224,11 @@
           "when": "view == dvc.views.trackedExplorerTree"
         },
         {
+          "command": "dvc.renameTarget",
+          "group": "7_modification@1",
+          "when": "view == dvc.views.trackedExplorerTree && viewItem =~ /^.*Data$/"
+        },
+        {
           "command": "dvc.deleteTarget",
           "group": "7_modification@2",
           "when": "view == dvc.views.trackedExplorerTree && viewItem != virtual"
