@@ -215,7 +215,7 @@ const getRunResumeOptions = (
 
 const getSingleSelectMenuOptions = (
   id: string,
-  sha: string,
+  sha: string | undefined,
   isWorkspace: boolean,
   projectHasCheckpoints: boolean,
   hasRunningWorkspaceExperiment: boolean,
@@ -268,7 +268,7 @@ const getSingleSelectMenuOptions = (
       MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT
     ),
     {
-      disabled: isWorkspace,
+      disabled: isWorkspace || !sha,
       id: MessageFromWebviewType.COPY_TO_CLIPBOARD,
       label: 'Copy Sha',
       message: {
@@ -324,7 +324,7 @@ const getSingleSelectMenuOptions = (
 
 const getContextMenuOptions = (
   id: string,
-  sha: string,
+  sha: string | undefined,
   branch: string | undefined | typeof WORKSPACE_BRANCH,
   isWorkspace: boolean,
   projectHasCheckpoints: boolean,
@@ -382,7 +382,7 @@ export const RowContextMenu: React.FC<RowProp> = ({
   const contextMenuOptions = useMemo(() => {
     return getContextMenuOptions(
       id,
-      sha as string,
+      sha,
       branch,
       isWorkspace,
       projectHasCheckpoints,
