@@ -1,4 +1,3 @@
-import { join } from 'path'
 import querystring from 'querystring'
 import fetch from 'node-fetch'
 import { collectBranches, collectFiles } from './collect'
@@ -21,8 +20,7 @@ import {
   Args,
   DOT_DVC,
   DVCLIVE_STEP_COMPLETED_SIGNAL_FILE,
-  ExperimentFlag,
-  TEMP_EXP_DIR
+  ExperimentFlag
 } from '../../cli/dvc/constants'
 import { COMMITS_SEPARATOR, gitPath } from '../../cli/git/constants'
 import { getGitPath } from '../../fileSystem'
@@ -59,7 +57,6 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
     this.studio = studio
 
     void this.watchExpGitRefs()
-    void this.watchQueueDirectories()
     void this.managedUpdate()
     this.waitForInitialLocalData()
   }
@@ -254,15 +251,6 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
           return this.managedUpdate()
         }
       }
-    )
-  }
-
-  private watchQueueDirectories() {
-    const tempQueueDirectory = join(this.dvcRoot, TEMP_EXP_DIR)
-    return createFileSystemWatcher(
-      disposable => this.dispose.track(disposable),
-      getRelativePattern(tempQueueDirectory, '**'),
-      (path: string) => this.listener(path)
     )
   }
 
