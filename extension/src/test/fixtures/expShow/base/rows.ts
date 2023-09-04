@@ -2,6 +2,7 @@ import { join } from '../../../util/path'
 import {
   Commit,
   GitRemoteStatus,
+  StudioLinkType,
   WORKSPACE_BRANCH
 } from '../../../../experiments/webview/contract'
 import { copyOriginalColors } from '../../../../experiments/model/status/colors'
@@ -143,6 +144,7 @@ const rowsFixture: Commit[] = [
     subRows: [
       {
         branch: 'main',
+        baselineSha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
         deps: {
           [join('data', 'data.xml')]: valueWithNoChanges(
             '22a1a2931c8370d3aeedd7183606fd7f'
@@ -202,6 +204,7 @@ const rowsFixture: Commit[] = [
       },
       {
         branch: 'main',
+        baselineSha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
         deps: {
           [join('data', 'data.xml')]: valueWithNoChanges(
             '22a1a2931c8370d3aeedd7183606fd7f'
@@ -253,6 +256,7 @@ const rowsFixture: Commit[] = [
           }
         },
         gitRemoteStatus: GitRemoteStatus.ON_REMOTE,
+        studioLinkType: StudioLinkType.PUSHED,
         selected: false,
         sha: '42b8736b08170529903cd203a1f40382a4b4a8cd',
         starred: false,
@@ -260,6 +264,7 @@ const rowsFixture: Commit[] = [
       },
       {
         branch: 'main',
+        baselineSha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
         deps: {
           [join('data', 'data.xml')]: valueWithNoChanges(
             '22a1a2931c8370d3aeedd7183606fd7f'
@@ -318,6 +323,7 @@ const rowsFixture: Commit[] = [
       },
       {
         branch: 'main',
+        baselineSha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
         displayColor: undefined,
         id: '489fd8b',
         sha: '489fd8bdaa709f7330aac342e051a9431c625481',
@@ -330,6 +336,7 @@ const rowsFixture: Commit[] = [
       },
       {
         branch: 'main',
+        baselineSha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
         deps: {
           [join('data', 'data.xml')]: valueWithNoChanges(
             '22a1a2931c8370d3aeedd7183606fd7f'
@@ -383,6 +390,7 @@ const rowsFixture: Commit[] = [
       },
       {
         branch: 'main',
+        baselineSha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
         displayColor: undefined,
         deps: {
           [join('data', 'data.xml')]: valueWithNoChanges(
@@ -432,6 +440,7 @@ const rowsFixture: Commit[] = [
       },
       {
         branch: 'main',
+        baselineSha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
         displayColor: undefined,
         deps: {
           [join('data', 'data.xml')]: valueWithNoChanges(

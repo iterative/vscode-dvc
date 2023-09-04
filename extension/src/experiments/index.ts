@@ -35,7 +35,11 @@ import { DecorationProvider } from './model/decorationProvider'
 import { starredFilter } from './model/filterBy/constants'
 import { ResourceLocator } from '../resourceLocator'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
-import { ExperimentsOutput, isRemoteExperimentsOutput } from '../data'
+import {
+  ExperimentsOutput,
+  isRemoteExperimentsOutput,
+  isStudioExperimentsOutput
+} from '../data'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { Title } from '../vscode/title'
@@ -159,6 +163,7 @@ export class Experiments extends BaseRepository<TableData> {
           dvcRoot,
           internalCommands,
           this.experiments,
+          this.studio,
           subProjects
         )
     )
@@ -186,6 +191,13 @@ export class Experiments extends BaseRepository<TableData> {
     if (isRemoteExperimentsOutput(data)) {
       const { lsRemoteOutput } = data
       this.experiments.transformAndSetRemote(lsRemoteOutput)
+      return this.webviewMessages.sendWebviewMessage()
+    }
+
+    if (isStudioExperimentsOutput(data)) {
+      const { live, pushed, baseUrl } = data
+      this.studio.setBaseUrl(baseUrl)
+      this.experiments.setStudioData(live, pushed)
       return this.webviewMessages.sendWebviewMessage()
     }
 
@@ -597,13 +609,15 @@ export class Experiments extends BaseRepository<TableData> {
     return this.data.update()
   }
 
-  public async setStudioBaseUrl(studioToken: string | undefined) {
-    await Promise.all([this.isReady(), this.experiments.isReady()])
-    await this.studio.setBaseUrl(
-      studioToken,
-      this.experiments.getRemoteExpRefs()
-    )
-    return this.webviewMessages.sendWebviewMessage()
+  public setStudioAccessToken(studioAccessToken: string | undefined) {
+    const oldAccessToken = this.studio.getAccessToken()
+    const accessTokenInitialized = this.studio.isAccessTokenSet()
+    this.studio.setAccessToken(studioAccessToken)
+
+    if (!accessTokenInitialized || oldAccessToken === studioAccessToken) {
+      return
+    }
+    return this.data.managedUpdate()
   }
 
   public hasDvcLiveOnlyRunning() {

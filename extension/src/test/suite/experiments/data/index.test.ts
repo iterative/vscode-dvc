@@ -18,7 +18,7 @@ import {
   CommandId,
   InternalCommands
 } from '../../../../commands/internal'
-import { buildExperimentsData } from '../util'
+import { buildExperimentsData, mockBaseStudioUrl } from '../util'
 import {
   DEFAULT_CURRENT_BRANCH_COMMITS_TO_SHOW,
   ExperimentFlag
@@ -28,7 +28,13 @@ import * as FileSystem from '../../../../fileSystem'
 import { ExperimentsModel } from '../../../../experiments/model'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
 import expShowFixture from '../../../fixtures/expShow/base/output'
-import { isRemoteExperimentsOutput } from '../../../../data'
+import gitLogFixture from '../../../fixtures/expShow/base/gitLog'
+import {
+  isRemoteExperimentsOutput,
+  isStudioExperimentsOutput
+} from '../../../../data'
+import { Studio } from '../../../../experiments/studio'
+import { STUDIO_URL } from '../../../../setup/webview/contract'
 
 const MOCK_WORKSPACE_GIT_FOLDER = join(dvcDemoPath, '.mock-git')
 
@@ -52,7 +58,10 @@ suite('Experiments Data Test Suite', () => {
     const getDataUpdatedEvent = (data: ExperimentsData) =>
       new Promise(resolve =>
         data.onDidUpdate(data => {
-          if (isRemoteExperimentsOutput(data)) {
+          if (
+            isRemoteExperimentsOutput(data) ||
+            isStudioExperimentsOutput(data)
+          ) {
             return
           }
 
@@ -126,6 +135,12 @@ suite('Experiments Data Test Suite', () => {
             }),
             setBranches: stub()
           } as unknown as ExperimentsModel,
+          {
+            getAccessToken: () => '',
+            getGitRemoteUrl: () =>
+              'git@github.com:iterative/vscode-dvc-demo.git',
+            isReady: () => Promise.resolve(undefined)
+          } as Studio,
           []
         )
       )
@@ -187,6 +202,12 @@ suite('Experiments Data Test Suite', () => {
             }),
             setBranches: stub()
           } as unknown as ExperimentsModel,
+          {
+            getAccessToken: () => '',
+            getGitRemoteUrl: () =>
+              'git@github.com:iterative/vscode-dvc-demo.git',
+            isReady: () => Promise.resolve(undefined)
+          } as Studio,
           []
         )
       )
@@ -300,6 +321,48 @@ suite('Experiments Data Test Suite', () => {
       expect(mockGetNumCommits).to.have.calledWithExactly(
         dvcDemoPath,
         'other-branch'
+      )
+    })
+
+    it('should send the expected request to Studio if the user has a token set', async () => {
+      const mockStudioToken = 'isat_BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
+      const { data, mockFetch } = buildExperimentsData(
+        disposable,
+        '* main',
+        gitLogFixture,
+        mockStudioToken
+      )
+      const requestSent = new Promise(resolve =>
+        data.onDidUpdate(data => {
+          if (isStudioExperimentsOutput(data)) {
+            resolve(undefined)
+            expect(data).to.deep.equal({
+              live: [],
+              pushed: [],
+              view_url: mockBaseStudioUrl
+            })
+          }
+        })
+      )
+
+      await data.isReady()
+
+      await requestSent
+
+      expect(mockFetch).to.be.calledOnce
+      expect(mockFetch).to.be.calledWithExactly(
+        STUDIO_URL +
+          '/api/view-links?' +
+          'commits=53c3851f46955fa3e2b8f6e1c52999acc8c9ea77' +
+          '&commits=fe2919bb4394b30494bea905c253e10077b9a1bd' +
+          '&commits=7df876cb5147800cd3e489d563bc6dcd67188621' +
+          '&git_remote_url=git%40github.com%3Aiterative%2Fvscode-dvc-demo.git',
+        {
+          headers: {
+            Authorization: `token ${mockStudioToken}`
+          },
+          method: 'GET'
+        }
       )
     })
   })

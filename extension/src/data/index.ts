@@ -18,12 +18,26 @@ type LocalExperimentsOutput = {
 
 type RemoteExperimentsOutput = { lsRemoteOutput: string }
 
-export type ExperimentsOutput = LocalExperimentsOutput | RemoteExperimentsOutput
+type StudioExperimentsOutput = {
+  baseUrl: string | undefined
+  live: { baselineSha: string; name: string }[]
+  pushed: string[]
+}
+
+export type ExperimentsOutput =
+  | LocalExperimentsOutput
+  | RemoteExperimentsOutput
+  | StudioExperimentsOutput
 
 export const isRemoteExperimentsOutput = (
   data: ExperimentsOutput
 ): data is RemoteExperimentsOutput =>
   (data as RemoteExperimentsOutput).lsRemoteOutput !== undefined
+
+export const isStudioExperimentsOutput = (
+  data: ExperimentsOutput
+): data is StudioExperimentsOutput =>
+  (data as StudioExperimentsOutput).live !== undefined
 
 export abstract class BaseData<
   T extends
