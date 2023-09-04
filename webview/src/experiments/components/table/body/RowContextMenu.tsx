@@ -271,6 +271,7 @@ const getSingleSelectMenuOptions = (
     ),
     {
       disabled: isWorkspace || !sha,
+      divider: true,
       id: MessageFromWebviewType.COPY_TO_CLIPBOARD,
       label: 'Copy Sha',
       message: {
