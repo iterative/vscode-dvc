@@ -1,8 +1,8 @@
 import { PlotsOutput, PlotsOutputOrError } from '../cli/dvc/contract'
 import { isDvcError } from '../cli/dvc/reader'
-import { standardisePath } from '../fileSystem/util'
+import { ensureOsFileSep } from '../fileSystem/util'
 
-export const standardisePlotsDataPaths = (
+export const ensurePlotsDataPathsOsSep = (
   plotsData: PlotsOutputOrError
 ): PlotsOutputOrError => {
   if (isDvcError(plotsData)) {
@@ -12,7 +12,7 @@ export const standardisePlotsDataPaths = (
   const { data, errors } = plotsData
 
   for (const path of Object.keys(data)) {
-    standardisedData.data[standardisePath(path)] = data[path]
+    standardisedData.data[ensureOsFileSep(path)] = data[path]
   }
 
   if (!errors) {
@@ -23,7 +23,7 @@ export const standardisePlotsDataPaths = (
       return error
     }
 
-    return { ...error, name: standardisePath(error.name) }
+    return { ...error, name: ensureOsFileSep(error.name) }
   })
 
   return standardisedData

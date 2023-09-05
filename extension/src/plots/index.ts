@@ -5,7 +5,7 @@ import { WebviewMessages } from './webview/messages'
 import { PlotsData } from './data'
 import { ErrorsModel } from './errors/model'
 import { PlotsModel } from './model'
-import { standardisePlotsDataPaths } from './util'
+import { ensurePlotsDataPathsOsSep } from './util'
 import { collectEncodingElements, collectScale } from './paths/collect'
 import { PathsModel } from './paths/model'
 import { pickCustomPlots, pickMetricAndParam } from './model/quickPick'
@@ -293,7 +293,7 @@ export class Plots extends BaseRepository<TPlotsData> {
   private onDidUpdateData() {
     this.dispose.track(
       this.data.onDidUpdate(async ({ data, revs }) => {
-        const standardisedData = standardisePlotsDataPaths(data)
+        const standardisedData = ensurePlotsDataPathsOsSep(data)
         await Promise.all([
           this.plots.transformAndSet(standardisedData, revs),
           this.paths.transformAndSet(standardisedData, revs),
