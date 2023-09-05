@@ -36,6 +36,10 @@ export class Studio extends DeferredDisposable {
     return this.accessTokenSet
   }
 
+  public isConnected() {
+    return !!this.baseUrl
+  }
+
   public getAccessToken() {
     return this.studioAccessToken
   }
