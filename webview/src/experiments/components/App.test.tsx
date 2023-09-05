@@ -13,7 +13,8 @@ import {
   Column,
   ColumnType,
   Commit,
-  Experiment
+  Experiment,
+  StudioLinkType
 } from 'dvc/src/experiments/webview/contract'
 import { buildMetricOrParamPath } from 'dvc/src/experiments/columns/paths'
 import dataTypesTableFixture from 'dvc/src/test/fixtures/expShow/dataTypes/tableData'
@@ -1070,7 +1071,7 @@ describe('App', () => {
       expect(disabledMenuItem).toBeDefined()
 
       disabledMenuItem && fireEvent.click(disabledMenuItem, { bubbles: true })
-      expect(screen.queryAllByRole('menuitem')).toHaveLength(12)
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(13)
     })
 
     it('should be removed with a left click', () => {
@@ -1080,7 +1081,7 @@ describe('App', () => {
       fireEvent.contextMenu(row, { bubbles: true })
 
       advanceTimersByTime(100)
-      expect(screen.getAllByRole('menuitem')).toHaveLength(12)
+      expect(screen.getAllByRole('menuitem')).toHaveLength(13)
 
       fireEvent.click(row, {
         bubbles: true
@@ -1097,7 +1098,7 @@ describe('App', () => {
       fireEvent.contextMenu(row, { bubbles: true })
 
       advanceTimersByTime(100)
-      expect(screen.getAllByRole('menuitem')).toHaveLength(12)
+      expect(screen.getAllByRole('menuitem')).toHaveLength(13)
 
       const commit = getRow('main')
       fireEvent.click(commit, { bubbles: true })
@@ -1112,13 +1113,13 @@ describe('App', () => {
       fireEvent.contextMenu(row, { bubbles: true })
 
       advanceTimersByTime(100)
-      expect(screen.queryAllByRole('menuitem')).toHaveLength(12)
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(13)
 
       fireEvent.contextMenu(within(row).getByText('[exp-e7a67]'), {
         bubbles: true
       })
       advanceTimersByTime(200)
-      expect(screen.queryAllByRole('menuitem')).toHaveLength(12)
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(13)
     })
 
     it('should enable the remove option for an experiment', () => {
@@ -1482,6 +1483,31 @@ describe('App', () => {
 
       advanceTimersByTime(100)
       expect(selectedRows().length).toBe(0)
+    })
+
+    it("should allow the user to copy an experiment's Studio link", () => {
+      renderTable()
+
+      const target = screen.getByText('42b8736')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      advanceTimersByTime(100)
+      const menuitems = screen.getAllByRole('menuitem')
+
+      const copyLinkOption = menuitems.find(
+        item =>
+          item.textContent?.includes('Copy Studio Link') &&
+          !item.className.includes('disabled')
+      )
+
+      expect(copyLinkOption).toBeDefined()
+
+      copyLinkOption && fireEvent.click(copyLinkOption)
+
+      expect(sendMessage).toHaveBeenCalledWith({
+        payload: { id: 'test-branch', type: StudioLinkType.PUSHED },
+        type: MessageFromWebviewType.COPY_STUDIO_LINK
+      })
     })
   })
 
@@ -2063,8 +2089,8 @@ describe('App', () => {
       })
     })
 
-    it('should allow copying a Studio link when an experiment exists on the remote and Studio is connected', () => {
-      renderTable({ ...tableStateFixture, isStudioConnected: true })
+    it('should allow copying a Studio link when an experiment exists on the remote and Studio', () => {
+      renderTable()
 
       const copyLinkButton = within(getRow('42b8736')).getByLabelText(
         'Copy Experiment Link'
@@ -2072,21 +2098,30 @@ describe('App', () => {
       fireEvent.click(copyLinkButton)
 
       expect(mockPostMessage).toHaveBeenCalledWith({
-        payload: 'test-branch',
+        payload: { id: 'test-branch', type: StudioLinkType.PUSHED },
         type: MessageFromWebviewType.COPY_STUDIO_LINK
       })
     })
 
-    it('should not allow copying a Studio link when an experiment exists on the remote and Studio is not connected', () => {
-      renderTable({ ...tableStateFixture, isStudioConnected: false })
+    it('should not allow copying a Studio link when an experiment exists on the remote but not on Studio', () => {
+      renderTable({
+        ...tableStateFixture,
+        rows: tableDataFixture.rows.map(row => ({
+          ...row,
+          subRows: row.subRows?.map(exp => ({
+            ...exp,
+            studioLinkType: undefined
+          }))
+        }))
+      })
 
       expect(
         within(getRow('42b8736')).queryByLabelText('Copy Experiment Link')
       ).not.toBeInTheDocument()
     })
 
-    it('should not allow copying a Studio link when an experiment does not exist on the remote and Studio is connected', () => {
-      renderTable({ ...tableStateFixture, isStudioConnected: true })
+    it('should not allow copying a Studio link when an experiment does not exist on the remote or Studio', () => {
+      renderTable()
 
       expect(
         within(getRow('f0f9186')).queryByLabelText('Copy Experiment Link')

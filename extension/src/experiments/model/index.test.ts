@@ -57,6 +57,7 @@ describe('ExperimentsModel', () => {
       { main: 6 }
     )
     model.transformAndSetRemote(remoteExpRefsFixture)
+    model.setStudioData([], ['42b8736b08170529903cd203a1f40382a4b4a8cd'])
     expect(model.getRowData()).toStrictEqual(rowsFixture)
   })
 

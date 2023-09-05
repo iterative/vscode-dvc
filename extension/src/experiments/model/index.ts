@@ -6,7 +6,7 @@ import {
   collectAddRemoveCommitsDetails,
   collectExperiments,
   collectOrderedCommitsAndExperiments,
-  collectRemoteExpDetails,
+  collectRemoteExpShas,
   collectRunningInQueue,
   collectRunningInWorkspace
 } from './collect'
@@ -26,7 +26,8 @@ import {
   isRunning,
   GitRemoteStatus,
   RunningExperiment,
-  WORKSPACE_BRANCH
+  WORKSPACE_BRANCH,
+  StudioLinkType
 } from '../webview/contract'
 import { reorderListSubset } from '../../util/array'
 import {
@@ -80,8 +81,12 @@ export class ExperimentsModel extends ModelWithPersistence {
   private filters: Map<string, FilterDefinition> = new Map()
 
   private remoteExpShas?: Set<string>
-  private remoteExpRefs: string[] = []
   private pushing = new Set<string>()
+
+  private studioLiveOnlyExperiments: { baselineSha: string; name: string }[] =
+    []
+
+  private studioPushedExperiments: string[] = []
 
   private currentSorts: SortDefinition[]
   private running: RunningExperiment[] = []
@@ -176,11 +181,8 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public transformAndSetRemote(lsRemoteOutput: string) {
-    const { remoteExpShas, remoteExpRefs } =
-      collectRemoteExpDetails(lsRemoteOutput)
+    const remoteExpShas = collectRemoteExpShas(lsRemoteOutput)
     this.remoteExpShas = remoteExpShas
-    this.remoteExpRefs = remoteExpRefs
-    this.deferred.resolve()
   }
 
   public toggleStars(ids: string[]) {
@@ -390,6 +392,16 @@ export class ExperimentsModel extends ModelWithPersistence {
     })
   }
 
+  public getExperimentShas(id: string) {
+    for (const experiment of this.getExperiments()) {
+      if (experiment.id === id) {
+        const { baselineSha, sha } = experiment
+        return { baselineSha, sha }
+      }
+    }
+    return { baselineSha: undefined, sha: undefined }
+  }
+
   public getCommitsAndExperiments() {
     return collectOrderedCommitsAndExperiments(this.commits, commit =>
       this.getExperimentsByCommit(commit)
@@ -543,8 +555,21 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.availableBranchesToSelect
   }
 
-  public getRemoteExpRefs() {
-    return this.remoteExpRefs
+  public setStudioData(
+    live: { baselineSha: string; name: string }[],
+    pushed: string[]
+  ) {
+    this.studioLiveOnlyExperiments = live
+    this.studioPushedExperiments = pushed
+  }
+
+  public assumePushed(shas: string[]) {
+    for (const sha of shas) {
+      if (this.studioPushedExperiments.includes(sha)) {
+        continue
+      }
+      this.studioPushedExperiments.push(sha)
+    }
   }
 
   public hasDvcLiveOnlyRunning() {
@@ -596,6 +621,7 @@ export class ExperimentsModel extends ModelWithPersistence {
         const experiment = this.addDetails(originalExperiment)
 
         this.addRemoteStatus(experiment)
+        this.addStudioLinkType(experiment, commit.sha)
 
         return experiment
       })
@@ -621,6 +647,35 @@ export class ExperimentsModel extends ModelWithPersistence {
     experiment.gitRemoteStatus = this.remoteExpShas.has(experiment.sha)
       ? GitRemoteStatus.ON_REMOTE
       : GitRemoteStatus.NOT_ON_REMOTE
+  }
+
+  private addStudioLinkType(
+    experiment: Experiment,
+    baselineSha: string | undefined
+  ) {
+    if (
+      this.studioLiveOnlyExperiments.length === 0 &&
+      this.studioPushedExperiments.length === 0
+    ) {
+      return
+    }
+
+    if (
+      experiment.sha &&
+      this.studioPushedExperiments.includes(experiment.sha)
+    ) {
+      experiment.studioLinkType = StudioLinkType.PUSHED
+      return
+    }
+
+    if (
+      this.studioLiveOnlyExperiments.some(
+        ({ baselineSha: expBaselineSha, name }) =>
+          baselineSha === expBaselineSha && experiment.id === name
+      )
+    ) {
+      experiment.studioLinkType = StudioLinkType.LIVE
+    }
   }
 
   private setColoredStatus(runningExperiments: RunningExperiment[]) {

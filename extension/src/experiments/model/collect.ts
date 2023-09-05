@@ -262,7 +262,7 @@ const collectExpRange = (
   const expState = revs[0]
 
   const { name, rev } = expState
-  const { id: baselineId } = baseline
+  const { id: baselineId, sha: baselineSha } = baseline
 
   const label =
     rev === EXPERIMENT_WORKSPACE_ID
@@ -291,6 +291,8 @@ const collectExpRange = (
   if (name) {
     experiment.description = `[${name}]`
   }
+
+  experiment.baselineSha = baselineSha
 
   collectExecutorInfo(experiment, executor)
   collectRunningExperiment(acc, experiment)
@@ -483,15 +485,11 @@ export const collectRunningInWorkspace = (
   }
 }
 
-export const collectRemoteExpDetails = (
-  lsRemoteOutput: string
-): { remoteExpShas: Set<string>; remoteExpRefs: string[] } => {
-  const remoteExpRefs: string[] = []
-  const remoteExpShas = new Set<string>()
+export const collectRemoteExpShas = (lsRemoteOutput: string): Set<string> => {
+  const acc = new Set<string>()
   for (const shaAndRef of trimAndSplit(lsRemoteOutput)) {
-    const [sha, ref] = shaAndRef.split(/\s+/)
-    remoteExpShas.add(sha)
-    remoteExpRefs.push(ref.trim())
+    const [sha] = shaAndRef.split(/\s+/)
+    acc.add(sha)
   }
-  return { remoteExpRefs, remoteExpShas }
+  return acc
 }
