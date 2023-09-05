@@ -384,7 +384,8 @@ export const stubWorkspaceGettersWebview = async (
     experiments,
     experimentsModel,
     messageSpy,
-    mockMessageReceived
+    mockMessageReceived,
+    webview
   } = await buildExperimentsWebview({ disposer })
 
   return {
@@ -395,6 +396,7 @@ export const stubWorkspaceGettersWebview = async (
     experimentsModel,
     messageSpy,
     ...stubWorkspaceExperiments(dvcRoot, experiments),
-    mockMessageReceived
+    mockMessageReceived,
+    webview
   }
 }

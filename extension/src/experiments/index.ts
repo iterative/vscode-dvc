@@ -10,6 +10,7 @@ import omit from 'lodash.omit'
 import { ColumnLike, addStarredToColumns } from './columns/like'
 import { setContextForEditorTitleIcons } from './context'
 import { ExperimentsModel } from './model'
+import { collectRemoteExpShas } from './model/collect'
 import {
   pickExperiment,
   pickExperiments,
@@ -229,9 +230,10 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public async unsetPushing(ids: string[]) {
-    await this.update()
+    await Promise.all([this.update(), this.patchStudioApiTimingIssue(ids)])
+
     this.experiments.unsetPushing(ids)
-    return this.notifyChanged()
+    return this.webviewMessages.sendWebviewMessage()
   }
 
   public hasCheckpoints() {
@@ -758,5 +760,57 @@ export class Experiments extends BaseRepository<TableData> {
     const columns = this.columns.getTerminalNodes()
     const columnLikes = addStarredToColumns(columns)
     return pickColumnToFilter(columnLikes)
+  }
+
+  private async patchStudioApiTimingIssue(ids: string[]) {
+    if (!this.studio.isConnected()) {
+      return
+    }
+
+    const [, { lsRemoteOutput }] = await Promise.all([
+      this.waitForStudioUpdate(),
+      this.waitForRemoteUpdate()
+    ])
+
+    const remoteExpShas = collectRemoteExpShas(lsRemoteOutput)
+
+    const shas = []
+    for (const { id, sha } of this.experiments.getExperiments()) {
+      if (ids.includes(id) && sha && remoteExpShas.has(sha)) {
+        shas.push(sha)
+      }
+    }
+
+    this.experiments.assumePushed(shas)
+  }
+
+  private waitForStudioUpdate() {
+    return new Promise(resolve => {
+      const listener = this.dispose.track(
+        this.data.onDidUpdate(data => {
+          if (!isStudioExperimentsOutput(data)) {
+            return
+          }
+          this.dispose.untrack(listener)
+          listener.dispose()
+          resolve(undefined)
+        })
+      )
+    })
+  }
+
+  private waitForRemoteUpdate(): Promise<{ lsRemoteOutput: string }> {
+    return new Promise(resolve => {
+      const listener = this.dispose.track(
+        this.data.onDidUpdate(data => {
+          if (!isRemoteExperimentsOutput(data)) {
+            return
+          }
+          this.dispose.untrack(listener)
+          listener.dispose()
+          resolve(data)
+        })
+      )
+    })
   }
 }
