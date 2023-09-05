@@ -19,7 +19,7 @@ import { ExperimentsModel } from '../model'
 import { SortDefinition } from '../model/sortBy'
 import { getPositiveIntegerInput } from '../../vscode/inputBox'
 import { Title } from '../../vscode/title'
-import { ConfigKey, setConfigValue } from '../../vscode/config'
+import { ConfigKey, getConfigValue, setConfigValue } from '../../vscode/config'
 import { NUM_OF_COMMITS_TO_INCREASE } from '../../cli/dvc/constants'
 import { Pipeline } from '../../pipeline'
 import { collectColumnsWithChangedValues } from '../columns/collect'
@@ -376,9 +376,10 @@ export class WebviewMessages {
   }
 
   private async setMaxTableHeadDepth() {
+    const currentValue = getConfigValue(ConfigKey.EXP_TABLE_HEAD_MAX_HEIGHT)
     const newValue = await getPositiveIntegerInput(
       Title.SET_EXPERIMENTS_HEADER_HEIGHT,
-      { prompt: 'Use 0 for infinite height.', value: '0' },
+      { prompt: 'Use 0 for infinite height.', value: currentValue },
       true
     )
 
