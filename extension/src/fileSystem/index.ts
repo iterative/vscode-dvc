@@ -214,6 +214,17 @@ const loadYamlAsDoc = (
   }
 }
 
+const getYamlFileIndent = (lines: string[]) => {
+  const firstLineWithInd = lines.find(line => line.startsWith(' '))
+  if (!firstLineWithInd) {
+    return 2
+  }
+  const spacesMatches = firstLineWithInd.match(/^( +)[^ ]/)
+  const spaces = spacesMatches?.[1]
+
+  return spaces ? spaces.length : 2
+}
+
 export const addPlotToDvcYamlFile = (cwd: string, plotObj: PlotConfigData) => {
   const dvcYamlFile = `${cwd}/dvc.yaml`
   const dvcYamlDoc = loadYamlAsDoc(dvcYamlFile)
@@ -225,10 +236,13 @@ export const addPlotToDvcYamlFile = (cwd: string, plotObj: PlotConfigData) => {
   const { doc, lineCounter } = dvcYamlDoc
   const { dataFile, ...plot } = plotObj
   const plotName = relative(cwd, dataFile)
-  const plotYaml = yaml.stringify({ plots: [{ [plotName]: plot }] }).split('\n')
   const dvcYamlLines = readFileSync(dvcYamlFile, 'utf8').split('\n')
+  const indent = getYamlFileIndent(dvcYamlLines)
 
   const plots = doc.get('plots', true) as yaml.YAMLSeq | undefined
+  const plotYaml = yaml
+    .stringify({ plots: [{ [plotName]: plot }] }, { indent })
+    .split('\n')
 
   if (!plots?.range) {
     dvcYamlLines.push(...plotYaml)
