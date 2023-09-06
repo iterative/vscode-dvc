@@ -53,14 +53,14 @@ const pickTemplateAndFields = async (
       'bar_horizontal_sorted',
       'bar_horizontal'
     ],
-    'Pick a plot template'
+    'Pick a Plot Template'
   )
 
   if (!template) {
     return
   }
 
-  const x = await quickPickOne(fields, 'Pick A Metric for X')
+  const x = await quickPickOne(fields, 'Pick a Metric for X')
 
   if (!x) {
     return
@@ -68,7 +68,7 @@ const pickTemplateAndFields = async (
 
   const y = await quickPickOne(
     fields.filter(field => x !== field),
-    'Pick A Metric for Y'
+    'Pick a Metric for Y'
   )
 
   if (!y) {
@@ -88,10 +88,9 @@ export type PlotConfigData = {
 export const pickPlotConfiguration = async (): Promise<
   PlotConfigData | undefined
 > => {
-  // TBD file validation will be in next pr
+  // TBD data file validation will be in next pr
   const file = (await pickDataFile()) as string
-
-  const data = parseDataFile(file) as Record<string, unknown>[]
+  const data = (await parseDataFile(file)) as Record<string, unknown>[]
   const keys = Object.keys(data[0])
 
   const templateAndFields = await pickTemplateAndFields(keys)
