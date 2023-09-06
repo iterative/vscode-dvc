@@ -654,7 +654,7 @@ suite('Plots Test Suite', () => {
 
       const mockNewCustomPlotsOrder = [
         'custom-summary.json:accuracy-params.yaml:epochs',
-        'custom-summary.json:loss-params.yaml:dropout'
+        'custom-summary.json:loss-params.yaml:log_file'
       ]
 
       stub(plotsModel, 'getCustomPlots')
@@ -680,7 +680,7 @@ suite('Plots Test Suite', () => {
         },
         {
           metric: 'summary.json:loss',
-          param: 'params.yaml:dropout'
+          param: 'params.yaml:log_file'
         }
       ])
       expect(messageSpy).to.be.calledOnce
