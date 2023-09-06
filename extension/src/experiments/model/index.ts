@@ -6,7 +6,7 @@ import {
   collectAddRemoveCommitsDetails,
   collectExperiments,
   collectOrderedCommitsAndExperiments,
-  collectRemoteExpRefs,
+  collectRemoteExpShas,
   collectRunningInQueue,
   collectRunningInWorkspace
 } from './collect'
@@ -181,7 +181,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public transformAndSetRemote(lsRemoteOutput: string) {
-    const remoteExpShas = collectRemoteExpRefs(lsRemoteOutput)
+    const remoteExpShas = collectRemoteExpShas(lsRemoteOutput)
     this.remoteExpShas = remoteExpShas
   }
 
@@ -561,6 +561,15 @@ export class ExperimentsModel extends ModelWithPersistence {
   ) {
     this.studioLiveOnlyExperiments = live
     this.studioPushedExperiments = pushed
+  }
+
+  public assumePushed(shas: string[]) {
+    for (const sha of shas) {
+      if (this.studioPushedExperiments.includes(sha)) {
+        continue
+      }
+      this.studioPushedExperiments.push(sha)
+    }
   }
 
   public hasDvcLiveOnlyRunning() {

@@ -485,7 +485,7 @@ export const collectRunningInWorkspace = (
   }
 }
 
-export const collectRemoteExpRefs = (lsRemoteOutput: string): Set<string> => {
+export const collectRemoteExpShas = (lsRemoteOutput: string): Set<string> => {
   const acc = new Set<string>()
   for (const shaAndRef of trimAndSplit(lsRemoteOutput)) {
     const [sha] = shaAndRef.split(/\s+/)
