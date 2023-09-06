@@ -21,7 +21,8 @@ import {
   writeTsv,
   isPathInProject,
   getPidFromFile,
-  getEntryFromJsonFile
+  getEntryFromJsonFile,
+  addPlotToDvcYamlFile
 } from '.'
 import { dvcDemoPath } from '../test/util'
 import { DOT_DVC } from '../cli/dvc/constants'
@@ -432,6 +433,38 @@ describe('findOrCreateDvcYamlFile', () => {
         path: '/',
         scheme: 'file'
       })
+    )
+  })
+})
+
+describe('addPlotToDvcYamlFile', () => {
+  it('should add plots item with created plot if dvc.yaml file has no plots', () => {
+    const mockDvcYamlContent = [
+      'stages:',
+      '  train:',
+      '    cmd: python train.py'
+    ].join('\n')
+    const mockPlotYamlContent = [
+      '',
+      'plots:',
+      `  - ${relative('/', 'data.json')}:`,
+      '      template: simple',
+      '      x: epochs',
+      '      y: accuracy',
+      ''
+    ].join('\n')
+    mockedReadFileSync.mockReturnValueOnce(mockDvcYamlContent)
+
+    addPlotToDvcYamlFile('/', {
+      dataFile: 'data.json',
+      template: 'simple',
+      x: 'epochs',
+      y: 'accuracy'
+    })
+
+    expect(mockedWriteFileSync).toHaveBeenCalledWith(
+      '//dvc.yaml',
+      mockDvcYamlContent + mockPlotYamlContent
     )
   })
 })
