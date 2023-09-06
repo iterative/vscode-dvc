@@ -8,8 +8,6 @@ import {
 import { quickPickOne } from '../vscode/quickPick'
 import { pickFile } from '../vscode/resourcePicker'
 import { Title } from '../vscode/title'
-import { isObject } from '../util/object'
-import { Toast } from '../vscode/toast'
 
 const parseDataFile = (file: string) => {
   const ext = getFileExtension(file)
@@ -38,23 +36,6 @@ const pickDataFile = () => {
     },
     openLabel: 'Select'
   })
-}
-
-const getFieldOptions = (data: unknown): string[] => {
-  const isArray = Array.isArray(data)
-  const isObj = isObject(data)
-  if (!isArray && !isObj) {
-    return []
-  }
-
-  const maybeFieldsObjArr = isArray ? data : data[Object.keys(data)[0]]
-
-  if (!Array.isArray(maybeFieldsObjArr)) {
-    return []
-  }
-
-  const maybeFieldsObj: unknown = maybeFieldsObjArr[0]
-  return isObject(maybeFieldsObj) ? Object.keys(maybeFieldsObj) : []
 }
 
 const pickTemplateAndFields = async (
@@ -107,26 +88,11 @@ export type PlotConfigData = {
 export const pickPlotConfiguration = async (): Promise<
   PlotConfigData | undefined
 > => {
-  const file = await pickDataFile()
+  // TBD file validation will be in next pr
+  const file = (await pickDataFile()) as string
 
-  if (!file) {
-    return
-  }
-
-  const data = parseDataFile(file)
-
-  if (!data) {
-    // TBD maybe we could add an action to toasts that lets you try again?
-    return Toast.showError('Failed to parse data from file.')
-  }
-
-  const keys = getFieldOptions(data)
-
-  if (keys.length === 0) {
-    return Toast.showError(
-      'Failed to find field options for plot data. Is your file following DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
-    )
-  }
+  const data = parseDataFile(file) as Record<string, unknown>[]
+  const keys = Object.keys(data[0])
 
   const templateAndFields = await pickTemplateAndFields(keys)
 
