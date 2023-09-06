@@ -84,6 +84,10 @@ export const createSpec = (
     data: { name: 'values' },
     encoding: {
       x: {
+        axis: {
+          labelLimit: 75,
+          titlePadding: 30
+        },
         field: 'param',
         scale: {
           zero: false
@@ -92,6 +96,10 @@ export const createSpec = (
         type: getSpecDataType(paramType)
       },
       y: {
+        axis: {
+          labelLimit: 75,
+          titlePadding: 30
+        },
         field: 'metric',
         scale: {
           zero: false

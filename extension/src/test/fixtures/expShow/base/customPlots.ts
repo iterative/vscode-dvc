@@ -104,6 +104,10 @@ const data: CustomPlotsData = {
         data: { name: 'values' },
         encoding: {
           x: {
+            axis: {
+              labelLimit: 75,
+              titlePadding: 30
+            },
             field: 'param',
             scale: {
               zero: false
@@ -112,6 +116,10 @@ const data: CustomPlotsData = {
             type: 'nominal'
           },
           y: {
+            axis: {
+              labelLimit: 75,
+              titlePadding: 30
+            },
             field: 'metric',
             scale: {
               zero: false
@@ -206,6 +214,10 @@ const data: CustomPlotsData = {
         data: { name: 'values' },
         encoding: {
           x: {
+            axis: {
+              labelLimit: 75,
+              titlePadding: 30
+            },
             field: 'param',
             scale: {
               zero: false
@@ -214,6 +226,10 @@ const data: CustomPlotsData = {
             type: 'quantitative'
           },
           y: {
+            axis: {
+              labelLimit: 75,
+              titlePadding: 30
+            },
             field: 'metric',
             scale: {
               zero: false
