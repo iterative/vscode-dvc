@@ -200,16 +200,59 @@ stages:
   return appendFileSync(dvcYamlPath, pipeline)
 }
 
+const loadYamlAsDoc = (
+  path: string
+): { doc: yaml.Document; lineCounter: yaml.LineCounter } | undefined => {
+  try {
+    const lineCounter = new yaml.LineCounter()
+    return {
+      doc: yaml.parseDocument(readFileSync(path, 'utf8'), { lineCounter }),
+      lineCounter
+    }
+  } catch {
+    Logger.error(`failed to load yaml ${path}`)
+  }
+}
+
+const getYamlFileIndent = (lines: string[]) => {
+  const firstLineWithInd = lines.find(line => line.startsWith(' '))
+  if (!firstLineWithInd) {
+    return 2
+  }
+  const spacesMatches = firstLineWithInd.match(/^( +)[^ ]/)
+  const spaces = spacesMatches?.[1]
+
+  return spaces ? spaces.length : 2
+}
+
 export const addPlotToDvcYamlFile = (cwd: string, plotObj: PlotConfigData) => {
   const dvcYamlFile = `${cwd}/dvc.yaml`
+  const dvcYamlDoc = loadYamlAsDoc(dvcYamlFile)
+
+  if (!dvcYamlDoc) {
+    return
+  }
+
+  const { doc, lineCounter } = dvcYamlDoc
   const { dataFile, ...plot } = plotObj
   const plotName = relative(cwd, dataFile)
   const dvcYamlLines = readFileSync(dvcYamlFile, 'utf8').split('\n')
-  const plotYaml = yaml.stringify({ plots: [{ [plotName]: plot }] }).split('\n')
+  const indent = getYamlFileIndent(dvcYamlLines)
 
-  // TBD this only works correctly for yaml with 2 space indent and no plots
-  // will adjust for other possibilities in another pr
-  dvcYamlLines.push(...plotYaml)
+  const plots = doc.get('plots', true) as yaml.YAMLSeq | undefined
+  const plotYaml = yaml
+    .stringify({ plots: [{ [plotName]: plot }] }, { indent })
+    .split('\n')
+
+  if (!plots?.range) {
+    dvcYamlLines.push(...plotYaml)
+    writeFileSync(dvcYamlFile, dvcYamlLines.join('\n'))
+    return
+  }
+
+  const insertLineNum = lineCounter.linePos(plots.range[2])
+  dvcYamlLines.splice(insertLineNum.line - 1, 0, ...plotYaml.slice(1))
+
   writeFileSync(dvcYamlFile, dvcYamlLines.join('\n'))
 }
 

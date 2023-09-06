@@ -454,6 +454,7 @@ describe('addPlotToDvcYamlFile', () => {
       ''
     ].join('\n')
     mockedReadFileSync.mockReturnValueOnce(mockDvcYamlContent)
+    mockedReadFileSync.mockReturnValueOnce(mockDvcYamlContent)
 
     addPlotToDvcYamlFile('/', {
       dataFile: 'data.json',
