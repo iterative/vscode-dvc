@@ -69,7 +69,16 @@ export const checkForCustomPlotOptions = (
   return false
 }
 
-export const createSpec = (title: string, metric: string, param: string) =>
+const getSpecDataType = (type: string) =>
+  type === 'number' ? 'quantitative' : 'nominal'
+
+export const createSpec = (
+  title: string,
+  metric: string,
+  param: string,
+  metricType: string,
+  paramType: string
+) =>
   ({
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
     data: { name: 'values' },
@@ -80,7 +89,7 @@ export const createSpec = (title: string, metric: string, param: string) =>
           zero: false
         },
         title: param,
-        type: 'quantitative'
+        type: getSpecDataType(paramType)
       },
       y: {
         field: 'metric',
@@ -88,7 +97,7 @@ export const createSpec = (title: string, metric: string, param: string) =>
           zero: false
         },
         title,
-        type: 'quantitative'
+        type: getSpecDataType(metricType)
       }
     },
     height: 'container',

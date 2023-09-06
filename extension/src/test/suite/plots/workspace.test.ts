@@ -37,7 +37,7 @@ suite('Workspace Plots Test Suite', () => {
 
       const mockMetricVsParamOrderValue = {
         metric: 'summary.json:accuracy',
-        param: 'params.yaml:dropout'
+        param: 'params.yaml:log_file'
       }
 
       mockGetMetricAndParam.onFirstCall().resolves(mockMetricVsParamOrderValue)
@@ -88,12 +88,12 @@ suite('Workspace Plots Test Suite', () => {
 
       mockSelectCustomPlots
         .onFirstCall()
-        .resolves(['custom-summary.json:loss-params.yaml:dropout'])
+        .resolves(['custom-summary.json:loss-params.yaml:log_file'])
 
       stub(plotsModel, 'getCustomPlotsOrder').returns([
         {
           metric: 'summary.json:loss',
-          param: 'params.yaml:dropout'
+          param: 'params.yaml:log_file'
         }
       ])
 
@@ -121,7 +121,7 @@ suite('Workspace Plots Test Suite', () => {
       stub(plotsModel, 'getCustomPlotsOrder').returns([
         {
           metric: 'summary.json:loss',
-          param: 'params.yaml:dropout'
+          param: 'params.yaml:log_file'
         }
       ])
 
