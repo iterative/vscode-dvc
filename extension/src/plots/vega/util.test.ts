@@ -8,7 +8,8 @@ import {
   extendVegaSpec,
   getColorScale,
   Encoding,
-  reverseOfLegendSuppressionUpdate
+  reverseOfLegendSuppressionUpdate,
+  makePlotZoomOnWheel
 } from './util'
 import confusionTemplate from '../../test/fixtures/plotsDiff/templates/confusion'
 import confusionNormalizedTemplate from '../../test/fixtures/plotsDiff/templates/confusionNormalized'
@@ -347,5 +348,25 @@ describe('reverseOfLegendSuppressionUpdate', () => {
     )
     expect(result).not.toContain('"legend":{"disable":true}')
     expect(result).toContain('"legend":{"disable":false}')
+  })
+})
+
+describe('makePlotZoomOnWheel', () => {
+  it('should provide a spec update that makes custom plots zoom on wheel (and enable pan when zoomed)', () => {
+    const { spec: specUpdate } = makePlotZoomOnWheel(true, false)
+
+    expect(Object.keys(specUpdate)).toContain('params')
+  })
+
+  it('should provide a spec update that does not break template plots but enables zoom on wheel (and pan when zoomed)', () => {
+    const { spec: specUpdate } = makePlotZoomOnWheel(false, false)
+
+    expect(Object.keys(specUpdate)).not.toContain('params')
+  })
+
+  it('should provide a spec update that enables zoom on wheel (and pan when zoomed) for the default templates which have smoothing', () => {
+    const { spec: specUpdate } = makePlotZoomOnWheel(false, true)
+
+    expect(specUpdate.layer?.[0].params).not.toBeUndefined()
   })
 })
