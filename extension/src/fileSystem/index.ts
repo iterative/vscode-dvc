@@ -253,7 +253,8 @@ export const addPlotToDvcYamlFile = (cwd: string, plotObj: PlotConfigData) => {
   const insertLineNum = lineCounter.linePos(plots.range[2])
   dvcYamlLines.splice(insertLineNum.line - 1, 0, ...plotYaml.slice(1))
 
-  writeFileSync(dvcYamlFile, dvcYamlLines.join('\n'))
+  void openFileInEditor(dvcYamlFile)
+  return writeFileSync(dvcYamlFile, dvcYamlLines.join('\n'))
 }
 
 export const getFileExtension = (filePath: string) => parse(filePath).ext

@@ -113,18 +113,18 @@ export const pickPlotConfiguration = async (): Promise<
     return
   }
 
-  const data = parseDataFile(file)
+  const data = await parseDataFile(file)
+  const failedToParseMessage =
+    'Failed to find field options for plot data. Is your file following DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
 
   if (!data) {
-    return Toast.showError('Failed to parse data from file.')
+    return Toast.showError(failedToParseMessage)
   }
 
   const keys = getFieldOptions(data)
 
   if (keys.length < 2) {
-    return Toast.showError(
-      'Failed to find field options for plot data. Is your file following DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
-    )
+    return Toast.showError(failedToParseMessage)
   }
 
   const templateAndFields = await pickTemplateAndFields(keys)

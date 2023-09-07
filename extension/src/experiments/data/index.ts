@@ -1,4 +1,5 @@
-import { join } from 'path'
+import querystring from 'querystring'
+import fetch from 'node-fetch'
 import { collectBranches, collectFiles } from './collect'
 import {
   EXPERIMENTS_GIT_LOGS_REFS,
@@ -12,25 +13,30 @@ import { ExpShowOutput } from '../../cli/dvc/contract'
 import {
   BaseData,
   ExperimentsOutput,
-  isRemoteExperimentsOutput
+  isRemoteExperimentsOutput,
+  isStudioExperimentsOutput
 } from '../../data'
 import {
   Args,
   DOT_DVC,
-  ExperimentFlag,
-  TEMP_EXP_DIR
+  DVCLIVE_STEP_COMPLETED_SIGNAL_FILE,
+  ExperimentFlag
 } from '../../cli/dvc/constants'
 import { COMMITS_SEPARATOR, gitPath } from '../../cli/git/constants'
 import { getGitPath } from '../../fileSystem'
 import { ExperimentsModel } from '../model'
+import { Studio } from '../studio'
+import { STUDIO_URL } from '../../setup/webview/contract'
 
 export class ExperimentsData extends BaseData<ExperimentsOutput> {
   private readonly experiments: ExperimentsModel
+  private readonly studio: Studio
 
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
     experiments: ExperimentsModel,
+    studio: Studio,
     subProjects: string[]
   ) {
     super(
@@ -38,13 +44,19 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
       internalCommands,
       [{ name: 'update', process: () => this.update() }],
       subProjects,
-      ['dvc.lock', 'dvc.yaml', 'params.yaml', DOT_DVC]
+      [
+        'dvc.lock',
+        'dvc.yaml',
+        'params.yaml',
+        DOT_DVC,
+        DVCLIVE_STEP_COMPLETED_SIGNAL_FILE
+      ]
     )
 
     this.experiments = experiments
+    this.studio = studio
 
     void this.watchExpGitRefs()
-    void this.watchQueueDirectories()
     void this.managedUpdate()
     this.waitForInitialLocalData()
   }
@@ -54,10 +66,13 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
   }
 
   public async update(): Promise<void> {
-    await Promise.all([this.updateExpShow(), this.updateRemoteExpRefs()])
+    await Promise.all([
+      this.updateExpShowAndStudio(),
+      this.updateRemoteExpRefs()
+    ])
   }
 
-  private async updateExpShow() {
+  private async updateExpShowAndStudio() {
     await this.updateBranches()
     const [currentBranch, ...branches] = this.experiments.getBranchesToShow()
     const availableNbCommits: { [branch: string]: number } = {}
@@ -73,8 +88,21 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
     }
 
     const branchLogs = await Promise.all(promises)
-    const { args, gitLog, rowOrder } = this.collectGitLogAndOrder(branchLogs)
+    const { args, gitLog, rowOrder, shas } =
+      this.collectGitLogAndOrder(branchLogs)
 
+    return Promise.all([
+      this.updateExpShow(args, availableNbCommits, gitLog, rowOrder),
+      this.requestStudioData(shas)
+    ])
+  }
+
+  private async updateExpShow(
+    args: Args,
+    availableNbCommits: { [branch: string]: number },
+    gitLog: string,
+    rowOrder: { branch: string; sha: string }[]
+  ) {
     const expShow = await this.internalCommands.executeCommand<ExpShowOutput>(
       AvailableCommands.EXP_SHOW,
       this.dvcRoot,
@@ -84,6 +112,49 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
     this.notifyChanged({ availableNbCommits, expShow, gitLog, rowOrder })
 
     this.collectFiles({ expShow })
+  }
+
+  private async requestStudioData(shas: string[]) {
+    await this.studio.isReady()
+
+    const defaultData = { baseUrl: undefined, live: [], pushed: [] }
+
+    const studioAccessToken = this.studio.getAccessToken()
+
+    if (!studioAccessToken || shas.length === 0) {
+      this.notifyChanged(defaultData)
+      return
+    }
+
+    const params = querystring.stringify({
+      commits: shas,
+      git_remote_url: this.studio.getGitRemoteUrl()
+    })
+
+    try {
+      const response = await fetch(`${STUDIO_URL}/api/view-links?${params}`, {
+        headers: {
+          Authorization: `token ${studioAccessToken}`
+        },
+        method: 'GET'
+      })
+
+      const { live, pushed, view_url } = (await response.json()) as {
+        live: { baseline_sha: string; name: string }[]
+        pushed: string[]
+        view_url: string
+      }
+      this.notifyChanged({
+        baseUrl: view_url,
+        live: live.map(({ baseline_sha, name }) => ({
+          baselineSha: baseline_sha,
+          name
+        })),
+        pushed
+      })
+    } catch {
+      this.notifyChanged(defaultData)
+    }
   }
 
   private async collectGitLogByBranch(
@@ -118,6 +189,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
   ) {
     const rowOrder: { branch: string; sha: string }[] = []
     const args: Args = []
+    const shas = []
     const gitLog: string[] = []
 
     for (const { branch, branchLog } of branchLogs) {
@@ -129,9 +201,10 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
           continue
         }
         args.push(ExperimentFlag.REV, sha)
+        shas.push(sha)
       }
     }
-    return { args, gitLog: gitLog.join(COMMITS_SEPARATOR), rowOrder }
+    return { args, gitLog: gitLog.join(COMMITS_SEPARATOR), rowOrder, shas }
   }
 
   private async updateBranches() {
@@ -181,17 +254,8 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
     )
   }
 
-  private watchQueueDirectories() {
-    const tempQueueDirectory = join(this.dvcRoot, TEMP_EXP_DIR)
-    return createFileSystemWatcher(
-      disposable => this.dispose.track(disposable),
-      getRelativePattern(tempQueueDirectory, '**'),
-      (path: string) => this.listener(path)
-    )
-  }
-
   private async updateRemoteExpRefs() {
-    const [remoteExpRefs] = await Promise.all([
+    const [lsRemoteOutput] = await Promise.all([
       this.internalCommands.executeCommand(
         AvailableCommands.GIT_GET_REMOTE_EXPERIMENT_REFS,
         this.dvcRoot
@@ -199,13 +263,16 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
       this.isReady()
     ])
 
-    this.notifyChanged({ remoteExpRefs })
+    this.notifyChanged({ lsRemoteOutput })
   }
 
   private waitForInitialLocalData() {
     const waitForInitialData = this.dispose.track(
       this.onDidUpdate(data => {
-        if (isRemoteExperimentsOutput(data)) {
+        if (
+          isRemoteExperimentsOutput(data) ||
+          isStudioExperimentsOutput(data)
+        ) {
           return
         }
         this.dispose.untrack(waitForInitialData)

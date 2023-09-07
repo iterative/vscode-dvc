@@ -1,5 +1,5 @@
 import { SortDefinition } from '../experiments/model/sortBy'
-import { TableData } from '../experiments/webview/contract'
+import { StudioLinkType, TableData } from '../experiments/webview/contract'
 import {
   PlotHeight,
   PlotsData,
@@ -116,7 +116,7 @@ export type MessageFromWebview =
     }
   | {
       type: MessageFromWebviewType.COPY_STUDIO_LINK
-      payload: string
+      payload: { id: string; type: StudioLinkType }
     }
   | {
       type: MessageFromWebviewType.EXPORT_PLOT_DATA_AS_JSON

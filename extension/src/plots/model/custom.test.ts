@@ -6,18 +6,18 @@ describe('cleanupOlderValue', () => {
   it('should update value if contents are outdated', () => {
     const output = cleanupOldOrderValue({
       metric: 'metrics:summary.json:loss',
-      param: 'params:params.yaml:dropout'
+      param: 'params:params.yaml:log_file'
     })
     expect(output).toStrictEqual({
       metric: 'summary.json:loss',
-      param: 'params.yaml:dropout'
+      param: 'params.yaml:log_file'
     })
   })
 
   it('should not update value if contents are not outdated', () => {
     const value = {
       metric: 'summary.json:loss',
-      param: 'params.yaml:dropout'
+      param: 'params.yaml:log_file'
     }
     const output = cleanupOldOrderValue(value)
     expect(output).toStrictEqual(value)
@@ -30,13 +30,13 @@ describe('checkForCustomPlotOptions', () => {
       [
         {
           hasChildren: false,
-          label: 'dropout',
-          path: 'params:params.yaml:dropout',
+          label: 'log_file',
+          path: 'params:params.yaml:log_file',
           type: ColumnType.PARAMS
         },
         {
           hasChildren: false,
-          label: 'dropout',
+          label: 'log_file',
           path: 'params:params.yaml:epochs',
           type: ColumnType.PARAMS
         },
@@ -63,13 +63,13 @@ describe('checkForCustomPlotOptions', () => {
       [
         {
           hasChildren: false,
-          label: 'dropout',
-          path: 'params:params.yaml:dropout',
+          label: 'log_file',
+          path: 'params:params.yaml:log_file',
           type: ColumnType.PARAMS
         },
         {
           hasChildren: false,
-          label: 'dropout',
+          label: 'log_file',
           path: 'params:params.yaml:epochs',
           type: ColumnType.PARAMS
         },
@@ -90,7 +90,7 @@ describe('checkForCustomPlotOptions', () => {
         ...customPlotsOrderFixture,
         {
           metric: 'summary.json:accuracy',
-          param: 'params.yaml:dropout'
+          param: 'params.yaml:log_file'
         },
         {
           metric: 'summary.json:loss',

@@ -874,7 +874,7 @@ describe('App', () => {
     let plots = screen.getAllByTestId(/summary\.json/)
 
     expect(plots.map(plot => plot.id)).toStrictEqual([
-      'custom-summary.json:loss-params.yaml:dropout',
+      'custom-summary.json:loss-params.yaml:log_file',
       'custom-summary.json:accuracy-params.yaml:epochs'
     ])
 
@@ -884,7 +884,7 @@ describe('App', () => {
 
     expect(plots.map(plot => plot.id)).toStrictEqual([
       'custom-summary.json:accuracy-params.yaml:epochs',
-      'custom-summary.json:loss-params.yaml:dropout'
+      'custom-summary.json:loss-params.yaml:log_file'
     ])
   })
 
@@ -895,7 +895,7 @@ describe('App', () => {
 
     const plots = screen.getAllByTestId(/summary\.json/)
     expect(plots.map(plot => plot.id)).toStrictEqual([
-      'custom-summary.json:loss-params.yaml:dropout',
+      'custom-summary.json:loss-params.yaml:log_file',
       'custom-summary.json:accuracy-params.yaml:epochs'
     ])
 
@@ -905,7 +905,7 @@ describe('App', () => {
 
     const expectedOrder = [
       'custom-summary.json:accuracy-params.yaml:epochs',
-      'custom-summary.json:loss-params.yaml:dropout'
+      'custom-summary.json:loss-params.yaml:log_file'
     ]
 
     expect(mockPostMessage).toHaveBeenCalledTimes(1)
@@ -928,7 +928,7 @@ describe('App', () => {
 
     expect(
       screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
-    ).toStrictEqual(['custom-summary.json:loss-params.yaml:dropout'])
+    ).toStrictEqual(['custom-summary.json:loss-params.yaml:log_file'])
 
     sendSetDataMessage({
       custom: customPlotsFixture
@@ -937,7 +937,7 @@ describe('App', () => {
     expect(
       screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
     ).toStrictEqual([
-      'custom-summary.json:loss-params.yaml:dropout',
+      'custom-summary.json:loss-params.yaml:log_file',
       'custom-summary.json:accuracy-params.yaml:epochs'
     ])
   })
@@ -950,7 +950,7 @@ describe('App', () => {
     expect(
       screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
     ).toStrictEqual([
-      'custom-summary.json:loss-params.yaml:dropout',
+      'custom-summary.json:loss-params.yaml:log_file',
       'custom-summary.json:accuracy-params.yaml:epochs'
     ])
 
@@ -978,7 +978,7 @@ describe('App', () => {
     dragAndDrop(templatePlots[0], customPlots[1])
 
     expect(customPlots.map(plot => plot.id)).toStrictEqual([
-      'custom-summary.json:loss-params.yaml:dropout',
+      'custom-summary.json:loss-params.yaml:log_file',
       'custom-summary.json:accuracy-params.yaml:epochs'
     ])
   })
@@ -1221,7 +1221,7 @@ describe('App', () => {
 
     const expectedOrder = [
       'custom-summary.json:accuracy-params.yaml:epochs',
-      'custom-summary.json:loss-params.yaml:dropout'
+      'custom-summary.json:loss-params.yaml:log_file'
     ]
 
     expect(

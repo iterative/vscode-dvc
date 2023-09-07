@@ -2,6 +2,49 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.51] - 2023-09-05
+
+### 🚀 New Features and Enhancements
+
+- Provide shareable links for all experiments found on Studio [#4600](https://github.com/iterative/vscode-dvc/pull/4600) by [@mattseddon](https://github.com/mattseddon)
+- Patch Studio API update timinig issue [#4619](https://github.com/iterative/vscode-dvc/pull/4619) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Fix plots paths breaking on windows [#4607](https://github.com/iterative/vscode-dvc/pull/4607) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Revert collecting remote exp refs [#4609](https://github.com/iterative/vscode-dvc/pull/4609) by [@mattseddon](https://github.com/mattseddon)
+
+## [1.0.50] - 2023-09-03
+
+### 🐛 Bug Fixes
+
+- Send full sha for copy sha command [#4615](https://github.com/iterative/vscode-dvc/pull/4615) by [@mattseddon](https://github.com/mattseddon)
+- Do not allow user to copy non-existent sha [#4617](https://github.com/iterative/vscode-dvc/pull/4617) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (3.17.0) [#4593](https://github.com/iterative/vscode-dvc/pull/4593) by [@mattseddon](https://github.com/mattseddon)
+- Stop explicitly watching temp queued experiment directories (already covered) [#4610](https://github.com/iterative/vscode-dvc/pull/4610) by [@mattseddon](https://github.com/mattseddon)
+
+## [1.0.49] - 2023-08-29
+
+### 🐛 Bug Fixes
+
+- Use DVCLive step completed signal file events to trigger experiments and plots data updates [#4579](https://github.com/iterative/vscode-dvc/pull/4579) by [@mattseddon](https://github.com/mattseddon)
+
+## [1.0.48] - 2023-08-28
+
+### 🚀 New Features and Enhancements
+
+- Add "Matrix Pipeline Stage" dvc snippet [#4577](https://github.com/iterative/vscode-dvc/pull/4577) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Call Studio API will all refs available on the Git remote [#4580](https://github.com/iterative/vscode-dvc/pull/4580) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.47] - 2023-08-25
 
 ### 🚀 New Features and Enhancements

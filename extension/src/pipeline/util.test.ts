@@ -9,6 +9,7 @@ import {
   getFileExtension
 } from '../fileSystem'
 import { Title } from '../vscode/title'
+import { Toast } from '../vscode/toast'
 
 const mockedPickFile = jest.mocked(pickFile)
 const mockedLoadJson = jest.mocked(loadJson)
@@ -17,6 +18,9 @@ const mockedLoadYaml = jest.mocked(loadYamlAsJs)
 const mockedLoadTsv = jest.mocked(loadTsv)
 const mockedGetFileExt = jest.mocked(getFileExtension)
 const mockedQuickPickOne = jest.mocked(quickPickOne)
+const mockedToast = jest.mocked(Toast)
+const mockedShowError = jest.fn()
+mockedToast.showError = mockedShowError
 
 jest.mock('../fileSystem')
 jest.mock('../vscode/resourcePicker')
@@ -92,6 +96,79 @@ describe('pickPlotConfiguration', () => {
     await pickPlotConfiguration()
 
     expect(mockedLoadYaml).toHaveBeenCalledWith('file.yaml')
+  })
+
+  it('should return early if user does not select a file', async () => {
+    mockedPickFile.mockResolvedValueOnce(undefined)
+
+    const result = await pickPlotConfiguration()
+
+    expect(result).toStrictEqual(undefined)
+  })
+
+  const failedToParseMessage =
+    'Failed to find field options for plot data. Is your file following DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
+
+  it('should show a toast message if file fails to parse', async () => {
+    mockedPickFile.mockResolvedValueOnce('file.csv')
+    mockedLoadCsv.mockReturnValueOnce(undefined)
+
+    const result = await pickPlotConfiguration()
+
+    expect(result).toStrictEqual(undefined)
+    expect(mockedShowError).toHaveBeenCalledTimes(1)
+    expect(mockedShowError).toHaveBeenCalledWith(failedToParseMessage)
+  })
+
+  it('should show a toast message if fields are not found within a file', async () => {
+    mockedPickFile.mockResolvedValue('file.yaml')
+    const invalidValues: unknown[] = [
+      'string',
+      13,
+      [],
+      ['array', 'of', 'strings'],
+      [1, 2, 3],
+      [{ field1: 'only one field' }],
+      {},
+      { val: undefined },
+      { val: [] },
+      { val: { field1: {} } },
+      { val: [{ field1: 'only one field' }] },
+      { field1: 123, field2: [{ field1: 1, field2: 2 }] }
+    ]
+
+    let result
+
+    for (const [ind, invalidVal] of invalidValues.entries()) {
+      mockedLoadYaml.mockReturnValueOnce(invalidVal)
+
+      result = await pickPlotConfiguration()
+
+      expect(result).toStrictEqual(undefined)
+      expect(mockedShowError).toHaveBeenCalledTimes(1 + ind)
+      expect(mockedShowError).toHaveBeenCalledWith(failedToParseMessage)
+    }
+  })
+
+  it('should parse fields from valid data files', async () => {
+    mockedPickFile.mockResolvedValue('file.yaml')
+    const invalidValues: unknown[] = [
+      [{ field1: 1, field2: 2 }],
+      [
+        { field1: 1, field2: 2, field3: 1, field4: 2 },
+        { field1: 1, field2: 2, field3: 1, field4: 2 }
+      ],
+      { field1: [{ field1: 1, field2: 2 }] }
+    ]
+
+    for (const [ind, val] of invalidValues.entries()) {
+      mockedLoadYaml.mockReturnValueOnce(val)
+
+      await pickPlotConfiguration()
+
+      expect(mockedShowError).not.toHaveBeenCalledTimes(1)
+      expect(mockedQuickPickOne).toHaveBeenCalledTimes(ind + 1)
+    }
   })
 
   it('should let user pick a template, x field, and y field', async () => {

@@ -17,6 +17,7 @@ import { QuickPickOptionsWithTitle } from '../../../vscode/quickPick'
 import * as FileSystem from '../../../fileSystem'
 import { ScriptCommand } from '../../../pipeline'
 import * as VscodeContext from '../../../vscode/context'
+import * as PipelineUtil from '../../../pipeline/util'
 
 suite('Pipeline Test Suite', () => {
   const disposable = Disposable.fn()
@@ -286,6 +287,39 @@ suite('Pipeline Test Suite', () => {
       expect(mockQuickPickOneOrInput).to.be.calledOnce
       expect(mockFindOrCreateDvcYamlFile).not.to.be.called
     })
+  })
+
+  it('should add a top-level plot', async () => {
+    const { pipeline } = buildPipeline({
+      disposer: disposable,
+      dvcRoot: dvcDemoPath
+    })
+    const mockPickPlotConfiguration = stub(
+      PipelineUtil,
+      'pickPlotConfiguration'
+    )
+    const mockAddPlotToDvcFile = stub(FileSystem, 'addPlotToDvcYamlFile')
+
+    await pipeline.isReady()
+
+    mockPickPlotConfiguration.onSecondCall().resolves(undefined)
+
+    await pipeline.addTopLevelPlot()
+
+    expect(mockPickPlotConfiguration).to.be.calledOnce
+    expect(mockAddPlotToDvcFile).not.to.be.called
+
+    mockPickPlotConfiguration.onSecondCall().resolves({
+      dataFile: 'results.json',
+      template: 'simple',
+      x: 'step',
+      y: 'acc'
+    })
+
+    await pipeline.addTopLevelPlot()
+
+    expect(mockPickPlotConfiguration).to.be.calledTwice
+    expect(mockAddPlotToDvcFile).to.be.called
   })
 
   it('should set the appropriate context value when a dvc.yaml is open in the active editor', async () => {

@@ -22,7 +22,10 @@ import {
   isPathInProject,
   getPidFromFile,
   getEntryFromJsonFile,
-  addPlotToDvcYamlFile
+  addPlotToDvcYamlFile,
+  loadYamlAsJs,
+  loadCsv,
+  loadTsv
 } from '.'
 import { dvcDemoPath } from '../test/util'
 import { DOT_DVC } from '../cli/dvc/constants'
@@ -60,6 +63,84 @@ mockedWindow.showTextDocument = mockedShowTextDocument
 
 beforeEach(() => {
   jest.resetAllMocks()
+})
+
+describe('loadYamlAsJs', () => {
+  it('should load in yaml file contents as a js object', () => {
+    const mockYamlContent = [
+      'stages:',
+      '  train:',
+      '    cmd: python train.py'
+    ].join('\n')
+    mockedReadFileSync.mockReturnValueOnce(mockYamlContent)
+
+    const result = loadYamlAsJs('dvc.yaml')
+
+    expect(result).toStrictEqual({
+      stages: {
+        train: {
+          cmd: 'python train.py'
+        }
+      }
+    })
+  })
+
+  it('should catch any errors', () => {
+    mockedReadFileSync.mockImplementationOnce(() => {
+      throw new Error('fake error')
+    })
+    const result = loadYamlAsJs('dvc.yaml')
+
+    expect(result).toStrictEqual(undefined)
+  })
+})
+
+describe('loadCsv', () => {
+  it('should load in csv file contents as a js object', async () => {
+    const mockCsvContent = ['epoch,acc', '10,0.69', '11,0.345'].join('\n')
+
+    mockedReadFileSync.mockReturnValueOnce(mockCsvContent)
+
+    const result = await loadCsv('values.csv')
+
+    expect(result).toStrictEqual([
+      { acc: 0.69, epoch: 10 },
+      { acc: 0.345, epoch: 11 }
+    ])
+  })
+
+  it('should catch any errors', () => {
+    mockedReadFileSync.mockImplementationOnce(() => {
+      throw new Error('fake error')
+    })
+    const result = loadCsv('values.csv')
+
+    expect(result).toStrictEqual(undefined)
+  })
+})
+
+describe('loadTsv', () => {
+  it('should load in tsv file contents as a js object', async () => {
+    const mockTsvContent = ['epoch\tacc', '10\t0.69', '11\t0.345'].join('\n')
+
+    mockedReadFileSync.mockReturnValueOnce(mockTsvContent)
+
+    const result = await loadTsv('result.tsv')
+
+    expect(result).toStrictEqual([
+      { acc: 0.69, epoch: 10 },
+      { acc: 0.345, epoch: 11 }
+    ])
+  })
+
+  it('should catch any errors', () => {
+    mockedReadFileSync.mockImplementationOnce(() => {
+      throw new Error('fake error')
+    })
+    const result = loadTsv('values.tsv')
+
+    expect(result).toStrictEqual(undefined)
+  })
 })
 
 describe('writeJson', () => {
