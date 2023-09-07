@@ -210,7 +210,8 @@ export const addPlotToDvcYamlFile = (cwd: string, plotObj: PlotConfigData) => {
   // TBD this only works correctly for yaml with 2 space indent and no plots
   // will adjust for other possibilities in another pr
   dvcYamlLines.push(...plotYaml)
-  writeFileSync(dvcYamlFile, dvcYamlLines.join('\n'))
+  void openFileInEditor(dvcYamlFile)
+  return writeFileSync(dvcYamlFile, dvcYamlLines.join('\n'))
 }
 
 export const getFileExtension = (filePath: string) => parse(filePath).ext

@@ -427,7 +427,7 @@
         "title": "Add Plot",
         "command": "dvc.addTopLevelPlot",
         "category": "DVC",
-        "icon": "$(graph-scatter)"
+        "icon": "$(add)"
       },
       {
         "title": "Show Plots",
@@ -911,7 +911,7 @@
         },
         {
           "command": "dvc.addTopLevelPlot",
-          "when": "false"
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.showExperiments",
@@ -1124,11 +1124,6 @@
           "command": "dvc.stopAllRunningExperiments",
           "group": "navigation@0",
           "when": "dvc.experiments.webview.active && dvc.experiment.running && dvc.commands.available"
-        },
-        {
-          "command": "dvc.addTopLevelPlot",
-          "group": "navigation@0",
-          "when": "dvc.pipeline.file.active && dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.showPipelineDAG",
@@ -1443,6 +1438,11 @@
           "command": "dvc.views.plots.refreshPlots",
           "when": "view == dvc.views.plotsPathsTree",
           "group": "navigation@3"
+        },
+        {
+          "command": "dvc.addTopLevelPlot",
+          "when": "view == dvc.views.plotsPathsTree",
+          "group": "navigation@0"
         }
       ]
     },
