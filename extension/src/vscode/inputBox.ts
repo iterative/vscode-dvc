@@ -5,9 +5,11 @@ import { getIsoDate, isFreeTextDate } from '../util/date'
 
 export const getInput = (
   title: Title,
-  value?: string
+  value?: string,
+  prompt?: string
 ): Thenable<string | undefined> =>
   window.showInputBox({
+    prompt,
     title,
     value
   })

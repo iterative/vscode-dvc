@@ -281,6 +281,7 @@ suite('Repositories Tree Test Suite', () => {
       expect(mockMove).to.be.calledOnce
       expect(mockInputBox).to.be.calledOnce
       expect(mockInputBox).to.be.calledWith({
+        prompt: undefined,
         title: Title.ENTER_RELATIVE_DESTINATION,
         value: relPath
       })

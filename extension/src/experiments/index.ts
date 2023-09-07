@@ -461,14 +461,14 @@ export class Experiments extends BaseRepository<TableData> {
     )
   }
 
-  public pickAndModifyParams() {
+  public pickAndModifyParams(inputPrompt?: string) {
     const params = this.experiments.getWorkspaceParams()
 
     if (!params) {
       return
     }
 
-    return pickAndModifyParams(params)
+    return pickAndModifyParams(params, inputPrompt)
   }
 
   public getWorkspaceAndCommits() {
@@ -529,7 +529,9 @@ export class Experiments extends BaseRepository<TableData> {
       return
     }
 
-    const paramsToModify = await this.pickAndModifyParams()
+    const paramsToModify = await this.pickAndModifyParams(
+      'Use range(start,stop,step) or choice(*choices) to add multiple experiments to the queue'
+    )
     if (!paramsToModify) {
       return
     }

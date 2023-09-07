@@ -16,9 +16,10 @@ describe('pickAndModifyParams', () => {
   it('should return early if no params are selected', async () => {
     mockedQuickPickManyValues.mockResolvedValueOnce(undefined)
 
-    const paramsToQueue = await pickAndModifyParams([
-      { path: 'params.yaml:learning_rate', value: 2e-12 }
-    ])
+    const paramsToQueue = await pickAndModifyParams(
+      [{ path: 'params.yaml:learning_rate', value: 2e-12 }],
+      undefined
+    )
 
     expect(paramsToQueue).toBeUndefined()
     expect(mockedGetInput).not.toHaveBeenCalled()
@@ -38,10 +39,10 @@ describe('pickAndModifyParams', () => {
     mockedGetInput.mockResolvedValueOnce(firstInput)
     mockedGetInput.mockResolvedValueOnce(undefined)
 
-    const paramsToQueue = await pickAndModifyParams([
-      unchanged,
-      ...initialUserResponse
-    ])
+    const paramsToQueue = await pickAndModifyParams(
+      [unchanged, ...initialUserResponse],
+      undefined
+    )
 
     expect(paramsToQueue).toBeUndefined()
     expect(mockedGetInput).toHaveBeenCalledTimes(2)
@@ -75,35 +76,40 @@ describe('pickAndModifyParams', () => {
     mockedGetInput.mockResolvedValueOnce(input4)
     mockedGetInput.mockResolvedValueOnce(input5)
 
-    const paramsToQueue = await pickAndModifyParams([
-      unchanged,
-      ...initialUserResponse
-    ])
+    const paramsToQueue = await pickAndModifyParams(
+      [unchanged, ...initialUserResponse],
+      undefined
+    )
 
     expect(mockedGetInput).toHaveBeenCalledTimes(5)
     expect(mockedGetInput).toHaveBeenCalledWith(
       'Enter a Value for params.yaml:dropout',
-      '0.15'
+      '0.15',
+      undefined
     )
 
     expect(mockedGetInput).toHaveBeenCalledWith(
       'Enter a Value for params.yaml:process.threshold',
-      '0.86'
+      '0.86',
+      undefined
     )
 
     expect(mockedGetInput).toHaveBeenCalledWith(
       'Enter a Value for params.yaml:code_names',
-      '[0,1,2]'
+      '[0,1,2]',
+      undefined
     )
 
     expect(mockedGetInput).toHaveBeenCalledWith(
       'Enter a Value for params.yaml:arch',
-      'resnet18'
+      'resnet18',
+      undefined
     )
 
     expect(mockedGetInput).toHaveBeenCalledWith(
       'Enter a Value for params.yaml:transforms',
-      '[Pipeline: PILBase.create, Pipeline: partial -> PILBase.create]'
+      '[Pipeline: PILBase.create, Pipeline: partial -> PILBase.create]',
+      undefined
     )
 
     expect(paramsToQueue).toStrictEqual([
