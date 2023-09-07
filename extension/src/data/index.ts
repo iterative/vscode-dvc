@@ -16,14 +16,28 @@ type LocalExperimentsOutput = {
   rowOrder: { branch: string; sha: string }[]
 }
 
-type RemoteExperimentsOutput = { remoteExpRefs: string }
+type RemoteExperimentsOutput = { lsRemoteOutput: string }
 
-export type ExperimentsOutput = LocalExperimentsOutput | RemoteExperimentsOutput
+type StudioExperimentsOutput = {
+  baseUrl: string | undefined
+  live: { baselineSha: string; name: string }[]
+  pushed: string[]
+}
+
+export type ExperimentsOutput =
+  | LocalExperimentsOutput
+  | RemoteExperimentsOutput
+  | StudioExperimentsOutput
 
 export const isRemoteExperimentsOutput = (
   data: ExperimentsOutput
 ): data is RemoteExperimentsOutput =>
-  (data as RemoteExperimentsOutput).remoteExpRefs !== undefined
+  (data as RemoteExperimentsOutput).lsRemoteOutput !== undefined
+
+export const isStudioExperimentsOutput = (
+  data: ExperimentsOutput
+): data is StudioExperimentsOutput =>
+  (data as StudioExperimentsOutput).live !== undefined
 
 export abstract class BaseData<
   T extends
@@ -82,7 +96,7 @@ export abstract class BaseData<
     )
   }
 
-  protected listener(path: string) {
+  private listener(path: string) {
     const relPath = relative(this.dvcRoot, path)
     if (
       this.getWatchedFiles().some(

@@ -1,5 +1,6 @@
 import { spy, stub } from 'sinon'
 import { EventEmitter } from 'vscode'
+import * as Fetch from 'node-fetch'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { Experiments } from '../../../experiments'
 import { Disposer } from '../../../extension'
@@ -24,6 +25,7 @@ import { PersistenceKey } from '../../../persistence/constants'
 import { ExpShowOutput } from '../../../cli/dvc/contract'
 import { buildExperimentsPipeline } from '../pipeline/util'
 import { Setup } from '../../../setup'
+import { Studio } from '../../../experiments/studio'
 
 export const DEFAULT_EXPERIMENTS_OUTPUT = {
   availableNbCommits: { main: 5 },
@@ -32,22 +34,31 @@ export const DEFAULT_EXPERIMENTS_OUTPUT = {
   rowOrder: rowOrderFixture
 }
 
+export const mockBaseStudioUrl =
+  'https://studio.iterative.ai/user/olivaw/projects/vscode-dvc-demo-ynm6t3jxdx'
+
 export const buildExperiments = ({
   availableNbCommits = { main: 5 },
+  baseUrl = mockBaseStudioUrl,
   disposer,
   dvcRoot = dvcDemoPath,
   expShow = expShowFixture,
   gitLog = gitLogFixture,
-  remoteExpRefs = remoteExpRefsFixture,
+  live = [],
+  lsRemoteOutput = remoteExpRefsFixture,
+  pushed = ['42b8736b08170529903cd203a1f40382a4b4a8cd'],
   rowOrder = rowOrderFixture,
   stageList = 'train'
 }: {
   availableNbCommits?: { [branch: string]: number }
   disposer: Disposer
+  baseUrl?: string
   dvcRoot?: string
   expShow?: ExpShowOutput
   gitLog?: string
-  remoteExpRefs?: string
+  live?: { baselineSha: string; name: string }[]
+  lsRemoteOutput?: string
+  pushed?: string[]
   rowOrder?: { branch: string; sha: string }[]
   stageList?: string | null
 }) => {
@@ -103,7 +114,8 @@ export const buildExperiments = ({
       gitLog,
       rowOrder
     }),
-    experiments.setState({ remoteExpRefs })
+    experiments.setState({ lsRemoteOutput }),
+    experiments.setState({ baseUrl, live, pushed })
   ])
 
   return {
@@ -144,7 +156,7 @@ export const buildExperimentsWebview = async (inputs: {
   dvcRoot?: string
   expShow?: ExpShowOutput
   gitLog?: string
-  remoteExpRefs?: string
+  lsRemoteOutput?: string
   rowOrder?: { branch: string; sha: string }[]
   stageList?: string | null
 }) => {
@@ -258,7 +270,8 @@ const buildExperimentsDataDependencies = (disposer: Disposer) => {
 export const buildExperimentsData = (
   disposer: SafeWatcherDisposer,
   currentBranch = '* main',
-  commitOutput = gitLogFixture
+  commitOutput = gitLogFixture,
+  studioAccessToken = ''
 ) => {
   const {
     internalCommands,
@@ -273,6 +286,14 @@ export const buildExperimentsData = (
     commitOutput
   )
   const mockGetNumCommits = stub(gitReader, 'getNumCommits').resolves(404)
+  const mockFetch = stub(Fetch, 'default').resolves({
+    json: () =>
+      Promise.resolve({
+        live: [],
+        pushed: [],
+        view_url: mockBaseStudioUrl
+      })
+  } as Fetch.Response)
 
   const mockGetBranchesToShow = stub().returns(['main'])
   const mockSetBranches = stub()
@@ -285,6 +306,11 @@ export const buildExperimentsData = (
         getNbOfCommitsToShow: () => DEFAULT_CURRENT_BRANCH_COMMITS_TO_SHOW,
         setBranches: mockSetBranches
       } as unknown as ExperimentsModel,
+      {
+        getAccessToken: () => studioAccessToken,
+        getGitRemoteUrl: () => 'git@github.com:iterative/vscode-dvc-demo.git',
+        isReady: () => Promise.resolve(undefined)
+      } as Studio,
       []
     )
   )
@@ -293,6 +319,7 @@ export const buildExperimentsData = (
     data,
     mockCreateFileSystemWatcher,
     mockExpShow,
+    mockFetch,
     mockGetBranchesToShow,
     mockGetCommitMessages,
     mockGetNumCommits,
@@ -357,7 +384,8 @@ export const stubWorkspaceGettersWebview = async (
     experiments,
     experimentsModel,
     messageSpy,
-    mockMessageReceived
+    mockMessageReceived,
+    webview
   } = await buildExperimentsWebview({ disposer })
 
   return {
@@ -368,6 +396,7 @@ export const stubWorkspaceGettersWebview = async (
     experimentsModel,
     messageSpy,
     ...stubWorkspaceExperiments(dvcRoot, experiments),
-    mockMessageReceived
+    mockMessageReceived,
+    webview
   }
 }

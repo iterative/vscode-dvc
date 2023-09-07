@@ -47,7 +47,7 @@ export const getCustomPlotId = (metric: string, param: string) =>
   `custom-${metric}-${param}`
 
 const getValueFromColumn = (path: string, experiment: Experiment) =>
-  get(experiment, splitColumnPath(path)) as number | undefined
+  get(experiment, splitColumnPath(path)) as number | string | undefined
 
 const getValues = (
   experiments: Experiment[],
@@ -84,9 +84,16 @@ const getCustomPlotData = (
 
   const values = getValues(experiments, metricPath, paramPath)
 
+  const [{ param: paramVal, metric: metricVal }] = values
   const yTitle = truncateVerticalTitle(metric, nbItemsPerRow, height) as string
 
-  const spec = createSpec(yTitle, metric, param)
+  const spec = createSpec(
+    yTitle,
+    metric,
+    param,
+    typeof metricVal,
+    typeof paramVal
+  )
 
   return {
     id: getCustomPlotId(metric, param),

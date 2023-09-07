@@ -10,6 +10,7 @@ import omit from 'lodash.omit'
 import { ColumnLike, addStarredToColumns } from './columns/like'
 import { setContextForEditorTitleIcons } from './context'
 import { ExperimentsModel } from './model'
+import { collectRemoteExpShas } from './model/collect'
 import {
   pickExperiment,
   pickExperiments,
@@ -35,7 +36,11 @@ import { DecorationProvider } from './model/decorationProvider'
 import { starredFilter } from './model/filterBy/constants'
 import { ResourceLocator } from '../resourceLocator'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
-import { ExperimentsOutput, isRemoteExperimentsOutput } from '../data'
+import {
+  ExperimentsOutput,
+  isRemoteExperimentsOutput,
+  isStudioExperimentsOutput
+} from '../data'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { Title } from '../vscode/title'
@@ -159,6 +164,7 @@ export class Experiments extends BaseRepository<TableData> {
           dvcRoot,
           internalCommands,
           this.experiments,
+          this.studio,
           subProjects
         )
     )
@@ -184,8 +190,15 @@ export class Experiments extends BaseRepository<TableData> {
 
   public async setState(data: ExperimentsOutput) {
     if (isRemoteExperimentsOutput(data)) {
-      const { remoteExpRefs } = data
-      this.experiments.transformAndSetRemote(remoteExpRefs)
+      const { lsRemoteOutput } = data
+      this.experiments.transformAndSetRemote(lsRemoteOutput)
+      return this.webviewMessages.sendWebviewMessage()
+    }
+
+    if (isStudioExperimentsOutput(data)) {
+      const { live, pushed, baseUrl } = data
+      this.studio.setBaseUrl(baseUrl)
+      this.experiments.setStudioData(live, pushed)
       return this.webviewMessages.sendWebviewMessage()
     }
 
@@ -217,9 +230,10 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public async unsetPushing(ids: string[]) {
-    await this.update()
+    await Promise.all([this.update(), this.patchStudioApiTimingIssue(ids)])
+
     this.experiments.unsetPushing(ids)
-    return this.notifyChanged()
+    return this.webviewMessages.sendWebviewMessage()
   }
 
   public hasCheckpoints() {
@@ -597,10 +611,15 @@ export class Experiments extends BaseRepository<TableData> {
     return this.data.update()
   }
 
-  public async setStudioBaseUrl(studioToken: string | undefined) {
-    await this.isReady()
-    await this.studio.setBaseUrl(studioToken)
-    return this.webviewMessages.sendWebviewMessage()
+  public setStudioAccessToken(studioAccessToken: string | undefined) {
+    const oldAccessToken = this.studio.getAccessToken()
+    const accessTokenInitialized = this.studio.isAccessTokenSet()
+    this.studio.setAccessToken(studioAccessToken)
+
+    if (!accessTokenInitialized || oldAccessToken === studioAccessToken) {
+      return
+    }
+    return this.data.managedUpdate()
   }
 
   public hasDvcLiveOnlyRunning() {
@@ -741,5 +760,57 @@ export class Experiments extends BaseRepository<TableData> {
     const columns = this.columns.getTerminalNodes()
     const columnLikes = addStarredToColumns(columns)
     return pickColumnToFilter(columnLikes)
+  }
+
+  private async patchStudioApiTimingIssue(ids: string[]) {
+    if (!this.studio.isConnected()) {
+      return
+    }
+
+    const [, { lsRemoteOutput }] = await Promise.all([
+      this.waitForStudioUpdate(),
+      this.waitForRemoteUpdate()
+    ])
+
+    const remoteExpShas = collectRemoteExpShas(lsRemoteOutput)
+
+    const shas = []
+    for (const { id, sha } of this.experiments.getExperiments()) {
+      if (ids.includes(id) && sha && remoteExpShas.has(sha)) {
+        shas.push(sha)
+      }
+    }
+
+    this.experiments.assumePushed(shas)
+  }
+
+  private waitForStudioUpdate() {
+    return new Promise(resolve => {
+      const listener = this.dispose.track(
+        this.data.onDidUpdate(data => {
+          if (!isStudioExperimentsOutput(data)) {
+            return
+          }
+          this.dispose.untrack(listener)
+          listener.dispose()
+          resolve(undefined)
+        })
+      )
+    })
+  }
+
+  private waitForRemoteUpdate(): Promise<{ lsRemoteOutput: string }> {
+    return new Promise(resolve => {
+      const listener = this.dispose.track(
+        this.data.onDidUpdate(data => {
+          if (!isRemoteExperimentsOutput(data)) {
+            return
+          }
+          this.dispose.untrack(listener)
+          listener.dispose()
+          resolve(data)
+        })
+      )
+    })
   }
 }

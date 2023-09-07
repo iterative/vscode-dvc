@@ -33,6 +33,11 @@ export enum GitRemoteStatus {
   ON_REMOTE = 'on-remote'
 }
 
+export enum StudioLinkType {
+  LIVE = 'live',
+  PUSHED = 'pushed'
+}
+
 export type Experiment = {
   commit?: CommitData
   Created?: string
@@ -53,6 +58,8 @@ export type Experiment = {
   executorStatus?: ExecutorStatus
   timestamp?: string | null
   branch?: string | typeof WORKSPACE_BRANCH
+  baselineSha?: string | undefined
+  studioLinkType?: StudioLinkType
 }
 
 export const isRunning = (
@@ -106,7 +113,6 @@ export type TableData = {
   hasConfig: boolean
   hasMoreCommits: Record<string, boolean>
   hasRunningWorkspaceExperiment: boolean
-  isStudioConnected: boolean
   isShowingMoreCommits: Record<string, boolean>
   rows: Commit[]
   showOnlyChanged: boolean

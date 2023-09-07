@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux'
 import {
   ExecutorStatus,
   GitRemoteStatus,
+  StudioLinkType,
   isRunning
 } from 'dvc/src/experiments/webview/contract'
 import { CellHintTooltip } from './CellHintTooltip'
@@ -19,6 +20,7 @@ type ExperimentStatusIndicatorProps = {
   executorStatus: ExecutorStatus | undefined
   gitRemoteStatus: GitRemoteStatus | undefined
   id: string
+  studioLinkType: StudioLinkType | undefined
 }
 
 const Progress: React.FC = () => (
@@ -56,7 +58,7 @@ const CopyStudioLink: React.FC<{ id: string }> = ({ id }) => {
           timer.current = window.setTimeout(() => {
             setCopying(false)
           }, 1000)
-          return copyStudioLink(id)
+          return copyStudioLink(id, StudioLinkType.PUSHED)
         })}
       >
         <Icon
@@ -69,11 +71,11 @@ const CopyStudioLink: React.FC<{ id: string }> = ({ id }) => {
   )
 }
 
-const OnRemote: React.FC<{ id: string; isStudioConnected: boolean }> = ({
+const OnRemote: React.FC<{ id: string; showLinkIcon: boolean }> = ({
   id,
-  isStudioConnected
+  showLinkIcon
 }) => {
-  if (isStudioConnected) {
+  if (showLinkIcon) {
     return <CopyStudioLink id={id} />
   }
   return (
@@ -87,8 +89,8 @@ const OnRemote: React.FC<{ id: string; isStudioConnected: boolean }> = ({
 
 export const ExperimentStatusIndicator: React.FC<
   ExperimentStatusIndicatorProps
-> = ({ id, executorStatus: status, gitRemoteStatus }) => {
-  const { hasRunningWorkspaceExperiment, isStudioConnected } = useSelector(
+> = ({ id, executorStatus: status, gitRemoteStatus, studioLinkType }) => {
+  const { hasRunningWorkspaceExperiment } = useSelector(
     (state: ExperimentsState) => state.tableData
   )
 
@@ -121,6 +123,11 @@ export const ExperimentStatusIndicator: React.FC<
   }
 
   if (gitRemoteStatus === GitRemoteStatus.ON_REMOTE) {
-    return <OnRemote id={id} isStudioConnected={isStudioConnected} />
+    return (
+      <OnRemote
+        id={id}
+        showLinkIcon={studioLinkType === StudioLinkType.PUSHED}
+      />
+    )
   }
 }

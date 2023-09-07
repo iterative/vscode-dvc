@@ -1,5 +1,5 @@
 import { commands, Uri, ViewColumn, window } from 'vscode'
-import { TableData } from './contract'
+import { StudioLinkType, TableData } from './contract'
 import {
   RegisteredCliCommands,
   RegisteredCommands
@@ -19,7 +19,7 @@ import { ExperimentsModel } from '../model'
 import { SortDefinition } from '../model/sortBy'
 import { getPositiveIntegerInput } from '../../vscode/inputBox'
 import { Title } from '../../vscode/title'
-import { ConfigKey, setConfigValue } from '../../vscode/config'
+import { ConfigKey, getConfigValue, setConfigValue } from '../../vscode/config'
 import { NUM_OF_COMMITS_TO_INCREASE } from '../../cli/dvc/constants'
 import { Pipeline } from '../../pipeline'
 import { collectColumnsWithChangedValues } from '../columns/collect'
@@ -236,7 +236,7 @@ export class WebviewMessages {
         return this.copyToClipboard(message.payload)
 
       case MessageFromWebviewType.COPY_STUDIO_LINK:
-        return this.copyStudioLink(message.payload)
+        return this.copyStudioLink(message.payload.id, message.payload.type)
 
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
@@ -321,7 +321,6 @@ export class WebviewMessages {
       hasMoreCommits,
       hasRunningWorkspaceExperiment,
       isShowingMoreCommits,
-      isStudioConnected,
       rows,
       selectedBranches,
       selectedForPlotsCount,
@@ -340,7 +339,6 @@ export class WebviewMessages {
       this.experiments.getHasMoreCommits(),
       this.experiments.hasRunningWorkspaceExperiment(),
       this.experiments.getIsShowingMoreCommits(),
-      this.studio.isConnected(),
       this.experiments.getRowData(),
       this.experiments.getSelectedBranches(),
       this.experiments.getSelectedRevisions().length,
@@ -365,7 +363,6 @@ export class WebviewMessages {
       hasMoreCommits,
       hasRunningWorkspaceExperiment,
       isShowingMoreCommits,
-      isStudioConnected,
       rows,
       selectedBranches,
       selectedForPlotsCount,
@@ -379,9 +376,10 @@ export class WebviewMessages {
   }
 
   private async setMaxTableHeadDepth() {
+    const currentValue = getConfigValue(ConfigKey.EXP_TABLE_HEAD_MAX_HEIGHT)
     const newValue = await getPositiveIntegerInput(
       Title.SET_EXPERIMENTS_HEADER_HEIGHT,
-      { prompt: 'Use 0 for infinite height.', value: '0' },
+      { prompt: 'Use 0 for infinite height.', value: currentValue },
       true
     )
 
@@ -595,15 +593,14 @@ export class WebviewMessages {
     )
   }
 
-  private async copyStudioLink(id: string) {
-    const sha = this.experiments.getExperiments().find(exp => exp.id === id)
-      ?.sha
+  private async copyStudioLink(id: string, studioLinkType: StudioLinkType) {
+    const { baselineSha, sha } = this.experiments.getExperimentShas(id)
 
-    if (!sha) {
+    if (!(sha && baselineSha)) {
       return
     }
 
-    const link = this.studio.getLink(sha)
+    const link = this.studio.getLink(studioLinkType, sha, id, baselineSha)
 
     await writeToClipboard(link, `[Studio link](${link})`)
 
