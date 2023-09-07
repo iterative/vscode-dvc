@@ -80,8 +80,8 @@ export interface PlotsComparisonData {
 
 export type CustomPlotValues = {
   id: string
-  metric: number
-  param: number
+  metric: number | string
+  param: number | string
 }[]
 
 export type ColorScale = { domain: string[]; range: Color[] }

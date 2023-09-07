@@ -9,7 +9,7 @@ import { Experiment } from '../../../../experiments/webview/contract'
 export const customPlotsOrderFixture: CustomPlotsOrderValue[] = [
   {
     metric: 'summary.json:loss',
-    param: 'params.yaml:dropout'
+    param: 'params.yaml:log_file'
   },
   {
     metric: 'summary.json:accuracy',
@@ -28,7 +28,7 @@ export const experimentsWithCommits: Experiment[] = [
         accuracy: 0.3484833240509033
       }
     },
-    params: { 'params.yaml': { dropout: 0.122, epochs: 5 } }
+    params: { 'params.yaml': { log_file: 'logs.csv', epochs: 5 } }
   },
   {
     branch: 'main',
@@ -40,7 +40,7 @@ export const experimentsWithCommits: Experiment[] = [
         accuracy: 0.3484833240509033
       }
     },
-    params: { 'params.yaml': { dropout: 0.122, epochs: 5 } }
+    params: { 'params.yaml': { log_file: 'logs.csv', epochs: 5 } }
   },
   {
     branch: 'main',
@@ -52,7 +52,7 @@ export const experimentsWithCommits: Experiment[] = [
         accuracy: 0.3484833240509033
       }
     },
-    params: { 'params.yaml': { dropout: 0.122, epochs: 5 } }
+    params: { 'params.yaml': { log_file: 'logs.csv', epochs: 5 } }
   },
   {
     branch: 'main',
@@ -64,7 +64,7 @@ export const experimentsWithCommits: Experiment[] = [
       }
     },
     label: '1224',
-    params: { 'params.yaml': { dropout: 0.15, epochs: 2 } }
+    params: { 'params.yaml': { log_file: 'logs.csv', epochs: 2 } }
   },
   {
     branch: 'main',
@@ -76,7 +76,7 @@ export const experimentsWithCommits: Experiment[] = [
         loss: 1.9293040037155151
       }
     },
-    params: { 'params.yaml': { dropout: 0.122, epochs: 2 } }
+    params: { 'params.yaml': { log_file: 'logs.csv', epochs: 2 } }
   },
   {
     branch: 'main',
@@ -88,7 +88,7 @@ export const experimentsWithCommits: Experiment[] = [
         loss: 1.775016188621521
       }
     },
-    params: { 'params.yaml': { dropout: 0.124, epochs: 5 } }
+    params: { 'params.yaml': { log_file: 'logs.csv', epochs: 5 } }
   }
 ]
 
@@ -96,22 +96,30 @@ const data: CustomPlotsData = {
   enablePlotCreation: true,
   plots: [
     {
-      id: 'custom-summary.json:loss-params.yaml:dropout',
+      id: 'custom-summary.json:loss-params.yaml:log_file',
       metric: 'summary.json:loss',
-      param: 'params.yaml:dropout',
+      param: 'params.yaml:log_file',
       spec: {
         $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
         data: { name: 'values' },
         encoding: {
           x: {
+            axis: {
+              labelLimit: 75,
+              titlePadding: 30
+            },
             field: 'param',
             scale: {
               zero: false
             },
-            title: 'params.yaml:dropout',
-            type: 'quantitative'
+            title: 'params.yaml:log_file',
+            type: 'nominal'
           },
           y: {
+            axis: {
+              labelLimit: 75,
+              titlePadding: 30
+            },
             field: 'metric',
             scale: {
               zero: false
@@ -135,7 +143,7 @@ const data: CustomPlotsData = {
                 },
                 {
                   field: 'param',
-                  title: 'params.yaml:dropout'
+                  title: 'params.yaml:log_file'
                 }
               ]
             },
@@ -149,35 +157,19 @@ const data: CustomPlotsData = {
         width: 'container'
       },
       values: [
-        {
-          id: 'main',
-          metric: 2.048856019973755,
-          param: 0.122
-        },
+        { id: 'main', metric: 2.048856019973755, param: 'logs.csv' },
         {
           id: 'fe2919b',
           metric: 2.048856019973755,
-          param: 0.122
+          param: 'logs.csv'
         },
-        {
-          id: '7df876c',
-          metric: 2.048856019973755,
-          param: 0.122
-        },
-        {
-          id: 'exp-e7a67',
-          metric: 2.0205044746398926,
-          param: 0.15
-        },
-        {
-          id: 'test-branch',
-          metric: 1.9293040037155151,
-          param: 0.122
-        },
+        { id: '7df876c', metric: 2.048856019973755, param: 'logs.csv' },
+        { id: 'exp-e7a67', metric: 2.0205044746398926, param: 'logs.csv' },
+        { id: 'test-branch', metric: 1.9293040037155151, param: 'logs.csv' },
         {
           id: 'exp-83425',
           metric: 1.775016188621521,
-          param: 0.124
+          param: 'logs.csv'
         }
       ]
     },
@@ -222,6 +214,10 @@ const data: CustomPlotsData = {
         data: { name: 'values' },
         encoding: {
           x: {
+            axis: {
+              labelLimit: 75,
+              titlePadding: 30
+            },
             field: 'param',
             scale: {
               zero: false
@@ -230,6 +226,10 @@ const data: CustomPlotsData = {
             type: 'quantitative'
           },
           y: {
+            axis: {
+              labelLimit: 75,
+              titlePadding: 30
+            },
             field: 'metric',
             scale: {
               zero: false

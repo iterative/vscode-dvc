@@ -87,8 +87,8 @@ describe('pickMetricAndParam', () => {
     mockedQuickPickValue
       .mockResolvedValueOnce({
         hasChildren: false,
-        label: 'dropout',
-        path: 'params:params.yaml:dropout',
+        label: 'log_file',
+        path: 'params:params.yaml:log_file',
         type: ColumnType.PARAMS
       })
       .mockResolvedValueOnce(undefined)
@@ -98,8 +98,8 @@ describe('pickMetricAndParam', () => {
       [
         {
           hasChildren: false,
-          label: 'dropout',
-          path: 'params:params.yaml:dropout',
+          label: 'log_file',
+          path: 'params:params.yaml:log_file',
           type: ColumnType.PARAMS
         },
         {
@@ -117,8 +117,8 @@ describe('pickMetricAndParam', () => {
       [
         {
           hasChildren: false,
-          label: 'dropout',
-          path: 'params:params.yaml:dropout',
+          label: 'log_file',
+          path: 'params:params.yaml:log_file',
           type: ColumnType.PARAMS
         },
         {
@@ -151,8 +151,8 @@ describe('pickMetricAndParam', () => {
         { ...expectedParam, hasChildren: false, type: ColumnType.PARAMS },
         {
           hasChildren: false,
-          label: 'dropout',
-          path: 'params:params.yaml:dropout',
+          label: 'log_file',
+          path: 'params:params.yaml:log_file',
           type: ColumnType.PARAMS
         },
         {
@@ -191,8 +191,8 @@ describe('pickMetricAndParam', () => {
         },
         {
           hasChildren: false,
-          label: 'dropout',
-          path: 'params:params.yaml:dropout',
+          label: 'log_file',
+          path: 'params:params.yaml:log_file',
           type: ColumnType.PARAMS
         },
         {
@@ -218,7 +218,7 @@ describe('pickMetricAndParam', () => {
         ...customPlotsOrderFixture,
         {
           metric: 'summary.json:val_accuracy',
-          param: 'params.yaml:dropout'
+          param: 'params.yaml:log_file'
         },
         {
           metric: 'summary.json:val_accuracy',

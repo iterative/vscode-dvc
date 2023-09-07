@@ -8,6 +8,7 @@ import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { BaseData } from '../../data'
 import { sameContents, uniqueValues } from '../../util/array'
 import { PlotsModel } from '../model'
+import { DVCLIVE_STEP_COMPLETED_SIGNAL_FILE } from '../../cli/dvc/constants'
 
 export class PlotsData extends BaseData<{
   data: PlotsOutputOrError
@@ -39,7 +40,7 @@ export class PlotsData extends BaseData<{
         }
       ],
       subProjects,
-      ['dvc.yaml', 'dvc.lock']
+      ['dvc.yaml', 'dvc.lock', DVCLIVE_STEP_COMPLETED_SIGNAL_FILE]
     )
     this.model = model
     this.onDidTrigger = this.triggered.event

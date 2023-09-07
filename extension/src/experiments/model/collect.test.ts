@@ -1,4 +1,4 @@
-import { collectExperiments } from './collect'
+import { collectExperiments, collectRemoteExpShas } from './collect'
 import { generateTestExpShowOutput } from '../../test/util/experiments'
 import { ExpShowOutput } from '../../cli/dvc/contract'
 
@@ -99,5 +99,29 @@ describe('collectExperiments', () => {
       'campy-pall',
       'shyer-stir'
     ])
+  })
+})
+
+describe('collectRemoteExpShas', () => {
+  it('should parse the git ls-remote output', () => {
+    const output = `263e4408e42a0e215b0f70b36b2ab7b65a160d7e        refs/exps/a9/b32d14966b9be1396f2211d9eb743359708a07/vital-taal
+    d4f2a35773ead55b7ce4b596f600e98360e49372        refs/exps/a9/b32d14966b9be1396f2211d9eb743359708a07/whole-bout
+    5af79e8d5e53f4e41221b6a166121d96d50b630a        refs/exps/a9/d8057e088d46842f15c3b6d1bb2e4befd5f677/deism-bots
+    21745a4aa76daf59b49ec81480fe7a89c7ea8fb2        refs/exps/a9/d8057e088d46842f15c3b6d1bb2e4befd5f677/inter-gulf
+    390aef747f45fc49ec8928b24771f8950d057393        refs/exps/a9/d8057e088d46842f15c3b6d1bb2e4befd5f677/known-flus
+    142a803b83ff784ba1106cc4ad0ba03310da6186        refs/exps/a9/d8057e088d46842f15c3b6d1bb2e4befd5f677/tight-lira
+    21ce298cd1743405a0d73f5cb4cf52289ffa3276        refs/exps/bf/6ca8a35911bc6e62fb9bcaa506d4f4e185450c/crumb-orcs`
+    const remoteExpShas = collectRemoteExpShas(output)
+    expect(remoteExpShas).toStrictEqual(
+      new Set([
+        '263e4408e42a0e215b0f70b36b2ab7b65a160d7e',
+        'd4f2a35773ead55b7ce4b596f600e98360e49372',
+        '5af79e8d5e53f4e41221b6a166121d96d50b630a',
+        '21745a4aa76daf59b49ec81480fe7a89c7ea8fb2',
+        '390aef747f45fc49ec8928b24771f8950d057393',
+        '142a803b83ff784ba1106cc4ad0ba03310da6186',
+        '21ce298cd1743405a0d73f5cb4cf52289ffa3276'
+      ])
+    )
   })
 })
