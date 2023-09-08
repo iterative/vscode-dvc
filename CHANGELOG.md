@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.52] - 2023-09-08
+
+### 🚀 New Features and Enhancements
+
+- Add ability to zoom and pan plots when zoomed [#4629](https://github.com/iterative/vscode-dvc/pull/4629) by [@mattseddon](https://github.com/mattseddon)
+- Add Hydra syntax hint (prompt) to input box for modify and queue experiment command [#4630](https://github.com/iterative/vscode-dvc/pull/4630) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Fix custom plots breaking with non-numeric values [#4626](https://github.com/iterative/vscode-dvc/pull/4626) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (3.19.0) [#4641](https://github.com/iterative/vscode-dvc/pull/4641) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.51] - 2023-09-05
 
 ### 🚀 New Features and Enhancements
