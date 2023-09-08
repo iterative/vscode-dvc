@@ -1,29 +1,8 @@
 import { PLOT_TEMPLATES } from '../cli/dvc/contract'
-import {
-  getFileExtension,
-  loadJson,
-  loadCsv,
-  loadTsv,
-  loadYaml
-} from '../fileSystem'
+import { loadDataFile } from '../fileSystem'
 import { quickPickOne } from '../vscode/quickPick'
 import { pickFile } from '../vscode/resourcePicker'
 import { Title } from '../vscode/title'
-
-const parseDataFile = (file: string) => {
-  const ext = getFileExtension(file)
-
-  switch (ext) {
-    case '.csv':
-      return loadCsv(file)
-    case '.json':
-      return loadJson<Record<string, unknown> | unknown[]>(file)
-    case '.tsv':
-      return loadTsv(file)
-    case '.yaml':
-      return loadYaml<Record<string, unknown>>(file)
-  }
-}
 
 const pickDataFile = () => {
   return pickFile(Title.SELECT_PLOT_DATA, {
@@ -69,7 +48,7 @@ export const pickPlotConfiguration = async (): Promise<
   PlotConfigData | undefined
 > => {
   const file = (await pickDataFile()) as string
-  const data = (await parseDataFile(file)) as Record<string, unknown>[]
+  const data = (await loadDataFile(file)) as Record<string, unknown>[]
   const keys = Object.keys(data[0])
 
   const templateAndFields = await pickTemplateAndFields(keys)
