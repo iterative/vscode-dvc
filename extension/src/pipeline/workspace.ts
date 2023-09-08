@@ -49,7 +49,7 @@ export class WorkspacePipeline extends BaseWorkspace<Pipeline> {
   }
 
   public async showDag() {
-    const cwd = this.focusedProject || (await this.getOnlyOrPickProject())
+    const cwd = await this.getCwd()
 
     if (!cwd) {
       return
@@ -64,13 +64,17 @@ export class WorkspacePipeline extends BaseWorkspace<Pipeline> {
   }
 
   public async addTopLevelPlot() {
-    const cwd = this.focusedProject || (await this.getOnlyOrPickProject())
+    const cwd = await this.getCwd()
 
     if (!cwd) {
       return
     }
 
     void this.getRepository(cwd).addTopLevelPlot()
+  }
+
+  private getCwd() {
+    return this.focusedProject || this.getOnlyOrPickProject()
   }
 
   private renderDagAsMermaid() {

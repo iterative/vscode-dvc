@@ -1,62 +1,21 @@
-import {
-  getFileExtension,
-  loadJson,
-  loadCsv,
-  loadTsv,
-  loadYamlAsJs
-} from '../fileSystem'
+import { PLOT_TEMPLATES } from '../cli/dvc/contract'
+import { loadDataFile } from '../fileSystem'
 import { isObject } from '../util/object'
 import { quickPickOne } from '../vscode/quickPick'
 import { pickFile } from '../vscode/resourcePicker'
 import { Title } from '../vscode/title'
 import { Toast } from '../vscode/toast'
 
-const parseDataFile = (file: string) => {
-  const ext = getFileExtension(file)
-
-  if (ext === '.json') {
-    return loadJson<Record<string, unknown> | unknown[]>(file)
-  }
-
-  if (ext === '.csv') {
-    return loadCsv(file)
-  }
-
-  if (ext === '.tsv') {
-    return loadTsv(file)
-  }
-
-  if (ext === '.yaml') {
-    return loadYamlAsJs<Record<string, unknown>>(file)
-  }
-}
-
 const pickDataFile = () => {
   return pickFile(Title.SELECT_PLOT_DATA, {
-    filters: {
-      'Data Formats': ['json', 'csv', 'tsv', 'yaml']
-    },
-    openLabel: 'Select'
+    'Data Formats': ['json', 'csv', 'tsv', 'yaml']
   })
 }
 
 const pickTemplateAndFields = async (
   fields: string[]
 ): Promise<{ x: string; y: string; template: string } | undefined> => {
-  const template = await quickPickOne(
-    [
-      'simple',
-      'linear',
-      'confusion',
-      'confusion_normalized',
-      'scatter',
-      'scatter_jitter',
-      'smooth',
-      'bar_horizontal_sorted',
-      'bar_horizontal'
-    ],
-    'Pick a Plot Template'
-  )
+  const template = await quickPickOne(PLOT_TEMPLATES, 'Pick a Plot Template')
 
   if (!template) {
     return
@@ -113,7 +72,7 @@ export const pickPlotConfiguration = async (): Promise<
     return
   }
 
-  const data = await parseDataFile(file)
+  const data = await loadDataFile(file)
   const failedToParseMessage =
     'Failed to find field options for plot data. Is your file following DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
 

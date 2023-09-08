@@ -23,6 +23,7 @@ describe('pickFile', () => {
     expect(mockedShowOpenDialog).toHaveBeenCalledWith({
       canSelectFolders: false,
       canSelectMany: false,
+      openLabel: 'Select',
       title: mockedTitle
     })
   })

@@ -3,14 +3,21 @@ import { Title } from './title'
 
 export const pickFile = async (
   title: Title,
-  opts?: OpenDialogOptions
+  filters?: OpenDialogOptions['filters']
 ): Promise<string | undefined> => {
-  const uris = await window.showOpenDialog({
+  const opts: OpenDialogOptions = {
     canSelectFolders: false,
     canSelectMany: false,
-    title,
-    ...opts
-  })
+    filters,
+    openLabel: 'Select',
+    title
+  }
+
+  if (filters) {
+    opts.filters = filters
+  }
+
+  const uris = await window.showOpenDialog(opts)
 
   if (uris) {
     const [{ fsPath }] = uris

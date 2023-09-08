@@ -1,21 +1,12 @@
-import { pickPlotConfiguration } from './util'
+import { pickPlotConfiguration } from './quickPick'
 import { pickFile } from '../vscode/resourcePicker'
 import { quickPickOne } from '../vscode/quickPick'
-import {
-  loadJson,
-  loadCsv,
-  loadYamlAsJs,
-  loadTsv,
-  getFileExtension
-} from '../fileSystem'
+import { getFileExtension, loadDataFile } from '../fileSystem'
 import { Title } from '../vscode/title'
 import { Toast } from '../vscode/toast'
 
 const mockedPickFile = jest.mocked(pickFile)
-const mockedLoadJson = jest.mocked(loadJson)
-const mockedLoadCsv = jest.mocked(loadCsv)
-const mockedLoadYaml = jest.mocked(loadYamlAsJs)
-const mockedLoadTsv = jest.mocked(loadTsv)
+const mockedLoadDataFile = jest.mocked(loadDataFile)
 const mockedGetFileExt = jest.mocked(getFileExtension)
 const mockedQuickPickOne = jest.mocked(quickPickOne)
 const mockedToast = jest.mocked(Toast)
@@ -55,47 +46,15 @@ const mockValidData = [
 ]
 
 describe('pickPlotConfiguration', () => {
-  it('should let user pick from files with accepted data types', async () => {
+  it('should let the user pick from files with accepted data types', async () => {
     mockedPickFile.mockResolvedValueOnce('file.json')
-    mockedLoadJson.mockReturnValueOnce(mockValidData)
+    mockedLoadDataFile.mockReturnValueOnce(mockValidData)
 
     await pickPlotConfiguration()
 
     expect(mockedPickFile).toHaveBeenCalledWith(Title.SELECT_PLOT_DATA, {
-      filters: {
-        'Data Formats': ['json', 'csv', 'tsv', 'yaml']
-      },
-      openLabel: 'Select'
+      'Data Formats': ['json', 'csv', 'tsv', 'yaml']
     })
-  })
-
-  it('should parse chosen data file', async () => {
-    mockedLoadJson.mockReturnValueOnce(mockValidData)
-    mockedLoadCsv.mockResolvedValueOnce(mockValidData)
-    mockedLoadJson.mockReturnValueOnce(mockValidData)
-    mockedLoadTsv.mockResolvedValueOnce(mockValidData)
-    mockedLoadYaml.mockReturnValueOnce(mockValidData)
-    mockedPickFile
-      .mockResolvedValueOnce('file.json')
-      .mockResolvedValueOnce('file.csv')
-      .mockResolvedValueOnce('file.tsv')
-      .mockResolvedValueOnce('file.yaml')
-
-    await pickPlotConfiguration()
-
-    expect(mockedLoadJson).toHaveBeenCalledWith('file.json')
-
-    await pickPlotConfiguration()
-
-    expect(mockedLoadCsv).toHaveBeenCalledWith('file.csv')
-
-    await pickPlotConfiguration()
-
-    expect(mockedLoadTsv).toHaveBeenCalledWith('file.tsv')
-
-    await pickPlotConfiguration()
-
-    expect(mockedLoadYaml).toHaveBeenCalledWith('file.yaml')
   })
 
   it('should return early if user does not select a file', async () => {
@@ -111,7 +70,7 @@ describe('pickPlotConfiguration', () => {
 
   it('should show a toast message if file fails to parse', async () => {
     mockedPickFile.mockResolvedValueOnce('file.csv')
-    mockedLoadCsv.mockReturnValueOnce(undefined)
+    mockedLoadDataFile.mockReturnValueOnce(undefined)
 
     const result = await pickPlotConfiguration()
 
@@ -140,7 +99,7 @@ describe('pickPlotConfiguration', () => {
     let result
 
     for (const [ind, invalidVal] of invalidValues.entries()) {
-      mockedLoadYaml.mockReturnValueOnce(invalidVal)
+      mockedLoadDataFile.mockReturnValueOnce(invalidVal)
 
       result = await pickPlotConfiguration()
 
@@ -162,7 +121,7 @@ describe('pickPlotConfiguration', () => {
     ]
 
     for (const [ind, val] of invalidValues.entries()) {
-      mockedLoadYaml.mockReturnValueOnce(val)
+      mockedLoadDataFile.mockReturnValueOnce(val)
 
       await pickPlotConfiguration()
 
@@ -171,9 +130,9 @@ describe('pickPlotConfiguration', () => {
     }
   })
 
-  it('should let user pick a template, x field, and y field', async () => {
+  it('should let the user pick a template, x field, and y field', async () => {
     mockedPickFile.mockResolvedValueOnce('file.json')
-    mockedLoadJson.mockReturnValueOnce(mockValidData)
+    mockedLoadDataFile.mockReturnValueOnce(mockValidData)
     mockedQuickPickOne
       .mockResolvedValueOnce('simple')
       .mockResolvedValueOnce('actual')
@@ -214,36 +173,21 @@ describe('pickPlotConfiguration', () => {
     })
   })
 
-  it('should return early if user does not pick a template', async () => {
+  it('should return early if the user does not pick a template', async () => {
     mockedPickFile.mockResolvedValueOnce('file.json')
-    mockedLoadJson.mockReturnValueOnce(mockValidData)
+    mockedLoadDataFile.mockReturnValueOnce(mockValidData)
     mockedQuickPickOne.mockResolvedValueOnce(undefined)
 
     const result = await pickPlotConfiguration()
 
     expect(mockedQuickPickOne).toHaveBeenCalledTimes(1)
-    expect(mockedQuickPickOne).toHaveBeenNthCalledWith(
-      1,
-      [
-        'simple',
-        'linear',
-        'confusion',
-        'confusion_normalized',
-        'scatter',
-        'scatter_jitter',
-        'smooth',
-        'bar_horizontal_sorted',
-        'bar_horizontal'
-      ],
-      'Pick a Plot Template'
-    )
 
     expect(result).toStrictEqual(undefined)
   })
 
-  it('should return early if user does not pick a x field', async () => {
+  it('should return early if the user does not pick a x field', async () => {
     mockedPickFile.mockResolvedValueOnce('file.json')
-    mockedLoadJson.mockReturnValueOnce(mockValidData)
+    mockedLoadDataFile.mockReturnValueOnce(mockValidData)
     mockedQuickPickOne
       .mockResolvedValueOnce('simple')
       .mockResolvedValueOnce(undefined)
@@ -251,32 +195,12 @@ describe('pickPlotConfiguration', () => {
     const result = await pickPlotConfiguration()
 
     expect(mockedQuickPickOne).toHaveBeenCalledTimes(2)
-    expect(mockedQuickPickOne).toHaveBeenNthCalledWith(
-      1,
-      [
-        'simple',
-        'linear',
-        'confusion',
-        'confusion_normalized',
-        'scatter',
-        'scatter_jitter',
-        'smooth',
-        'bar_horizontal_sorted',
-        'bar_horizontal'
-      ],
-      'Pick a Plot Template'
-    )
-    expect(mockedQuickPickOne).toHaveBeenNthCalledWith(
-      2,
-      ['actual', 'prob'],
-      'Pick a Metric for X'
-    )
     expect(result).toStrictEqual(undefined)
   })
 
-  it('should return early if user does not pick a y field', async () => {
+  it('should return early if the user does not pick a y field', async () => {
     mockedPickFile.mockResolvedValueOnce('file.json')
-    mockedLoadJson.mockReturnValueOnce(mockValidData)
+    mockedLoadDataFile.mockReturnValueOnce(mockValidData)
     mockedQuickPickOne
       .mockResolvedValueOnce('simple')
       .mockResolvedValueOnce('actual')
@@ -284,31 +208,7 @@ describe('pickPlotConfiguration', () => {
 
     const result = await pickPlotConfiguration()
 
-    expect(mockedQuickPickOne).toHaveBeenNthCalledWith(
-      1,
-      [
-        'simple',
-        'linear',
-        'confusion',
-        'confusion_normalized',
-        'scatter',
-        'scatter_jitter',
-        'smooth',
-        'bar_horizontal_sorted',
-        'bar_horizontal'
-      ],
-      'Pick a Plot Template'
-    )
-    expect(mockedQuickPickOne).toHaveBeenNthCalledWith(
-      2,
-      ['actual', 'prob'],
-      'Pick a Metric for X'
-    )
-    expect(mockedQuickPickOne).toHaveBeenNthCalledWith(
-      3,
-      ['prob'],
-      'Pick a Metric for Y'
-    )
+    expect(mockedQuickPickOne).toHaveBeenCalledTimes(3)
     expect(result).toStrictEqual(undefined)
   })
 })

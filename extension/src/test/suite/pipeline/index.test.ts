@@ -17,7 +17,7 @@ import { QuickPickOptionsWithTitle } from '../../../vscode/quickPick'
 import * as FileSystem from '../../../fileSystem'
 import { ScriptCommand } from '../../../pipeline'
 import * as VscodeContext from '../../../vscode/context'
-import * as PipelineUtil from '../../../pipeline/util'
+import * as PipelineQuickPick from '../../../pipeline/quickPick'
 
 suite('Pipeline Test Suite', () => {
   const disposable = Disposable.fn()
@@ -295,7 +295,7 @@ suite('Pipeline Test Suite', () => {
       dvcRoot: dvcDemoPath
     })
     const mockPickPlotConfiguration = stub(
-      PipelineUtil,
+      PipelineQuickPick,
       'pickPlotConfiguration'
     )
     const mockAddPlotToDvcFile = stub(FileSystem, 'addPlotToDvcYamlFile')
