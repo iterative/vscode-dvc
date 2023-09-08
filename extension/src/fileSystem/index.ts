@@ -30,7 +30,7 @@ import { processExists } from '../process/execution'
 import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
 import { DOT_DVC } from '../cli/dvc/constants'
 import { delay } from '../util/time'
-import { PlotConfigData } from '../pipeline/util'
+import { PlotConfigData } from '../pipeline/quickPick'
 
 export const exists = (path: string): boolean => existsSync(path)
 
@@ -264,7 +264,7 @@ export const relativeWithUri = (dvcRoot: string, uri: Uri) =>
 
 export const removeDir = (path: string): void => removeSync(path)
 
-export const loadYamlAsJs = <T>(path: string): T | undefined => {
+const loadYaml = <T>(path: string): T | undefined => {
   try {
     return yaml.parse(readFileSync(path, 'utf8')) as T
   } catch {
@@ -280,7 +280,7 @@ export const loadJson = <T>(path: string): T | undefined => {
   }
 }
 
-export const loadCsv = (path: string) => {
+const loadCsv = (path: string) => {
   try {
     const content = readFileSync(path).toString()
 
@@ -290,13 +290,28 @@ export const loadCsv = (path: string) => {
   }
 }
 
-export const loadTsv = (path: string) => {
+const loadTsv = (path: string) => {
   try {
     const content = readFileSync(path).toString()
 
     return csv2json(content, { delimiter: { field: '\t' } })
   } catch {
     Logger.error(`failed to load TSV from ${path}`)
+  }
+}
+
+export const loadDataFile = (file: string): unknown => {
+  const ext = getFileExtension(file)
+
+  switch (ext) {
+    case '.csv':
+      return loadCsv(file)
+    case '.json':
+      return loadJson<Record<string, unknown> | unknown[]>(file)
+    case '.tsv':
+      return loadTsv(file)
+    case '.yaml':
+      return loadYaml<Record<string, unknown>>(file)
   }
 }
 
