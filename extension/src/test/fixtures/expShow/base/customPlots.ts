@@ -103,6 +103,28 @@ const data: CustomPlotsData = {
         $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
         data: { name: 'values' },
         encoding: {
+          color: {
+            field: 'id',
+            legend: null,
+            scale: {
+              domain: [
+                'main',
+                'exp-e7a67',
+                'test-branch',
+                'exp-83425',
+                'fe2919b',
+                '7df876c'
+              ],
+              range: [
+                '#13adc7',
+                '#f46837',
+                '#48bb78',
+                '#4299e1',
+                '#4c78a8',
+                '#4c78a8'
+              ]
+            }
+          },
           x: {
             axis: {
               labelLimit: 75,
@@ -157,13 +179,13 @@ const data: CustomPlotsData = {
         width: 'container'
       },
       values: [
-        { id: 'main', metric: 2.048856019973755, param: 'logs.csv' },
+        { id: '7df876c', metric: 2.048856019973755, param: 'logs.csv' },
         {
           id: 'fe2919b',
           metric: 2.048856019973755,
           param: 'logs.csv'
         },
-        { id: '7df876c', metric: 2.048856019973755, param: 'logs.csv' },
+        { id: 'main', metric: 2.048856019973755, param: 'logs.csv' },
         { id: 'exp-e7a67', metric: 2.0205044746398926, param: 'logs.csv' },
         { id: 'test-branch', metric: 1.9293040037155151, param: 'logs.csv' },
         {
@@ -179,7 +201,7 @@ const data: CustomPlotsData = {
       param: 'params.yaml:epochs',
       values: [
         {
-          id: 'main',
+          id: '7df876c',
           metric: 0.3484833240509033,
           param: 5
         },
@@ -189,7 +211,7 @@ const data: CustomPlotsData = {
           param: 5
         },
         {
-          id: '7df876c',
+          id: 'main',
           metric: 0.3484833240509033,
           param: 5
         },
@@ -213,6 +235,28 @@ const data: CustomPlotsData = {
         $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
         data: { name: 'values' },
         encoding: {
+          color: {
+            field: 'id',
+            legend: null,
+            scale: {
+              domain: [
+                'main',
+                'exp-e7a67',
+                'test-branch',
+                'exp-83425',
+                'fe2919b',
+                '7df876c'
+              ],
+              range: [
+                '#13adc7',
+                '#f46837',
+                '#48bb78',
+                '#4299e1',
+                '#4c78a8',
+                '#4c78a8'
+              ]
+            }
+          },
           x: {
             axis: {
               labelLimit: 75,

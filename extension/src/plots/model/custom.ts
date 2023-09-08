@@ -2,6 +2,7 @@ import { VisualizationSpec } from 'react-vega'
 import { getCustomPlotId } from './collect'
 import { Column, ColumnType } from '../../experiments/webview/contract'
 import { FILE_SEPARATOR } from '../../experiments/columns/paths'
+import { ColorScale } from '../webview/contract'
 
 export type CustomPlotsOrderValue = {
   metric: string
@@ -77,12 +78,14 @@ export const createSpec = (
   metric: string,
   param: string,
   metricType: string,
-  paramType: string
+  paramType: string,
+  colorScale: ColorScale
 ) =>
   ({
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
     data: { name: 'values' },
     encoding: {
+      color: { field: 'id', legend: null, scale: colorScale },
       x: {
         axis: {
           labelLimit: 75,
