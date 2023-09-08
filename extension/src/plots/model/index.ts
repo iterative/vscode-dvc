@@ -166,8 +166,14 @@ export class PlotsModel extends ModelWithPersistence {
     const nbItemsPerRow = this.getNbItemsPerRowOrWidth(
       PlotsSection.CUSTOM_PLOTS
     )
+    const colorScale = getColorScale(
+      this.getSelectedRevisionDetails().filter(
+        ({ id }) => id !== EXPERIMENT_WORKSPACE_ID
+      )
+    )
     const plotsOrderValues = this.getCustomPlotsOrder()
     const plots: CustomPlotData[] = collectCustomPlots({
+      colorScale,
       experiments,
       height,
       nbItemsPerRow,
