@@ -65,10 +65,7 @@ describe('pickPlotConfiguration', () => {
     expect(result).toStrictEqual(undefined)
   })
 
-  const failedToParseMessage =
-    'Failed to find field options for plot data. Is your file following DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
-
-  it('should show a toast message if file fails to parse', async () => {
+  it('should show a toast message if the file fails to parse', async () => {
     mockedPickFile.mockResolvedValueOnce('file.csv')
     mockedLoadDataFile.mockReturnValueOnce(undefined)
 
@@ -76,10 +73,12 @@ describe('pickPlotConfiguration', () => {
 
     expect(result).toStrictEqual(undefined)
     expect(mockedShowError).toHaveBeenCalledTimes(1)
-    expect(mockedShowError).toHaveBeenCalledWith(failedToParseMessage)
+    expect(mockedShowError).toHaveBeenCalledWith(
+      'Failed to parse the requested file. Does the file contain data and follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
+    )
   })
 
-  it('should show a toast message if fields are not found within a file', async () => {
+  it('should show a toast message if two fields are not found within a file', async () => {
     mockedPickFile.mockResolvedValue('file.yaml')
     const invalidValues: unknown[] = [
       'string',
@@ -105,13 +104,15 @@ describe('pickPlotConfiguration', () => {
 
       expect(result).toStrictEqual(undefined)
       expect(mockedShowError).toHaveBeenCalledTimes(1 + ind)
-      expect(mockedShowError).toHaveBeenCalledWith(failedToParseMessage)
+      expect(mockedShowError).toHaveBeenCalledWith(
+        'The request file does not contain enough keys (columns) to generate a plot. Does the file follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
+      )
     }
   })
 
   it('should parse fields from valid data files', async () => {
     mockedPickFile.mockResolvedValue('file.yaml')
-    const invalidValues: unknown[] = [
+    const validValues: unknown[] = [
       [{ field1: 1, field2: 2 }],
       [
         { field1: 1, field2: 2, field3: 1, field4: 2 },
@@ -120,12 +121,12 @@ describe('pickPlotConfiguration', () => {
       { field1: [{ field1: 1, field2: 2 }] }
     ]
 
-    for (const [ind, val] of invalidValues.entries()) {
+    for (const [ind, val] of validValues.entries()) {
       mockedLoadDataFile.mockReturnValueOnce(val)
 
       await pickPlotConfiguration()
 
-      expect(mockedShowError).not.toHaveBeenCalledTimes(1)
+      expect(mockedShowError).not.toHaveBeenCalled()
       expect(mockedQuickPickOne).toHaveBeenCalledTimes(ind + 1)
     }
   })

@@ -1,6 +1,10 @@
-import { PLOT_TEMPLATES } from '../cli/dvc/contract'
+import {
+  PLOT_TEMPLATES,
+  Value,
+  ValueTree,
+  isValueTree
+} from '../cli/dvc/contract'
 import { loadDataFile } from '../fileSystem'
-import { isObject } from '../util/object'
 import { quickPickOne } from '../vscode/quickPick'
 import { pickFile } from '../vscode/resourcePicker'
 import { Title } from '../vscode/title'
@@ -46,9 +50,11 @@ export type PlotConfigData = {
   y: string
 }
 
-const getFieldOptions = (data: unknown): string[] => {
+type UnknownValue = Value | ValueTree
+
+const getFieldOptions = (data: UnknownValue): string[] => {
   const isArray = Array.isArray(data)
-  const isObj = isObject(data)
+  const isObj = isValueTree(data)
   if (!isArray && !isObj) {
     return []
   }
@@ -59,8 +65,8 @@ const getFieldOptions = (data: unknown): string[] => {
     return []
   }
 
-  const maybeFieldsObj: unknown = maybeFieldsObjArr[0]
-  return isObject(maybeFieldsObj) ? Object.keys(maybeFieldsObj) : []
+  const maybeFieldsObj: UnknownValue = maybeFieldsObjArr[0]
+  return isValueTree(maybeFieldsObj) ? Object.keys(maybeFieldsObj) : []
 }
 
 export const pickPlotConfiguration = async (): Promise<
@@ -73,17 +79,19 @@ export const pickPlotConfiguration = async (): Promise<
   }
 
   const data = await loadDataFile(file)
-  const failedToParseMessage =
-    'Failed to find field options for plot data. Is your file following DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
 
   if (!data) {
-    return Toast.showError(failedToParseMessage)
+    return Toast.showError(
+      'Failed to parse the requested file. Does the file contain data and follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
+    )
   }
 
-  const keys = getFieldOptions(data)
+  const keys = getFieldOptions(data as UnknownValue)
 
   if (keys.length < 2) {
-    return Toast.showError(failedToParseMessage)
+    return Toast.showError(
+      'The request file does not contain enough keys (columns) to generate a plot. Does the file follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
+    )
   }
 
   const templateAndFields = await pickTemplateAndFields(keys)
