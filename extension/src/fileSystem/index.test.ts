@@ -23,7 +23,7 @@ import {
   getPidFromFile,
   getEntryFromJsonFile,
   addPlotToDvcYamlFile,
-  loadYamlAsJs,
+  loadYaml,
   loadCsv,
   loadTsv
 } from '.'
@@ -65,7 +65,7 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-describe('loadYamlAsJs', () => {
+describe('loadYaml', () => {
   it('should load in yaml file contents as a js object', () => {
     const mockYamlContent = [
       'stages:',
@@ -74,7 +74,7 @@ describe('loadYamlAsJs', () => {
     ].join('\n')
     mockedReadFileSync.mockReturnValueOnce(mockYamlContent)
 
-    const result = loadYamlAsJs('dvc.yaml')
+    const result = loadYaml('dvc.yaml')
 
     expect(result).toStrictEqual({
       stages: {
@@ -89,7 +89,7 @@ describe('loadYamlAsJs', () => {
     mockedReadFileSync.mockImplementationOnce(() => {
       throw new Error('fake error')
     })
-    const result = loadYamlAsJs('dvc.yaml')
+    const result = loadYaml('dvc.yaml')
 
     expect(result).toStrictEqual(undefined)
   })
@@ -528,7 +528,7 @@ describe('addPlotToDvcYamlFile', () => {
     const mockPlotYamlContent = [
       '',
       'plots:',
-      `  - ${relative('/', 'data.json')}:`,
+      '  - data.json:',
       '      template: simple',
       '      x: epochs',
       '      y: accuracy',
@@ -537,7 +537,7 @@ describe('addPlotToDvcYamlFile', () => {
     mockedReadFileSync.mockReturnValueOnce(mockDvcYamlContent)
 
     addPlotToDvcYamlFile('/', {
-      dataFile: 'data.json',
+      dataFile: '/data.json',
       template: 'simple',
       x: 'epochs',
       y: 'accuracy'

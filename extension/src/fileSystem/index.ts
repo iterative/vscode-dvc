@@ -207,8 +207,6 @@ export const addPlotToDvcYamlFile = (cwd: string, plotObj: PlotConfigData) => {
   const dvcYamlLines = readFileSync(dvcYamlFile, 'utf8').split('\n')
   const plotYaml = yaml.stringify({ plots: [{ [plotName]: plot }] }).split('\n')
 
-  // TBD this only works correctly for yaml with 2 space indent and no plots
-  // will adjust for other possibilities in another pr
   dvcYamlLines.push(...plotYaml)
   void openFileInEditor(dvcYamlFile)
   return writeFileSync(dvcYamlFile, dvcYamlLines.join('\n'))
@@ -221,7 +219,7 @@ export const relativeWithUri = (dvcRoot: string, uri: Uri) =>
 
 export const removeDir = (path: string): void => removeSync(path)
 
-export const loadYamlAsJs = <T>(path: string): T | undefined => {
+export const loadYaml = <T>(path: string): T | undefined => {
   try {
     return yaml.parse(readFileSync(path, 'utf8')) as T
   } catch {
