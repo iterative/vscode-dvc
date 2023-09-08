@@ -78,7 +78,7 @@ describe('pickPlotConfiguration', () => {
     )
   })
 
-  it('should show a toast message if two fields are not found within a file', async () => {
+  it('should show a toast message if an array of objects (with atleast two keys) are not found within a file', async () => {
     mockedPickFile.mockResolvedValue('file.yaml')
     const invalidValues: unknown[] = [
       'string',
@@ -87,12 +87,29 @@ describe('pickPlotConfiguration', () => {
       ['array', 'of', 'strings'],
       [1, 2, 3],
       [{ field1: 'only one field' }],
+      [
+        {
+          field1: 1,
+          field2: 2
+        },
+        { field: 2 }
+      ],
       {},
       { val: undefined },
       { val: [] },
       { val: { field1: {} } },
       { val: [{ field1: 'only one field' }] },
-      { field1: 123, field2: [{ field1: 1, field2: 2 }] }
+      { field1: 123, field2: [{ field1: 1, field2: 2 }] },
+      {
+        field1: [
+          {
+            field1: 1,
+            field2: 2
+          },
+          { field1: 1, field2: 2 },
+          { field3: 1 }
+        ]
+      }
     ]
 
     let result
@@ -118,7 +135,13 @@ describe('pickPlotConfiguration', () => {
         { field1: 1, field2: 2, field3: 1, field4: 2 },
         { field1: 1, field2: 2, field3: 1, field4: 2 }
       ],
-      { field1: [{ field1: 1, field2: 2 }] }
+      { field1: [{ field1: 1, field2: 2 }] },
+      {
+        field1: [
+          { field1: 1, field2: 2 },
+          { field1: 3, field2: 4 }
+        ]
+      }
     ]
 
     for (const [ind, val] of validValues.entries()) {

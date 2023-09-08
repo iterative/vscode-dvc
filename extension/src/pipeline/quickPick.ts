@@ -1,3 +1,4 @@
+import isEqual from 'lodash.isequal'
 import {
   PLOT_TEMPLATES,
   Value,
@@ -52,6 +53,18 @@ export type PlotConfigData = {
 
 type UnknownValue = Value | ValueTree
 
+const getFieldsFromArr = (dataArr: UnknownValue[]) => {
+  const firstArrVal: UnknownValue = dataArr[0]
+  if (!isValueTree(firstArrVal)) {
+    return []
+  }
+  const fieldObjKeys = Object.keys(firstArrVal)
+  const objsHaveSameKeys = dataArr.every(
+    val => isValueTree(val) && isEqual(fieldObjKeys, Object.keys(val))
+  )
+  return objsHaveSameKeys ? fieldObjKeys : []
+}
+
 const getFieldOptions = (data: UnknownValue): string[] => {
   const isArray = Array.isArray(data)
   const isObj = isValueTree(data)
@@ -61,12 +74,9 @@ const getFieldOptions = (data: UnknownValue): string[] => {
 
   const maybeFieldsObjArr = isArray ? data : data[Object.keys(data)[0]]
 
-  if (!Array.isArray(maybeFieldsObjArr)) {
-    return []
-  }
-
-  const maybeFieldsObj: UnknownValue = maybeFieldsObjArr[0]
-  return isValueTree(maybeFieldsObj) ? Object.keys(maybeFieldsObj) : []
+  return Array.isArray(maybeFieldsObjArr)
+    ? getFieldsFromArr(maybeFieldsObjArr)
+    : []
 }
 
 export const pickPlotConfiguration = async (): Promise<
