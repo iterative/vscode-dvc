@@ -215,10 +215,7 @@ const loadYamlAsDoc = (
 }
 
 const getYamlFileIndent = (lines: string[]) => {
-  const firstLineWithInd = lines.find(line => line.startsWith(' '))
-  if (!firstLineWithInd) {
-    return 2
-  }
+  const firstLineWithInd = lines.find(line => line.startsWith(' ')) || ''
   const spacesMatches = firstLineWithInd.match(/^( +)[^ ]/)
   const spaces = spacesMatches?.[1]
 
@@ -250,8 +247,12 @@ export const addPlotToDvcYamlFile = (cwd: string, plotObj: PlotConfigData) => {
     return
   }
 
-  const insertLineNum = lineCounter.linePos(plots.range[2])
-  dvcYamlLines.splice(insertLineNum.line - 1, 0, ...plotYaml.slice(1))
+  const plotsEndPos = lineCounter.linePos(plots.range[2]).line
+  const arePlotsAtBottomOfFile =
+    plotsEndPos === dvcYamlLines.length &&
+    dvcYamlLines[dvcYamlLines.length - 1].trim() !== ''
+  const insertLineNum = arePlotsAtBottomOfFile ? plotsEndPos : plotsEndPos - 1
+  dvcYamlLines.splice(insertLineNum, 0, ...plotYaml.slice(1))
 
   void openFileInEditor(dvcYamlFile)
   return writeFileSync(dvcYamlFile, dvcYamlLines.join('\n'))

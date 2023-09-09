@@ -516,19 +516,104 @@ describe('findOrCreateDvcYamlFile', () => {
 })
 
 describe('addPlotToDvcYamlFile', () => {
-  it('should add plots item with created plot if dvc.yaml file has no plots', () => {
+  const mockStagesLines = ['stages:', '  train:', '    cmd: python train.py']
+  const mockPlotsListLines = [
+    'plots:',
+    '  - eval/importance.png',
+    '  - Precision-Recall:',
+    '      x: recall',
+    '      y:',
+    '        eval/prc/train.json: precision',
+    '        eval/prc/test.json: precision'
+  ]
+  const mockNewPlotLines = [
+    '  - data.json:',
+    '      template: simple',
+    '      x: epochs',
+    '      y: accuracy'
+  ]
+  it('should add a plots list with the new plot if the dvc.yaml file has no plots', () => {
+    const mockDvcYamlContent = mockStagesLines.join('\n')
+    const mockPlotYamlContent = ['', 'plots:', ...mockNewPlotLines, ''].join(
+      '\n'
+    )
+    mockedReadFileSync.mockReturnValueOnce(mockDvcYamlContent)
+    mockedReadFileSync.mockReturnValueOnce(mockDvcYamlContent)
+
+    addPlotToDvcYamlFile('/', {
+      dataFile: '/data.json',
+      template: 'simple',
+      x: 'epochs',
+      y: 'accuracy'
+    })
+
+    expect(mockedWriteFileSync).toHaveBeenCalledWith(
+      '//dvc.yaml',
+      mockDvcYamlContent + mockPlotYamlContent
+    )
+  })
+
+  it('should add the new plot if the dvc.yaml file already has plots', () => {
+    const mockDvcYamlContent = [...mockPlotsListLines, ...mockStagesLines]
+    const mockPlotYamlContent = [...mockNewPlotLines, '']
+    mockedReadFileSync.mockReturnValueOnce(mockDvcYamlContent.join('\n'))
+    mockedReadFileSync.mockReturnValueOnce(mockDvcYamlContent.join('\n'))
+
+    addPlotToDvcYamlFile('/', {
+      dataFile: '/data.json',
+      template: 'simple',
+      x: 'epochs',
+      y: 'accuracy'
+    })
+
+    mockDvcYamlContent.splice(7, 0, ...mockPlotYamlContent)
+
+    expect(mockedWriteFileSync).toHaveBeenCalledWith(
+      '//dvc.yaml',
+      mockDvcYamlContent.join('\n')
+    )
+  })
+
+  it('should add a new plot if the dvc.yaml plots list is at bottom of file', () => {
+    const mockDvcYamlContent = [...mockStagesLines, ...mockPlotsListLines].join(
+      '\n'
+    )
+    const mockPlotYamlContent = ['', ...mockNewPlotLines, ''].join('\n')
+    mockedReadFileSync.mockReturnValueOnce(mockDvcYamlContent)
+    mockedReadFileSync.mockReturnValueOnce(mockDvcYamlContent)
+
+    addPlotToDvcYamlFile('/', {
+      dataFile: '/data.json',
+      template: 'simple',
+      x: 'epochs',
+      y: 'accuracy'
+    })
+
+    expect(mockedWriteFileSync).toHaveBeenCalledWith(
+      '//dvc.yaml',
+      mockDvcYamlContent + mockPlotYamlContent
+    )
+  })
+
+  it('should add a new plot with an indent level that matches the dvc.yaml file', () => {
     const mockDvcYamlContent = [
       'stages:',
-      '  train:',
-      '    cmd: python train.py'
+      '    train:',
+      '        cmd: python train.py',
+      'plots:',
+      '    - eval/importance.png',
+      '    - Precision-Recall:',
+      '          x: recall',
+      '          y:',
+      '              eval/prc/train.json: precision',
+      '              eval/prc/test.json: precision'
     ].join('\n')
     const mockPlotYamlContent = [
       '',
-      'plots:',
-      '  - data.json:',
-      '      template: simple',
-      '      x: epochs',
-      '      y: accuracy',
+      '    - data.json:',
+      '          template: simple',
+      '          x: epochs',
+      '          y: accuracy',
       ''
     ].join('\n')
     mockedReadFileSync.mockReturnValueOnce(mockDvcYamlContent)
