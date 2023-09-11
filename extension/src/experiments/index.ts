@@ -382,6 +382,10 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getWorkspaceCommitsAndExperiments()
   }
 
+  public getFilteredCommitsAndExperiments() {
+    return this.experiments.getFilteredCommitsAndExperiments()
+  }
+
   public async selectExperimentsToPlot() {
     const experiments = this.experiments.getWorkspaceCommitsAndExperiments()
 

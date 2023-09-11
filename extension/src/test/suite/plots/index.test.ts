@@ -44,9 +44,16 @@ import { isErrorItem } from '../../../tree'
 import { RegisteredCommands } from '../../../commands/external'
 import { REVISIONS } from '../../fixtures/plotsDiff'
 import * as FileSystem from '../../../fileSystem'
-import { ExpShowOutput, experimentHasError } from '../../../cli/dvc/contract'
+import {
+  EXPERIMENT_WORKSPACE_ID,
+  ExpShowOutput,
+  experimentHasError
+} from '../../../cli/dvc/contract'
+import { Experiment } from '../../../experiments/webview/contract'
 import { COMMITS_SEPARATOR } from '../../../cli/git/constants'
 import { BaseWebview } from '../../../webview'
+import * as PlotsCollectUtils from '../../../plots/model/collect'
+import { Operator } from '../../../experiments/model/filterBy'
 
 suite('Plots Test Suite', () => {
   const disposable = Disposable.fn()
@@ -169,6 +176,40 @@ suite('Plots Test Suite', () => {
       expect(mockRemoveDir).to.be.calledOnce
       expect(mockRemoveDir).to.be.calledWithExactly(
         join(dvcDemoPath, TEMP_PLOTS_DIR)
+      )
+    })
+
+    it('should only use unfiltered experiments and commits in custom plots', async () => {
+      const { plots, plotsModel, experimentsModel } = await buildPlots({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
+
+      const plotsCustomPlotsSpy = spy(PlotsCollectUtils, 'collectCustomPlots')
+
+      await plots.isReady()
+
+      stub(experimentsModel, 'getFilters').returns([
+        {
+          operator: Operator.EQUAL,
+          path: 'params:params.yaml:epochs',
+          value: 2
+        }
+      ])
+
+      plotsModel.getCustomPlots()
+
+      const allExperiments: Experiment[] =
+        experimentsModel.getWorkspaceCommitsAndExperiments()
+
+      const { experiments } = plotsCustomPlotsSpy.firstCall.args[0]
+
+      expect(experiments).to.deep.equal(
+        allExperiments.filter(
+          ({ id, params }) =>
+            id !== EXPERIMENT_WORKSPACE_ID &&
+            params?.['params.yaml']?.epochs === 2
+        )
       )
     })
 
