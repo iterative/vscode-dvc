@@ -47,7 +47,11 @@ export const CustomPlots: React.FC<CustomPlotsProps> = ({ plotsIds }) => {
   }
 
   if (!hasData) {
-    return <EmptyState isFullScreen={false}>No Plots to Display</EmptyState>
+    return (
+      <EmptyState isFullScreen={false}>
+        No Plots to Display. Are any of your experiments or commits unfiltered?
+      </EmptyState>
+    )
   }
 
   if (order.length === 0) {
