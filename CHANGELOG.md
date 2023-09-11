@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.53] - 2023-09-11
+
+### 🚀 New Features and Enhancements
+
+- Apply selected experiment colors to custom plots [#4647](https://github.com/iterative/vscode-dvc/pull/4647) by [@mattseddon](https://github.com/mattseddon)
+- Add top-level plots wizard [#4586](https://github.com/iterative/vscode-dvc/pull/4586) by [@julieg18](https://github.com/julieg18)
+
 ## [1.0.52] - 2023-09-08
 
 ### 🚀 New Features and Enhancements
