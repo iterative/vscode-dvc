@@ -4,10 +4,15 @@ import { appendFileSync, writeFileSync } from 'fs-extra'
 import { setContextForEditorTitleIcons } from './context'
 import { PipelineData } from './data'
 import { PipelineModel } from './model'
+import { pickPlotConfiguration } from './quickPick'
 import { DeferredDisposable } from '../class/deferred'
 import { InternalCommands } from '../commands/internal'
 import { TEMP_DAG_FILE } from '../cli/dvc/constants'
-import { findOrCreateDvcYamlFile, getFileExtension } from '../fileSystem'
+import {
+  addPlotToDvcYamlFile,
+  findOrCreateDvcYamlFile,
+  getFileExtension
+} from '../fileSystem'
 import { getInput, getValidInput } from '../vscode/inputBox'
 import { Title } from '../vscode/title'
 import { quickPickOne, quickPickOneOrInput } from '../vscode/quickPick'
@@ -105,6 +110,22 @@ export class Pipeline extends DeferredDisposable {
       return
     }
     return this.addPipeline()
+  }
+
+  public async addTopLevelPlot() {
+    const cwd = await this.getCwd()
+
+    if (!cwd) {
+      return
+    }
+
+    const plotConfiguration = await pickPlotConfiguration()
+
+    if (!plotConfiguration) {
+      return
+    }
+
+    addPlotToDvcYamlFile(cwd, plotConfiguration)
   }
 
   public forceRerender() {

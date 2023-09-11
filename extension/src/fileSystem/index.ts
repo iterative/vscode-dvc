@@ -18,9 +18,9 @@ import {
   removeSync,
   writeFileSync
 } from 'fs-extra'
-import { load } from 'js-yaml'
 import { Uri, workspace, window, commands, ViewColumn } from 'vscode'
-import { json2csv } from 'json-2-csv'
+import { csv2json, json2csv } from 'json-2-csv'
+import yaml from 'yaml'
 import { standardizePath } from './path'
 import { definedAndNonEmpty, sortCollectedArray } from '../util/array'
 import { Logger } from '../common/logger'
@@ -30,6 +30,7 @@ import { processExists } from '../process/execution'
 import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
 import { DOT_DVC } from '../cli/dvc/constants'
 import { delay } from '../util/time'
+import { PlotConfigData } from '../pipeline/quickPick'
 
 export const exists = (path: string): boolean => existsSync(path)
 
@@ -199,6 +200,78 @@ stages:
   return appendFileSync(dvcYamlPath, pipeline)
 }
 
+const loadYamlAsDoc = (
+  path: string
+): { doc: yaml.Document; lineCounter: yaml.LineCounter } | undefined => {
+  try {
+    const lineCounter = new yaml.LineCounter()
+    return {
+      doc: yaml.parseDocument(readFileSync(path, 'utf8'), { lineCounter }),
+      lineCounter
+    }
+  } catch {
+    Logger.error(`failed to load yaml ${path}`)
+  }
+}
+
+const getPlotsYaml = (
+  cwd: string,
+  plotObj: PlotConfigData,
+  indentSearchLines: string[]
+) => {
+  const { dataFile, ...plot } = plotObj
+  const plotName = relative(cwd, dataFile)
+  const indentReg = /^( +)[^ ]/
+  const indentLine = indentSearchLines.find(line => indentReg.test(line)) || ''
+  const spacesMatches = indentLine.match(indentReg)
+  const spaces = spacesMatches?.[1]
+
+  return yaml
+    .stringify(
+      { plots: [{ [plotName]: plot }] },
+      { indent: spaces ? spaces.length : 2 }
+    )
+    .split('\n')
+}
+
+export const addPlotToDvcYamlFile = (cwd: string, plotObj: PlotConfigData) => {
+  const dvcYamlFile = `${cwd}/dvc.yaml`
+  const dvcYamlDoc = loadYamlAsDoc(dvcYamlFile)
+
+  if (!dvcYamlDoc) {
+    return
+  }
+
+  const { doc, lineCounter } = dvcYamlDoc
+
+  const dvcYamlLines = readFileSync(dvcYamlFile, 'utf8').split('\n')
+  const plots = doc.get('plots', true) as yaml.YAMLSeq | undefined
+
+  if (!plots?.range) {
+    const plotYaml = getPlotsYaml(cwd, plotObj, dvcYamlLines)
+    dvcYamlLines.push(...plotYaml)
+    writeFileSync(dvcYamlFile, dvcYamlLines.join('\n'))
+    return
+  }
+
+  const plotsEndPos = lineCounter.linePos(plots.range[2]).line
+  const arePlotsAtBottomOfFile =
+    plotsEndPos === dvcYamlLines.length &&
+    dvcYamlLines[dvcYamlLines.length - 1].trim() !== ''
+  const insertLineNum = arePlotsAtBottomOfFile ? plotsEndPos : plotsEndPos - 1
+
+  const plotsStartPos = lineCounter.linePos(plots.range[0]).line - 1
+  const plotYaml = getPlotsYaml(
+    cwd,
+    plotObj,
+    dvcYamlLines.slice(plotsStartPos, insertLineNum)
+  )
+  dvcYamlLines.splice(insertLineNum, 0, ...plotYaml.slice(1))
+
+  void openFileInEditor(dvcYamlFile)
+  return writeFileSync(dvcYamlFile, dvcYamlLines.join('\n'))
+}
+
 export const getFileExtension = (filePath: string) => parse(filePath).ext
 
 export const relativeWithUri = (dvcRoot: string, uri: Uri) =>
@@ -206,9 +279,9 @@ export const relativeWithUri = (dvcRoot: string, uri: Uri) =>
 
 export const removeDir = (path: string): void => removeSync(path)
 
-export const loadYaml = <T>(path: string): T | undefined => {
+const loadYaml = <T>(path: string): T | undefined => {
   try {
-    return load(readFileSync(path, 'utf8')) as T
+    return yaml.parse(readFileSync(path, 'utf8')) as T
   } catch {
     Logger.error(`failed to load yaml ${path}`)
   }
@@ -219,6 +292,41 @@ export const loadJson = <T>(path: string): T | undefined => {
     return JSON.parse(readFileSync(path).toString()) as T
   } catch {
     Logger.error(`failed to load JSON from ${path}`)
+  }
+}
+
+const loadCsv = (path: string) => {
+  try {
+    const content = readFileSync(path).toString()
+
+    return csv2json(content)
+  } catch {
+    Logger.error(`failed to load CSV from ${path}`)
+  }
+}
+
+const loadTsv = (path: string) => {
+  try {
+    const content = readFileSync(path).toString()
+
+    return csv2json(content, { delimiter: { field: '\t' } })
+  } catch {
+    Logger.error(`failed to load TSV from ${path}`)
+  }
+}
+
+export const loadDataFile = (file: string): unknown => {
+  const ext = getFileExtension(file)
+
+  switch (ext) {
+    case '.csv':
+      return loadCsv(file)
+    case '.json':
+      return loadJson<Record<string, unknown> | unknown[]>(file)
+    case '.tsv':
+      return loadTsv(file)
+    case '.yaml':
+      return loadYaml<Record<string, unknown>>(file)
   }
 }
 

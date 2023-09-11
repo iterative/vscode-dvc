@@ -3,6 +3,18 @@ import { Plot } from '../../plots/webview/contract'
 export const MIN_CLI_VERSION = '2.58.1'
 export const LATEST_TESTED_CLI_VERSION = '3.19.0'
 
+export const PLOT_TEMPLATES = [
+  'simple',
+  'linear',
+  'confusion',
+  'confusion_normalized',
+  'scatter',
+  'scatter_jitter',
+  'smooth',
+  'bar_horizontal_sorted',
+  'bar_horizontal'
+]
+
 type ErrorContents = { type: string; msg: string }
 
 export type DvcError = { error: ErrorContents }

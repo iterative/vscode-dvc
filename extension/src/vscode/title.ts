@@ -40,6 +40,7 @@ export enum Title {
   SELECT_SORT_DIRECTION = 'Select Sort Direction',
   SELECT_SORTS_TO_REMOVE = 'Select Sort(s) to Remove',
   SELECT_TRAINING_SCRIPT = 'Select your Training Script',
+  SELECT_PLOT_DATA = 'Select Data to Plot',
   SETUP_WORKSPACE = 'Setup the Workspace',
   SET_EXPERIMENTS_HEADER_HEIGHT = 'Set the Maximum Experiment Table Header Height',
   SET_REMOTE_AS_DEFAULT = 'Set Default Remote',
