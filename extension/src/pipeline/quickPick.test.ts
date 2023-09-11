@@ -122,7 +122,7 @@ describe('pickPlotConfiguration', () => {
       expect(result).toStrictEqual(undefined)
       expect(mockedShowError).toHaveBeenCalledTimes(1 + ind)
       expect(mockedShowError).toHaveBeenCalledWith(
-        'The request file does not contain enough keys (columns) to generate a plot. Does the file follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
+        'The requested file does not contain enough keys (columns) to generate a plot. Does the file follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
       )
     }
   })
