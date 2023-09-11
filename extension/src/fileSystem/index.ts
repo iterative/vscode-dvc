@@ -214,12 +214,24 @@ const loadYamlAsDoc = (
   }
 }
 
-const getYamlFileIndent = (lines: string[]) => {
-  const firstLineWithInd = lines.find(line => line.startsWith(' ')) || ''
-  const spacesMatches = firstLineWithInd.match(/^( +)[^ ]/)
+const getPlotsYaml = (
+  cwd: string,
+  plotObj: PlotConfigData,
+  indentSearchLines: string[]
+) => {
+  const { dataFile, ...plot } = plotObj
+  const plotName = relative(cwd, dataFile)
+  const indentReg = /^( +)[^ ]/
+  const indentLine = indentSearchLines.find(line => indentReg.test(line)) || ''
+  const spacesMatches = indentLine.match(indentReg)
   const spaces = spacesMatches?.[1]
 
-  return spaces ? spaces.length : 2
+  return yaml
+    .stringify(
+      { plots: [{ [plotName]: plot }] },
+      { indent: spaces ? spaces.length : 2 }
+    )
+    .split('\n')
 }
 
 export const addPlotToDvcYamlFile = (cwd: string, plotObj: PlotConfigData) => {
@@ -231,17 +243,12 @@ export const addPlotToDvcYamlFile = (cwd: string, plotObj: PlotConfigData) => {
   }
 
   const { doc, lineCounter } = dvcYamlDoc
-  const { dataFile, ...plot } = plotObj
-  const plotName = relative(cwd, dataFile)
-  const dvcYamlLines = readFileSync(dvcYamlFile, 'utf8').split('\n')
-  const indent = getYamlFileIndent(dvcYamlLines)
 
+  const dvcYamlLines = readFileSync(dvcYamlFile, 'utf8').split('\n')
   const plots = doc.get('plots', true) as yaml.YAMLSeq | undefined
-  const plotYaml = yaml
-    .stringify({ plots: [{ [plotName]: plot }] }, { indent })
-    .split('\n')
 
   if (!plots?.range) {
+    const plotYaml = getPlotsYaml(cwd, plotObj, dvcYamlLines)
     dvcYamlLines.push(...plotYaml)
     writeFileSync(dvcYamlFile, dvcYamlLines.join('\n'))
     return
@@ -252,6 +259,13 @@ export const addPlotToDvcYamlFile = (cwd: string, plotObj: PlotConfigData) => {
     plotsEndPos === dvcYamlLines.length &&
     dvcYamlLines[dvcYamlLines.length - 1].trim() !== ''
   const insertLineNum = arePlotsAtBottomOfFile ? plotsEndPos : plotsEndPos - 1
+
+  const plotsStartPos = lineCounter.linePos(plots.range[0]).line - 1
+  const plotYaml = getPlotsYaml(
+    cwd,
+    plotObj,
+    dvcYamlLines.slice(plotsStartPos, insertLineNum)
+  )
   dvcYamlLines.splice(insertLineNum, 0, ...plotYaml.slice(1))
 
   void openFileInEditor(dvcYamlFile)
