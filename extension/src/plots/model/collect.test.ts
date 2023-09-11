@@ -41,12 +41,30 @@ describe('collectCustomPlots', () => {
   it('should return the expected data from the test fixture', () => {
     const expectedOutput: CustomPlotData[] = customPlotsFixture.plots
     const data = collectCustomPlots({
+      colorScale: {
+        domain: ['main', 'exp-e7a67', 'test-branch', 'exp-83425'],
+        range: ['#13adc7', '#f46837', '#48bb78', '#4299e1']
+      },
       experiments: experimentsWithCommits,
       height: DEFAULT_PLOT_HEIGHT,
       nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,
       plotsOrderValues: customPlotsOrderFixture
     })
     expect(data).toStrictEqual(expectedOutput)
+  })
+
+  it('should return selected revisions last', () => {
+    const data = collectCustomPlots({
+      colorScale: {
+        domain: ['main'],
+        range: ['#13adc7']
+      },
+      experiments: experimentsWithCommits,
+      height: DEFAULT_PLOT_HEIGHT,
+      nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,
+      plotsOrderValues: customPlotsOrderFixture
+    })
+    expect(data[0].values.slice(-1)[0].id).toStrictEqual('main')
   })
 })
 

@@ -3,7 +3,10 @@ import VegaLite, { VegaLiteProps } from 'react-vega/lib/VegaLite'
 import { Config } from 'vega-lite'
 import merge from 'lodash.merge'
 import cloneDeep from 'lodash.clonedeep'
-import { reverseOfLegendSuppressionUpdate } from 'dvc/src/plots/vega/util'
+import {
+  makePlotZoomOnWheel,
+  reverseOfLegendSuppressionUpdate
+} from 'dvc/src/plots/vega/util'
 import { TemplateVegaLite } from './templatePlots/TemplateVegaLite'
 import styles from './styles.module.scss'
 import { getThemeValue, ThemeProperty } from '../../util/styles'
@@ -40,6 +43,12 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
   isTemplatePlot,
   openActionsMenu
 }: ZoomedInPlotProps) => {
+  const isCustomPlot = !isTemplatePlot
+  const hasSmoothing =
+    isTemplatePlot &&
+    (props.spec as { params?: { name: string }[] }).params?.[0]?.name ===
+      'smooth'
+
   const zoomedInPlotRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -72,8 +81,13 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
     }
   }
 
+  const specUpdate = merge(
+    reverseOfLegendSuppressionUpdate(),
+    makePlotZoomOnWheel(isCustomPlot, hasSmoothing)
+  )
+
   const vegaLiteProps = {
-    ...merge({ ...cloneDeep(props) }, reverseOfLegendSuppressionUpdate()),
+    ...merge({ ...cloneDeep(props) }, specUpdate),
     actions: {
       compiled: false,
       editor: false,

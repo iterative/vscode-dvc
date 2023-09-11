@@ -22,13 +22,15 @@ const pickParamsToModify = (params: Param[]): Thenable<Param[] | undefined> =>
   )
 
 const pickNewParamValues = async (
-  paramsToModify: Param[]
+  paramsToModify: Param[],
+  inputPrompt: string | undefined
 ): Promise<string[] | undefined> => {
   const args: string[] = []
   for (const { path, value } of paramsToModify) {
     const input = await getInput(
       getEnterValueTitle(path),
-      standardizeValue(value)
+      standardizeValue(value),
+      inputPrompt
     )
     if (input === undefined) {
       return
@@ -39,7 +41,8 @@ const pickNewParamValues = async (
 }
 
 export const pickAndModifyParams = async (
-  params: Param[]
+  params: Param[],
+  inputPrompt: string | undefined
 ): Promise<string[] | undefined> => {
   const paramsToModify = await pickParamsToModify(params)
 
@@ -47,5 +50,5 @@ export const pickAndModifyParams = async (
     return
   }
 
-  return pickNewParamValues(paramsToModify)
+  return pickNewParamValues(paramsToModify, inputPrompt)
 }

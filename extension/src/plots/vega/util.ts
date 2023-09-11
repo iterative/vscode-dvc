@@ -353,3 +353,42 @@ export const reverseOfLegendSuppressionUpdate = () => ({
     }
   }
 })
+
+export const makePlotZoomOnWheel = (
+  isCustomPlot: boolean,
+  hasSmoothing: boolean
+) => {
+  if (isCustomPlot) {
+    return {
+      spec: {
+        params: [
+          {
+            bind: 'scales',
+            name: 'grid',
+            select: 'interval'
+          }
+        ]
+      }
+    }
+  }
+  if (hasSmoothing) {
+    return {
+      spec: {
+        layer: [
+          { params: [{ bind: 'scales', name: 'grid', select: 'interval' }] }
+        ]
+      }
+    }
+  }
+
+  return {
+    spec: {
+      selection: {
+        grid: {
+          bind: 'scales',
+          type: 'interval'
+        }
+      }
+    }
+  }
+}

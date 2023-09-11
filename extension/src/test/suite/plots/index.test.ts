@@ -490,12 +490,23 @@ suite('Plots Test Suite', () => {
         type: MessageFromWebviewType.EXPORT_PLOT_DATA_AS_JSON
       })
 
+      const expectedOrder = [
+        'exp-83425',
+        'test-branch',
+        'exp-e7a67',
+        '7df876c',
+        'fe2919b',
+        'main'
+      ]
+
       await openFileEvent
 
       expect(mockWriteJson).to.be.calledOnce
       expect(mockWriteJson).to.be.calledWithExactly(
         exportFile.path,
-        customPlot.values,
+        [...customPlot.values].sort(
+          (a, b) => expectedOrder.indexOf(a.id) - expectedOrder.indexOf(b.id)
+        ),
         true
       )
       expect(mockOpenFile).to.calledWithExactly(exportFile.path)
@@ -579,11 +590,23 @@ suite('Plots Test Suite', () => {
 
       await openFileEvent
 
+      const expectedOrder = [
+        'exp-83425',
+        'test-branch',
+        'exp-e7a67',
+        '7df876c',
+        'fe2919b',
+        'main'
+      ]
+
       expect(mockWriteTsv).to.be.calledOnce
       expect(mockWriteTsv).to.be.calledWithExactly(
         exportFile.path,
-        customPlot.values
+        [...customPlot.values].sort(
+          (a, b) => expectedOrder.indexOf(a.id) - expectedOrder.indexOf(b.id)
+        )
       )
+
       expect(mockOpenFile).to.calledWithExactly(exportFile.path)
       expect(mockSendTelemetryEvent).to.be.calledOnce
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
