@@ -189,13 +189,15 @@ suite('Plots Test Suite', () => {
 
       await plots.isReady()
 
-      stub(experimentsModel, 'getFilters').returns([
-        {
-          operator: Operator.EQUAL,
-          path: 'params:params.yaml:epochs',
-          value: 2
-        }
-      ])
+      stub(experimentsModel, 'getFilters')
+        .onFirstCall()
+        .returns([
+          {
+            operator: Operator.EQUAL,
+            path: 'params:params.yaml:epochs',
+            value: 2
+          }
+        ])
 
       plotsModel.getCustomPlots()
 

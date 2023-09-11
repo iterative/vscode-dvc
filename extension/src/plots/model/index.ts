@@ -154,7 +154,7 @@ export class PlotsModel extends ModelWithPersistence {
   }
 
   public getCustomPlots(): CustomPlotsData | undefined {
-    const experiments = this.experiments.getFilteredCommitsAndExperiments()
+    const experiments = this.experiments.getUnfilteredCommitsAndExperiments()
 
     if (experiments.length === 0) {
       return

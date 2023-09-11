@@ -365,11 +365,11 @@ export class ExperimentsModel extends ModelWithPersistence {
     return [...this.getWorkspaceAndCommits(), ...this.getExperiments()]
   }
 
-  public getFilteredCommitsAndExperiments() {
+  public getUnfilteredCommitsAndExperiments() {
+    const filters = this.getFilters()
     return this.getWorkspaceCommitsAndExperiments().filter(
       exp =>
-        exp.id !== EXPERIMENT_WORKSPACE_ID &&
-        !!filterExperiment(this.getFilters(), exp)
+        exp.id !== EXPERIMENT_WORKSPACE_ID && !!filterExperiment(filters, exp)
     )
   }
 
