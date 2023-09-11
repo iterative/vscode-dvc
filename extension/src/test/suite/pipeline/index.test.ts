@@ -302,7 +302,7 @@ suite('Pipeline Test Suite', () => {
 
     await pipeline.isReady()
 
-    mockPickPlotConfiguration.onSecondCall().resolves(undefined)
+    mockPickPlotConfiguration.onFirstCall().resolves(undefined)
 
     await pipeline.addTopLevelPlot()
 
