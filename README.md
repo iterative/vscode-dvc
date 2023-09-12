@@ -8,8 +8,8 @@
 ![Rating](https://img.shields.io/visual-studio-marketplace/r/iterative.dvc)
 
 [![Continuous Integration](https://github.com/iterative/vscode-dvc/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/iterative/vscode-dvc/actions/workflows/continuous-integration.yml)
-[![Maintainability](https://api.codeclimate.com/v1/badges/394dc6629c487ab8776c/maintainability)](https://api.codeclimate.com/v1/badges/394dc6629c487ab8776c/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/394dc6629c487ab8776c/test_coverage)](https://api.codeclimate.com/v1/badges/394dc6629c487ab8776c/test_coverage)
+[![Maintainability](https://api.codeclimate.com/v1/badges/394dc6629c487ab8776c/maintainability)](https://codeclimate.com/github/iterative/vscode-dvc/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/394dc6629c487ab8776c/test_coverage)](https://codeclimate.com/github/iterative/vscode-dvc/test_coverage)
 
 [Quick start](#quick-start) • [What you get](#what-you-get) •
 [Commands](#useful-commands) • [Configuration](#configuration) •
