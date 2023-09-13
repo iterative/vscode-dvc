@@ -526,17 +526,14 @@ describe('App', () => {
 
     expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
     expect(screen.getByText('Custom')).toBeInTheDocument()
-    expect(
-      screen.getByText(
-        'No Plots to Display. Are any of your experiments or commits unfiltered?'
-      )
-    ).toBeInTheDocument()
+    expect(screen.getByText('No Plots to Display.')).toBeInTheDocument()
   })
 
   it('should render custom with "No Plots Added" message when there are no plots added', () => {
     renderAppWithOptionalData({
       custom: {
         ...customPlotsFixture,
+        hasAddedPlots: false,
         plots: []
       },
       template: templatePlotsFixture
@@ -546,6 +543,22 @@ describe('App', () => {
     expect(screen.queryByText('No Plots to Display')).not.toBeInTheDocument()
     expect(screen.getByText('Custom')).toBeInTheDocument()
     expect(screen.getByText('No Plots Added')).toBeInTheDocument()
+  })
+
+  it('should render custom with "No Data to Plot" message when there are added plots but no unfiltered experiments', () => {
+    renderAppWithOptionalData({
+      custom: {
+        ...customPlotsFixture,
+        hasUnfilteredExperiments: false,
+        plots: []
+      },
+      template: templatePlotsFixture
+    })
+
+    expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
+    expect(screen.queryByText('No Plots to Display')).not.toBeInTheDocument()
+    expect(screen.getByText('Custom')).toBeInTheDocument()
+    expect(screen.getByText('No Data to Plot')).toBeInTheDocument()
   })
 
   it('should render the comparison table when given a message with comparison plots data', () => {

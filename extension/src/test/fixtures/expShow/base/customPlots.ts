@@ -313,7 +313,9 @@ const data: CustomPlotsData = {
     }
   ],
   nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,
-  height: DEFAULT_PLOT_HEIGHT
+  height: DEFAULT_PLOT_HEIGHT,
+  hasAddedPlots: true,
+  hasUnfilteredExperiments: true
 }
 
 export default data

@@ -27,7 +27,6 @@ import {
   DEFAULT_SECTION_NB_ITEMS_PER_ROW_OR_WIDTH,
   PlotsSection,
   SectionCollapsed,
-  CustomPlotData,
   CustomPlotsData,
   DEFAULT_HEIGHT,
   DEFAULT_NB_ITEMS_PER_ROW,
@@ -155,41 +154,39 @@ export class PlotsModel extends ModelWithPersistence {
 
   public getCustomPlots(): CustomPlotsData | undefined {
     const experiments = this.experiments.getUnfilteredCommitsAndExperiments()
-
-    if (experiments.length === 0) {
-      return
-    }
-
+    const hasUnfilteredExperiments = experiments.length > 0
+    const plotsOrderValues = this.getCustomPlotsOrder()
+    const enablePlotCreation = checkForCustomPlotOptions(
+      this.experiments.getColumnTerminalNodes(),
+      plotsOrderValues
+    )
     const height = this.getHeight(PlotsSection.CUSTOM_PLOTS)
     const nbItemsPerRow = this.getNbItemsPerRowOrWidth(
       PlotsSection.CUSTOM_PLOTS
     )
+    const hasAddedPlots = plotsOrderValues.length > 0
+
     const colorScale = getColorScale(
       this.getSelectedRevisionDetails().filter(
         ({ id }) => id !== EXPERIMENT_WORKSPACE_ID
       )
     )
-    const plotsOrderValues = this.getCustomPlotsOrder()
-    const plots: CustomPlotData[] = collectCustomPlots({
-      colorScale,
-      experiments,
-      height,
-      nbItemsPerRow,
-      plotsOrderValues
-    })
-
-    if (plots.length === 0 && plotsOrderValues.length > 0) {
-      return
-    }
 
     return {
-      enablePlotCreation: checkForCustomPlotOptions(
-        this.experiments.getColumnTerminalNodes(),
-        plotsOrderValues
-      ),
+      enablePlotCreation,
+      hasAddedPlots,
+      hasUnfilteredExperiments,
       height,
       nbItemsPerRow,
-      plots
+      plots: hasUnfilteredExperiments
+        ? collectCustomPlots({
+            colorScale,
+            experiments,
+            height,
+            nbItemsPerRow,
+            plotsOrderValues
+          })
+        : []
     }
   }
 
