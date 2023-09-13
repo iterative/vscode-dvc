@@ -1124,6 +1124,23 @@ suite('Plots Test Suite', () => {
       )
     })
 
+    it('should handle a add template plot mmessage from the webview', async () => {
+      const { mockMessageReceived } = await buildPlotsWebview({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
+
+      const executeCommandSpy = spy(commands, 'executeCommand')
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.ADD_PIPELINE_PLOT
+      })
+
+      expect(executeCommandSpy).to.be.calledWithExactly(
+        RegisteredCommands.PIPELINE_ADD_PLOT
+      )
+    })
+
     it('should handle the CLI throwing an error', async () => {
       const { data, errorsModel, mockPlotsDiff, plots, plotsModel } =
         await buildPlots({ disposer: disposable, plotsDiff: plotsDiffFixture })

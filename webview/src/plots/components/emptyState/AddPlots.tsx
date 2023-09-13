@@ -1,6 +1,7 @@
 import React from 'react'
 import {
   addCustomPlot,
+  addPipelinePlot,
   selectPlots,
   selectRevisions
 } from '../../util/messages'
@@ -19,12 +20,19 @@ export const AddPlots: React.FC<AddPlotsProps> = ({
     <p>No Plots to Display</p>
     <div>
       <StartButton onClick={selectRevisions} text="Add Experiments" />
-      {hasUnselectedPlots && (
+      {hasUnselectedPlots ? (
         <StartButton
           isNested={true}
           appearance="secondary"
           onClick={selectPlots}
-          text="Add Plots"
+          text="Select Plots"
+        />
+      ) : (
+        <StartButton
+          isNested={true}
+          appearance="secondary"
+          onClick={addPipelinePlot}
+          text="Add Plot"
         />
       )}
       {!hasCustomPlots && (

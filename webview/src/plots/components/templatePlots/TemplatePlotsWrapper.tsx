@@ -5,6 +5,7 @@ import { TemplatePlots } from './TemplatePlots'
 import { changeSize } from './templatePlotsSlice'
 import { PlotsContainer } from '../PlotsContainer'
 import { PlotsState } from '../../store'
+import { addPipelinePlot } from '../../util/messages'
 
 export const TemplatePlotsWrapper: React.FC = () => {
   const { nbItemsPerRow, isCollapsed, height, hasItems } = useSelector(
@@ -20,6 +21,7 @@ export const TemplatePlotsWrapper: React.FC = () => {
       changeSize={changeSize}
       hasItems={hasItems}
       height={height}
+      addPlotsButton={{ onClick: addPipelinePlot }}
     >
       <TemplatePlots />
     </PlotsContainer>

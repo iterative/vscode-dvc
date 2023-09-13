@@ -336,18 +336,18 @@ describe('App', () => {
     expect(loading).toHaveLength(3)
   })
 
-  it('should render only get started (buttons: add plots, add experiments, add custom plots) when there are some selected exps, all unselected plots, and no custom plots', async () => {
+  it('should render only get started (buttons: select plots, add experiments, add custom plots) when there are some selected exps, all unselected plots, and no custom plots', async () => {
     renderAppWithOptionalData({
       hasPlots: true,
       hasUnselectedPlots: true,
       selectedRevisions: [{} as Revision]
     })
     const addExperimentsButton = await screen.findByText('Add Experiments')
-    const addPlotsButton = await screen.findByText('Add Plots')
+    const selectPlotsButton = await screen.findByText('Select Plots')
     const addCustomPlotsButton = await screen.findByText('Add Custom Plot')
 
     expect(addExperimentsButton).toBeInTheDocument()
-    expect(addPlotsButton).toBeInTheDocument()
+    expect(selectPlotsButton).toBeInTheDocument()
     expect(addCustomPlotsButton).toBeInTheDocument()
     expect(screen.queryByTestId('section-container')).not.toBeInTheDocument()
 
@@ -361,7 +361,7 @@ describe('App', () => {
 
     mockPostMessage.mockReset()
 
-    fireEvent.click(addPlotsButton)
+    fireEvent.click(selectPlotsButton)
 
     expect(mockPostMessage).toHaveBeenCalledWith({
       type: MessageFromWebviewType.SELECT_PLOTS
@@ -427,7 +427,7 @@ describe('App', () => {
     mockPostMessage.mockReset()
   })
 
-  it('should render get started (buttons: add plots, add experiments) and custom section when there are some selected exps, all unselected plots, and added custom plots', async () => {
+  it('should render get started (buttons: select plots, add experiments) and custom section when there are some selected exps, all unselected plots, and added custom plots', async () => {
     renderAppWithOptionalData({
       custom: customPlotsFixture,
       hasPlots: true,
@@ -435,12 +435,12 @@ describe('App', () => {
       selectedRevisions: [{} as Revision]
     })
     const addExperimentsButton = await screen.findByText('Add Experiments')
-    const addPlotsButton = await screen.findByText('Add Plots')
+    const selectPlotsButton = await screen.findByText('Select Plots')
     const addCustomPlotsButton = screen.queryByText('Add Custom Plot')
     const customSection = await screen.findByTestId('section-container')
 
     expect(addExperimentsButton).toBeInTheDocument()
-    expect(addPlotsButton).toBeInTheDocument()
+    expect(selectPlotsButton).toBeInTheDocument()
     expect(addCustomPlotsButton).not.toBeInTheDocument()
     expect(customSection).toBeInTheDocument()
 
@@ -454,7 +454,7 @@ describe('App', () => {
 
     mockPostMessage.mockReset()
 
-    fireEvent.click(addPlotsButton)
+    fireEvent.click(selectPlotsButton)
 
     expect(mockPostMessage).toHaveBeenCalledWith({
       type: MessageFromWebviewType.SELECT_PLOTS
@@ -462,7 +462,7 @@ describe('App', () => {
     mockPostMessage.mockReset()
   })
 
-  it('should render only get started (buttons: add experiments, add custom plots) when there are no selected exps and no custom plots', async () => {
+  it('should render only get started (buttons: add experiments, add custom plots, add plots) when there are no selected exps and no custom plots', async () => {
     renderAppWithOptionalData({
       custom: null,
       hasPlots: true,
@@ -470,13 +470,13 @@ describe('App', () => {
       selectedRevisions: undefined
     })
     const addExperimentsButton = await screen.findByText('Add Experiments')
-    const addPlotsButton = screen.queryByText('Add Plots')
+    const addPlotsButton = await screen.findByText('Add Plot')
     const addCustomPlotsButton = await screen.findByText('Add Custom Plot')
     const customSection = screen.queryByTestId('section-container')
 
     expect(addExperimentsButton).toBeInTheDocument()
     expect(addCustomPlotsButton).toBeInTheDocument()
-    expect(addPlotsButton).not.toBeInTheDocument()
+    expect(addPlotsButton).toBeInTheDocument()
     expect(customSection).not.toBeInTheDocument()
 
     mockPostMessage.mockReset()
@@ -492,9 +492,15 @@ describe('App', () => {
       type: MessageFromWebviewType.ADD_CUSTOM_PLOT
     })
     mockPostMessage.mockReset()
+
+    fireEvent.click(addPlotsButton)
+
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      type: MessageFromWebviewType.ADD_PIPELINE_PLOT
+    })
   })
 
-  it('should render get started (buttons: add experiments) and custom section when there are no selected exps and added custom plots', async () => {
+  it('should render get started (buttons: add experiments, add plots) and custom section when there are no selected exps and added custom plots', async () => {
     renderAppWithOptionalData({
       custom: customPlotsFixture,
       hasPlots: true,
@@ -502,13 +508,13 @@ describe('App', () => {
       selectedRevisions: undefined
     })
     const addExperimentsButton = await screen.findByText('Add Experiments')
-    const addPlotsButton = screen.queryByText('Add Plots')
+    const addPlotsButton = await screen.findByText('Add Plot')
     const addCustomPlotsButton = screen.queryByText('Add Custom Plot')
     const customSection = await screen.findByTestId('section-container')
 
     expect(addExperimentsButton).toBeInTheDocument()
     expect(addCustomPlotsButton).not.toBeInTheDocument()
-    expect(addPlotsButton).not.toBeInTheDocument()
+    expect(addPlotsButton).toBeInTheDocument()
     expect(customSection).toBeInTheDocument()
 
     mockPostMessage.mockReset()
@@ -516,6 +522,13 @@ describe('App', () => {
     fireEvent.click(addExperimentsButton)
     expect(mockPostMessage).toHaveBeenCalledWith({
       type: MessageFromWebviewType.SELECT_EXPERIMENTS
+    })
+
+    mockPostMessage.mockReset()
+
+    fireEvent.click(addPlotsButton)
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      type: MessageFromWebviewType.ADD_PIPELINE_PLOT
     })
   })
 
