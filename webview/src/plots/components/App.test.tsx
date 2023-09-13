@@ -526,7 +526,7 @@ describe('App', () => {
 
     expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
     expect(screen.getByText('Custom')).toBeInTheDocument()
-    expect(screen.getByText('No Plots to Display.')).toBeInTheDocument()
+    expect(screen.getByText('No Plots to Display')).toBeInTheDocument()
   })
 
   it('should render custom with "No Plots Added" message when there are no plots added', () => {
