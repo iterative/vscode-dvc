@@ -5,8 +5,15 @@ import { addPipelinePlot, selectRevisions } from '../../util/messages'
 export const Welcome: React.FC = () => (
   <div>
     <p>No Plots Detected.</p>
-    <StartButton onClick={addPipelinePlot} text="Add Plot" />
-    <StartButton onClick={selectRevisions} text="Add Experiments" />
+    <div>
+      <StartButton onClick={addPipelinePlot} text="Add Plot" />
+      <StartButton
+        appearance="secondary"
+        onClick={selectRevisions}
+        text="Add Experiments"
+        isNested={true}
+      />
+    </div>
     <p>
       Learn how to{' '}
       <a href="https://dvc.org/doc/user-guide/experiment-management/visualizing-plots">
