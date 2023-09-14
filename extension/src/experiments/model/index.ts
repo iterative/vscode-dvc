@@ -1,6 +1,6 @@
 import { Memento } from 'vscode'
 import { SortDefinition, sortExperiments } from './sortBy'
-import { FilterDefinition, getFilterId } from './filterBy'
+import { FilterDefinition, filterExperiment, getFilterId } from './filterBy'
 import { collectFiltered, collectUnfiltered } from './filterBy/collect'
 import {
   collectAddRemoveCommitsDetails,
@@ -363,6 +363,14 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   public getWorkspaceCommitsAndExperiments() {
     return [...this.getWorkspaceAndCommits(), ...this.getExperiments()]
+  }
+
+  public getUnfilteredCommitsAndExperiments() {
+    const filters = this.getFilters()
+    return this.getWorkspaceCommitsAndExperiments().filter(
+      exp =>
+        exp.id !== EXPERIMENT_WORKSPACE_ID && !!filterExperiment(filters, exp)
+    )
   }
 
   public getErrors() {

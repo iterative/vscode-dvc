@@ -102,6 +102,8 @@ export type CustomPlotsData = {
   nbItemsPerRow: number
   enablePlotCreation: boolean
   height: PlotHeight
+  hasUnfilteredExperiments: boolean
+  hasAddedPlots: boolean
 }
 
 export enum PlotsType {

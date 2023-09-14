@@ -22,9 +22,14 @@ interface CustomPlotsProps {
 
 export const CustomPlots: React.FC<CustomPlotsProps> = ({ plotsIds }) => {
   const [order, setOrder] = useState(plotsIds)
-  const { nbItemsPerRow, hasData, hasItems, disabledDragPlotIds } = useSelector(
-    (state: PlotsState) => state.custom
-  )
+  const {
+    nbItemsPerRow,
+    hasData,
+    hasItems,
+    hasAddedPlots,
+    disabledDragPlotIds,
+    hasUnfilteredExperiments
+  } = useSelector((state: PlotsState) => state.custom)
   const [onSection, setOnSection] = useState(false)
   const draggedRef = useSelector(
     (state: PlotsState) => state.dragAndDrop.draggedRef
@@ -50,8 +55,12 @@ export const CustomPlots: React.FC<CustomPlotsProps> = ({ plotsIds }) => {
     return <EmptyState isFullScreen={false}>No Plots to Display</EmptyState>
   }
 
-  if (order.length === 0) {
+  if (!hasAddedPlots) {
     return <EmptyState isFullScreen={false}>No Plots Added</EmptyState>
+  }
+
+  if (!hasUnfilteredExperiments) {
+    return <EmptyState isFullScreen={false}>No Data to Plot</EmptyState>
   }
 
   const items = order.map(plot => (
