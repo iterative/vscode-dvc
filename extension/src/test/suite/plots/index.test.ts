@@ -1137,7 +1137,8 @@ suite('Plots Test Suite', () => {
       })
 
       expect(executeCommandSpy).to.be.calledWithExactly(
-        RegisteredCommands.PIPELINE_ADD_PLOT
+        RegisteredCommands.PIPELINE_ADD_PLOT,
+        dvcDemoPath
       )
     })
 

@@ -77,7 +77,10 @@ export class WebviewMessages {
           this.dvcRoot
         )
       case MessageFromWebviewType.ADD_PIPELINE_PLOT:
-        return commands.executeCommand(RegisteredCommands.PIPELINE_ADD_PLOT)
+        return commands.executeCommand(
+          RegisteredCommands.PIPELINE_ADD_PLOT,
+          this.dvcRoot
+        )
       case MessageFromWebviewType.EXPORT_PLOT_DATA_AS_CSV:
         return this.exportPlotDataAsCsv(message.payload)
       case MessageFromWebviewType.EXPORT_PLOT_DATA_AS_TSV:
