@@ -21,8 +21,10 @@ export interface CustomPlotsState extends Omit<CustomPlotsData, 'plots'> {
 export const customPlotsInitialState: CustomPlotsState = {
   disabledDragPlotIds: [],
   enablePlotCreation: true,
+  hasAddedPlots: false,
   hasData: false,
   hasItems: false,
+  hasUnfilteredExperiments: false,
   height: DEFAULT_HEIGHT[PlotsSection.CUSTOM_PLOTS],
   isCollapsed: DEFAULT_SECTION_COLLAPSED[PlotsSection.CUSTOM_PLOTS],
   nbItemsPerRow:
