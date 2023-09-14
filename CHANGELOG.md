@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.54] - 2023-09-14
+
+### 🚀 New Features and Enhancements
+
+- Apply table filters to custom plot data [#4657](https://github.com/iterative/vscode-dvc/pull/4657) by [@julieg18](https://github.com/julieg18)
+- Add "Add Top-level Plot" command to plots webview [#4664](https://github.com/iterative/vscode-dvc/pull/4664) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Fix typo in plot wizard error toast [#4658](https://github.com/iterative/vscode-dvc/pull/4658) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Fix Code Climate badges [#4659](https://github.com/iterative/vscode-dvc/pull/4659) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.53] - 2023-09-11
 
 ### 🚀 New Features and Enhancements
