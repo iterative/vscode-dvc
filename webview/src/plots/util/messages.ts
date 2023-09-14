@@ -8,6 +8,12 @@ export const addCustomPlot = () =>
     type: MessageFromWebviewType.ADD_CUSTOM_PLOT
   })
 
+export const addPipelinePlot = () => {
+  sendMessage({
+    type: MessageFromWebviewType.ADD_PIPELINE_PLOT
+  })
+}
+
 export const exportPlotDataAsCsv = (id: string) => {
   sendMessage({
     payload: id,

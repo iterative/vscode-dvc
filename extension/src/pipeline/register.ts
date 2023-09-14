@@ -1,6 +1,7 @@
 import { WorkspacePipeline } from './workspace'
 import { RegisteredCommands } from '../commands/external'
 import { InternalCommands } from '../commands/internal'
+import { Context, getDvcRootFromContext } from '../vscode/context'
 
 export const registerPipelineCommands = (
   pipelines: WorkspacePipeline,
@@ -13,6 +14,7 @@ export const registerPipelineCommands = (
 
   internalCommands.registerExternalCommand(
     RegisteredCommands.PIPELINE_ADD_PLOT,
-    () => pipelines.addTopLevelPlot()
+    (context: Context) =>
+      pipelines.addTopLevelPlot(getDvcRootFromContext(context))
   )
 }
