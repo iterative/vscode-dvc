@@ -74,7 +74,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
     menuItems.unshift({
       icon: Add,
       onClick: addPlotsButton.onClick,
-      tooltip: 'Add Plots'
+      tooltip: 'Add Plot'
     })
   }
 

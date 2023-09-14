@@ -759,16 +759,14 @@ describe('App', () => {
 
     const customSection = screen.getAllByTestId('section-container')[2]
 
-    expect(
-      within(customSection).getByLabelText('Add Plots')
-    ).toBeInTheDocument()
+    expect(within(customSection).getByLabelText('Add Plot')).toBeInTheDocument()
 
     sendSetDataMessage({
       custom: { ...customPlotsFixture, enablePlotCreation: false }
     })
 
     expect(
-      within(customSection).queryByLabelText('Add Plots')
+      within(customSection).queryByLabelText('Add Plot')
     ).not.toBeInTheDocument()
   })
 
