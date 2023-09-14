@@ -1124,7 +1124,7 @@ suite('Plots Test Suite', () => {
       )
     })
 
-    it('should handle a add template plot mmessage from the webview', async () => {
+    it('should handle an add pipeline plot message from the webview', async () => {
       const { mockMessageReceived } = await buildPlotsWebview({
         disposer: disposable,
         plotsDiff: plotsDiffFixture
