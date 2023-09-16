@@ -635,7 +635,7 @@ describe('App', () => {
     expect(screen.queryByText('Images')).not.toBeInTheDocument()
   })
 
-  it('should toggle the custom plots section in state when its header is clicked', async () => {
+  it('should hide plots when their section is collapsed (setting to null can break some Vega plots)', async () => {
     renderAppWithOptionalData({
       custom: customPlotsFixture
     })
@@ -664,9 +664,11 @@ describe('App', () => {
       }
     })
 
-    expect(
-      screen.queryByLabelText('Vega visualization')
-    ).not.toBeInTheDocument()
+    const hiddenPlots = await screen.findAllByLabelText('Vega visualization')
+    for (const hiddenPlot of hiddenPlots) {
+      expect(hiddenPlot).toBeInTheDocument()
+      expect(hiddenPlot).not.toBeVisible()
+    }
   })
 
   it('should not toggle the custom plots section when its header is clicked and its title is selected', async () => {
