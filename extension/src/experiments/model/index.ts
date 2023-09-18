@@ -1,4 +1,5 @@
 import { Memento } from 'vscode'
+import omit from 'lodash.omit'
 import { SortDefinition, sortExperiments } from './sortBy'
 import { FilterDefinition, filterExperiment, getFilterId } from './filterBy'
 import { collectFiltered, collectUnfiltered } from './filterBy/collect'
@@ -440,25 +441,41 @@ export class ExperimentsModel extends ModelWithPersistence {
   public getRowData() {
     const commitsBySha = this.applyFiltersToCommits()
 
-    const rows: Commit[] = [
-      { branch: WORKSPACE_BRANCH, ...this.addDetails(this.workspace) }
-    ]
+    const workspaceBranch = {
+      branch: WORKSPACE_BRANCH,
+      ...this.addDetails(this.workspace)
+    }
+    const rows: Commit[] = []
+    const sorts = this.getSorts()
     for (const { branch, sha } of this.rowOrder) {
+      // move all or some of this code into a separate util
       const commit = commitsBySha[sha]
       if (!commit) {
         continue
       }
-      if (commit.subRows) {
-        commit.subRows = commit.subRows.map(experiment => ({
+      const subRowsWithBranch: Experiment[] | undefined =
+        commit?.subRows?.map(experiment => ({
           ...experiment,
           branch
-        }))
+        })) || undefined
+
+      if (commit.subRows && sorts.length > 0) {
+        rows.push(
+          omit({ ...commit, branch }, 'subRows'),
+          ...(subRowsWithBranch || [])
+        )
+        continue
       }
 
-      rows.push({ ...commit, branch })
-    }
+      const commitWithBranch = { ...commit, branch }
 
-    return rows
+      if (commitWithBranch.subRows) {
+        commitWithBranch.subRows = subRowsWithBranch
+      }
+
+      rows.push(commitWithBranch)
+    }
+    return [workspaceBranch, ...sortExperiments(sorts, rows)]
   }
 
   public getHasMoreCommits() {
@@ -816,6 +833,7 @@ export class ExperimentsModel extends ModelWithPersistence {
       const experiments = this.getExperimentsByCommit(
         commitWithSelectedAndStarred
       )
+
       const unfilteredCommit = collectUnfiltered(
         commitWithSelectedAndStarred,
         experiments,
