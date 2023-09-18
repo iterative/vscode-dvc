@@ -415,7 +415,7 @@ export class PlotsModel extends ModelWithPersistence {
       await Promise.all([
         collectData(output),
         collectTemplates(output),
-        collectMultiSourceVariations(output, this.multiSourceVariations)
+        collectMultiSourceVariations(output)
       ])
 
     this.comparisonData = {
