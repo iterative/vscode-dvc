@@ -71,14 +71,14 @@ export class WebviewMessages {
 
   public handleMessageFromWebview(message: MessageFromWebview) {
     switch (message.type) {
+      case MessageFromWebviewType.ADD_PLOT:
+        return commands.executeCommand(
+          RegisteredCommands.ADD_PLOT,
+          this.dvcRoot
+        )
       case MessageFromWebviewType.ADD_CUSTOM_PLOT:
         return commands.executeCommand(
           RegisteredCommands.PLOTS_CUSTOM_ADD,
-          this.dvcRoot
-        )
-      case MessageFromWebviewType.ADD_PIPELINE_PLOT:
-        return commands.executeCommand(
-          RegisteredCommands.PIPELINE_ADD_PLOT,
           this.dvcRoot
         )
       case MessageFromWebviewType.EXPORT_PLOT_DATA_AS_CSV:

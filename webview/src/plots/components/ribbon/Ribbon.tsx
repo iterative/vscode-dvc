@@ -7,8 +7,9 @@ import { RibbonBlock } from './RibbonBlock'
 import { update } from './ribbonSlice'
 import { IconButton } from '../../../shared/components/button/IconButton'
 import { PlotsState } from '../../store'
-import { ListFilter, Refresh } from '../../../shared/components/icons'
+import { Add, ListFilter, Refresh } from '../../../shared/components/icons'
 import {
+  addPlot,
   refreshRevisions,
   removeRevision,
   selectRevisions
@@ -73,6 +74,14 @@ export const Ribbon: React.FC = () => {
           onClick={selectRevisions}
           icon={ListFilter}
           text={`${revisions.length} of ${MAX_NB_EXP}`}
+        />
+      </li>
+      <li className={styles.buttonWrapper}>
+        <IconButton
+          appearance="secondary"
+          onClick={addPlot}
+          icon={Add}
+          text="Add Plot"
         />
       </li>
       <li className={styles.buttonWrapper}>

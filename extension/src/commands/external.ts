@@ -81,6 +81,8 @@ export enum RegisteredCommands {
   PLOTS_CUSTOM_ADD = 'dvc.views.plots.addCustomPlot',
   PLOTS_CUSTOM_REMOVE = 'dvc.views.plots.removeCustomPlots',
 
+  ADD_PLOT = 'dvc.addPlot',
+
   EXPERIMENT_AND_PLOTS_SHOW = 'dvc.showExperimentsAndPlots',
 
   EXTENSION_CHECK_CLI_COMPATIBLE = 'dvc.checkCLICompatible',

@@ -3,16 +3,15 @@ import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import { sendMessage } from '../../shared/vscode'
 import { PlotGroup } from '../components/templatePlots/templatePlotsSlice'
 
+export const addPlot = () =>
+  sendMessage({
+    type: MessageFromWebviewType.ADD_PLOT
+  })
+
 export const addCustomPlot = () =>
   sendMessage({
     type: MessageFromWebviewType.ADD_CUSTOM_PLOT
   })
-
-export const addPipelinePlot = () => {
-  sendMessage({
-    type: MessageFromWebviewType.ADD_PIPELINE_PLOT
-  })
-}
 
 export const exportPlotDataAsCsv = (id: string) => {
   sendMessage({

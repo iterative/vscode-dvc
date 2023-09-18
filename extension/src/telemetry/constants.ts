@@ -204,6 +204,8 @@ export interface IEventNamePropertyMapping {
   [EventName.PLOTS_CUSTOM_ADD]: undefined
   [EventName.PLOTS_CUSTOM_REMOVE]: undefined
 
+  [EventName.ADD_PLOT]: undefined
+
   [EventName.ADD_TARGET]: undefined
   [EventName.CHECKOUT_TARGET]: undefined
   [EventName.CHECKOUT]: undefined
