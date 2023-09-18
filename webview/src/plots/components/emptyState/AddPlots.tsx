@@ -13,21 +13,20 @@ export const AddPlots: React.FC<AddPlotsProps> = ({
     <p>No Plots to Display</p>
     <div>
       <StartButton onClick={selectRevisions} text="Add Experiments" />
-      {hasUnselectedPlots ? (
+      {hasUnselectedPlots && (
         <StartButton
           isNested={true}
           appearance="secondary"
           onClick={selectPlots}
           text="Select Plots"
         />
-      ) : (
-        <StartButton
-          isNested={true}
-          appearance="secondary"
-          onClick={addPlot}
-          text="Add Plot"
-        />
       )}
+      <StartButton
+        isNested={true}
+        appearance="secondary"
+        onClick={addPlot}
+        text="Add Plot"
+      />
     </div>
   </div>
 )

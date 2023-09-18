@@ -1209,7 +1209,7 @@ suite('Plots Test Suite', () => {
       )
     })
 
-    it('should handle an add pipeline plot message from the webview', async () => {
+    it('should handle an add plot message from the webview', async () => {
       const { mockMessageReceived } = await buildPlotsWebview({
         disposer: disposable,
         plotsDiff: plotsDiffFixture
@@ -1218,11 +1218,11 @@ suite('Plots Test Suite', () => {
       const executeCommandSpy = spy(commands, 'executeCommand')
 
       mockMessageReceived.fire({
-        type: MessageFromWebviewType.ADD_PIPELINE_PLOT
+        type: MessageFromWebviewType.ADD_PLOT
       })
 
       expect(executeCommandSpy).to.be.calledWithExactly(
-        RegisteredCommands.PIPELINE_ADD_PLOT,
+        RegisteredCommands.ADD_PLOT,
         dvcDemoPath
       )
     })

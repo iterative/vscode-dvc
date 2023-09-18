@@ -22,8 +22,8 @@ export const showSetupOrExecuteCommand =
   }
 
 const enum PLOT_TYPE {
-  CUSTOM,
-  TOP_LEVEL
+  CUSTOM = 'custom',
+  TOP_LEVEL = 'top-level'
 }
 
 export const addPlotCommand = async (context: Context) => {
