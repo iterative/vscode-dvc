@@ -1730,7 +1730,7 @@
     "node-fetch": "2.7.0",
     "process-exists": "4.1.0",
     "tree-kill": "1.2.2",
-    "uuid": "9.0.0",
+    "uuid": "9.0.1",
     "vega-util": "1.17.2",
     "vscode-languageclient": "8.1.0",
     "yaml": "2.3.2"
