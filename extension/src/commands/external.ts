@@ -72,13 +72,11 @@ export enum RegisteredCommands {
   STOP_EXPERIMENTS = 'dvc.stopAllRunningExperiments',
 
   PIPELINE_SHOW_DAG = 'dvc.showPipelineDAG',
-  PIPELINE_ADD_PLOT = 'dvc.addTopLevelPlot',
 
   PLOTS_PATH_TOGGLE = 'dvc.views.plotsPathsTree.toggleStatus',
   PLOTS_SHOW = 'dvc.showPlots',
   PLOTS_SELECT = 'dvc.views.plotsPathsTree.selectPlots',
   PLOTS_REFRESH = 'dvc.views.plots.refreshPlots',
-  PLOTS_CUSTOM_ADD = 'dvc.views.plots.addCustomPlot',
   PLOTS_CUSTOM_REMOVE = 'dvc.views.plots.removeCustomPlots',
 
   ADD_PLOT = 'dvc.addPlot',

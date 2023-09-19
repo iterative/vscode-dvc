@@ -1107,20 +1107,23 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle an add custom plot message from the webview', async () => {
-      const { mockMessageReceived } = await buildPlotsWebview({
+      const { mockMessageReceived, plots } = await buildPlotsWebview({
         disposer: disposable,
         plotsDiff: plotsDiffFixture
       })
 
-      const executeCommandSpy = spy(commands, 'executeCommand')
+      const mockAddCustomPlot = stub(plots, 'addCustomPlot')
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
 
       mockMessageReceived.fire({
         type: MessageFromWebviewType.ADD_CUSTOM_PLOT
       })
 
-      expect(executeCommandSpy).to.be.calledWithExactly(
-        RegisteredCommands.PLOTS_CUSTOM_ADD,
-        dvcDemoPath
+      expect(mockAddCustomPlot).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_PLOTS_CUSTOM_ADD,
+        undefined,
+        undefined
       )
     })
 

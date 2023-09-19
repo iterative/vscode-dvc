@@ -70,18 +70,14 @@ export const Ribbon: React.FC = () => {
       className={cx(styles.list, needsShadow && styles.withShadow)}
     >
       <li className={styles.buttonWrapper}>
+        <IconButton onClick={addPlot} icon={Add} text="Add Plot" />
+      </li>
+      <li className={styles.buttonWrapper}>
         <IconButton
           onClick={selectRevisions}
           icon={ListFilter}
           text={`${revisions.length} of ${MAX_NB_EXP}`}
-        />
-      </li>
-      <li className={styles.buttonWrapper}>
-        <IconButton
           appearance="secondary"
-          onClick={addPlot}
-          icon={Add}
-          text="Add Plot"
         />
       </li>
       <li className={styles.buttonWrapper}>

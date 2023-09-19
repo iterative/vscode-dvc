@@ -2411,23 +2411,6 @@ describe('App', () => {
       ).toBeInTheDocument()
     })
 
-    it('should send a message to select the revisions when clicking the filter button', () => {
-      renderAppWithOptionalData({
-        comparison: comparisonTableFixture,
-        sectionCollapsed: DEFAULT_SECTION_COLLAPSED
-      })
-
-      const filterButton = within(screen.getByTestId('ribbon')).getAllByRole(
-        'button'
-      )[0]
-
-      fireEvent.click(filterButton)
-
-      expect(mockPostMessage).toHaveBeenCalledWith({
-        type: MessageFromWebviewType.SELECT_EXPERIMENTS
-      })
-    })
-
     it('should send a message to add a plot when clicking the add plot button', () => {
       renderAppWithOptionalData({
         comparison: comparisonTableFixture,
@@ -2436,7 +2419,7 @@ describe('App', () => {
 
       const addPlotButton = within(screen.getByTestId('ribbon')).getAllByRole(
         'button'
-      )[1]
+      )[0]
 
       mockPostMessage.mockReset()
       fireEvent.click(addPlotButton)
@@ -2444,6 +2427,23 @@ describe('App', () => {
       expect(mockPostMessage).toHaveBeenCalledTimes(1)
       expect(mockPostMessage).toHaveBeenCalledWith({
         type: MessageFromWebviewType.ADD_PLOT
+      })
+    })
+
+    it('should send a message to select the revisions when clicking the filter button', () => {
+      renderAppWithOptionalData({
+        comparison: comparisonTableFixture,
+        sectionCollapsed: DEFAULT_SECTION_COLLAPSED
+      })
+
+      const filterButton = within(screen.getByTestId('ribbon')).getAllByRole(
+        'button'
+      )[1]
+
+      fireEvent.click(filterButton)
+
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.SELECT_EXPERIMENTS
       })
     })
 

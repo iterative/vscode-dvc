@@ -49,7 +49,7 @@ import { DvcViewer } from './cli/dvc/viewer'
 import { registerSetupCommands } from './setup/commands/register'
 import { Status } from './status'
 import { registerPersistenceCommands } from './persistence/register'
-import { addPlotCommand, showSetupOrExecuteCommand } from './commands/util'
+import { showSetupOrExecuteCommand } from './commands/util'
 import { WorkspacePipeline } from './pipeline/workspace'
 import { registerPipelineCommands } from './pipeline/register'
 
@@ -192,10 +192,11 @@ class Extension extends Disposable {
       this.setup
     )
     registerPipelineCommands(this.pipelines, this.internalCommands)
-    registerPlotsCommands(this.plots, this.internalCommands, this.setup)
-    this.internalCommands.registerExternalCommand(
-      RegisteredCommands.ADD_PLOT,
-      addPlotCommand
+    registerPlotsCommands(
+      this.plots,
+      this.internalCommands,
+      this.setup,
+      this.pipelines
     )
     registerSetupCommands(this.setup, this.internalCommands)
     this.internalCommands.registerExternalCommand(
