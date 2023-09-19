@@ -20,9 +20,9 @@ describe('pickPlotType', () => {
       [
         {
           description:
-            'Create a top-level plot definition by selecting data from a file',
-          label: 'Top-Level',
-          value: 'top-level'
+            'Create a data series plot definition by selecting data from a file',
+          label: 'Data Series',
+          value: 'data-series'
         },
         {
           description:

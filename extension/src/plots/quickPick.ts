@@ -3,7 +3,7 @@ import { Title } from '../vscode/title'
 
 export const enum PLOT_TYPE {
   CUSTOM = 'custom',
-  TOP_LEVEL = 'top-level'
+  DATA_SERIES = 'data-series'
 }
 
 export const pickPlotType = () =>
@@ -11,9 +11,9 @@ export const pickPlotType = () =>
     [
       {
         description:
-          'Create a top-level plot definition by selecting data from a file',
-        label: 'Top-Level',
-        value: PLOT_TYPE.TOP_LEVEL
+          'Create a data series plot definition by selecting data from a file',
+        label: 'Data Series',
+        value: PLOT_TYPE.DATA_SERIES
       },
       {
         description:

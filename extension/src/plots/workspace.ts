@@ -87,8 +87,8 @@ export class WorkspacePlots extends BaseWorkspaceWebviews<Plots, PlotsData> {
       await this.addCustomPlot(overrideRoot)
     }
 
-    if (response === PLOT_TYPE.TOP_LEVEL) {
-      await pipelines.addTopLevelPlot(overrideRoot)
+    if (response === PLOT_TYPE.DATA_SERIES) {
+      await pipelines.addDataSeriesPlot(overrideRoot)
     }
 
     sendTelemetryEvent(

@@ -26,19 +26,21 @@ suite('Workspace Plots Test Suite', () => {
   })
 
   describe('dvc.addPlot', () => {
-    it('should be able to add a top-level plot', async () => {
+    it('should be able to add a data series plot', async () => {
       const mockPickPlotType = stub(quickPickUtil, 'pickPlotType')
-      const mockAddTopLevelPlot = stub(
+      const mockAddDataSeriesPlot = stub(
         WorkspacePipeline.prototype,
-        'addTopLevelPlot'
+        'addDataSeriesPlot'
       )
 
-      mockPickPlotType.onFirstCall().resolves(quickPickUtil.PLOT_TYPE.TOP_LEVEL)
-      mockAddTopLevelPlot.onFirstCall().resolves(undefined)
+      mockPickPlotType
+        .onFirstCall()
+        .resolves(quickPickUtil.PLOT_TYPE.DATA_SERIES)
+      mockAddDataSeriesPlot.onFirstCall().resolves(undefined)
 
       await commands.executeCommand(RegisteredCommands.ADD_PLOT)
 
-      expect(mockAddTopLevelPlot).to.be.calledOnce
+      expect(mockAddDataSeriesPlot).to.be.calledOnce
     })
 
     it('should be able to add a custom plot', async () => {
@@ -75,9 +77,9 @@ suite('Workspace Plots Test Suite', () => {
 
     it('should not add a plot if users cancels', async () => {
       const mockPickPlotType = stub(quickPickUtil, 'pickPlotType')
-      const mockAddTopLevelPlot = stub(
+      const mockAddDataSeriesPlot = stub(
         WorkspacePipeline.prototype,
-        'addTopLevelPlot'
+        'addDataSeriesPlot'
       )
       const mockGetMetricAndParam = stub(
         customPlotQuickPickUtil,
@@ -88,7 +90,7 @@ suite('Workspace Plots Test Suite', () => {
 
       await commands.executeCommand(RegisteredCommands.ADD_PLOT)
 
-      expect(mockAddTopLevelPlot).not.to.be.called
+      expect(mockAddDataSeriesPlot).not.to.be.called
       expect(mockGetMetricAndParam).not.to.be.called
     })
 
