@@ -86,7 +86,7 @@ export const EventName = Object.assign(
     VIEWS_PLOTS_COMPARISON_ROWS_REORDERED:
       'views.plots.comparisonRowsReordered',
     VIEWS_PLOTS_CREATED: 'views.plots.created',
-    VIEWS_PLOTS_CUSTOM_ADD: 'views.plots.custom',
+    VIEWS_PLOTS_CUSTOM_ADD: 'views.plots.addCustomPlot',
     VIEWS_PLOTS_EXPERIMENT_TOGGLE: 'views.plots.toggleExperimentStatus',
     VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_CSV: 'views.plots.exportPlotDataAsCsv',
     VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_JSON: 'views.plots.exportPlotDataAsJson',
