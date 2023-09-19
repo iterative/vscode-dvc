@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.55] - 2023-09-18
+
+### 🐛 Bug Fixes
+
+- Fix Vega plots disappearing [#4673](https://github.com/iterative/vscode-dvc/pull/4673) by [@mattseddon](https://github.com/mattseddon)
+- Remove mutli source plots encoding cache [#4678](https://github.com/iterative/vscode-dvc/pull/4678) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Use insiders for e2e tests (chromium missing) [#4669](https://github.com/iterative/vscode-dvc/pull/4669) by [@mattseddon](https://github.com/mattseddon)
+- Update demo project and latest tested CLI version (3.21.0) [#4668](https://github.com/iterative/vscode-dvc/pull/4668) by [@mattseddon](https://github.com/mattseddon)
+- Increase windows tests timeout [#4677](https://github.com/iterative/vscode-dvc/pull/4677) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.54] - 2023-09-14
 
 ### 🚀 New Features and Enhancements

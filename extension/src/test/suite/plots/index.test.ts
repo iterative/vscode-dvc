@@ -1218,13 +1218,13 @@ suite('Plots Test Suite', () => {
         plotsDiff: plotsDiffFixture
       })
 
-      const executeCommandSpy = spy(commands, 'executeCommand')
+      const mockExecuteCommand = stub(commands, 'executeCommand')
 
       mockMessageReceived.fire({
         type: MessageFromWebviewType.ADD_PLOT
       })
 
-      expect(executeCommandSpy).to.be.calledWithExactly(
+      expect(mockExecuteCommand).to.be.calledWithExactly(
         RegisteredCommands.ADD_PLOT,
         dvcDemoPath
       )
