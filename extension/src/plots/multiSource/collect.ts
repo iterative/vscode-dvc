@@ -119,31 +119,15 @@ const collectMultiSourceValues = (variations: Variations): Values => {
   return values
 }
 
-const sortDifferentVariations = (
-  differentVariations: { field: string; variations: number }[],
-  expectedOrder: string[]
-): { field: string; variations: number }[] => {
-  differentVariations.sort(
-    (
-      { field: aField, variations: aVariations },
-      { field: bField, variations: bVariations }
-    ) =>
-      aVariations === bVariations
-        ? expectedOrder.indexOf(aField) - expectedOrder.indexOf(bField)
-        : aVariations - bVariations
-  )
-  return differentVariations
-}
-
 const groupVariations = (
   variations: Variations,
   values: Values
 ): {
-  lessValuesThanVariations: { field: string; variations: number }[]
+  lessValuesThanVariations: string[]
   valuesMatchVariations: string[]
 } => {
   const valuesMatchVariations: string[] = []
-  const lessValuesThanVariations: { field: string; variations: number }[] = []
+  const lessValuesThanVariations: string[] = []
 
   for (const [field, valueSet] of Object.entries(values)) {
     if (valueSet.size === 1) {
@@ -153,14 +137,14 @@ const groupVariations = (
       valuesMatchVariations.push(field)
       continue
     }
-    lessValuesThanVariations.push({ field, variations: valueSet.size })
+    lessValuesThanVariations.push(field)
   }
 
   const expectedOrder = ['filename', 'field']
   return {
-    lessValuesThanVariations: sortDifferentVariations(
+    lessValuesThanVariations: sortCollectedArray(
       lessValuesThanVariations,
-      expectedOrder
+      (a, b) => expectedOrder.indexOf(a) - expectedOrder.indexOf(b)
     ),
     valuesMatchVariations: sortCollectedArray(
       valuesMatchVariations,
@@ -224,7 +208,7 @@ const collectMergedStrokeDashEncoding = (
 const collectEncodingFromValues = <T extends typeof Shape | typeof StrokeDash>(
   scaleRange: T,
   values: Values,
-  lessValuesThanVariations: { field: string; variations: number }[]
+  lessValuesThanVariations: string[]
 ): { field: string; scale: { range: T[number][]; domain: string[] } } => {
   const scale: { range: T[number][]; domain: string[] } = {
     domain: [],
@@ -233,10 +217,9 @@ const collectEncodingFromValues = <T extends typeof Shape | typeof StrokeDash>(
   const filenameOrField = lessValuesThanVariations.shift()
   let idx = 0
   const field = new Set<string>()
-  if (filenameOrField?.field) {
-    for (const value of values[filenameOrField.field as 'filename' | 'field'] ||
-      []) {
-      field.add(filenameOrField.field)
+  if (filenameOrField) {
+    for (const value of values[filenameOrField as 'filename' | 'field'] || []) {
+      field.add(filenameOrField)
       scale.domain.push(value)
       scale.range.push(scaleRange[idx])
       scale.domain.sort()
@@ -250,7 +233,7 @@ const collectUnmergedStrokeDashEncoding = (
   acc: MultiSourceEncoding,
   path: string,
   values: Values,
-  lessValuesThanVariations: { field: string; variations: number }[]
+  lessValuesThanVariations: string[]
 ): void => {
   acc[path] = {
     strokeDash: collectEncodingFromValues(
@@ -265,7 +248,7 @@ const collectUnmergedShapeEncoding = (
   acc: MultiSourceEncoding,
   path: string,
   values: Values,
-  lessValuesThanVariations: { field: string; variations: number }[]
+  lessValuesThanVariations: string[]
 ): void => {
   acc[path] = {
     ...acc[path],
@@ -273,8 +256,6 @@ const collectUnmergedShapeEncoding = (
   }
 }
 
-// this is how we can collect the encoding for multi-source plots
-// we need to pass in the anchors that we want to fill as well
 const collectPathMultiSourceEncoding = (
   acc: MultiSourceEncoding,
   path: string,
@@ -290,7 +271,7 @@ const collectPathMultiSourceEncoding = (
   if (valuesMatchVariations.length > 0) {
     const keysToCombined = [
       ...valuesMatchVariations,
-      ...lessValuesThanVariations.map(({ field }) => field)
+      ...lessValuesThanVariations
     ]
     collectMergedStrokeDashEncoding(acc, path, variations, keysToCombined)
     return
