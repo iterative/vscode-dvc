@@ -438,44 +438,21 @@ export class ExperimentsModel extends ModelWithPersistence {
     }
   }
 
-  public getRowData() {
+  public getRowData(): Commit[] {
     const commitsBySha = this.applyFiltersToCommits()
 
     const workspaceBranch = {
       branch: WORKSPACE_BRANCH,
       ...this.addDetails(this.workspace)
     }
-    const rows: Commit[] = []
+    const rowsAcc: Commit[] = []
     const sorts = this.getSorts()
+    const flattenRows = sorts.length > 0
+
     for (const { branch, sha } of this.rowOrder) {
-      // move all or some of this code into a separate util
-      const commit = commitsBySha[sha]
-      if (!commit) {
-        continue
-      }
-      const subRowsWithBranch: Experiment[] | undefined =
-        commit?.subRows?.map(experiment => ({
-          ...experiment,
-          branch
-        })) || undefined
-
-      if (commit.subRows && sorts.length > 0) {
-        rows.push(
-          omit({ ...commit, branch }, 'subRows'),
-          ...(subRowsWithBranch || [])
-        )
-        continue
-      }
-
-      const commitWithBranch = { ...commit, branch }
-
-      if (commitWithBranch.subRows) {
-        commitWithBranch.subRows = subRowsWithBranch
-      }
-
-      rows.push(commitWithBranch)
+      this.collectRowCommitData(rowsAcc, branch, commitsBySha[sha], flattenRows)
     }
-    return [workspaceBranch, ...sortExperiments(sorts, rows)]
+    return [workspaceBranch, ...sortExperiments(sorts, rowsAcc)]
   }
 
   public getHasMoreCommits() {
@@ -846,5 +823,37 @@ export class ExperimentsModel extends ModelWithPersistence {
       commitsBySha[commit.sha as string] = unfilteredCommit
     }
     return commitsBySha
+  }
+
+  private collectRowCommitData(
+    rowsAcc: Commit[],
+    branch: string,
+    commit: Commit,
+    flattenRows: boolean
+  ) {
+    if (!commit) {
+      return
+    }
+    const commitWithBranch = { ...commit, branch }
+    const subRowsWithBranch: Experiment[] | undefined = commit?.subRows?.map(
+      experiment => ({
+        ...experiment,
+        branch
+      })
+    )
+
+    if (commit.subRows) {
+      commitWithBranch.subRows = subRowsWithBranch
+    }
+
+    if (flattenRows) {
+      rowsAcc.push(
+        omit(commitWithBranch, 'subRows'),
+        ...(subRowsWithBranch || [])
+      )
+      return
+    }
+
+    rowsAcc.push(commitWithBranch)
   }
 }
