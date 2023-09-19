@@ -85,10 +85,8 @@ const collectPathMultiSourceVariations = (
   }
 }
 
-export const collectMultiSourceVariations = (
-  output: PlotsOutput,
-  acc: Record<string, Record<string, unknown>[]>
-) => {
+export const collectMultiSourceVariations = (output: PlotsOutput) => {
+  const acc: Record<string, Record<string, unknown>[]> = {}
   const { data } = output
   for (const [path, plots] of Object.entries(data)) {
     collectPathMultiSourceVariations(acc, path, plots)
@@ -275,6 +273,8 @@ const collectUnmergedShapeEncoding = (
   }
 }
 
+// this is how we can collect the encoding for multi-source plots
+// we need to pass in the anchors that we want to fill as well
 const collectPathMultiSourceEncoding = (
   acc: MultiSourceEncoding,
   path: string,
