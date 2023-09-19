@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.56] - 2023-09-19
+
+### 🐛 Bug Fixes
+
+- Fix type error in integration tests [#4684](https://github.com/iterative/vscode-dvc/pull/4684) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Simplify data structure used to collect multisource encoding update [#4687](https://github.com/iterative/vscode-dvc/pull/4687) by [@mattseddon](https://github.com/mattseddon)
+- Update demo project and latest tested CLI version (3.22.0) [#4686](https://github.com/iterative/vscode-dvc/pull/4686) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.55] - 2023-09-18
 
 ### 🐛 Bug Fixes
