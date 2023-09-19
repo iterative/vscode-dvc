@@ -1215,13 +1215,13 @@ suite('Plots Test Suite', () => {
         plotsDiff: plotsDiffFixture
       })
 
-      const executeCommandSpy = spy(commands, 'executeCommand')
+      const mockExecuteCommand = stub(commands, 'executeCommand')
 
       mockMessageReceived.fire({
         type: MessageFromWebviewType.ADD_PIPELINE_PLOT
       })
 
-      expect(executeCommandSpy).to.be.calledWithExactly(
+      expect(mockExecuteCommand).to.be.calledWithExactly(
         RegisteredCommands.PIPELINE_ADD_PLOT,
         dvcDemoPath
       )
