@@ -1,5 +1,5 @@
 import { Column, ColumnType } from '../../webview/contract'
-import { EXPERIMENT_COLUMN_ID } from '../constants'
+import { EXPERIMENT_COLUMN_ID, GIT_INFO_COLUMN_ID } from '../constants'
 
 export const collectColumnOrder = async (
   existingColumnOrder: string[],
@@ -23,6 +23,10 @@ export const collectColumnOrder = async (
 
   if (!existingColumnOrder.includes(EXPERIMENT_COLUMN_ID)) {
     existingColumnOrder.unshift(EXPERIMENT_COLUMN_ID)
+  }
+
+  if (!existingColumnOrder.includes(GIT_INFO_COLUMN_ID)) {
+    existingColumnOrder.splice(1, 0, GIT_INFO_COLUMN_ID)
   }
 
   return [

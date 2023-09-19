@@ -497,7 +497,8 @@ $badge-size: 0.85rem;
     visibility: visible;
   }
 
-  .timestampInnerCell {
+  .timestampInnerCell,
+  .gitInfoInnerCell {
     height: 42px;
   }
 }
@@ -857,6 +858,42 @@ $badge-size: 0.85rem;
   @extend %truncateLeftChild;
 
   font-size: 0.9em;
+}
+
+.gitInfoInnerCell {
+  @extend %baseInnerCell;
+  @extend %truncateLeftParent;
+
+  line-height: normal;
+  text-align: left;
+  height: 36px;
+}
+
+.gitInfoBranch {
+  @extend %truncateLeftChild;
+
+  font-size: 0.6rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+
+  > * {
+    vertical-align: middle;
+  }
+
+  svg {
+    fill: $accent-color;
+    margin-right: 1px;
+  }
+}
+
+.gitInfoCommit {
+  @extend %truncateLeftChild;
+
+  font-size: 0.75em;
+
+  > * {
+    vertical-align: middle;
+  }
 }
 
 .cellTooltip {

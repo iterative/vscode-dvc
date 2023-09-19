@@ -11,3 +11,5 @@ export const timestampColumn: Column = {
 }
 
 export const EXPERIMENT_COLUMN_ID = 'id'
+
+export const GIT_INFO_COLUMN_ID = 'git_info'

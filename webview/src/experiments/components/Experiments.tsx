@@ -56,12 +56,15 @@ export const ExperimentsTable: React.FC = () => {
     columnOrder: columnOrderData,
     columnWidths,
     hasConfig,
-    rows: data
+    rows: data,
+    sorts
   } = useSelector((state: ExperimentsState) => state.tableData)
 
   const [expanded, setExpanded] = useState({})
 
-  const [columns, setColumns] = useState(buildColumns(columnData))
+  const [columns, setColumns] = useState(
+    buildColumns(columnData, sorts.length > 0)
+  )
   const [columnSizing, setColumnSizing] =
     useState<ColumnSizingState>(columnWidths)
   const [columnOrder, setColumnOrder] = useState(columnOrderData)
@@ -72,8 +75,8 @@ export const ExperimentsTable: React.FC = () => {
   }, [columnSizing, columnWidths])
 
   useEffect(() => {
-    setColumns(buildColumns(columnData))
-  }, [columnData])
+    setColumns(buildColumns(columnData, sorts.length > 0))
+  }, [columnData, sorts])
 
   const getRowId = useCallback(
     (experiment: Commit, relativeIndex: number, parent?: TableRow<Commit>) =>
