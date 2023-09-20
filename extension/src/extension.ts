@@ -192,7 +192,12 @@ class Extension extends Disposable {
       this.setup
     )
     registerPipelineCommands(this.pipelines, this.internalCommands)
-    registerPlotsCommands(this.plots, this.internalCommands, this.setup)
+    registerPlotsCommands(
+      this.plots,
+      this.internalCommands,
+      this.setup,
+      this.pipelines
+    )
     registerSetupCommands(this.setup, this.internalCommands)
     this.internalCommands.registerExternalCommand(
       RegisteredCommands.EXPERIMENT_AND_PLOTS_SHOW,

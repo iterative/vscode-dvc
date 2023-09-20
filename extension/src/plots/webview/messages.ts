@@ -41,6 +41,7 @@ export class WebviewMessages {
 
   private readonly getWebview: () => BaseWebview<TPlotsData> | undefined
   private readonly selectPlots: () => Promise<void>
+  private readonly addCustomPlot: () => Promise<void>
 
   constructor(
     dvcRoot: string,
@@ -49,7 +50,8 @@ export class WebviewMessages {
     errors: ErrorsModel,
     experiments: Experiments,
     getWebview: () => BaseWebview<TPlotsData> | undefined,
-    selectPlots: () => Promise<void>
+    selectPlots: () => Promise<void>,
+    addCustomPlot: () => Promise<void>
   ) {
     this.dvcRoot = dvcRoot
     this.paths = paths
@@ -58,6 +60,7 @@ export class WebviewMessages {
     this.experiments = experiments
     this.getWebview = getWebview
     this.selectPlots = selectPlots
+    this.addCustomPlot = addCustomPlot
   }
 
   public async sendWebviewMessage() {
@@ -71,16 +74,13 @@ export class WebviewMessages {
 
   public handleMessageFromWebview(message: MessageFromWebview) {
     switch (message.type) {
+      case MessageFromWebviewType.ADD_PLOT:
+        return commands.executeCommand(
+          RegisteredCommands.ADD_PLOT,
+          this.dvcRoot
+        )
       case MessageFromWebviewType.ADD_CUSTOM_PLOT:
-        return commands.executeCommand(
-          RegisteredCommands.PLOTS_CUSTOM_ADD,
-          this.dvcRoot
-        )
-      case MessageFromWebviewType.ADD_PIPELINE_PLOT:
-        return commands.executeCommand(
-          RegisteredCommands.PIPELINE_ADD_PLOT,
-          this.dvcRoot
-        )
+        return this.addCustomPlotFromWebview()
       case MessageFromWebviewType.EXPORT_PLOT_DATA_AS_CSV:
         return this.exportPlotDataAsCsv(message.payload)
       case MessageFromWebviewType.EXPORT_PLOT_DATA_AS_TSV:
@@ -307,6 +307,11 @@ export class WebviewMessages {
       undefined,
       undefined
     )
+  }
+
+  private addCustomPlotFromWebview() {
+    void this.addCustomPlot()
+    sendTelemetryEvent(EventName.VIEWS_PLOTS_CUSTOM_ADD, undefined, undefined)
   }
 
   private setExperimentStatus(id: string) {

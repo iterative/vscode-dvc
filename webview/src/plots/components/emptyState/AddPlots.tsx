@@ -1,48 +1,32 @@
 import React from 'react'
-import {
-  addCustomPlot,
-  addPipelinePlot,
-  selectPlots,
-  selectRevisions
-} from '../../util/messages'
+import { addPlot, selectPlots, selectRevisions } from '../../util/messages'
 import { StartButton } from '../../../shared/components/button/StartButton'
 
 type AddPlotsProps = {
-  hasCustomPlots: boolean
   hasUnselectedPlots: boolean
 }
 
 export const AddPlots: React.FC<AddPlotsProps> = ({
-  hasCustomPlots,
   hasUnselectedPlots
 }: AddPlotsProps) => (
   <div>
     <p>No Plots to Display</p>
     <div>
       <StartButton onClick={selectRevisions} text="Add Experiments" />
-      {hasUnselectedPlots ? (
+      {hasUnselectedPlots && (
         <StartButton
           isNested={true}
           appearance="secondary"
           onClick={selectPlots}
           text="Select Plots"
         />
-      ) : (
-        <StartButton
-          isNested={true}
-          appearance="secondary"
-          onClick={addPipelinePlot}
-          text="Add Plot"
-        />
       )}
-      {!hasCustomPlots && (
-        <StartButton
-          isNested={true}
-          appearance="secondary"
-          onClick={addCustomPlot}
-          text="Add Custom Plot"
-        />
-      )}
+      <StartButton
+        isNested={true}
+        appearance="secondary"
+        onClick={addPlot}
+        text="Add Plot"
+      />
     </div>
   </div>
 )

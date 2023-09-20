@@ -425,7 +425,7 @@
       },
       {
         "title": "Add Plot",
-        "command": "dvc.addTopLevelPlot",
+        "command": "dvc.addPlot",
         "category": "DVC",
         "icon": "$(add)"
       },
@@ -600,11 +600,6 @@
         "command": "dvc.views.plots.refreshPlots",
         "category": "DVC",
         "icon": "$(refresh)"
-      },
-      {
-        "title": "Add Custom Plot",
-        "command": "dvc.views.plots.addCustomPlot",
-        "category": "DVC"
       },
       {
         "title": "Remove Custom Plot(s)",
@@ -910,7 +905,7 @@
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
-          "command": "dvc.addTopLevelPlot",
+          "command": "dvc.addPlot",
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
@@ -1027,10 +1022,6 @@
         },
         {
           "command": "dvc.views.plots.refreshPlots",
-          "when": "dvc.commands.available && dvc.project.available"
-        },
-        {
-          "command": "dvc.views.plots.addCustomPlot",
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
@@ -1425,7 +1416,7 @@
           "group": "navigation@3"
         },
         {
-          "command": "dvc.addTopLevelPlot",
+          "command": "dvc.addPlot",
           "when": "view == dvc.views.plotsPathsTree",
           "group": "navigation@0"
         },

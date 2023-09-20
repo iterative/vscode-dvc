@@ -86,6 +86,7 @@ export const EventName = Object.assign(
     VIEWS_PLOTS_COMPARISON_ROWS_REORDERED:
       'views.plots.comparisonRowsReordered',
     VIEWS_PLOTS_CREATED: 'views.plots.created',
+    VIEWS_PLOTS_CUSTOM_ADD: 'views.plots.addCustomPlot',
     VIEWS_PLOTS_EXPERIMENT_TOGGLE: 'views.plots.toggleExperimentStatus',
     VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_CSV: 'views.plots.exportPlotDataAsCsv',
     VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_JSON: 'views.plots.exportPlotDataAsJson',
@@ -195,14 +196,14 @@ export interface IEventNamePropertyMapping {
   [EventName.STOP_EXPERIMENTS]: { stopped: boolean; wasRunning: boolean }
 
   [EventName.PIPELINE_SHOW_DAG]: undefined
-  [EventName.PIPELINE_ADD_PLOT]: undefined
 
   [EventName.PLOTS_PATH_TOGGLE]: undefined
   [EventName.PLOTS_SHOW]: undefined
   [EventName.PLOTS_SELECT]: undefined
   [EventName.PLOTS_REFRESH]: undefined
-  [EventName.PLOTS_CUSTOM_ADD]: undefined
   [EventName.PLOTS_CUSTOM_REMOVE]: undefined
+
+  [EventName.ADD_PLOT]: { type: string | undefined }
 
   [EventName.ADD_TARGET]: undefined
   [EventName.CHECKOUT_TARGET]: undefined
@@ -287,6 +288,7 @@ export interface IEventNamePropertyMapping {
 
   [EventName.VIEWS_PLOTS_CLOSED]: undefined
   [EventName.VIEWS_PLOTS_CREATED]: undefined
+  [EventName.VIEWS_PLOTS_CUSTOM_ADD]: undefined
   [EventName.VIEWS_PLOTS_FOCUS_CHANGED]: WebviewFocusChangedProperties
   [EventName.VIEWS_PLOTS_REVISIONS_REORDERED]: undefined
   [EventName.VIEWS_PLOTS_COMPARISON_ROWS_REORDERED]: undefined

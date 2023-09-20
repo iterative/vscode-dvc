@@ -289,7 +289,7 @@ suite('Pipeline Test Suite', () => {
     })
   })
 
-  it('should add a top-level plot', async () => {
+  it('should add a data series plot', async () => {
     const { pipeline } = buildPipeline({
       disposer: disposable,
       dvcRoot: dvcDemoPath
@@ -304,7 +304,7 @@ suite('Pipeline Test Suite', () => {
 
     mockPickPlotConfiguration.onFirstCall().resolves(undefined)
 
-    await pipeline.addTopLevelPlot()
+    await pipeline.addDataSeriesPlot()
 
     expect(mockPickPlotConfiguration).to.be.calledOnce
     expect(mockAddPlotToDvcFile).not.to.be.called
@@ -316,7 +316,7 @@ suite('Pipeline Test Suite', () => {
       y: 'acc'
     })
 
-    await pipeline.addTopLevelPlot()
+    await pipeline.addDataSeriesPlot()
 
     expect(mockPickPlotConfiguration).to.be.calledTwice
     expect(mockAddPlotToDvcFile).to.be.called
