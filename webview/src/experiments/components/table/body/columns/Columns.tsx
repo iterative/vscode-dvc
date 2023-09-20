@@ -62,8 +62,8 @@ const getDefaultColumns = (flattenTable: boolean) => {
         >,
         header: GitInfoHeader,
         id: GIT_INFO_COLUMN_ID,
-        minSize: 100,
-        size: 100
+        minSize: 150,
+        size: 150
       })
     )
   }

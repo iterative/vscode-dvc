@@ -419,6 +419,18 @@ $badge-size: 0.85rem;
   text-overflow: ellipsis;
 }
 
+.gitInfoHeaderContents {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+
+  svg {
+    width: 16px;
+    height: 16px;
+    fill: $accent-color;
+  }
+}
+
 .headerCellText {
   @extend %truncateLeftParent;
   @extend %headerCellPadding;
@@ -866,7 +878,8 @@ $badge-size: 0.85rem;
 
   line-height: normal;
   text-align: left;
-  height: 36px;
+  height: 32px;
+  font-size: 0.6rem;
 }
 
 .gitInfoBranch {
@@ -874,7 +887,7 @@ $badge-size: 0.85rem;
 
   font-size: 0.6rem;
   font-weight: 600;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 
   > * {
     vertical-align: middle;
@@ -888,8 +901,6 @@ $badge-size: 0.85rem;
 
 .gitInfoCommit {
   @extend %truncateLeftChild;
-
-  font-size: 0.75em;
 
   > * {
     vertical-align: middle;
