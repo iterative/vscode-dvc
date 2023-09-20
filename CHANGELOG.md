@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.57] - 2023-09-20
+
+### 🚀 New Features and Enhancements
+
+- Merge create plot commands [#4680](https://github.com/iterative/vscode-dvc/pull/4680) by [@julieg18](https://github.com/julieg18)
+
 ## [1.0.56] - 2023-09-19
 
 ### 🐛 Bug Fixes
