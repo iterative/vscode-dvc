@@ -100,7 +100,6 @@ export type CustomPlotData = CustomPlot & {
 export type CustomPlotsData = {
   plots: CustomPlotData[]
   nbItemsPerRow: number
-  enablePlotCreation: boolean
   height: PlotHeight
   hasUnfilteredExperiments: boolean
   hasAddedPlots: boolean

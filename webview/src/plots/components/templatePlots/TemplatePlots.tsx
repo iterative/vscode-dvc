@@ -4,6 +4,7 @@ import cx from 'classnames'
 import { useDispatch, useSelector } from 'react-redux'
 import { AddedSection } from './AddedSection'
 import { TemplatePlotsGrid } from './TemplatePlotsGrid'
+import { NoPlotsToDisplay } from './NoPlotsToDisplay'
 import { PlotGroup, updateSections } from './templatePlotsSlice'
 import { removeFromPreviousAndAddToNewSection } from './util'
 import { createIDWithIndex, getIDIndex } from '../../../util/ids'
@@ -11,7 +12,6 @@ import styles from '../styles.module.scss'
 import { shouldUseVirtualizedGrid } from '../util'
 import { PlotsState } from '../../store'
 import { setDraggedOverGroup } from '../../../shared/components/dragDrop/dragDropSlice'
-import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { isSameGroup } from '../../../shared/components/dragDrop/DragDropContainer'
 import { changeOrderWithDraggedInfo } from '../../../util/array'
 import { LoadingSection, sectionIsLoading } from '../LoadingSection'
@@ -95,8 +95,9 @@ export const TemplatePlots: React.FC = () => {
   if (sectionIsLoading(selectedRevisions, hasItems)) {
     return <LoadingSection />
   }
+
   if (!sections || sections.length === 0) {
-    return <EmptyState isFullScreen={false}>No Plots to Display</EmptyState>
+    return <NoPlotsToDisplay />
   }
 
   const firstSection = sections[0]
