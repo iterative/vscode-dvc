@@ -1720,7 +1720,7 @@ suite('Experiments Test Suite', () => {
   })
 
   describe('Sorting', () => {
-    it('should be able to sort', async () => {
+    it('should be able to flatten the table rows and sort', async () => {
       const { experiments, messageSpy } = await buildExperimentsWebview({
         disposer: disposable,
         availableNbCommits: { main: 20 },
@@ -1816,8 +1816,16 @@ suite('Experiments Test Suite', () => {
       expect(getIds(sortedRows)).to.deep.equal([
         { id: EXPERIMENT_WORKSPACE_ID },
         {
-          id: '2d879497587b80b2d9e61f072d9dbe9c07a65357',
-          subRows: ['exp-2', 'exp-1', 'exp-3']
+          id: '2d879497587b80b2d9e61f072d9dbe9c07a65357'
+        },
+        {
+          id: 'exp-2'
+        },
+        {
+          id: 'exp-1'
+        },
+        {
+          id: 'exp-3'
         }
       ])
 
