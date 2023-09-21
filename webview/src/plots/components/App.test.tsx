@@ -415,7 +415,7 @@ describe('App', () => {
     fireEvent.click(addCustomPlotsButton)
 
     expect(mockPostMessage).toHaveBeenCalledWith({
-      type: MessageFromWebviewType.ADD_CUSTOM_PLOT
+      type: MessageFromWebviewType.ADD_PLOT
     })
     mockPostMessage.mockReset()
 
@@ -538,7 +538,7 @@ describe('App', () => {
     expect(screen.getByText('No Plots to Display')).toBeInTheDocument()
   })
 
-  it('should render custom with "No Plots Added" message when there are no plots added', () => {
+  it('should render custom with "No Plots Added" message and "Add Plot" button when there are no plots added', () => {
     renderAppWithOptionalData({
       custom: {
         ...customPlotsFixture,
@@ -552,6 +552,16 @@ describe('App', () => {
     expect(screen.queryByText('No Plots to Display')).not.toBeInTheDocument()
     expect(screen.getByText('Custom')).toBeInTheDocument()
     expect(screen.getByText('No Plots Added')).toBeInTheDocument()
+    const customSection = screen.getByTestId('custom-plots-section-details')
+
+    const addPlotButton = within(customSection).getByText('Add Plot')
+
+    expect(addPlotButton).toBeInTheDocument()
+
+    fireEvent.click(addPlotButton)
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      type: MessageFromWebviewType.ADD_PLOT
+    })
   })
 
   it('should render custom with "No Data to Plot" message when there are added plots but no unfiltered experiments', () => {
@@ -568,6 +578,62 @@ describe('App', () => {
     expect(screen.queryByText('No Plots to Display')).not.toBeInTheDocument()
     expect(screen.getByText('Custom')).toBeInTheDocument()
     expect(screen.getByText('No Data to Plot')).toBeInTheDocument()
+  })
+
+  it('should render template with "No Plots to Display" message and "Add Plot" button if there is no template data and no unselected plots', () => {
+    renderAppWithOptionalData({
+      comparison: comparisonTableFixture,
+      custom: customPlotsFixture,
+      hasUnselectedPlots: false,
+      template: null
+    })
+
+    expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
+    expect(screen.getByText('No Plots to Display')).toBeInTheDocument()
+
+    const templateSection = screen.getByTestId('template-plots-section-details')
+
+    const addPlotButton = within(templateSection).getByText('Add Plot')
+    const selectPlotsButton =
+      within(templateSection).queryByText('Select Plots')
+
+    expect(selectPlotsButton).not.toBeInTheDocument()
+    expect(addPlotButton).toBeInTheDocument()
+
+    fireEvent.click(addPlotButton)
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      type: MessageFromWebviewType.ADD_PLOT
+    })
+  })
+
+  it('should render template with "No Plots to Display" message and action buttons ("Select Plots" and "Add Plot") if there is no template data and unselected plots', () => {
+    renderAppWithOptionalData({
+      comparison: comparisonTableFixture,
+      custom: customPlotsFixture,
+      hasUnselectedPlots: true,
+      template: null
+    })
+
+    expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
+    expect(screen.getByText('No Plots to Display')).toBeInTheDocument()
+
+    const templateSection = screen.getByTestId('template-plots-section-details')
+    const selectPlotsButton = within(templateSection).getByText('Select Plots')
+    const addPlotButton = within(templateSection).getByText('Add Plot')
+
+    expect(selectPlotsButton).toBeInTheDocument()
+    fireEvent.click(selectPlotsButton)
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      type: MessageFromWebviewType.SELECT_PLOTS
+    })
+
+    mockPostMessage.mockReset()
+
+    expect(addPlotButton).toBeInTheDocument()
+    fireEvent.click(addPlotButton)
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      type: MessageFromWebviewType.ADD_PLOT
+    })
   })
 
   it('should render the comparison table when given a message with comparison plots data', () => {
@@ -764,25 +830,6 @@ describe('App', () => {
       payload: { [PlotsSection.CUSTOM_PLOTS]: true },
       type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
     })
-  })
-
-  it('should hide the custom plots add button if there are no more plots to create', () => {
-    renderAppWithOptionalData({
-      comparison: comparisonTableFixture,
-      custom: customPlotsFixture
-    })
-
-    const customSection = screen.getAllByTestId('section-container')[2]
-
-    expect(within(customSection).getByLabelText('Add Plot')).toBeInTheDocument()
-
-    sendSetDataMessage({
-      custom: { ...customPlotsFixture, enablePlotCreation: false }
-    })
-
-    expect(
-      within(customSection).queryByLabelText('Add Plot')
-    ).not.toBeInTheDocument()
   })
 
   it('should display a slider to pick the number of items per row if there are items and the action is available', () => {
