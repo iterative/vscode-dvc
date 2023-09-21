@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "1.9.5",
-    "@tanstack/react-table": "8.9.8",
+    "@tanstack/react-table": "8.9.9",
     "@tippyjs/react": "4.2.6",
     "@vscode/webview-ui-toolkit": "1.2.2",
     "classnames": "2.3.2",
@@ -74,7 +74,7 @@
     "jest-environment-jsdom": "29.7.0",
     "lint-staged": "14.0.1",
     "raw-loader": "4.0.2",
-    "sass": "1.66.1",
+    "sass": "1.67.0",
     "sass-loader": "13.3.2",
     "storybook": "7.4.1",
     "storybook-addon-themes": "6.1.0",
