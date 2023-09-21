@@ -8,11 +8,6 @@ export const addPlot = () =>
     type: MessageFromWebviewType.ADD_PLOT
   })
 
-export const addCustomPlot = () =>
-  sendMessage({
-    type: MessageFromWebviewType.ADD_CUSTOM_PLOT
-  })
-
 export const exportPlotDataAsCsv = (id: string) => {
   sendMessage({
     payload: id,

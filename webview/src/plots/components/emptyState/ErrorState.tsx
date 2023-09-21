@@ -1,10 +1,6 @@
 import React from 'react'
 import { EmptyState } from './EmptyState'
-import {
-  addCustomPlot,
-  refreshRevisions,
-  selectRevisions
-} from '../../util/messages'
+import { addPlot, refreshRevisions, selectRevisions } from '../../util/messages'
 import { RefreshButton } from '../../../shared/components/button/RefreshButton'
 import { StartButton } from '../../../shared/components/button/StartButton'
 import { ErrorIcon } from '../../../shared/components/errorIcon/ErrorIcon'
@@ -23,7 +19,7 @@ export const ErrorState: React.FC<{
         <StartButton
           isNested={true}
           appearance="secondary"
-          onClick={addCustomPlot}
+          onClick={addPlot}
           text="Add Custom Plot"
         />
       )}

@@ -415,7 +415,7 @@ describe('App', () => {
     fireEvent.click(addCustomPlotsButton)
 
     expect(mockPostMessage).toHaveBeenCalledWith({
-      type: MessageFromWebviewType.ADD_CUSTOM_PLOT
+      type: MessageFromWebviewType.ADD_PLOT
     })
     mockPostMessage.mockReset()
 
@@ -560,7 +560,7 @@ describe('App', () => {
 
     fireEvent.click(addPlotButton)
     expect(mockPostMessage).toHaveBeenCalledWith({
-      type: MessageFromWebviewType.ADD_CUSTOM_PLOT
+      type: MessageFromWebviewType.ADD_PLOT
     })
   })
 

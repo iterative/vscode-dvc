@@ -17,7 +17,6 @@ export enum MessageFromWebviewType {
   APPLY_EXPERIMENT_TO_WORKSPACE = 'apply-experiment-to-workspace',
   ADD_STARRED_EXPERIMENT_FILTER = 'add-starred-experiment-filter',
   ADD_PLOT = 'add-plot',
-  ADD_CUSTOM_PLOT = 'add-custom-plot',
   CREATE_BRANCH_FROM_EXPERIMENT = 'create-branch-from-experiment',
   COPY_TO_CLIPBOARD = 'copy-to-clipboard',
   COPY_STUDIO_LINK = 'copy-studio-link',
@@ -108,9 +107,6 @@ export type PlotsTemplatesReordered = {
 }[]
 
 export type MessageFromWebview =
-  | {
-      type: MessageFromWebviewType.ADD_CUSTOM_PLOT
-    }
   | {
       type: MessageFromWebviewType.ADD_PLOT
     }
