@@ -4,7 +4,7 @@ import React, { useMemo } from 'react'
 import { Header } from '@tanstack/react-table'
 import { useSelector } from 'react-redux'
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
-import { SortOrder, getSortDetails, isFromExperimentColumn } from './util'
+import { SortOrder, getSortDetails, isFromDefaultColumn } from './util'
 import { MessagesMenu } from '../../../../shared/components/messagesMenu/MessagesMenu'
 import { MessagesMenuOptionProps } from '../../../../shared/components/messagesMenu/MessagesMenuOption'
 import { ExperimentsState } from '../../../store'
@@ -57,7 +57,7 @@ const getFilterDetails = (
   const id = header.column.id
 
   const canFilter =
-    !isFromExperimentColumn(header) && header.column.columns.length <= 1
+    !isFromDefaultColumn(header) && header.column.columns.length <= 1
 
   return { canFilter, isFiltered: filters.includes(id) }
 }
@@ -73,7 +73,7 @@ const getMenuOptions = (
 
   return [
     {
-      disabled: isFromExperimentColumn(header),
+      disabled: isFromDefaultColumn(header),
       id: 'hide',
       label: 'Hide',
       message: {
@@ -82,7 +82,7 @@ const getMenuOptions = (
       }
     },
     {
-      disabled: isFromExperimentColumn(header),
+      disabled: isFromDefaultColumn(header),
       id: 'move-to-start',
       label: 'Move to Start',
       message: {

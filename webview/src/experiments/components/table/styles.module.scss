@@ -419,7 +419,11 @@ $badge-size: 0.85rem;
   text-overflow: ellipsis;
 }
 
-.gitInfoHeaderContents {
+.headerWithTooltip {
+  display: flex;
+}
+
+.headerWithTooltipContents {
   display: flex;
   gap: 2px;
   align-items: center;
@@ -510,7 +514,8 @@ $badge-size: 0.85rem;
   }
 
   .timestampInnerCell,
-  .gitInfoInnerCell {
+  .branchInnerCell,
+  .commitInnerCell {
     height: 42px;
   }
 }
@@ -851,7 +856,9 @@ $badge-size: 0.85rem;
   }
 }
 
-.timestampInnerCell {
+.timestampInnerCell,
+.branchInnerCell,
+.commitInnerCell {
   @extend %baseInnerCell;
   @extend %truncateLeftParent;
 
@@ -872,22 +879,17 @@ $badge-size: 0.85rem;
   font-size: 0.9em;
 }
 
-.gitInfoInnerCell {
-  @extend %baseInnerCell;
-  @extend %truncateLeftParent;
+.commitInnerCell .cellContents {
+  font-size: 0.7rem;
 
-  line-height: normal;
-  text-align: left;
-  height: 32px;
-  font-size: 0.6rem;
+  > * {
+    vertical-align: middle;
+  }
 }
 
-.gitInfoBranch {
-  @extend %truncateLeftChild;
-
-  font-size: 0.6rem;
+.branchInnerCell .cellContents {
+  font-size: 0.65rem;
   font-weight: 600;
-  margin-bottom: 2px;
 
   > * {
     vertical-align: middle;
@@ -896,14 +898,6 @@ $badge-size: 0.85rem;
   svg {
     fill: $accent-color;
     margin-right: 1px;
-  }
-}
-
-.gitInfoCommit {
-  @extend %truncateLeftChild;
-
-  > * {
-    vertical-align: middle;
   }
 }
 

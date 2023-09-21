@@ -12,6 +12,11 @@ import {
   limitSummaryOrder
 } from './util'
 import { collectColumnOrder } from './collect/order'
+import {
+  BRANCH_COLUMN_ID,
+  COMMIT_COLUMN_ID,
+  DEFAULT_COLUMN_IDS
+} from './constants'
 import { Column, ColumnType } from '../webview/contract'
 import { ExpShowOutput } from '../../cli/dvc/contract'
 import { PersistenceKey } from '../../persistence/constants'
@@ -103,11 +108,12 @@ export class ColumnsModel extends PathSelectionModel<Column> {
   }
 
   public selectFirst(firstColumns: string[]) {
+    const defaultColumns = DEFAULT_COLUMN_IDS
     const columnOrder = [
-      'id',
+      ...defaultColumns,
       ...firstColumns,
       ...this.getColumnOrder().filter(
-        column => !['id', ...firstColumns].includes(column)
+        column => ![...defaultColumns, ...firstColumns].includes(column)
       )
     ]
     this.setColumnOrder(columnOrder)
@@ -198,6 +204,13 @@ export class ColumnsModel extends PathSelectionModel<Column> {
 
     for (const { path } of selectedColumns) {
       if (!this.columnOrderState.includes(path)) {
+        return this.setColumnOrderFromData(selectedColumns)
+      }
+    }
+
+    const maybeMissingDefaultColumns = [COMMIT_COLUMN_ID, BRANCH_COLUMN_ID]
+    for (const id of maybeMissingDefaultColumns) {
+      if (!this.columnOrderState.includes(id)) {
         return this.setColumnOrderFromData(selectedColumns)
       }
     }

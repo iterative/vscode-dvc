@@ -10,7 +10,8 @@ import {
 import { ColumnType, Experiment } from 'dvc/src/experiments/webview/contract'
 import {
   EXPERIMENT_COLUMN_ID,
-  GIT_INFO_COLUMN_ID
+  BRANCH_COLUMN_ID,
+  COMMIT_COLUMN_ID
 } from 'dvc/src/experiments/columns/constants'
 import { Header } from '../../content/Header'
 import { Cell, CellValue } from '../../content/Cell'
@@ -19,8 +20,10 @@ import { DateCellContents } from '../../content/DateCellContent'
 import { TimestampHeader } from '../../content/TimestampHeader'
 import { ExperimentCell } from '../../content/ExperimentCell'
 import { ExperimentHeader } from '../../content/ExperimentHeader'
-import { GitInfoHeader } from '../../content/GitInfoHeader'
-import { GitInfoCellContent } from '../../content/GitInfoCellContent'
+import { BranchCellContent } from '../../content/BranchCellContent'
+import { BranchHeader } from '../../content/BranchHeader'
+import { CommitCellContent } from '../../content/CommitCellContent'
+import { CommitHeader } from '../../content/CommitHeader'
 
 export type ColumnWithGroup = ColumnDef<Experiment, unknown> & {
   group: ColumnType
@@ -56,14 +59,23 @@ const getDefaultColumns = (flattenTable: boolean) => {
 
   if (flattenTable) {
     columns.push(
-      columnHelper.accessor(() => GIT_INFO_COLUMN_ID, {
-        cell: GitInfoCellContent as unknown as React.FC<
+      columnHelper.accessor(() => BRANCH_COLUMN_ID, {
+        cell: BranchCellContent as unknown as React.FC<
           CellContext<Column, CellValue>
         >,
-        header: GitInfoHeader,
-        id: GIT_INFO_COLUMN_ID,
+        header: BranchHeader,
+        id: BRANCH_COLUMN_ID,
         minSize: 150,
         size: 150
+      }),
+      columnHelper.accessor(() => COMMIT_COLUMN_ID, {
+        cell: CommitCellContent as unknown as React.FC<
+          CellContext<Column, CellValue>
+        >,
+        header: CommitHeader,
+        id: COMMIT_COLUMN_ID,
+        minSize: 100,
+        size: 100
       })
     )
   }
