@@ -1,5 +1,4 @@
 import { Memento } from 'vscode'
-import omit from 'lodash.omit'
 import { SortDefinition, sortExperiments } from './sortBy'
 import { FilterDefinition, filterExperiment, getFilterId } from './filterBy'
 import { collectFiltered, collectUnfiltered } from './filterBy/collect'
@@ -438,21 +437,37 @@ export class ExperimentsModel extends ModelWithPersistence {
     }
   }
 
-  public getRowData(): Commit[] {
-    const commitsBySha = this.applyFiltersToCommits()
-
-    const workspaceBranch = {
+  public getRowData() {
+    const workspaceRow = {
       branch: WORKSPACE_BRANCH,
       ...this.addDetails(this.workspace)
     }
-    const rowsAcc: Commit[] = []
     const sorts = this.getSorts()
-    const flattenRows = sorts.length > 0
+    const flattenRowData = sorts.length > 0
+    if (flattenRowData) {
+      return this.getFlattenedRowData(workspaceRow)
+    }
+
+    const commitsBySha: { [sha: string]: Commit } = this.applyFiltersToCommits()
+    const rows: Commit[] = [workspaceRow]
 
     for (const { branch, sha } of this.rowOrder) {
-      this.collectRowCommitData(rowsAcc, branch, commitsBySha[sha], flattenRows)
+      const commit = commitsBySha[sha]
+      if (!commit) {
+        continue
+      }
+
+      if (commit.subRows) {
+        commit.subRows = commit.subRows.map(experiment => ({
+          ...experiment,
+          branch
+        }))
+      }
+
+      rows.push({ ...commit, branch })
     }
-    return [workspaceBranch, ...sortExperiments(sorts, rowsAcc)]
+
+    return rows
   }
 
   public getHasMoreCommits() {
@@ -825,35 +840,39 @@ export class ExperimentsModel extends ModelWithPersistence {
     return commitsBySha
   }
 
-  private collectRowCommitData(
-    rowsAcc: Commit[],
-    branch: string,
-    commit: Commit,
-    flattenRows: boolean
-  ) {
-    if (!commit) {
-      return
-    }
-    const commitWithBranch = { ...commit, branch }
-    const subRowsWithBranch: Experiment[] | undefined = commit?.subRows?.map(
-      experiment => ({
-        ...experiment,
-        branch
-      })
-    )
+  private applyFiltersToFlattenedCommits() {
+    const commitsBySha: { [sha: string]: Commit[] } = {}
+    const filters = this.getFilters()
 
-    if (commit.subRows) {
-      commitWithBranch.subRows = subRowsWithBranch
-    }
-
-    if (flattenRows) {
-      rowsAcc.push(
-        omit(commitWithBranch, 'subRows'),
-        ...(subRowsWithBranch || [])
+    for (const commit of this.commits) {
+      const commitWithSelectedAndStarred = this.addDetails(commit)
+      const experiments = this.getExperimentsByCommit(
+        commitWithSelectedAndStarred
       )
-      return
+
+      commitsBySha[commit.sha as string] = [
+        commitWithSelectedAndStarred,
+        ...(experiments || [])
+      ].filter(exp => !!filterExperiment(filters, exp))
     }
 
-    rowsAcc.push(commitWithBranch)
+    return commitsBySha
+  }
+
+  private getFlattenedRowData(workspaceRow: Commit): Commit[] {
+    const commitsBySha: { [sha: string]: Commit[] } =
+      this.applyFiltersToFlattenedCommits()
+    const rows = []
+
+    for (const { branch, sha } of this.rowOrder) {
+      const commits = commitsBySha[sha]
+      if (!commits) {
+        continue
+      }
+
+      rows.push(...commits.map(commit => ({ ...commit, branch })))
+    }
+
+    return [workspaceRow, ...sortExperiments(this.getSorts(), rows)]
   }
 }

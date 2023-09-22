@@ -919,7 +919,7 @@ describe('TableContent', () => {
     expect(screen.getByText('new-branch')).toBeInTheDocument()
   })
 
-  it('should flatten table rows and remove branch rows when table is sorted', () => {
+  it('should not add branch rows when the table is sorted', () => {
     const multipleBranchesInstance = {
       ...instance,
       getRowModel: getMockFlattenedRowModel
