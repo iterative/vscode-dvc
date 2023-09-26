@@ -7,8 +7,9 @@ import { RibbonBlock } from './RibbonBlock'
 import { update } from './ribbonSlice'
 import { IconButton } from '../../../shared/components/button/IconButton'
 import { PlotsState } from '../../store'
-import { ListFilter, Refresh } from '../../../shared/components/icons'
+import { Add, ListFilter, Refresh } from '../../../shared/components/icons'
 import {
+  addPlot,
   refreshRevisions,
   removeRevision,
   selectRevisions
@@ -69,10 +70,14 @@ export const Ribbon: React.FC = () => {
       className={cx(styles.list, needsShadow && styles.withShadow)}
     >
       <li className={styles.buttonWrapper}>
+        <IconButton onClick={addPlot} icon={Add} text="Add Plot" />
+      </li>
+      <li className={styles.buttonWrapper}>
         <IconButton
           onClick={selectRevisions}
           icon={ListFilter}
           text={`${revisions.length} of ${MAX_NB_EXP}`}
+          appearance="secondary"
         />
       </li>
       <li className={styles.buttonWrapper}>

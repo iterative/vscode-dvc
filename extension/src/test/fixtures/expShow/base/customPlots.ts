@@ -93,7 +93,6 @@ export const experimentsWithCommits: Experiment[] = [
 ]
 
 const data: CustomPlotsData = {
-  enablePlotCreation: true,
   plots: [
     {
       id: 'custom-summary.json:loss-params.yaml:log_file',

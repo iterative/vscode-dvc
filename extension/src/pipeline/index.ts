@@ -112,7 +112,7 @@ export class Pipeline extends DeferredDisposable {
     return this.addPipeline()
   }
 
-  public async addTopLevelPlot() {
+  public async addDataSeriesPlot() {
     const cwd = await this.getCwd()
 
     if (!cwd) {

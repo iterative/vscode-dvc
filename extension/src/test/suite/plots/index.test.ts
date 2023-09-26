@@ -1106,24 +1106,6 @@ suite('Plots Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should handle an add custom plot message from the webview', async () => {
-      const { mockMessageReceived } = await buildPlotsWebview({
-        disposer: disposable,
-        plotsDiff: plotsDiffFixture
-      })
-
-      const executeCommandSpy = spy(commands, 'executeCommand')
-
-      mockMessageReceived.fire({
-        type: MessageFromWebviewType.ADD_CUSTOM_PLOT
-      })
-
-      expect(executeCommandSpy).to.be.calledWithExactly(
-        RegisteredCommands.PLOTS_CUSTOM_ADD,
-        dvcDemoPath
-      )
-    })
-
     it('should handle a remove custom plot message from the webview', async () => {
       const { mockMessageReceived } = await buildPlotsWebview({
         disposer: disposable,
@@ -1209,20 +1191,20 @@ suite('Plots Test Suite', () => {
       )
     })
 
-    it('should handle an add pipeline plot message from the webview', async () => {
+    it('should handle an add plot message from the webview', async () => {
       const { mockMessageReceived } = await buildPlotsWebview({
         disposer: disposable,
         plotsDiff: plotsDiffFixture
       })
 
-      const executeCommandSpy = spy(commands, 'executeCommand')
+      const mockExecuteCommand = stub(commands, 'executeCommand')
 
       mockMessageReceived.fire({
-        type: MessageFromWebviewType.ADD_PIPELINE_PLOT
+        type: MessageFromWebviewType.ADD_PLOT
       })
 
-      expect(executeCommandSpy).to.be.calledWithExactly(
-        RegisteredCommands.PIPELINE_ADD_PLOT,
+      expect(mockExecuteCommand).to.be.calledWithExactly(
+        RegisteredCommands.ADD_PLOT,
         dvcDemoPath
       )
     })

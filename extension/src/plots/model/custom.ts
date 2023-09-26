@@ -52,24 +52,6 @@ export const getCustomPlotPathsFromColumns = (
   return { metrics, params }
 }
 
-export const checkForCustomPlotOptions = (
-  columns: Column[],
-  customPlotOrder: CustomPlotsOrderValue[]
-): boolean => {
-  const { metrics, params } = getCustomPlotPathsFromColumns(columns)
-  const plotIds = getCustomPlotIds(customPlotOrder)
-
-  for (const metric of metrics) {
-    for (const param of params) {
-      if (!plotIds.has(getCustomPlotId(metric, param))) {
-        return true
-      }
-    }
-  }
-
-  return false
-}
-
 const getSpecDataType = (type: string) =>
   type === 'number' ? 'quantitative' : 'nominal'
 
