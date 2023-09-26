@@ -195,14 +195,14 @@ export interface IEventNamePropertyMapping {
   [EventName.STOP_EXPERIMENTS]: { stopped: boolean; wasRunning: boolean }
 
   [EventName.PIPELINE_SHOW_DAG]: undefined
-  [EventName.PIPELINE_ADD_PLOT]: undefined
 
   [EventName.PLOTS_PATH_TOGGLE]: undefined
   [EventName.PLOTS_SHOW]: undefined
   [EventName.PLOTS_SELECT]: undefined
   [EventName.PLOTS_REFRESH]: undefined
-  [EventName.PLOTS_CUSTOM_ADD]: undefined
   [EventName.PLOTS_CUSTOM_REMOVE]: undefined
+
+  [EventName.ADD_PLOT]: { type: string | undefined }
 
   [EventName.ADD_TARGET]: undefined
   [EventName.CHECKOUT_TARGET]: undefined

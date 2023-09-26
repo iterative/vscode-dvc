@@ -185,7 +185,9 @@ export const closeAllEditors = async (): Promise<void> => {
 
 export const createCustomPlot = async (): Promise<void> => {
   const workbench = await browser.getWorkbench()
-  const addCustomPlot = await workbench.executeCommand('DVC: Add Custom Plot')
+  const addCustomPlot = await workbench.executeCommand('DVC: Add Plot')
+  await browser.waitUntil(() => addCustomPlot.elem.isDisplayed())
+  await browser.keys(['ArrowDown', 'Enter'])
   await browser.waitUntil(() => addCustomPlot.elem.isDisplayed())
   await browser.keys('Enter')
   await browser.waitUntil(() => addCustomPlot.elem.isDisplayed())

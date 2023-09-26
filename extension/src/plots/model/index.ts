@@ -16,11 +16,7 @@ import {
   collectSelectedComparisonPlots
 } from './collect'
 import { getRevisionSummaryColumns } from './util'
-import {
-  checkForCustomPlotOptions,
-  cleanupOldOrderValue,
-  CustomPlotsOrderValue
-} from './custom'
+import { cleanupOldOrderValue, CustomPlotsOrderValue } from './custom'
 import {
   Revision,
   DEFAULT_SECTION_COLLAPSED,
@@ -156,10 +152,6 @@ export class PlotsModel extends ModelWithPersistence {
     const experiments = this.experiments.getUnfilteredCommitsAndExperiments()
     const hasUnfilteredExperiments = experiments.length > 0
     const plotsOrderValues = this.getCustomPlotsOrder()
-    const enablePlotCreation = checkForCustomPlotOptions(
-      this.experiments.getColumnTerminalNodes(),
-      plotsOrderValues
-    )
     const height = this.getHeight(PlotsSection.CUSTOM_PLOTS)
     const nbItemsPerRow = this.getNbItemsPerRowOrWidth(
       PlotsSection.CUSTOM_PLOTS
@@ -173,7 +165,6 @@ export class PlotsModel extends ModelWithPersistence {
     )
 
     return {
-      enablePlotCreation,
       hasAddedPlots,
       hasUnfilteredExperiments,
       height,
@@ -415,7 +406,7 @@ export class PlotsModel extends ModelWithPersistence {
       await Promise.all([
         collectData(output),
         collectTemplates(output),
-        collectMultiSourceVariations(output, this.multiSourceVariations)
+        collectMultiSourceVariations(output)
       ])
 
     this.comparisonData = {

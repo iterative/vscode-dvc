@@ -5,17 +5,11 @@ import { CustomPlots } from './CustomPlots'
 import { changeSize } from './customPlotsSlice'
 import { PlotsContainer } from '../PlotsContainer'
 import { PlotsState } from '../../store'
-import { addCustomPlot, removeCustomPlots } from '../../util/messages'
+import { removeCustomPlots } from '../../util/messages'
 
 export const CustomPlotsWrapper: React.FC = () => {
-  const {
-    plotsIds,
-    nbItemsPerRow,
-    isCollapsed,
-    height,
-    enablePlotCreation,
-    hasAddedPlots
-  } = useSelector((state: PlotsState) => state.custom)
+  const { plotsIds, nbItemsPerRow, isCollapsed, height, hasAddedPlots } =
+    useSelector((state: PlotsState) => state.custom)
   const [selectedPlots, setSelectedPlots] = useState<string[]>([])
   useEffect(() => {
     setSelectedPlots(plotsIds)
@@ -29,9 +23,6 @@ export const CustomPlotsWrapper: React.FC = () => {
       sectionKey={PlotsSection.CUSTOM_PLOTS}
       nbItemsPerRowOrWidth={nbItemsPerRow}
       sectionCollapsed={isCollapsed}
-      addPlotsButton={
-        enablePlotCreation ? { onClick: addCustomPlot } : undefined
-      }
       removePlotsButton={
         hasAddedPlots ? { onClick: removeCustomPlots } : undefined
       }

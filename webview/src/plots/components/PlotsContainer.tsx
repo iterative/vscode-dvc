@@ -156,25 +156,20 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
         )
       }
     >
-      {open && (
-        <div
-          className={cx({
-            [styles.plotsWrapper]: sectionKey !== PlotsSection.COMPARISON_TABLE,
-            [styles.smallPlots]: nbItemsPerRowOrWidth >= 4
-          })}
-          style={
-            {
-              '--nb-per-row': nbItemsPerRowOrWidth
-            } as DetailedHTMLProps<
-              HTMLAttributes<HTMLDivElement>,
-              HTMLDivElement
-            >
-          }
-          data-testid="plots-wrapper"
-        >
-          {children}
-        </div>
-      )}
+      <div
+        className={cx({
+          [styles.plotsWrapper]: sectionKey !== PlotsSection.COMPARISON_TABLE,
+          [styles.smallPlots]: nbItemsPerRowOrWidth >= 4
+        })}
+        style={
+          {
+            '--nb-per-row': nbItemsPerRowOrWidth
+          } as DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement>
+        }
+        data-testid="plots-wrapper"
+      >
+        {children}
+      </div>
     </SectionContainer>
   )
 }

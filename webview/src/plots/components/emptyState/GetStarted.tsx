@@ -18,10 +18,7 @@ export const GetStarted: React.FC<GetStartedProps> = ({
 }) => (
   <EmptyState hasCustomPlots={hasCustomPlots} modal={modal}>
     {hasPlots ? (
-      <AddPlots
-        hasUnselectedPlots={hasUnselectedPlots}
-        hasCustomPlots={hasCustomPlots}
-      />
+      <AddPlots hasUnselectedPlots={hasUnselectedPlots} />
     ) : (
       <Welcome />
     )}

@@ -2,6 +2,7 @@ import React, { DragEvent, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import cx from 'classnames'
 import { CustomPlot } from './CustomPlot'
+import { NoPlotsAdded } from './NoPlotsAdded'
 import styles from '../styles.module.scss'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import {
@@ -56,7 +57,7 @@ export const CustomPlots: React.FC<CustomPlotsProps> = ({ plotsIds }) => {
   }
 
   if (!hasAddedPlots) {
-    return <EmptyState isFullScreen={false}>No Plots Added</EmptyState>
+    return <NoPlotsAdded />
   }
 
   if (!hasUnfilteredExperiments) {

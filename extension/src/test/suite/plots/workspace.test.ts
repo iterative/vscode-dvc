@@ -9,6 +9,8 @@ import { closeAllEditors } from '../util'
 import * as customPlotQuickPickUtil from '../../../plots/model/quickPick'
 import { customPlotsOrderFixture } from '../../fixtures/expShow/base/customPlots'
 import { RegisteredCommands } from '../../../commands/external'
+import * as quickPickUtil from '../../../plots/quickPick'
+import { WorkspacePipeline } from '../../../pipeline/workspace'
 
 suite('Workspace Plots Test Suite', () => {
   const disposable = Disposable.fn()
@@ -23,12 +25,31 @@ suite('Workspace Plots Test Suite', () => {
     return closeAllEditors()
   })
 
-  describe('dvc.views.plots.addCustomPlot', () => {
+  describe('dvc.addPlot', () => {
+    it('should be able to add a data series plot', async () => {
+      const mockPickPlotType = stub(quickPickUtil, 'pickPlotType')
+      const mockAddDataSeriesPlot = stub(
+        WorkspacePipeline.prototype,
+        'addDataSeriesPlot'
+      )
+
+      mockPickPlotType
+        .onFirstCall()
+        .resolves(quickPickUtil.PLOT_TYPE.DATA_SERIES)
+      mockAddDataSeriesPlot.onFirstCall().resolves(undefined)
+
+      await commands.executeCommand(RegisteredCommands.ADD_PLOT)
+
+      expect(mockAddDataSeriesPlot).to.be.calledOnce
+    })
+
     it('should be able to add a custom plot', async () => {
       const { plotsModel } = await buildPlots({
         disposer: disposable,
         plotsDiff: plotsDiffFixture
       })
+
+      const mockPickPlotType = stub(quickPickUtil, 'pickPlotType')
 
       const mockGetMetricAndParam = stub(
         customPlotQuickPickUtil,
@@ -40,12 +61,13 @@ suite('Workspace Plots Test Suite', () => {
         param: 'params.yaml:log_file'
       }
 
+      mockPickPlotType.onFirstCall().resolves(quickPickUtil.PLOT_TYPE.CUSTOM)
       mockGetMetricAndParam.onFirstCall().resolves(mockMetricVsParamOrderValue)
 
       const mockSetCustomPlotsOrder = stub(plotsModel, 'setCustomPlotsOrder')
       mockSetCustomPlotsOrder.returns(undefined)
 
-      await commands.executeCommand(RegisteredCommands.PLOTS_CUSTOM_ADD)
+      await commands.executeCommand(RegisteredCommands.ADD_PLOT)
 
       expect(mockSetCustomPlotsOrder).to.be.calledWith([
         ...customPlotsOrderFixture,
@@ -53,7 +75,26 @@ suite('Workspace Plots Test Suite', () => {
       ])
     })
 
-    it('should not add a custom plot if user cancels', async () => {
+    it('should not add a plot if users cancels', async () => {
+      const mockPickPlotType = stub(quickPickUtil, 'pickPlotType')
+      const mockAddDataSeriesPlot = stub(
+        WorkspacePipeline.prototype,
+        'addDataSeriesPlot'
+      )
+      const mockGetMetricAndParam = stub(
+        customPlotQuickPickUtil,
+        'pickMetricAndParam'
+      )
+
+      mockPickPlotType.onFirstCall().resolves(undefined)
+
+      await commands.executeCommand(RegisteredCommands.ADD_PLOT)
+
+      expect(mockAddDataSeriesPlot).not.to.be.called
+      expect(mockGetMetricAndParam).not.to.be.called
+    })
+
+    it('should not add a custom plot if user cancels during custom plot creation', async () => {
       const { plotsModel } = await buildPlots({
         disposer: disposable,
         plotsDiff: plotsDiffFixture
@@ -62,13 +103,15 @@ suite('Workspace Plots Test Suite', () => {
         customPlotQuickPickUtil,
         'pickMetricAndParam'
       )
+      const mockPickPlotType = stub(quickPickUtil, 'pickPlotType')
 
+      mockPickPlotType.onFirstCall().resolves(quickPickUtil.PLOT_TYPE.CUSTOM)
       mockGetMetricAndParam.onFirstCall().resolves(undefined)
 
       const mockSetCustomPlotsOrder = stub(plotsModel, 'setCustomPlotsOrder')
       mockSetCustomPlotsOrder.returns(undefined)
 
-      await commands.executeCommand(RegisteredCommands.PLOTS_CUSTOM_ADD)
+      await commands.executeCommand(RegisteredCommands.ADD_PLOT)
 
       expect(mockSetCustomPlotsOrder).to.not.be.called
     })

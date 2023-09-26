@@ -20,7 +20,6 @@ export interface CustomPlotsState extends Omit<CustomPlotsData, 'plots'> {
 
 export const customPlotsInitialState: CustomPlotsState = {
   disabledDragPlotIds: [],
-  enablePlotCreation: true,
   hasAddedPlots: false,
   hasData: false,
   hasItems: false,

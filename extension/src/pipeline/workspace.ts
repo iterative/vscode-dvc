@@ -63,14 +63,14 @@ export class WorkspacePipeline extends BaseWorkspace<Pipeline> {
     )
   }
 
-  public async addTopLevelPlot(overrideRoot?: string) {
+  public async addDataSeriesPlot(overrideRoot?: string) {
     const cwd = overrideRoot || (await this.getCwd())
 
     if (!cwd) {
       return
     }
 
-    void this.getRepository(cwd).addTopLevelPlot()
+    void this.getRepository(cwd).addDataSeriesPlot()
   }
 
   private getCwd() {

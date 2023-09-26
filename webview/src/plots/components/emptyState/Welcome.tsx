@@ -1,12 +1,12 @@
 import React from 'react'
 import { StartButton } from '../../../shared/components/button/StartButton'
-import { addPipelinePlot, selectRevisions } from '../../util/messages'
+import { addPlot, selectRevisions } from '../../util/messages'
 
 export const Welcome: React.FC = () => (
   <div>
     <p>No Plots Detected.</p>
     <div>
-      <StartButton onClick={addPipelinePlot} text="Add Plot" />
+      <StartButton onClick={addPlot} text="Add Plot" />
       <StartButton
         appearance="secondary"
         onClick={selectRevisions}
