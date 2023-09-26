@@ -26,8 +26,8 @@ import { vsCodeApi } from '../../shared/api'
 import {
   commonColumnFields,
   expectHeaders,
-  tableData as columnSortingTableDataFixture
-} from '../../test/columnSort'
+  tableData as simplifiedSortedTableDataFixture
+} from '../../test/sort'
 import {
   NORMAL_TOOLTIP_DELAY,
   HEADER_TOOLTIP_DELAY
@@ -47,7 +47,7 @@ import {
   renderTableWithNoColumns,
   renderTableWithoutRunningExperiments,
   renderTableWithPlaceholder,
-  renderTableWithColumnSortingData,
+  renderTableWithSortingData,
   selectedRows,
   setTableData,
   renderTableWithFilters
@@ -147,12 +147,12 @@ describe('App', () => {
   })
 
   it('should be able to order a column to the final space after a new column is added', async () => {
-    const { getDraggableHeaderFromText } = renderTableWithColumnSortingData()
+    const { getDraggableHeaderFromText } = renderTableWithSortingData()
 
     setTableData({
-      ...columnSortingTableDataFixture,
+      ...simplifiedSortedTableDataFixture,
       columns: [
-        ...columnSortingTableDataFixture.columns,
+        ...simplifiedSortedTableDataFixture.columns,
         {
           ...commonColumnFields,
           id: 'D',
