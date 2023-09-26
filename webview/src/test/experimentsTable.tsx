@@ -13,7 +13,7 @@ import deeplyNestedTableDataFixture from 'dvc/src/test/fixtures/expShow/deeplyNe
 import tableDataFixture from 'dvc/src/test/fixtures/expShow/base/tableData'
 import { MessageToWebviewType } from 'dvc/src/webview/contract'
 import { ExecutorStatus } from 'dvc/src/cli/dvc/contract'
-import { tableData as sortingTableDataFixture } from './sort'
+import { tableData as columnSortingTableDataFixture } from './columnSort'
 import { customQueries, getRow } from './queries'
 import { App } from '../experiments/components/App'
 import { experimentsReducers } from '../experiments/store'
@@ -52,8 +52,8 @@ export const renderTableWithNoColumns = () => {
   renderTable({ ...tableDataFixture, columns: [] })
 }
 
-export const renderTableWithSortingData = () => {
-  return renderTable(sortingTableDataFixture)
+export const renderTableWithColumnSortingData = () => {
+  return renderTable(columnSortingTableDataFixture)
 }
 
 export const renderTableWithFilters = () => {

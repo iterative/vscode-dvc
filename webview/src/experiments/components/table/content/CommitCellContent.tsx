@@ -11,10 +11,10 @@ export const CommitCellContent: React.FC<
 > = cell => {
   const {
     row: {
-      original: { baselineSha, sha }
+      original: { baselineSha }
     }
   } = cell as unknown as CellContext<Experiment, CellValue>
-  const labelSha = baselineSha?.slice(0, 7) || sha?.slice(0, 7)
+  const labelSha = baselineSha?.slice(0, 7)
 
   if (!labelSha) {
     return (

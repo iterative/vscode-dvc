@@ -15,8 +15,8 @@ import { vsCodeApi } from '../../../shared/api'
 import {
   expectHeaders,
   getHeaders,
-  tableData as sortingTableDataFixture
-} from '../../../test/sort'
+  tableData as columnSortingTableDataFixture
+} from '../../../test/columnSort'
 import { dragAndDrop, dragEnter, dragLeave } from '../../../test/dragDrop'
 import { DragEnterDirection } from '../../../shared/components/dragDrop/util'
 import { experimentsReducers } from '../../store'
@@ -33,7 +33,7 @@ describe('Table', () => {
     partialTableData: Partial<TableData> = {}
   ) => {
     const tableData = {
-      ...sortingTableDataFixture,
+      ...columnSortingTableDataFixture,
       ...partialTableData,
       branches: ['main']
     }
@@ -94,7 +94,7 @@ describe('Table', () => {
 
       it('should add a descending sort to the column, when clicking on the descending option', async () => {
         renderExperimentsTable({
-          ...sortingTableDataFixture,
+          ...columnSortingTableDataFixture,
           sorts: [
             {
               descending: false,
@@ -116,7 +116,7 @@ describe('Table', () => {
 
       it('should remove the column sort if the remove option is selected', async () => {
         renderExperimentsTable({
-          ...sortingTableDataFixture,
+          ...columnSortingTableDataFixture,
           sorts: [
             {
               descending: true,
@@ -236,7 +236,7 @@ describe('Table', () => {
     it('should order the columns with the columnOrder from the data', async () => {
       const columnOrder = ['id', 'Created', 'params:C', 'params:B', 'params:A']
       const tableDataWithCustomColOrder = {
-        ...sortingTableDataFixture,
+        ...columnSortingTableDataFixture,
         columnOrder
       }
       renderExperimentsTable(tableDataWithCustomColOrder)
@@ -251,7 +251,7 @@ describe('Table', () => {
       }
 
       const tableDataWithColumnSetting = {
-        ...sortingTableDataFixture,
+        ...columnSortingTableDataFixture,
         columnWidths
       }
       render(
@@ -290,7 +290,7 @@ describe('Table', () => {
       }
 
       const tableDataWithColumnSetting = {
-        ...sortingTableDataFixture,
+        ...columnSortingTableDataFixture,
         columnWidths
       }
       render(

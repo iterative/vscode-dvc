@@ -8,6 +8,7 @@ import {
 } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import tableDataFixture from 'dvc/src/test/fixtures/expShow/base/tableData'
+import sortedTableData from 'dvc/src/test/fixtures/expShow/sorted/tableData'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import {
   Column,
@@ -25,8 +26,8 @@ import { vsCodeApi } from '../../shared/api'
 import {
   commonColumnFields,
   expectHeaders,
-  tableData as sortingTableDataFixture
-} from '../../test/sort'
+  tableData as columnSortingTableDataFixture
+} from '../../test/columnSort'
 import {
   NORMAL_TOOLTIP_DELAY,
   HEADER_TOOLTIP_DELAY
@@ -46,7 +47,7 @@ import {
   renderTableWithNoColumns,
   renderTableWithoutRunningExperiments,
   renderTableWithPlaceholder,
-  renderTableWithSortingData,
+  renderTableWithColumnSortingData,
   selectedRows,
   setTableData,
   renderTableWithFilters
@@ -59,6 +60,11 @@ import { collectColumnData } from '../state/tableDataSlice'
 const tableStateFixture = {
   ...tableDataFixture,
   columnData: collectColumnData(tableDataFixture.columns)
+}
+
+const sortedTableDataFixture = {
+  ...sortedTableData,
+  columnData: collectColumnData(sortedTableData.columns)
 }
 
 jest.mock('../../shared/api')
@@ -141,12 +147,12 @@ describe('App', () => {
   })
 
   it('should be able to order a column to the final space after a new column is added', async () => {
-    const { getDraggableHeaderFromText } = renderTableWithSortingData()
+    const { getDraggableHeaderFromText } = renderTableWithColumnSortingData()
 
     setTableData({
-      ...sortingTableDataFixture,
+      ...columnSortingTableDataFixture,
       columns: [
-        ...sortingTableDataFixture.columns,
+        ...columnSortingTableDataFixture.columns,
         {
           ...commonColumnFields,
           id: 'D',
@@ -162,6 +168,48 @@ describe('App', () => {
     dragAndDrop(headerB, headerD, DragEnterDirection.AUTO)
 
     await expectHeaders(['A', 'C', 'D', 'B'])
+  })
+
+  it('should add a "branch/tags" column if the table is sorted', () => {
+    renderTable(sortedTableDataFixture)
+
+    const branchHeader = screen.getByTestId('header-branch')
+    expect(branchHeader).toBeInTheDocument()
+
+    const branchHeaderTextContent =
+      within(branchHeader).getByText('Branch/Tags')
+    expect(branchHeader).toBeInTheDocument()
+
+    fireEvent.mouseEnter(branchHeaderTextContent, { bubbles: true })
+    expect(screen.getByRole('tooltip')).toBeInTheDocument()
+    expect(screen.getByRole('tooltip')).toHaveTextContent(
+      'The table has limited functionality while sorted. Clear all sorts to have nested rows and increase/decrease commits.'
+    )
+
+    expect(screen.getByTestId('branch___main').textContent).toStrictEqual(
+      'main'
+    )
+  })
+
+  it('should add a "parents" column if the table is sorted', () => {
+    renderTable(sortedTableDataFixture)
+
+    const commitHeader = screen.getByTestId('header-commit')
+    expect(commitHeader).toBeInTheDocument()
+
+    const commitHeaderTextContent = within(commitHeader).getByText('Parent')
+    expect(commitHeader).toBeInTheDocument()
+
+    fireEvent.mouseEnter(commitHeaderTextContent, { bubbles: true })
+    expect(screen.getByRole('tooltip')).toBeInTheDocument()
+    expect(screen.getByRole('tooltip')).toHaveTextContent(
+      'The table has limited functionality while sorted. Clear all sorts to have nested rows and increase/decrease commits.'
+    )
+
+    expect(screen.getByTestId('commit___main').textContent).toStrictEqual('')
+    expect(screen.getByTestId('commit___exp-83425').textContent).toStrictEqual(
+      '53c3851'
+    )
   })
 
   describe('Row expansion', () => {
