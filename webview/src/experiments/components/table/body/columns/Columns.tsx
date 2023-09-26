@@ -65,8 +65,8 @@ const getDefaultColumns = (flattenTable: boolean) => {
         >,
         header: BranchHeader,
         id: BRANCH_COLUMN_ID,
-        minSize: 110,
-        size: 110
+        minSize: 115,
+        size: 115
       }),
       columnHelper.accessor(() => COMMIT_COLUMN_ID, {
         cell: CommitCellContent as unknown as React.FC<
