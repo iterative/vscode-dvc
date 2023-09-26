@@ -456,14 +456,12 @@ export class ExperimentsModel extends ModelWithPersistence {
       if (!commit) {
         continue
       }
-
       if (commit.subRows) {
         commit.subRows = commit.subRows.map(experiment => ({
           ...experiment,
           branch
         }))
       }
-
       rows.push({ ...commit, branch })
     }
 
@@ -865,12 +863,14 @@ export class ExperimentsModel extends ModelWithPersistence {
     const rows = []
 
     for (const { branch, sha } of this.rowOrder) {
-      const commits = commitsBySha[sha]
-      if (!commits) {
+      const commitsAndExps = commitsBySha[sha]
+      if (!commitsAndExps) {
         continue
       }
 
-      rows.push(...commits.map(commit => ({ ...commit, branch })))
+      rows.push(
+        ...commitsAndExps.map(commitOrExp => ({ ...commitOrExp, branch }))
+      )
     }
 
     return [workspaceRow, ...sortExperiments(this.getSorts(), rows)]

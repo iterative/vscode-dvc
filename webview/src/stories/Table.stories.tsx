@@ -8,6 +8,7 @@ import workspaceChangesFixture from 'dvc/src/test/fixtures/expShow/base/workspac
 import deeplyNestedTableData from 'dvc/src/test/fixtures/expShow/deeplyNested/tableData'
 import dataTypesTableFixture from 'dvc/src/test/fixtures/expShow/dataTypes/tableData'
 import survivalTableData from 'dvc/src/test/fixtures/expShow/survival/tableData'
+import sortedTableData from 'dvc/src/test/fixtures/expShow/sorted/tableData'
 import { timestampColumn } from 'dvc/src/experiments/columns/constants'
 import { delay } from 'dvc/src/util/time'
 import {
@@ -61,10 +62,7 @@ const tableData = getTableState({
   selectedBranches: [],
   selectedForPlotsCount: 2,
   showOnlyChanged: false,
-  sorts: [
-    { descending: true, path: 'params:params.yaml:epochs' },
-    { descending: false, path: 'params:params.yaml:log_file' }
-  ]
+  sorts: []
 })
 
 const noRunningExperiments = {
@@ -311,6 +309,11 @@ WithNoSortsOrFilters.args = {
     filters: [],
     sorts: []
   }
+}
+
+export const WithSortedRows = Template.bind({})
+WithSortedRows.args = {
+  tableData: getTableState(sortedTableData)
 }
 
 export const Scrolled: StoryFn<{ tableData: TableDataState }> = ({
