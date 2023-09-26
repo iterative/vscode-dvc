@@ -25,6 +25,7 @@ import { WebviewWrapper } from '../../shared/components/webviewWrapper/WebviewWr
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { ExperimentsState } from '../store'
 import { resizeColumn } from '../util/messages'
+import { isDefaultColumn } from '../util/columns'
 
 const DEFAULT_COLUMN_WIDTH = 90
 const MINIMUM_COLUMN_WIDTH = 90
@@ -111,7 +112,9 @@ export const ExperimentsTable: React.FC = () => {
     toggleAllRowsExpanded()
   }, [toggleAllRowsExpanded])
 
-  const hasOnlyDefaultColumns = columns.length <= 1
+  const hasOnlyDefaultColumns = columns.every(
+    ({ id }) => id && isDefaultColumn(id)
+  )
   if (hasOnlyDefaultColumns) {
     return <AddColumns />
   }

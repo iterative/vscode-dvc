@@ -105,6 +105,19 @@ describe('App', () => {
     expect(noColumnsState).toBeInTheDocument()
   })
 
+  it('should show the no columns selected empty state when there are no columns provided and the table is sorted', () => {
+    const { columns } = tableStateFixture
+    const sortPath = columns[columns.length - 1].path
+    renderTable({
+      ...tableDataFixture,
+      columns: [],
+      sorts: [{ descending: true, path: sortPath }]
+    })
+
+    const noColumnsState = screen.queryByText('No Columns Selected.')
+    expect(noColumnsState).toBeInTheDocument()
+  })
+
   it('should not show the no columns selected empty state when only the timestamp column is provided', () => {
     renderTable({
       ...tableStateFixture,
