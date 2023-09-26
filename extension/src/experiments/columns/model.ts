@@ -108,12 +108,11 @@ export class ColumnsModel extends PathSelectionModel<Column> {
   }
 
   public selectFirst(firstColumns: string[]) {
-    const defaultColumns = DEFAULT_COLUMN_IDS
     const columnOrder = [
-      ...defaultColumns,
+      ...DEFAULT_COLUMN_IDS,
       ...firstColumns,
       ...this.getColumnOrder().filter(
-        column => ![...defaultColumns, ...firstColumns].includes(column)
+        column => ![...DEFAULT_COLUMN_IDS, ...firstColumns].includes(column)
       )
     ]
     this.setColumnOrder(columnOrder)
