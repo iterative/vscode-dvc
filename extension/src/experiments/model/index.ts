@@ -462,6 +462,7 @@ export class ExperimentsModel extends ModelWithPersistence {
           branch
         }))
       }
+
       rows.push({ ...commit, branch })
     }
 
@@ -823,7 +824,6 @@ export class ExperimentsModel extends ModelWithPersistence {
       const experiments = this.getExperimentsByCommit(
         commitWithSelectedAndStarred
       )
-
       const unfilteredCommit = collectUnfiltered(
         commitWithSelectedAndStarred,
         experiments,
