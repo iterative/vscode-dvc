@@ -71,8 +71,8 @@ describe('collectCustomPlots', () => {
     const expectedOutput: CustomPlotData[] = customPlotsFixture.plots
     const data = collectCustomPlots({
       colorScale: {
-        domain: ['main', 'exp-e7a67', 'test-branch', 'exp-83425'],
-        range: ['#13adc7', '#f46837', '#48bb78', '#4299e1']
+        domain: ['main', 'exp-e7a67', 'test-branch', 'exp-83425', 'failed-exp'],
+        range: ['#13adc7', '#f46837', '#48bb78', '#4299e1', '#f56565']
       },
       experiments: [
         ...experimentsWithCommits,
@@ -80,6 +80,12 @@ describe('collectCustomPlots', () => {
           branch: 'main',
           id: 'weird-exp',
           label: 'exp with no metrics or params'
+        },
+        {
+          branch: 'main',
+          error: 'failed to run',
+          id: 'failed-exp',
+          label: '123'
         }
       ],
       height: DEFAULT_PLOT_HEIGHT,

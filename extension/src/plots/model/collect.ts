@@ -84,24 +84,24 @@ const filterColorScale = (
   colorScale: ColorScale | undefined,
   valueIds: string[]
 ) => {
-  const completeColorScale: ColorScale = {
+  const filteredColorScale: ColorScale = {
     domain: [],
     range: []
   }
 
   if (!colorScale) {
-    return completeColorScale
+    return filteredColorScale
   }
 
   for (const [ind, id] of colorScale.domain.entries()) {
     if (!valueIds.includes(id)) {
       continue
     }
-    completeColorScale.domain.push(id)
-    completeColorScale.range.push(colorScale.range[ind])
+    filteredColorScale.domain.push(id)
+    filteredColorScale.range.push(colorScale.range[ind])
   }
 
-  return completeColorScale
+  return filteredColorScale
 }
 
 const fillColorScale = (
