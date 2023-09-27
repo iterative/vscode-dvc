@@ -369,7 +369,8 @@ WithMultipleBranches.args = {
   tableData: getTableState({
     ...survivalTableData,
     rows: [
-      ...survivalTableData.rows.map(row => ({
+      survivalTableData.rows[0],
+      ...rowsWithoutWorkspace.map(row => ({
         ...row,
         branch: branches[0],
         subRows: row.subRows?.map(subRow => ({
