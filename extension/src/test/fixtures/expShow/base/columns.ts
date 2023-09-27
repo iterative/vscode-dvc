@@ -10,6 +10,8 @@ const nestedParamsFile = join('nested', 'params.yaml')
 
 export const dataColumnOrder: string[] = [
   'id',
+  'branch',
+  'commit',
   'Created',
   'metrics:summary.json:accuracy',
   'metrics:summary.json:loss',

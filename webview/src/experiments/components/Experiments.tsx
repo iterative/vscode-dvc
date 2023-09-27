@@ -25,6 +25,7 @@ import { WebviewWrapper } from '../../shared/components/webviewWrapper/WebviewWr
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { ExperimentsState } from '../store'
 import { resizeColumn } from '../util/messages'
+import { isDefaultColumn } from '../util/columns'
 
 const DEFAULT_COLUMN_WIDTH = 90
 const MINIMUM_COLUMN_WIDTH = 90
@@ -56,12 +57,15 @@ export const ExperimentsTable: React.FC = () => {
     columnOrder: columnOrderData,
     columnWidths,
     hasConfig,
-    rows: data
+    rows: data,
+    sorts
   } = useSelector((state: ExperimentsState) => state.tableData)
 
   const [expanded, setExpanded] = useState({})
 
-  const [columns, setColumns] = useState(buildColumns(columnData))
+  const [columns, setColumns] = useState(
+    buildColumns(columnData, sorts.length > 0)
+  )
   const [columnSizing, setColumnSizing] =
     useState<ColumnSizingState>(columnWidths)
   const [columnOrder, setColumnOrder] = useState(columnOrderData)
@@ -72,8 +76,8 @@ export const ExperimentsTable: React.FC = () => {
   }, [columnSizing, columnWidths])
 
   useEffect(() => {
-    setColumns(buildColumns(columnData))
-  }, [columnData])
+    setColumns(buildColumns(columnData, sorts.length > 0))
+  }, [columnData, sorts])
 
   const getRowId = useCallback(
     (experiment: Commit, relativeIndex: number, parent?: TableRow<Commit>) =>
@@ -108,7 +112,9 @@ export const ExperimentsTable: React.FC = () => {
     toggleAllRowsExpanded()
   }, [toggleAllRowsExpanded])
 
-  const hasOnlyDefaultColumns = columns.length <= 1
+  const hasOnlyDefaultColumns = columns.every(
+    ({ id }) => id && isDefaultColumn(id)
+  )
   if (hasOnlyDefaultColumns) {
     return <AddColumns />
   }

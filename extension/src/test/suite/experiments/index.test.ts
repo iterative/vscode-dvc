@@ -1096,9 +1096,12 @@ suite('Experiments Test Suite', () => {
       })
       await messageSent
 
-      const [id, firstColumn] = messageSpy.lastCall.args[0].columnOrder
+      const [id, branch, commit, firstColumn] =
+        messageSpy.lastCall.args[0].columnOrder
 
       expect(id).to.equal('id')
+      expect(commit).to.equal('commit')
+      expect(branch).to.equal('branch')
       expect(firstColumn).to.equal(movedColumn)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -1126,8 +1129,11 @@ suite('Experiments Test Suite', () => {
 
       expect(paramsYamlColumns).to.be.greaterThan(6)
 
-      const [id, ...columns] = messageSpy.lastCall.args[0].columnOrder
+      const [id, branch, commit, ...columns] =
+        messageSpy.lastCall.args[0].columnOrder
       expect(id).to.equal('id')
+      expect(branch).to.equal('branch')
+      expect(commit).to.equal('commit')
 
       let params = 0
       let other = 0

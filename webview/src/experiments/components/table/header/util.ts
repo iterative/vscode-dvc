@@ -1,4 +1,5 @@
 import { Header } from '@tanstack/react-table'
+import { DEFAULT_COLUMN_IDS } from 'dvc/src/experiments/columns/constants'
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
 import { Experiment } from 'dvc/src/experiments/webview/contract'
 
@@ -14,15 +15,22 @@ const possibleOrders = {
   undefined: SortOrder.NONE
 } as const
 
-export const isFromExperimentColumn = (header: Header<Experiment, unknown>) =>
-  header.column.id === 'id' || header.column.id.startsWith('id_placeholder')
+export const isFromDefaultColumn = (header: Header<Experiment, unknown>) => {
+  const headerId = header.column.id
+
+  for (const id of DEFAULT_COLUMN_IDS) {
+    if (headerId === id || headerId.startsWith(`${id}_placeholder`)) {
+      return true
+    }
+  }
+}
 
 export const getSortDetails = (
   header: Header<Experiment, unknown>,
   sorts: SortDefinition[]
 ): { id: string; isSortable: boolean; sortOrder: SortOrder } => {
-  const isNotExperiments = !isFromExperimentColumn(header)
-  const isSortable = isNotExperiments && header.column.columns.length <= 1
+  const isNotDefaultColumn = !isFromDefaultColumn(header)
+  const isSortable = isNotDefaultColumn && header.column.columns.length <= 1
   const baseColumn =
     header.headerGroup.headers.find(
       h => h.column.id === header.placeholderId

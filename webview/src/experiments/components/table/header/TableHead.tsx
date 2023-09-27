@@ -13,7 +13,7 @@ import { ExperimentsState } from '../../../store'
 import {
   leafColumnIds,
   reorderColumnIds,
-  isExperimentColumn
+  isDefaultColumn
 } from '../../../util/columns'
 import { DragFunction } from '../../../../shared/components/dragDrop/Draggable'
 import styles from '../styles.module.scss'
@@ -80,7 +80,7 @@ export const TableHead = ({
 
   const onDragEnter = (e: DragEvent<HTMLElement>) => {
     findDisplacedHeader(e.currentTarget.id, displacedHeader => {
-      if (!isExperimentColumn(displacedHeader.id)) {
+      if (!isDefaultColumn(displacedHeader.id)) {
         dispatch(setDropTarget(displacedHeader.id))
       }
     })

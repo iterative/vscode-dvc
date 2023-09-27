@@ -363,8 +363,9 @@ suite('Experiments Columns Tree Test Suite', () => {
 
       const firstColumns = []
       const otherColumns = []
+      const defaultColumns = ['id', 'branch', 'commit']
       for (const column of columnsOrder) {
-        if (column === 'id') {
+        if (defaultColumns.includes(column)) {
           continue
         }
         if (
@@ -410,7 +411,7 @@ suite('Experiments Columns Tree Test Suite', () => {
       ])
 
       expect(columnsModel.getColumnOrder()).to.deep.equal([
-        'id',
+        ...defaultColumns,
         ...firstColumns,
         ...otherColumns
       ])
