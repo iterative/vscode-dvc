@@ -67,7 +67,7 @@ describe('collectCustomPlots', () => {
     expect(data[0].values.slice(-1)[0].id).toStrictEqual('main')
   })
 
-  it('should create custom plot scales that matches the collected values', () => {
+  it('should create custom plot scales that match the collected values', () => {
     const expectedOutput: CustomPlotData[] = customPlotsFixture.plots
     const data = collectCustomPlots({
       colorScale: {
