@@ -25,6 +25,7 @@ import { vsCodeApi } from '../../shared/api'
 import {
   commonColumnFields,
   expectHeaders,
+  getHeaders,
   tableData as sortingTableDataFixture
 } from '../../test/sort'
 import {
@@ -162,6 +163,30 @@ describe('App', () => {
     dragAndDrop(headerB, headerD, DragEnterDirection.AUTO)
 
     await expectHeaders(['A', 'C', 'D', 'B'])
+  })
+
+  it('should be able to move columns to the start', async () => {
+    renderTable({
+      ...sortingTableDataFixture,
+      columnOrder: ['id', 'Created', 'params:A', 'params:B', 'params:C']
+    })
+
+    await expectHeaders(['A', 'B', 'C'])
+
+    const moveBCtoStart = ['id', 'params:B', 'params:C', 'Created', 'params:A']
+
+    setTableData({
+      ...sortingTableDataFixture,
+      columnOrder: moveBCtoStart
+    })
+
+    expect(await getHeaders()).toStrictEqual([
+      'Experiment',
+      'B',
+      'C',
+      'Created',
+      'A'
+    ])
   })
 
   describe('Row expansion', () => {
