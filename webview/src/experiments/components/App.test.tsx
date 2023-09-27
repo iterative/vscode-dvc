@@ -62,7 +62,7 @@ const tableStateFixture = {
   columnData: collectColumnData(tableDataFixture.columns)
 }
 
-const sortedTableDataFixture = {
+const sortedTableStateFixture = {
   ...sortedTableData,
   columnData: collectColumnData(sortedTableData.columns)
 }
@@ -184,7 +184,7 @@ describe('App', () => {
   })
 
   it('should add a "branch/tags" column if the table is sorted', () => {
-    renderTable(sortedTableDataFixture)
+    renderTable(sortedTableStateFixture)
 
     const branchHeader = screen.getByTestId('header-branch')
     expect(branchHeader).toBeInTheDocument()
@@ -204,8 +204,8 @@ describe('App', () => {
     )
   })
 
-  it('should add a "parents" column if the table is sorted', () => {
-    renderTable(sortedTableDataFixture)
+  it('should add a "parent" column if the table is sorted', () => {
+    renderTable(sortedTableStateFixture)
 
     const commitHeader = screen.getByTestId('header-commit')
     expect(commitHeader).toBeInTheDocument()

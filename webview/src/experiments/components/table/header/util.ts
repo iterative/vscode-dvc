@@ -29,8 +29,8 @@ export const getSortDetails = (
   header: Header<Experiment, unknown>,
   sorts: SortDefinition[]
 ): { id: string; isSortable: boolean; sortOrder: SortOrder } => {
-  const isNotExperiments = !isFromDefaultColumn(header)
-  const isSortable = isNotExperiments && header.column.columns.length <= 1
+  const isNotDefaultColumn = !isFromDefaultColumn(header)
+  const isSortable = isNotDefaultColumn && header.column.columns.length <= 1
   const baseColumn =
     header.headerGroup.headers.find(
       h => h.column.id === header.placeholderId

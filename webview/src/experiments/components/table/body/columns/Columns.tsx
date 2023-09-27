@@ -20,10 +20,9 @@ import { DateCellContents } from '../../content/DateCellContent'
 import { TimestampHeader } from '../../content/TimestampHeader'
 import { ExperimentCell } from '../../content/ExperimentCell'
 import { ExperimentHeader } from '../../content/ExperimentHeader'
+import { SortedTableHeader } from '../../content/SortedTableHeader'
 import { BranchCellContent } from '../../content/BranchCellContent'
-import { BranchHeader } from '../../content/BranchHeader'
 import { CommitCellContent } from '../../content/CommitCellContent'
-import { CommitHeader } from '../../content/CommitHeader'
 
 export type ColumnWithGroup = ColumnDef<Experiment, unknown> & {
   group: ColumnType
@@ -63,7 +62,7 @@ const getDefaultColumns = (flattenTable: boolean) => {
         cell: BranchCellContent as unknown as React.FC<
           CellContext<Column, CellValue>
         >,
-        header: BranchHeader,
+        header: () => <SortedTableHeader name="Branch/Tags" />,
         id: BRANCH_COLUMN_ID,
         minSize: 115,
         size: 115
@@ -72,7 +71,7 @@ const getDefaultColumns = (flattenTable: boolean) => {
         cell: CommitCellContent as unknown as React.FC<
           CellContext<Column, CellValue>
         >,
-        header: CommitHeader,
+        header: () => <SortedTableHeader name="Parent" />,
         id: COMMIT_COLUMN_ID,
         minSize: 80,
         size: 80
