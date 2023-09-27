@@ -80,6 +80,27 @@ const getValues = (
   return values
 }
 
+const filterColorScale = (
+  completeColorScale: ColorScale,
+  values: CustomPlotValues
+) => {
+  const valueIds = new Set(values.map(({ id }) => id))
+  const { domain: completeDomain, range: completeRange } = completeColorScale
+  const filteredColorScale: ColorScale = {
+    domain: [],
+    range: []
+  }
+
+  for (const [ind, id] of completeDomain.entries()) {
+    if (!valueIds.has(id)) {
+      continue
+    }
+    filteredColorScale.domain.push(id)
+    filteredColorScale.range.push(completeRange[ind])
+  }
+  return filteredColorScale
+}
+
 const getCustomPlotData = (
   orderValue: CustomPlotsOrderValue,
   experiments: Experiment[],
@@ -93,6 +114,7 @@ const getCustomPlotData = (
   const paramPath = getFullValuePath(ColumnType.PARAMS, param)
 
   const values = getValues(experiments, metricPath, paramPath, renderLastIds)
+  const filteredColorScale = filterColorScale(completeColorScale, values)
 
   const [{ param: paramVal, metric: metricVal }] = values
   const yTitle = truncateVerticalTitle(metric, nbItemsPerRow, height) as string
@@ -103,7 +125,7 @@ const getCustomPlotData = (
     param,
     typeof metricVal,
     typeof paramVal,
-    completeColorScale
+    filteredColorScale
   )
 
   return {
