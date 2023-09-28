@@ -18,21 +18,25 @@ export const extractSemver = (stdout: string): ParsedSemver | undefined => {
   return { major: Number(major), minor: Number(minor), patch: Number(patch) }
 }
 
-const checkCLIVersion = (currentSemVer: {
-  major: number
-  minor: number
-  patch: number
-}): CliCompatible => {
+const checkCLIVersion = (
+  currentSemVer: {
+    major: number
+    minor: number
+    patch: number
+  },
+  minSemVer?: string
+): CliCompatible => {
   const {
     major: currentMajor,
     minor: currentMinor,
     patch: currentPatch
   } = currentSemVer
+  minSemVer = minSemVer || MIN_CLI_VERSION
   const {
     major: minMajor,
     minor: minMinor,
     patch: minPatch
-  } = extractSemver(MIN_CLI_VERSION) as ParsedSemver
+  } = extractSemver(minSemVer) as ParsedSemver
 
   const isBehindMinVersion =
     currentMajor < minMajor ||
@@ -47,7 +51,8 @@ const checkCLIVersion = (currentSemVer: {
 }
 
 export const isVersionCompatible = (
-  version: string | undefined
+  version: string | undefined,
+  required_version?: string | undefined
 ): CliCompatible => {
   if (!version) {
     return CliCompatible.NO_NOT_FOUND
@@ -62,6 +67,10 @@ export const isVersionCompatible = (
     Number.isNaN(currentSemVer.patch)
   ) {
     return CliCompatible.NO_CANNOT_VERIFY
+  }
+
+  if (required_version) {
+    return checkCLIVersion(currentSemVer, required_version)
   }
 
   return checkCLIVersion(currentSemVer)

@@ -13,6 +13,8 @@ import { Title } from '../../vscode/title'
 import { Context, getDvcRootFromContext } from '../../vscode/context'
 import { Setup } from '../../setup'
 import { showSetupOrExecuteCommand } from '../../commands/util'
+import { CliCompatible, isVersionCompatible } from '../../cli/dvc/version'
+import { warnVersionIncompatible } from '../../cli/dvc/discovery'
 
 type ExperimentDetails = { dvcRoot: string; id: string }
 
@@ -125,7 +127,8 @@ const registerExperimentNameCommands = (
 
 const registerExperimentInputCommands = (
   experiments: WorkspaceExperiments,
-  internalCommands: InternalCommands
+  internalCommands: InternalCommands,
+  setup: Setup
 ): void => {
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_BRANCH,
@@ -133,15 +136,29 @@ const registerExperimentInputCommands = (
   )
 
   internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.EXPERIMENT_RENAME,
-    ({ dvcRoot, id }: ExperimentDetails) =>
-      experiments.getInputAndRun(
+    RegisteredCliCommands.EXPERIMENT_VIEW_RENAME,
+    async ({ dvcRoot, id }: ExperimentDetails) => {
+      const cliVersion = await setup.getCliVersion(dvcRoot)
+      const REQUIRED_CLI_VERSION = '3.22.0'
+
+      if (
+        !(
+          isVersionCompatible(cliVersion, REQUIRED_CLI_VERSION) ===
+          CliCompatible.YES
+        )
+      ) {
+        warnVersionIncompatible(setup)
+        return
+      }
+
+      return experiments.getInputAndRun(
         getRenameExperimentCommand(experiments),
-        Title.ENTER_RENAME_NAME,
+        Title.ENTER_NEW_EXPERIMENT_NAME,
         id,
         dvcRoot,
         id
       )
+    }
   )
 
   internalCommands.registerExternalCliCommand(
@@ -281,7 +298,7 @@ export const registerExperimentCommands = (
 ) => {
   registerExperimentCwdCommands(experiments, internalCommands)
   registerExperimentNameCommands(experiments, internalCommands)
-  registerExperimentInputCommands(experiments, internalCommands)
+  registerExperimentInputCommands(experiments, internalCommands, setup)
   registerExperimentQuickPickCommands(experiments, internalCommands, setup)
   registerExperimentRunCommands(experiments, internalCommands, setup)
 
