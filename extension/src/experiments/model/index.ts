@@ -857,6 +857,16 @@ export class ExperimentsModel extends ModelWithPersistence {
     return commitsBySha
   }
 
+  private addBranchToFlattenedCommit(commitAndExps: Commit[], branch: string) {
+    return commitAndExps.map(commitOrExp => ({
+      ...commitOrExp,
+      branch: commitOrExp.branch || branch,
+      otherBranches: commitOrExp?.otherBranches
+        ? [...commitOrExp.otherBranches, branch]
+        : []
+    }))
+  }
+
   private getFlattenedRowData(workspaceRow: Commit): Commit[] {
     const commitsBySha: { [sha: string]: Commit[] } =
       this.applyFiltersToFlattenedCommits()
@@ -869,11 +879,7 @@ export class ExperimentsModel extends ModelWithPersistence {
 
       const commitAndExps = rowsBySha[sha] || commitsBySha[sha]
 
-      rowsBySha[sha] = commitAndExps.map(commitAndExp => ({
-        ...commitAndExp,
-        allBranches: [...(commitAndExp?.allBranches || []), branch],
-        branch: commitAndExp.branch || branch
-      }))
+      rowsBySha[sha] = this.addBranchToFlattenedCommit(commitAndExps, branch)
     }
 
     return [

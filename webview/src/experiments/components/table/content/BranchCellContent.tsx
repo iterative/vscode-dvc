@@ -15,7 +15,7 @@ export const BranchCellContent: React.FC<
 > = cell => {
   const {
     row: {
-      original: { branch, allBranches = [] }
+      original: { branch, otherBranches = [] }
     }
   } = cell as unknown as CellContext<Experiment, CellValue>
 
@@ -28,11 +28,11 @@ export const BranchCellContent: React.FC<
     )
   }
 
-  const hasMultiBranches = allBranches.length > 1
+  const hasMultiBranches = otherBranches.length > 0
 
   return (
     <Tooltip
-      content={allBranches.join(', ')}
+      content={[branch, ...otherBranches].join(', ')}
       placement="bottom-end"
       delay={NORMAL_TOOLTIP_DELAY}
     >
@@ -51,8 +51,9 @@ export const BranchCellContent: React.FC<
             <span>{branch}</span>
             {hasMultiBranches && (
               <span>
-                {allBranches[1]}
-                {allBranches.length > 2 && ` + ${allBranches.length - 2} more`}
+                {otherBranches[0]}
+                {otherBranches.length > 1 &&
+                  ` + ${otherBranches.length - 1} more`}
               </span>
             )}
           </span>
