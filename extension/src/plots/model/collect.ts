@@ -80,48 +80,46 @@ const getValues = (
   return values
 }
 
-const filterColorScale = (
-  colorScale: ColorScale | undefined,
-  valueIds: string[]
+const removeSelectedExperiment = (
+  orderedColorScale: ColorScale,
+  hasValues: boolean,
+  idx: number
 ) => {
-  const filteredColorScale: ColorScale = {
-    domain: [],
-    range: []
+  const isSelectedExperiment = idx !== -1
+  if (!isSelectedExperiment || hasValues) {
+    return
   }
 
-  if (!colorScale) {
-    return filteredColorScale
-  }
-
-  for (const [ind, id] of colorScale.domain.entries()) {
-    if (!valueIds.includes(id)) {
-      continue
-    }
-    filteredColorScale.domain.push(id)
-    filteredColorScale.range.push(colorScale.range[ind])
-  }
-
-  return filteredColorScale
+  orderedColorScale.domain.splice(idx, 1)
+  orderedColorScale.range.splice(idx, 1)
 }
 
 const fillColorScale = (
   experiments: Experiment[],
   colorScale: ColorScale | undefined,
-  valueIds: string[]
+  valueIds: Set<string>
 ) => {
-  const completeColorScale = filterColorScale(colorScale, valueIds)
+  const orderedColorScale = {
+    domain: [...(colorScale?.domain || [])],
+    range: [...(colorScale?.range || [])]
+  }
 
   for (const experiment of experiments) {
     const { id } = experiment
-    if (!valueIds.includes(id) || completeColorScale.domain.includes(id)) {
+    const idx = orderedColorScale.domain.indexOf(id)
+    const isSelectedExperiment = idx !== -1
+    const hasValues = valueIds.has(id)
+
+    if (!hasValues || isSelectedExperiment) {
+      removeSelectedExperiment(orderedColorScale, hasValues, idx)
       continue
     }
 
-    completeColorScale.domain.push(id)
-    completeColorScale.range.push('#4c78a8' as Color)
+    orderedColorScale.domain.push(id)
+    orderedColorScale.range.push('#4c78a8' as Color)
   }
 
-  return completeColorScale
+  return orderedColorScale
 }
 
 const getCustomPlotData = (
@@ -137,7 +135,7 @@ const getCustomPlotData = (
 
   const renderLastIds = new Set(colorScale?.domain)
   const values = getValues(experiments, metricPath, paramPath, renderLastIds)
-  const valueIds = values.map(({ id }) => id)
+  const valueIds = new Set(values.map(({ id }) => id))
   const completeColorScale = fillColorScale(experiments, colorScale, valueIds)
 
   const [{ param: paramVal, metric: metricVal }] = values
