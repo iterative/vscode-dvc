@@ -2,7 +2,7 @@ import { join } from 'path'
 import isEmpty from 'lodash.isempty'
 import {
   collectData,
-  collectTemplates,
+  collectTemplatesDetails,
   collectCustomPlots,
   collectOrderedRevisions,
   collectImageUrl
@@ -12,14 +12,13 @@ import customPlotsFixture, {
   customPlotsOrderFixture,
   experimentsWithCommits
 } from '../../test/fixtures/expShow/base/customPlots'
-import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
+import { EXPERIMENT_WORKSPACE_ID, TemplatePlot } from '../../cli/dvc/contract'
 import { sameContents } from '../../util/array'
 import {
   CustomPlotData,
   DEFAULT_NB_ITEMS_PER_ROW,
   DEFAULT_PLOT_HEIGHT,
-  ImagePlot,
-  TemplatePlot
+  ImagePlot
 } from '../webview/contract'
 import { exists } from '../../fileSystem'
 import { REVISIONS } from '../../test/fixtures/plotsDiff'
@@ -100,18 +99,14 @@ describe('collectData', () => {
   it('should return the expected output from the test fixture', () => {
     const { revisionData, comparisonData } = collectData(plotsDiffFixture)
 
-    const values =
-      (logsLossPlot?.datapoints as {
-        [revision: string]: Record<string, unknown>[]
-      }) || {}
+    const values = JSON.parse(
+      logsLossPlot?.anchor_definitions?.['<DVC_METRIC_DATA>'] || '[]'
+    ) as ({ rev: string } & Record<string, unknown>)[]
 
     expect(isEmpty(values)).toBeFalsy()
 
     for (const revision of REVISIONS) {
-      const expectedValues = values[revision]?.map(value => ({
-        ...value,
-        rev: revision
-      }))
+      const expectedValues = values.filter(({ rev }) => rev === revision)
       expect(revisionData[revision][logsLossPath]).toStrictEqual(expectedValues)
     }
 
@@ -139,7 +134,7 @@ describe('collectData', () => {
     expect(testBranchHeatmap).toBeDefined()
     expect(testBranchHeatmap).toStrictEqual([
       plotsDiffFixture.data[heatmapPlot].find(({ revisions }) =>
-        sameContents(revisions as string[], ['test-branch'])
+        sameContents(revisions, ['test-branch'])
       )
     ])
   })
@@ -147,16 +142,20 @@ describe('collectData', () => {
 
 describe('collectTemplates', () => {
   it('should return the expected output from the test fixture', () => {
-    const { content } = logsLossPlot
+    const { content, anchor_definitions } = logsLossPlot
 
-    const templates = collectTemplates(plotsDiffFixture)
+    const templates = collectTemplatesDetails(plotsDiffFixture)
     expect(Object.keys(templates)).toStrictEqual([
       logsLossPath,
       join('logs', 'acc.tsv'),
       'predictions.json'
     ])
 
-    expect(JSON.parse(templates[logsLossPath])).toStrictEqual(content)
+    // probably need to delete color entry to get to match
+    expect(templates[logsLossPath]).toStrictEqual({
+      anchorDefinitions: anchor_definitions,
+      content
+    })
   })
 })
 

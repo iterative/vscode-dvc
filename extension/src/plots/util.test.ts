@@ -1,8 +1,7 @@
 import { sep } from 'path'
 import { ensurePlotsDataPathsOsSep } from './util'
-import { PlotsType } from './webview/contract'
 import { FIELD_SEPARATOR } from '../cli/dvc/constants'
-import { PlotsOutput } from '../cli/dvc/contract'
+import { PlotsOutput, PlotsType } from '../cli/dvc/contract'
 
 const joinWithSep = (pathArr: string[], slash = sep) => pathArr.join(slash)
 
@@ -18,8 +17,8 @@ const getOutput = (slash = sep): PlotsOutput => {
       ],
       [joinWithSep([`dvc.yaml${FIELD_SEPARATOR}logs`, 'acc.tsv'], slash)]: [
         {
-          content: {},
-          datapoints: { main: [{}] },
+          anchor_definitions: { '<DVC_METRIC_DATA>': '[]' },
+          content: '',
           revisions: ['main'],
           type: PlotsType.VEGA
         }

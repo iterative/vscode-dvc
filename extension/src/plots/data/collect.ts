@@ -1,7 +1,11 @@
-import { PlotsOutputOrError } from '../../cli/dvc/contract'
+import {
+  isImagePlotOutput,
+  PlotOutput,
+  PlotsOutputOrError,
+  TemplatePlot
+} from '../../cli/dvc/contract'
 import { isDvcError } from '../../cli/dvc/reader'
 import { uniqueValues } from '../../util/array'
-import { isImagePlot, Plot, TemplatePlot } from '../webview/contract'
 
 const collectImageFile = (acc: string[], file: string): void => {
   if (acc.includes(file)) {
@@ -14,8 +18,7 @@ const collectFromDatapoint = (
   acc: string[],
   data: Record<string, unknown>
 ): void => {
-  const filename = (data as { dvc_data_version_info?: { filename?: string } })
-    ?.dvc_data_version_info?.filename
+  const filename = data.filename as string | undefined
 
   if (!filename || acc.includes(filename)) {
     return
@@ -24,16 +27,20 @@ const collectFromDatapoint = (
 }
 
 const collectTemplateFiles = (acc: string[], plot: TemplatePlot): void => {
-  for (const datapoints of Object.values(plot.datapoints || {})) {
-    for (const datapoint of datapoints) {
-      collectFromDatapoint(acc, datapoint)
-    }
+  for (const datapoint of JSON.parse(
+    plot.anchor_definitions['<DVC_METRIC_DATA>']
+  )) {
+    collectFromDatapoint(acc, datapoint as Record<string, unknown>)
   }
 }
 
-const collectKeyData = (acc: string[], key: string, plots: Plot[]): void => {
+const collectKeyData = (
+  acc: string[],
+  key: string,
+  plots: PlotOutput[]
+): void => {
   for (const plot of plots) {
-    if (isImagePlot(plot)) {
+    if (isImagePlotOutput(plot)) {
       collectImageFile(acc, key)
       continue
     }

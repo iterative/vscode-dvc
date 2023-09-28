@@ -1,5 +1,4 @@
 import { join, sep } from 'path'
-import { VisualizationSpec } from 'react-vega'
 import isEqual from 'lodash.isequal'
 import {
   collectEncodingElements,
@@ -10,10 +9,14 @@ import {
   PathType,
   PlotPath
 } from './collect'
-import { TemplatePlotGroup, PlotsType } from '../webview/contract'
+import { TemplatePlotGroup } from '../webview/contract'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
-import { Shape, StrokeDash } from '../multiSource/constants'
-import { EXPERIMENT_WORKSPACE_ID, PlotsOutput } from '../../cli/dvc/contract'
+import { StrokeDash } from '../multiSource/constants'
+import {
+  EXPERIMENT_WORKSPACE_ID,
+  PlotsOutput,
+  PlotsType
+} from '../../cli/dvc/contract'
 import { REVISIONS } from '../../test/fixtures/plotsDiff'
 import { FIELD_SEPARATOR } from '../../cli/dvc/constants'
 
@@ -112,27 +115,26 @@ describe('collectPaths', () => {
         data: {
           [remainingPath]: [
             {
-              content: {},
-              datapoints: {
-                [fetchedRevs[0]]: [
+              anchor_definitions: {
+                '<DVC_METRIC_DATA>': JSON.stringify([
                   {
                     loss: '2.43323',
+                    rev: fetchedRevs[0],
                     step: '0'
-                  }
-                ],
-                [fetchedRevs[1]]: [
+                  },
                   {
                     loss: '2.43323',
+                    rev: fetchedRevs[1],
                     step: '0'
-                  }
-                ],
-                [fetchedRevs[2]]: [
+                  },
                   {
                     loss: '2.43323',
+                    rev: fetchedRevs[2],
                     step: '0'
                   }
-                ]
+                ])
               },
+              content: '{}',
               revisions: fetchedRevs,
               type: PlotsType.VEGA
             }
@@ -212,16 +214,16 @@ describe('collectPaths', () => {
       data: {
         [join('logs', 'scalars', 'acc.tsv')]: [
           {
-            content: {},
-            datapoints: { [EXPERIMENT_WORKSPACE_ID]: [{}] },
+            anchor_definitions: { '<DVC_METRIC_DATA>': '[]' },
+            content: '{}',
             revisions,
             type: PlotsType.VEGA
           }
         ],
         [join('logs', 'scalars', 'loss.tsv')]: [
           {
-            content: {},
-            datapoints: { [EXPERIMENT_WORKSPACE_ID]: [{}] },
+            anchor_definitions: { '<DVC_METRIC_DATA>': '[]' },
+            content: '{}',
             revisions,
             type: PlotsType.VEGA
           }
@@ -235,18 +237,18 @@ describe('collectPaths', () => {
         ],
         'predictions.json': [
           {
-            content: {
+            anchor_definitions: { '<DVC_METRIC_DATA>': '[]' },
+            content: JSON.stringify({
               facet: { field: 'rev', type: 'nominal' }
-            } as VisualizationSpec,
-            datapoints: { [EXPERIMENT_WORKSPACE_ID]: [{}] },
+            }),
             revisions,
             type: PlotsType.VEGA
           }
         ],
         [join(`dvc.yaml${FIELD_SEPARATOR}logs`, 'acc.tsv')]: [
           {
-            content: {},
-            datapoints: { [EXPERIMENT_WORKSPACE_ID]: [{}] },
+            anchor_definitions: { '<DVC_METRIC_DATA>': '[]' },
+            content: '{}',
             revisions,
             type: PlotsType.VEGA
           }
@@ -258,8 +260,8 @@ describe('collectPaths', () => {
           'acc.tsv'
         )]: [
           {
-            content: {},
-            datapoints: { [EXPERIMENT_WORKSPACE_ID]: [{}] },
+            anchor_definitions: { '<DVC_METRIC_DATA>': '[]' },
+            content: '{}',
             revisions,
             type: PlotsType.VEGA
           }
@@ -678,10 +680,6 @@ describe('collectEncodingElements', () => {
   it('should collect encoding elements from multi source encoding', () => {
     const elements = collectEncodingElements(__filename, {
       [__filename]: {
-        shape: {
-          field: 'filename',
-          scale: { domain: ['X', 'Y'], range: [Shape[0], Shape[1]] }
-        },
         strokeDash: {
           field: 'field',
           scale: {
@@ -706,16 +704,6 @@ describe('collectEncodingElements', () => {
         label: 'C',
         type: EncodingType.STROKE_DASH,
         value: StrokeDash[2]
-      },
-      {
-        label: 'X',
-        type: EncodingType.SHAPE,
-        value: Shape[0]
-      },
-      {
-        label: 'Y',
-        type: EncodingType.SHAPE,
-        value: Shape[1]
       }
     ])
   })

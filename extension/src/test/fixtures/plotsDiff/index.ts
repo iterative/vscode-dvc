@@ -1,12 +1,13 @@
 import { TopLevelSpec } from 'vega-lite'
-import { VisualizationSpec } from 'react-vega'
-import { extendVegaSpec, isMultiViewPlot } from '../../../plots/vega/util'
-import { EXPERIMENT_WORKSPACE_ID, PlotsOutput } from '../../../cli/dvc/contract'
+import { isMultiViewPlot } from '../../../plots/vega/util'
 import {
-  ComparisonPlots,
+  EXPERIMENT_WORKSPACE_ID,
+  PlotsOutput,
+  PlotsType
+} from '../../../cli/dvc/contract'
+import {
   ComparisonRevisionData,
   TemplatePlotSection,
-  PlotsType,
   TemplatePlotGroup,
   TemplatePlotsData,
   TemplatePlots,
@@ -32,245 +33,281 @@ const basicVega = {
         'exp-83425',
         'exp-e7a67'
       ],
-      datapoints: {
-        [EXPERIMENT_WORKSPACE_ID]: [
+      anchor_definitions: {
+        '<DVC_METRIC_DATA>': JSON.stringify([
           {
             loss: '2.298783302307129',
             step: '0',
-            timestamp: '1641966224600'
+            timestamp: '1641966224600',
+            rev: EXPERIMENT_WORKSPACE_ID
           },
           {
             loss: '2.2779736518859863',
             step: '1',
-            timestamp: '1641966239108'
+            timestamp: '1641966239108',
+            rev: EXPERIMENT_WORKSPACE_ID
           },
           {
             loss: '2.2572131156921387',
             step: '2',
-            timestamp: '1641966253176'
+            timestamp: '1641966253176',
+            rev: EXPERIMENT_WORKSPACE_ID
           },
           {
             loss: '2.238112688064575',
             step: '3',
-            timestamp: '1641966267354'
+            timestamp: '1641966267354',
+            rev: EXPERIMENT_WORKSPACE_ID
           },
           {
             loss: '2.212251901626587',
             step: '4',
-            timestamp: '1641966285745'
+            timestamp: '1641966285745',
+            rev: EXPERIMENT_WORKSPACE_ID
           },
           {
             loss: '2.1894900798797607',
             step: '5',
-            timestamp: '1641966303339'
+            timestamp: '1641966303339',
+            rev: EXPERIMENT_WORKSPACE_ID
           },
           {
             loss: '2.165510654449463',
             step: '6',
-            timestamp: '1641966320693'
+            timestamp: '1641966320693',
+            rev: EXPERIMENT_WORKSPACE_ID
           },
           {
             loss: '2.135964870452881',
             step: '7',
-            timestamp: '1641966335781'
+            timestamp: '1641966335781',
+            rev: EXPERIMENT_WORKSPACE_ID
           },
           {
             loss: '2.114135265350342',
             step: '8',
-            timestamp: '1641966351758'
-          }
-        ],
-        main: [
+            timestamp: '1641966351758',
+            rev: EXPERIMENT_WORKSPACE_ID
+          },
           {
             loss: '2.298783302307129',
             step: '0',
-            timestamp: '1641966224600'
+            timestamp: '1641966224600',
+            rev: 'main'
           },
           {
             loss: '2.2779736518859863',
             step: '1',
-            timestamp: '1641966239108'
+            timestamp: '1641966239108',
+            rev: 'main'
           },
           {
             loss: '2.2572131156921387',
             step: '2',
-            timestamp: '1641966253176'
+            timestamp: '1641966253176',
+            rev: 'main'
           },
           {
             loss: '2.238112688064575',
             step: '3',
-            timestamp: '1641966267354'
+            timestamp: '1641966267354',
+            rev: 'main'
           },
           {
             loss: '2.212251901626587',
             step: '4',
-            timestamp: '1641966285745'
+            timestamp: '1641966285745',
+            rev: 'main'
           },
           {
             loss: '2.1894900798797607',
             step: '5',
-            timestamp: '1641966303339'
+            timestamp: '1641966303339',
+            rev: 'main'
           },
           {
             loss: '2.165510654449463',
             step: '6',
-            timestamp: '1641966320693'
+            timestamp: '1641966320693',
+            rev: 'main'
           },
           {
             loss: '2.135964870452881',
             step: '7',
-            timestamp: '1641966335781'
+            timestamp: '1641966335781',
+            rev: 'main'
           },
           {
             loss: '2.114135265350342',
             step: '8',
-            timestamp: '1641966351758'
-          }
-        ],
-        'test-branch': [
+            timestamp: '1641966351758',
+            rev: 'main'
+          },
           {
             loss: '1.6454246044158936',
             step: '0',
-            timestamp: '1642041785966'
+            timestamp: '1642041785966',
+            rev: 'test-branch'
           },
           {
             loss: '1.6063436269760132',
             step: '1',
-            timestamp: '1642041804111'
+            timestamp: '1642041804111',
+            rev: 'test-branch'
           },
           {
             loss: '1.5570942163467407',
             step: '2',
-            timestamp: '1642041820386'
+            timestamp: '1642041820386',
+            rev: 'test-branch'
           },
           {
             loss: '1.5230435132980347',
             step: '3',
-            timestamp: '1642041836358'
+            timestamp: '1642041836358',
+            rev: 'test-branch'
           },
           {
             loss: '1.473145842552185',
             step: '4',
-            timestamp: '1642041851764'
+            timestamp: '1642041851764',
+            rev: 'test-branch'
           },
           {
             loss: '1.444159984588623',
             step: '5',
-            timestamp: '1642041866838'
+            timestamp: '1642041866838',
+            rev: 'test-branch'
           },
           {
             loss: '1.3941730260849',
             step: '6',
-            timestamp: '1642041881837'
+            timestamp: '1642041881837',
+            rev: 'test-branch'
           },
           {
             loss: '1.370380163192749',
             step: '7',
-            timestamp: '1642041897483'
+            timestamp: '1642041897483',
+            rev: 'test-branch'
           },
           {
             loss: '1.3217320442199707',
             step: '8',
-            timestamp: '1642041912764'
-          }
-        ],
-        'exp-83425': [
+            timestamp: '1642041912764',
+            rev: 'test-branch'
+          },
           {
             loss: '2.273470401763916',
             step: '0',
-            timestamp: '1642041482186'
+            timestamp: '1642041482186',
+            rev: 'exp-83425'
           },
           {
             loss: '2.20936918258667',
             step: '1',
-            timestamp: '1642041500577'
+            timestamp: '1642041500577',
+            rev: 'exp-83425'
           },
           {
             loss: '2.153379201889038',
-
             step: '2',
-            timestamp: '1642041519065'
+            timestamp: '1642041519065',
+            rev: 'exp-83425'
           },
           {
             loss: '2.0221104621887207',
             step: '3',
-            timestamp: '1642041543481'
+            timestamp: '1642041543481',
+            rev: 'exp-83425'
           },
           {
             loss: '2.024623155593872',
             step: '4',
-            timestamp: '1642041565772'
+            timestamp: '1642041565772',
+            rev: 'exp-83425'
           },
           {
             loss: '1.8110722303390503',
             step: '5',
-            timestamp: '1642041586986'
+            timestamp: '1642041586986',
+            rev: 'exp-83425'
           },
           {
             loss: '1.7324824333190918',
             step: '6',
-            timestamp: '1642041609569'
+            timestamp: '1642041609569',
+            rev: 'exp-83425'
           },
           {
             loss: '1.6054636240005493',
             step: '7',
-            timestamp: '1642041631783'
+            timestamp: '1642041631783',
+            rev: 'exp-83425'
           },
           {
             loss: '1.5145071744918823',
             step: '8',
-            timestamp: '1642041648829'
-          }
-        ],
-        'exp-e7a67': [
+            timestamp: '1642041648829',
+            rev: 'exp-83425'
+          },
           {
             loss: '2.0380799770355225',
             step: '0',
-            timestamp: '1642041230991'
+            timestamp: '1642041230991',
+            rev: 'exp-e7a67'
           },
           {
             loss: '2.0002100467681885',
             step: '1',
-            timestamp: '1642041244696'
+            timestamp: '1642041244696',
+            rev: 'exp-e7a67'
           },
           {
             loss: '1.9573605060577393',
             step: '2',
-            timestamp: '1642041257185'
+            timestamp: '1642041257185',
+            rev: 'exp-e7a67'
           },
           {
             loss: '1.91573965549469',
             step: '3',
-            timestamp: '1642041270652'
+            timestamp: '1642041270652',
+            rev: 'exp-e7a67'
           },
           {
             loss: '1.8714964389801025',
             step: '4',
-            timestamp: '1642041284801'
+            timestamp: '1642041284801',
+            rev: 'exp-e7a67'
           },
           {
             loss: '1.8267308473587036',
             step: '5',
-            timestamp: '1642041301919'
+            timestamp: '1642041301919',
+            rev: 'exp-e7a67'
           },
           {
             loss: '1.7825157642364502',
             step: '6',
-            timestamp: '1642041318814'
+            timestamp: '1642041318814',
+            rev: 'exp-e7a67'
           },
           {
             loss: '1.7360031604766846',
             step: '7',
-            timestamp: '1642041335775'
+            timestamp: '1642041335775',
+            rev: 'exp-e7a67'
           },
           {
             loss: '1.6929490566253662',
             step: '8',
-            timestamp: '1642041350855'
+            timestamp: '1642041350855',
+            rev: 'exp-e7a67'
           }
-        ]
+        ])
       },
-      content: {
+      content: JSON.stringify({
         $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
         data: {
           values: '<DVC_METRIC_DATA>'
@@ -343,7 +380,7 @@ const basicVega = {
             ]
           }
         ]
-      } as VisualizationSpec,
+      }),
       multiView: false
     }
   ]
@@ -521,35 +558,21 @@ const extendedSpecs = (plotsOutput: TemplatePlots): TemplatePlotSection[] => {
   for (const [path, plots] of Object.entries(plotsOutput)) {
     for (const originalPlot of plots) {
       const plot = {
-        content: extendVegaSpec(
-          {
-            ...originalPlot.content,
-            data: {
-              values:
-                REVISIONS.flatMap(
-                  revision =>
-                    originalPlot.datapoints?.[revision].map(values => ({
-                      ...values,
-                      rev: revision
-                    }))
-                ) || []
-            }
-          } as TopLevelSpec,
-          DEFAULT_NB_ITEMS_PER_ROW,
-          DEFAULT_PLOT_HEIGHT,
-          {
-            color: {
+        anchor_definitions: {
+          ...originalPlot.anchor_definitions,
+          '<DVC_METRIC_COLOR>': JSON.stringify({
+            scale: {
               domain: REVISIONS,
               range: copyOriginalColors().slice(0, 5)
             }
-          }
-        ) as VisualizationSpec,
+          })
+        },
+        content: originalPlot.content,
         id: path,
-        multiView: isMultiViewPlot(originalPlot.content as TopLevelSpec),
         revisions: REVISIONS,
         type: PlotsType.VEGA
       }
-      if (plot.multiView) {
+      if (isMultiViewPlot(JSON.parse(originalPlot.content) as TopLevelSpec)) {
         multiViewPlots.entries.push(plot)
         continue
       }

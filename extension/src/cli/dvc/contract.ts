@@ -1,5 +1,3 @@
-import { Plot } from '../../plots/webview/contract'
-
 export const MIN_CLI_VERSION = '2.58.1'
 export const LATEST_TESTED_CLI_VERSION = '3.26.0'
 
@@ -129,8 +127,40 @@ export const experimentHasError = (
 
 export type ExpShowOutput = (ExpState & { experiments?: ExpRange[] | null })[]
 
+export enum PlotsType {
+  VEGA = 'vega',
+  IMAGE = 'image'
+}
+export const isImagePlotOutput = (plot: {
+  type: PlotsType
+}): plot is ImagePlotOutput => plot.type === PlotsType.IMAGE
+
+export type AnchorDefinitions = {
+  '<DVC_METRIC_DATA>': string
+  '<DVC_METRIC_SHAPE>'?: string
+  '<DVC_METRIC_STROKE_DASH>'?: string
+  '<DVC_METRIC_COLOR>'?: string
+  // fun '<DVC_METRIC_X_LABEL>': string
+  // '<DVC_METRIC_Y_LABEL>': string
+}
+
+export type TemplatePlot = {
+  anchor_definitions: AnchorDefinitions
+  content: string
+  revisions: string[]
+  type: PlotsType
+}
+
+export type ImagePlotOutput = {
+  revisions: string[]
+  type: PlotsType
+  url: string
+}
+
+export type PlotOutput = TemplatePlot | ImagePlotOutput
+
 export interface PlotsData {
-  [path: string]: Plot[]
+  [path: string]: PlotOutput[]
 }
 
 export type PlotError = {
@@ -140,12 +170,12 @@ export type PlotError = {
 } & ErrorContents
 
 export type RawPlotsOutput = {
-  data?: { [path: string]: Plot[] }
+  data?: { [path: string]: PlotOutput[] }
   errors?: PlotError[]
 }
 
 export type PlotsOutput = RawPlotsOutput & {
-  data: { [path: string]: Plot[] }
+  data: { [path: string]: PlotOutput[] }
 }
 
 export type PlotsOutputOrError = PlotsOutput | DvcError

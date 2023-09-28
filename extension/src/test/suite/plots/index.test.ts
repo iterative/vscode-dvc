@@ -30,7 +30,6 @@ import {
   PlotsSection,
   TemplatePlotGroup,
   TemplatePlotsData,
-  TemplatePlot,
   ImagePlot
 } from '../../../plots/webview/contract'
 import { FIELD_SEPARATOR, TEMP_PLOTS_DIR } from '../../../cli/dvc/constants'
@@ -47,6 +46,7 @@ import * as FileSystem from '../../../fileSystem'
 import {
   EXPERIMENT_WORKSPACE_ID,
   ExpShowOutput,
+  TemplatePlot,
   experimentHasError
 } from '../../../cli/dvc/contract'
 import { Experiment } from '../../../experiments/webview/contract'
@@ -635,7 +635,9 @@ suite('Plots Test Suite', () => {
       expect(mockWriteCsv).to.be.calledOnce
       expect(mockWriteCsv).to.be.calledWithExactly(
         exportFile.path,
-        (templatePlot.content.data as { values: unknown[] }).values
+        JSON.parse(templatePlot.anchor_definitions['<DVC_METRIC_DATA>']) as {
+          values: unknown[]
+        }
       )
       expect(mockOpenFile).to.calledWithExactly(exportFile.path)
       expect(mockSendTelemetryEvent).to.be.calledOnce
@@ -951,12 +953,19 @@ suite('Plots Test Suite', () => {
             ({ revisions }) => !isEqual(revisions, [brokenExp])
           ),
           [lossTsvPath]: lossTsv.map((plot, i) => {
-            const datapoints = { ...lossTsv[i].datapoints }
-            delete datapoints[brokenExp]
+            const anchor_definitions = { ...lossTsv[i].anchor_definitions }
+            anchor_definitions['<DVC_METRIC_DATA>'] = JSON.stringify(
+              (
+                JSON.parse(anchor_definitions['<DVC_METRIC_DATA>']) as Record<
+                  string,
+                  unknown
+                >[]
+              ).filter(({ rev }) => rev !== brokenExp)
+            )
 
             return {
               ...plot,
-              datapoints,
+              anchor_definitions,
               revisions: lossTsv[i].revisions?.filter(rev => rev !== brokenExp)
             }
           })
@@ -1016,11 +1025,10 @@ suite('Plots Test Suite', () => {
 
       const [roc] = singleViewSection.entries
       const rocDatapoints =
-        (
-          roc.content.data as {
-            values: { rev: string; filename: string | undefined }[]
-          }
-        )?.values || []
+        (JSON.parse(roc.anchor_definitions['<DVC_METRIC_DATA>']) as {
+          rev: string
+          filename: string | undefined
+        }[]) || []
       expect(rocDatapoints.length).to.be.greaterThan(0)
       for (const entry of rocDatapoints) {
         expect(entry.rev).not.to.contain(FIELD_SEPARATOR)
@@ -1061,11 +1069,12 @@ suite('Plots Test Suite', () => {
       const [confusionMatrix] = multiViewSection.entries
 
       const confusionMatrixDatapoints =
-        (
-          confusionMatrix.content.data as {
-            values: { rev: string }[]
-          }
-        )?.values || []
+        (JSON.parse(
+          confusionMatrix.anchor_definitions['<DVC_METRIC_DATA>']
+        ) as {
+          rev: string
+          filename: string | undefined
+        }[]) || []
 
       expect(confusionMatrixDatapoints.length).to.be.greaterThan(0)
 

@@ -35,7 +35,6 @@ import {
 } from 'dvc/src/webview/contract'
 import { act } from 'react-dom/test-utils'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
-import { VisualizationSpec } from 'react-vega'
 import { App } from './App'
 import { NewSectionBlock } from './templatePlots/TemplatePlots'
 import {
@@ -2558,14 +2557,14 @@ describe('App', () => {
         {
           entries: [
             {
-              content: {
-                ...smoothTemplatePlotContent
-              } as unknown as VisualizationSpec,
-              datapoints: {
-                [EXPERIMENT_WORKSPACE_ID]:
+              anchor_definitions: {
+                '<DVC_METRIC_DATA>': JSON.stringify(
                   smoothTemplatePlotContent.data.values.slice(0, 10)
+                )
               },
+              content: JSON.stringify(smoothTemplatePlotContent),
               id: smoothId,
+              revisions: [EXPERIMENT_WORKSPACE_ID],
               type: PlotsType.VEGA
             }
           ],

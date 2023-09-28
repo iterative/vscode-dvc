@@ -1,5 +1,10 @@
 import { VisualizationSpec } from 'react-vega'
 import { Color } from '../../experiments/model/status/colors'
+import {
+  ImagePlotOutput,
+  PlotsType,
+  TemplatePlot
+} from '../../cli/dvc/contract'
 
 export const DEFAULT_NB_ITEMS_PER_ROW = 2
 
@@ -105,30 +110,14 @@ export type CustomPlotsData = {
   hasAddedPlots: boolean
 }
 
-export enum PlotsType {
-  VEGA = 'vega',
-  IMAGE = 'image'
-}
-
 export const isVegaPlot = (plot: Plot): plot is TemplatePlot =>
   plot.type === PlotsType.VEGA
 
-export type TemplatePlot = {
-  content: VisualizationSpec
-  datapoints?: { [revision: string]: Record<string, unknown>[] }
-  revisions?: string[]
-  type: PlotsType
-  multiView?: boolean
-}
-
-export type ImagePlot = {
-  revisions?: string[]
-  type: PlotsType
-  url: string
+export type ImagePlot = ImagePlotOutput & {
   ind?: number
 }
 
-export const isImagePlot = (plot: Plot): plot is ImagePlot =>
+export const isImagePlot = (plot: { type: PlotsType }): plot is ImagePlot =>
   plot.type === PlotsType.IMAGE
 
 export type Plot = TemplatePlot | ImagePlot
@@ -191,3 +180,5 @@ export type PlotsData =
       [PlotsDataKeys.SECTION_COLLAPSED]?: SectionCollapsed
     }
   | undefined
+
+export { PlotsType } from '../../cli/dvc/contract'
