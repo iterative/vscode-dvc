@@ -1505,6 +1505,27 @@ describe('App', () => {
       })
     })
 
+    it('should enable the user to rename an experiment', () => {
+      renderTableWithoutRunningExperiments()
+
+      const target = screen.getByText('4fb124a')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      advanceTimersByTime(100)
+      const menuitems = screen.getAllByRole('menuitem')
+      const renameOption = menuitems.find(
+        item => item.textContent?.includes('Rename')
+      )
+
+      expect(renameOption).toBeDefined()
+      renameOption && fireEvent.click(renameOption)
+
+      expect(sendMessage).toHaveBeenCalledWith({
+        payload: 'exp-e7a67',
+        type: MessageFromWebviewType.RENAME_EXPERIMENT
+      })
+    })
+
     it('should not enable the user to share a running experiment', () => {
       renderTable()
 

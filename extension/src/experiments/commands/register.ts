@@ -14,7 +14,9 @@ import { Context, getDvcRootFromContext } from '../../vscode/context'
 import { Setup } from '../../setup'
 import { showSetupOrExecuteCommand } from '../../commands/util'
 import { CliCompatible, isVersionCompatible } from '../../cli/dvc/version'
-import { warnVersionIncompatible } from '../../cli/dvc/discovery'
+import { Toast } from '../../vscode/toast'
+import { Response } from '../../vscode/response'
+import { SetupSection } from '../../setup/webview/contract'
 
 type ExperimentDetails = { dvcRoot: string; id: string }
 
@@ -147,7 +149,13 @@ const registerExperimentInputCommands = (
           CliCompatible.YES
         )
       ) {
-        warnVersionIncompatible(setup)
+        const response = await Toast.warnWithOptions(
+          'To rename experiments you need DVC version 3.22.0 or greater. Please update your DVC installation.',
+          Response.SHOW_SETUP
+        )
+        if (response === Response.SHOW_SETUP) {
+          return setup.showSetup(SetupSection.DVC)
+        }
         return
       }
 

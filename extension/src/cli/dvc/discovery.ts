@@ -29,7 +29,7 @@ const warnUnableToVerifyVersion = (setup: IExtensionSetup) => {
   )
 }
 
-export const warnVersionIncompatible = (setup: IExtensionSetup): void => {
+const warnVersionIncompatible = (setup: IExtensionSetup): void => {
   void warnWithSetupAction(
     setup,
     'The extension cannot initialize because the DVC CLI version is incompatible.'
