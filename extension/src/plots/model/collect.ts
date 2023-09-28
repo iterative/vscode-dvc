@@ -80,19 +80,63 @@ const getValues = (
   return values
 }
 
+const removeSelectedExperiment = (
+  orderedColorScale: ColorScale,
+  hasValues: boolean,
+  idx: number
+) => {
+  const isSelectedExperiment = idx !== -1
+  if (!isSelectedExperiment || hasValues) {
+    return
+  }
+
+  orderedColorScale.domain.splice(idx, 1)
+  orderedColorScale.range.splice(idx, 1)
+}
+
+const fillColorScale = (
+  experiments: Experiment[],
+  colorScale: ColorScale | undefined,
+  valueIds: Set<string>
+) => {
+  const orderedColorScale = {
+    domain: [...(colorScale?.domain || [])],
+    range: [...(colorScale?.range || [])]
+  }
+
+  for (const experiment of experiments) {
+    const { id } = experiment
+    const idx = orderedColorScale.domain.indexOf(id)
+    const isSelectedExperiment = idx !== -1
+    const hasValues = valueIds.has(id)
+
+    if (!hasValues || isSelectedExperiment) {
+      removeSelectedExperiment(orderedColorScale, hasValues, idx)
+      continue
+    }
+
+    orderedColorScale.domain.push(id)
+    orderedColorScale.range.push('#4c78a8' as Color)
+  }
+
+  return orderedColorScale
+}
+
 const getCustomPlotData = (
   orderValue: CustomPlotsOrderValue,
   experiments: Experiment[],
   height: number,
   nbItemsPerRow: number,
-  completeColorScale: ColorScale,
-  renderLastIds: Set<string>
+  colorScale: ColorScale | undefined
 ): CustomPlotData => {
   const { metric, param } = orderValue
   const metricPath = getFullValuePath(ColumnType.METRICS, metric)
   const paramPath = getFullValuePath(ColumnType.PARAMS, param)
 
+  const renderLastIds = new Set(colorScale?.domain)
   const values = getValues(experiments, metricPath, paramPath, renderLastIds)
+  const valueIds = new Set(values.map(({ id }) => id))
+  const completeColorScale = fillColorScale(experiments, colorScale, valueIds)
 
   const [{ param: paramVal, metric: metricVal }] = values
   const yTitle = truncateVerticalTitle(metric, nbItemsPerRow, height) as string
@@ -115,26 +159,6 @@ const getCustomPlotData = (
   } as CustomPlotData
 }
 
-const fillColorScale = (
-  colorScale: ColorScale | undefined,
-  experiments: Experiment[]
-) => {
-  const completeColorScale = {
-    domain: [...(colorScale?.domain || [])],
-    range: [...(colorScale?.range || [])]
-  }
-
-  for (const experiment of experiments) {
-    const { id } = experiment
-    if (completeColorScale.domain.includes(id)) {
-      continue
-    }
-    completeColorScale.domain.push(id)
-    completeColorScale.range.push('#4c78a8' as Color)
-  }
-  return completeColorScale
-}
-
 export const collectCustomPlots = ({
   colorScale,
   plotsOrderValues,
@@ -150,18 +174,9 @@ export const collectCustomPlots = ({
 }): CustomPlotData[] => {
   const plots = []
 
-  const completeColorScale = fillColorScale(colorScale, experiments)
-
   for (const value of plotsOrderValues) {
     plots.push(
-      getCustomPlotData(
-        value,
-        experiments,
-        height,
-        nbItemsPerRow,
-        completeColorScale,
-        new Set(colorScale?.domain)
-      )
+      getCustomPlotData(value, experiments, height, nbItemsPerRow, colorScale)
     )
   }
 
