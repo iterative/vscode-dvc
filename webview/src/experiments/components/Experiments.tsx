@@ -13,7 +13,8 @@ import {
   Row as TableRow,
   getCoreRowModel,
   getExpandedRowModel,
-  ColumnSizingState
+  ColumnSizingState,
+  ColumnOrderState
 } from '@tanstack/react-table'
 import { Table } from './table/Table'
 import styles from './table/styles.module.scss'
@@ -64,7 +65,8 @@ export const ExperimentsTable: React.FC = () => {
   const [columns, setColumns] = useState(buildColumns(columnData))
   const [columnSizing, setColumnSizing] =
     useState<ColumnSizingState>(columnWidths)
-  const [columnOrder, setColumnOrder] = useState(columnOrderData)
+  const [columnOrder, setColumnOrder] =
+    useState<ColumnOrderState>(columnOrderData)
   const resizeTimeout = useRef(0)
 
   useEffect(() => {
@@ -74,6 +76,10 @@ export const ExperimentsTable: React.FC = () => {
   useEffect(() => {
     setColumns(buildColumns(columnData))
   }, [columnData])
+
+  useEffect(() => {
+    setColumnOrder(columnOrderData)
+  }, [columnOrderData])
 
   const getRowId = useCallback(
     (experiment: Commit, relativeIndex: number, parent?: TableRow<Commit>) =>
