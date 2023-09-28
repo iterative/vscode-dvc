@@ -58,6 +58,7 @@ export type Experiment = {
   executorStatus?: ExecutorStatus
   timestamp?: string | null
   branch?: string | typeof WORKSPACE_BRANCH
+  allBranches?: string[]
   baselineSha?: string | undefined
   studioLinkType?: StudioLinkType
 }

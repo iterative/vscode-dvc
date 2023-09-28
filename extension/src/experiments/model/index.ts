@@ -860,19 +860,25 @@ export class ExperimentsModel extends ModelWithPersistence {
   private getFlattenedRowData(workspaceRow: Commit): Commit[] {
     const commitsBySha: { [sha: string]: Commit[] } =
       this.applyFiltersToFlattenedCommits()
-    const rows = []
+    const rowsBySha: { [sha: string]: Commit[] } = {}
 
     for (const { branch, sha } of this.rowOrder) {
-      const commitsAndExps = commitsBySha[sha]
-      if (!commitsAndExps) {
+      if (!commitsBySha[sha]) {
         continue
       }
 
-      rows.push(
-        ...commitsAndExps.map(commitOrExp => ({ ...commitOrExp, branch }))
-      )
+      const commitAndExps = rowsBySha[sha] || commitsBySha[sha]
+
+      rowsBySha[sha] = commitAndExps.map(commitAndExp => ({
+        ...commitAndExp,
+        allBranches: [...(commitAndExp?.allBranches || []), branch],
+        branch: commitAndExp.branch || branch
+      }))
     }
 
-    return [workspaceRow, ...sortExperiments(this.getSorts(), rows)]
+    return [
+      workspaceRow,
+      ...sortExperiments(this.getSorts(), Object.values(rowsBySha).flat())
+    ]
   }
 }
