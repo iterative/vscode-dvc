@@ -183,8 +183,8 @@ describe('App', () => {
     await expectHeaders(['A', 'C', 'D', 'B'])
   })
 
-  describe('Table Flattening On Sort', () => {
-    it('should add a "branch/tags" column if the table is sorted', () => {
+  describe('Sorted (Flattened) Table', () => {
+    it('should add a "branch/tags" column', () => {
       renderTable(sortedTableStateFixture)
 
       const branchHeader = screen.getByTestId('header-branch')
@@ -204,7 +204,7 @@ describe('App', () => {
       expect(branchCell).toHaveTextContent('main')
     })
 
-    it('should show two branches in the "branch/tags" cell if the row belongs to two branches', () => {
+    it('should show two branches in the "branch/tags" column cell if the row belongs to two branches', () => {
       renderTable(sortedTableStateFixture)
 
       const cellBranches = within(
@@ -215,7 +215,7 @@ describe('App', () => {
       expect(cellBranches[1]).toHaveTextContent('other-branch')
     })
 
-    it('should show two branches plus the amount remaining in the "branch/tags" cell if the row belongs to more than two branches', () => {
+    it('should show two branches plus the amount remaining in the "branch/tags" column cell if the row belongs to more than two branches', () => {
       renderTable(sortedTableStateFixture)
 
       const cellBranches = within(
@@ -226,7 +226,7 @@ describe('App', () => {
       expect(cellBranches[1]).toHaveTextContent('other-branch + 1 more')
     })
 
-    it('should add a "parent" column if the table is sorted', () => {
+    it('should add a "parent" column', () => {
       renderTable(sortedTableStateFixture)
 
       const commitHeader = screen.getByTestId('header-commit')
