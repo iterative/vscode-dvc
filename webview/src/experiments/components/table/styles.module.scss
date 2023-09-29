@@ -419,6 +419,22 @@ $badge-size: 0.85rem;
   text-overflow: ellipsis;
 }
 
+.headerWithTooltip {
+  display: flex;
+}
+
+.headerWithTooltipContents {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+
+  svg {
+    width: 16px;
+    height: 16px;
+    fill: $accent-color;
+  }
+}
+
 .headerCellText {
   @extend %truncateLeftParent;
   @extend %headerCellPadding;
@@ -497,7 +513,9 @@ $badge-size: 0.85rem;
     visibility: visible;
   }
 
-  .timestampInnerCell {
+  .timestampInnerCell,
+  .branchInnerCell,
+  .commitInnerCell {
     height: 42px;
   }
 }
@@ -838,7 +856,9 @@ $badge-size: 0.85rem;
   }
 }
 
-.timestampInnerCell {
+.timestampInnerCell,
+.branchInnerCell,
+.commitInnerCell {
   @extend %baseInnerCell;
   @extend %truncateLeftParent;
 
@@ -857,6 +877,28 @@ $badge-size: 0.85rem;
   @extend %truncateLeftChild;
 
   font-size: 0.9em;
+}
+
+.commitInnerCell .cellContents {
+  font-size: 0.7rem;
+
+  > * {
+    vertical-align: middle;
+  }
+}
+
+.branchInnerCell .cellContents {
+  font-size: 0.65rem;
+  font-weight: 600;
+
+  > * {
+    vertical-align: middle;
+  }
+
+  svg {
+    fill: $accent-color;
+    margin-right: 1px;
+  }
 }
 
 .cellTooltip {

@@ -1,6 +1,9 @@
 import { Experiment } from 'dvc/src/experiments/webview/contract'
 import { Header } from '@tanstack/react-table'
-import { EXPERIMENT_COLUMN_ID } from 'dvc/src/experiments/columns/constants'
+import {
+  EXPERIMENT_COLUMN_ID,
+  DEFAULT_COLUMN_IDS
+} from 'dvc/src/experiments/columns/constants'
 
 export const isFirstLevelHeader = (id: string) => id.split(':').length - 1 === 1
 
@@ -80,3 +83,5 @@ export const leafColumnIds = (
 
 export const isExperimentColumn = (id: string): boolean =>
   id === EXPERIMENT_COLUMN_ID
+
+export const isDefaultColumn = (id: string) => DEFAULT_COLUMN_IDS.includes(id)

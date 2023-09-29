@@ -1096,9 +1096,12 @@ suite('Experiments Test Suite', () => {
       })
       await messageSent
 
-      const [id, firstColumn] = messageSpy.lastCall.args[0].columnOrder
+      const [id, branch, commit, firstColumn] =
+        messageSpy.lastCall.args[0].columnOrder
 
       expect(id).to.equal('id')
+      expect(commit).to.equal('commit')
+      expect(branch).to.equal('branch')
       expect(firstColumn).to.equal(movedColumn)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -1126,8 +1129,11 @@ suite('Experiments Test Suite', () => {
 
       expect(paramsYamlColumns).to.be.greaterThan(6)
 
-      const [id, ...columns] = messageSpy.lastCall.args[0].columnOrder
+      const [id, branch, commit, ...columns] =
+        messageSpy.lastCall.args[0].columnOrder
       expect(id).to.equal('id')
+      expect(branch).to.equal('branch')
+      expect(commit).to.equal('commit')
 
       let params = 0
       let other = 0
@@ -1720,59 +1726,62 @@ suite('Experiments Test Suite', () => {
   })
 
   describe('Sorting', () => {
-    it('should be able to sort', async () => {
+    const mockExpShowOutput = generateTestExpShowOutput(
+      {},
+      {
+        rev: '2d879497587b80b2d9e61f072d9dbe9c07a65357',
+        experiments: [
+          {
+            params: {
+              'params.yaml': {
+                data: {
+                  test: 2
+                }
+              }
+            }
+          },
+          {
+            params: {
+              'params.yaml': {
+                data: {
+                  test: 1
+                }
+              }
+            }
+          },
+          {
+            params: {
+              'params.yaml': {
+                data: {
+                  test: 3
+                }
+              }
+            }
+          }
+        ],
+        data: { params: { 'params.yaml': { data: { test: 5 } } } }
+      }
+    )
+
+    const getIds = (rows: Commit[]) =>
+      rows.map(({ id, subRows }) => {
+        const data: { id: string; subRows?: string[] } = { id }
+
+        if (subRows) {
+          data.subRows = subRows.map(({ id }) => id)
+        }
+        return data
+      })
+
+    it('should be able to flatten the table rows and sort', async () => {
       const { experiments, messageSpy } = await buildExperimentsWebview({
         disposer: disposable,
         availableNbCommits: { main: 20 },
-        expShow: generateTestExpShowOutput(
-          {},
-          {
-            rev: '2d879497587b80b2d9e61f072d9dbe9c07a65357',
-            experiments: [
-              {
-                params: {
-                  'params.yaml': {
-                    data: {
-                      test: 2
-                    }
-                  }
-                }
-              },
-              {
-                params: {
-                  'params.yaml': {
-                    data: {
-                      test: 1
-                    }
-                  }
-                }
-              },
-              {
-                params: {
-                  'params.yaml': {
-                    data: {
-                      test: 3
-                    }
-                  }
-                }
-              }
-            ]
-          }
-        ),
+        expShow: mockExpShowOutput,
         rowOrder: [
           { sha: '2d879497587b80b2d9e61f072d9dbe9c07a65357', branch: 'main' }
         ]
       })
-
-      const getIds = (rows: Commit[]) =>
-        rows.map(({ id, subRows }) => {
-          const data: { id: string; subRows?: string[] } = { id }
-
-          if (subRows) {
-            data.subRows = subRows.map(({ id }) => id)
-          }
-          return data
-        })
 
       const { rows, sorts: noSorts } = messageSpy.lastCall.args[0]
 
@@ -1816,12 +1825,84 @@ suite('Experiments Test Suite', () => {
       expect(getIds(sortedRows)).to.deep.equal([
         { id: EXPERIMENT_WORKSPACE_ID },
         {
-          id: '2d879497587b80b2d9e61f072d9dbe9c07a65357',
-          subRows: ['exp-2', 'exp-1', 'exp-3']
+          id: 'exp-2'
+        },
+        {
+          id: 'exp-1'
+        },
+        {
+          id: 'exp-3'
+        },
+        {
+          id: '2d879497587b80b2d9e61f072d9dbe9c07a65357'
         }
       ])
 
       expect(sorts).to.deep.equal([{ descending: false, path: sortPath }])
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should be able to filter out parent commit rows when sorted', async () => {
+      const { experiments, experimentsModel, messageSpy } =
+        await buildExperimentsWebview({
+          disposer: disposable,
+          availableNbCommits: { main: 20 },
+          expShow: mockExpShowOutput,
+          rowOrder: [
+            { sha: '2d879497587b80b2d9e61f072d9dbe9c07a65357', branch: 'main' }
+          ]
+        })
+
+      const { rows, sorts: noSorts } = messageSpy.lastCall.args[0]
+
+      expect(getIds(rows)).to.deep.equal([
+        { id: EXPERIMENT_WORKSPACE_ID },
+        {
+          id: '2d879497587b80b2d9e61f072d9dbe9c07a65357',
+          subRows: ['exp-1', 'exp-2', 'exp-3']
+        }
+      ])
+
+      expect(noSorts).to.deep.equal([])
+
+      const paramPath = buildMetricOrParamPath(
+        ColumnType.PARAMS,
+        'params.yaml',
+        'test'
+      )
+
+      stub(experimentsModel, 'getFilters').returns([
+        {
+          operator: Operator.LESS_THAN,
+          path: paramPath,
+          value: 4
+        }
+      ])
+      stub(SortQuickPicks, 'pickSortToAdd')
+        .onFirstCall()
+        .resolves({ descending: true, path: paramPath })
+
+      messageSpy.resetHistory()
+      const messageSent = waitForSpyCall(messageSpy, messageSpy.callCount)
+
+      await experiments.addSort()
+      await messageSent
+
+      const { rows: sortedRows, sorts } = messageSpy.lastCall.args[0]
+
+      expect(getIds(sortedRows)).to.deep.equal([
+        { id: EXPERIMENT_WORKSPACE_ID },
+        {
+          id: 'exp-3'
+        },
+        {
+          id: 'exp-1'
+        },
+        {
+          id: 'exp-2'
+        }
+      ])
+
+      expect(sorts).to.deep.equal([{ descending: true, path: paramPath }])
     }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
 

@@ -8,6 +8,7 @@ import {
 } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import tableDataFixture from 'dvc/src/test/fixtures/expShow/base/tableData'
+import sortedTableData from 'dvc/src/test/fixtures/expShow/sorted/tableData'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import {
   Column,
@@ -26,7 +27,7 @@ import {
   commonColumnFields,
   expectHeaders,
   getHeaders,
-  tableData as sortingTableDataFixture
+  tableData as simplifiedSortedTableDataFixture
 } from '../../test/sort'
 import {
   NORMAL_TOOLTIP_DELAY,
@@ -62,6 +63,11 @@ const tableStateFixture = {
   columnData: collectColumnData(tableDataFixture.columns)
 }
 
+const sortedTableStateFixture = {
+  ...sortedTableData,
+  columnData: collectColumnData(sortedTableData.columns)
+}
+
 jest.mock('../../shared/api')
 jest.mock('../../util/styles')
 jest.mock('./overflowHoverTooltip/useIsFullyContained', () => ({
@@ -95,6 +101,19 @@ describe('App', () => {
 
   it('should show the no columns selected empty state when there are no columns provided', () => {
     renderTableWithNoColumns()
+
+    const noColumnsState = screen.queryByText('No Columns Selected.')
+    expect(noColumnsState).toBeInTheDocument()
+  })
+
+  it('should show the no columns selected empty state when there are no columns provided and the table is sorted', () => {
+    const { columns } = tableStateFixture
+    const sortPath = columns[columns.length - 1].path
+    renderTable({
+      ...tableDataFixture,
+      columns: [],
+      sorts: [{ descending: true, path: sortPath }]
+    })
 
     const noColumnsState = screen.queryByText('No Columns Selected.')
     expect(noColumnsState).toBeInTheDocument()
@@ -145,9 +164,9 @@ describe('App', () => {
     const { getDraggableHeaderFromText } = renderTableWithSortingData()
 
     setTableData({
-      ...sortingTableDataFixture,
+      ...simplifiedSortedTableDataFixture,
       columns: [
-        ...sortingTableDataFixture.columns,
+        ...simplifiedSortedTableDataFixture.columns,
         {
           ...commonColumnFields,
           id: 'D',
@@ -165,9 +184,51 @@ describe('App', () => {
     await expectHeaders(['A', 'C', 'D', 'B'])
   })
 
+  it('should add a "branch/tags" column if the table is sorted', () => {
+    renderTable(sortedTableStateFixture)
+
+    const branchHeader = screen.getByTestId('header-branch')
+    expect(branchHeader).toBeInTheDocument()
+
+    const branchHeaderTextContent =
+      within(branchHeader).getByText('Branch/Tags')
+    expect(branchHeader).toBeInTheDocument()
+
+    fireEvent.mouseEnter(branchHeaderTextContent, { bubbles: true })
+    expect(screen.getByRole('tooltip')).toBeInTheDocument()
+    expect(screen.getByRole('tooltip')).toHaveTextContent(
+      'The table has limited functionality while sorted. Clear all sorts to have nested rows and increase/decrease commits.'
+    )
+
+    expect(screen.getByTestId('branch___main').textContent).toStrictEqual(
+      'main'
+    )
+  })
+
+  it('should add a "parent" column if the table is sorted', () => {
+    renderTable(sortedTableStateFixture)
+
+    const commitHeader = screen.getByTestId('header-commit')
+    expect(commitHeader).toBeInTheDocument()
+
+    const commitHeaderTextContent = within(commitHeader).getByText('Parent')
+    expect(commitHeader).toBeInTheDocument()
+
+    fireEvent.mouseEnter(commitHeaderTextContent, { bubbles: true })
+    expect(screen.getByRole('tooltip')).toBeInTheDocument()
+    expect(screen.getByRole('tooltip')).toHaveTextContent(
+      'The table has limited functionality while sorted. Clear all sorts to have nested rows and increase/decrease commits.'
+    )
+
+    expect(screen.getByTestId('commit___main').textContent).toStrictEqual('')
+    expect(screen.getByTestId('commit___exp-83425').textContent).toStrictEqual(
+      '53c3851'
+    )
+  })
+
   it('should be able to move columns to the start', async () => {
     renderTable({
-      ...sortingTableDataFixture,
+      ...simplifiedSortedTableDataFixture,
       columnOrder: ['id', 'Created', 'params:A', 'params:B', 'params:C']
     })
 
@@ -176,7 +237,7 @@ describe('App', () => {
     const moveBCtoStart = ['id', 'params:B', 'params:C', 'Created', 'params:A']
 
     setTableData({
-      ...sortingTableDataFixture,
+      ...simplifiedSortedTableDataFixture,
       columnOrder: moveBCtoStart
     })
 

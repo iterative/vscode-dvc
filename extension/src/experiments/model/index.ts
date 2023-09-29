@@ -438,11 +438,19 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public getRowData() {
-    const commitsBySha = this.applyFiltersToCommits()
+    const workspaceRow = {
+      branch: WORKSPACE_BRANCH,
+      ...this.addDetails(this.workspace)
+    }
+    const sorts = this.getSorts()
+    const flattenRowData = sorts.length > 0
+    if (flattenRowData) {
+      return this.getFlattenedRowData(workspaceRow)
+    }
 
-    const rows: Commit[] = [
-      { branch: WORKSPACE_BRANCH, ...this.addDetails(this.workspace) }
-    ]
+    const commitsBySha: { [sha: string]: Commit } = this.applyFiltersToCommits()
+    const rows: Commit[] = [workspaceRow]
+
     for (const { branch, sha } of this.rowOrder) {
       const commit = commitsBySha[sha]
       if (!commit) {
@@ -828,5 +836,43 @@ export class ExperimentsModel extends ModelWithPersistence {
       commitsBySha[commit.sha as string] = unfilteredCommit
     }
     return commitsBySha
+  }
+
+  private applyFiltersToFlattenedCommits() {
+    const commitsBySha: { [sha: string]: Commit[] } = {}
+    const filters = this.getFilters()
+
+    for (const commit of this.commits) {
+      const commitWithSelectedAndStarred = this.addDetails(commit)
+      const experiments = this.getExperimentsByCommit(
+        commitWithSelectedAndStarred
+      )
+
+      commitsBySha[commit.sha as string] = [
+        commitWithSelectedAndStarred,
+        ...(experiments || [])
+      ].filter(exp => !!filterExperiment(filters, exp))
+    }
+
+    return commitsBySha
+  }
+
+  private getFlattenedRowData(workspaceRow: Commit): Commit[] {
+    const commitsBySha: { [sha: string]: Commit[] } =
+      this.applyFiltersToFlattenedCommits()
+    const rows = []
+
+    for (const { branch, sha } of this.rowOrder) {
+      const commitsAndExps = commitsBySha[sha]
+      if (!commitsAndExps) {
+        continue
+      }
+
+      rows.push(
+        ...commitsAndExps.map(commitOrExp => ({ ...commitOrExp, branch }))
+      )
+    }
+
+    return [workspaceRow, ...sortExperiments(this.getSorts(), rows)]
   }
 }

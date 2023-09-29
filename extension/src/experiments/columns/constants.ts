@@ -11,3 +11,12 @@ export const timestampColumn: Column = {
 }
 
 export const EXPERIMENT_COLUMN_ID = 'id'
+
+export const COMMIT_COLUMN_ID = 'commit'
+export const BRANCH_COLUMN_ID = 'branch'
+
+export const DEFAULT_COLUMN_IDS = [
+  EXPERIMENT_COLUMN_ID,
+  BRANCH_COLUMN_ID,
+  COMMIT_COLUMN_ID
+]

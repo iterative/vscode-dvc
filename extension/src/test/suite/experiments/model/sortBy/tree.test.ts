@@ -95,6 +95,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
     return closeAllEditors()
   })
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('ExperimentsSortByTree', () => {
     it('should appear in the UI', async () => {
       await expect(
@@ -161,6 +162,21 @@ suite('Experiments Sort By Tree Test Suite', () => {
             get(exp, selector)
           )
 
+      const getSortedParamsArray = (selector = testParamPathArray) => {
+        const rows = messageSpy.getCall(-1).firstArg.rows
+        const params = []
+
+        for (const row of rows) {
+          const param = get(row, selector)
+
+          if (param) {
+            params.push(param)
+          }
+        }
+
+        return params
+      }
+
       stub(WorkspaceExperiments.prototype, 'getDvcRoots').returns([dvcDemoPath])
       stub(WorkspaceExperiments.prototype, 'getOnlyOrPickProject').resolves(
         dvcDemoPath
@@ -176,9 +192,10 @@ suite('Experiments Sort By Tree Test Suite', () => {
       )
       await tableChangedPromise
       mockShowQuickPick.reset()
-      expect(getParamsArray(), 'single sort with table command').to.deep.equal([
-        1, 2, 3, 4
-      ])
+      expect(
+        getSortedParamsArray(),
+        'single sort with table command'
+      ).to.deep.equal([1, 2, 3, 4])
 
       const tableSortRemoved = experimentsUpdatedEvent(experiments)
 
@@ -193,7 +210,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
 
       await addSortWithMocks(otherTestParamPath, false)
       expect(
-        getParamsArray(),
+        getSortedParamsArray(),
         `row order is maintained after applying a sort on ${otherTestParamPath}`
       ).to.deep.equal([1, 3, 2, 4])
 
@@ -212,7 +229,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
         }
       ])
       expect(
-        getParamsArray(),
+        getSortedParamsArray(),
         'the result of both sorts is sent to the webview'
       ).to.deep.equal([3, 1, 4, 2])
 
@@ -231,7 +248,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
         }
       ])
       expect(
-        getParamsArray(),
+        getSortedParamsArray(),
         'the result of the switched sort is sent to the webview'
       ).to.deep.equal([4, 2, 3, 1])
 
@@ -243,7 +260,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
         }
       )
       expect(
-        getParamsArray(),
+        getSortedParamsArray(),
         'when removing a sort that changes the order of ties, those ties should reflect their original order'
       ).to.deep.equal([2, 4, 1, 3])
 

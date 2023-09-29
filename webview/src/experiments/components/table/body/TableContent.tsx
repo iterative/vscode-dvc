@@ -1,9 +1,12 @@
 import React, { Fragment, RefObject } from 'react'
 import { Row } from '@tanstack/react-table'
+import { useSelector } from 'react-redux'
 import { Experiment } from 'dvc/src/experiments/webview/contract'
 import { TableBody } from './TableBody'
+import { SortedTableContent } from './SortedTableContent'
 import { collectBranchWithRows } from './util'
 import { BranchDivider } from './branchDivider/BranchDivider'
+import { ExperimentsState } from '../../../store'
 
 interface TableContentProps {
   rows: Row<Experiment>[]
@@ -16,6 +19,18 @@ export const TableContent: React.FC<TableContentProps> = ({
   tableHeadHeight,
   tableRef
 }) => {
+  const sorts = useSelector((state: ExperimentsState) => state.tableData.sorts)
+
+  if (sorts.length > 0) {
+    return (
+      <SortedTableContent
+        rows={rows}
+        tableHeadHeight={tableHeadHeight}
+        tableRef={tableRef}
+      />
+    )
+  }
+
   return (
     <>
       {collectBranchWithRows(rows).map(([branch, branchRows]) => {

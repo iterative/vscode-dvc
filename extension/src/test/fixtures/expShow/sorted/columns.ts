@@ -1,40 +1,9 @@
 import { join } from 'path'
 import { Column, ColumnType } from '../../../../experiments/webview/contract'
-import {
-  buildDepPath,
-  buildMetricOrParamPath
-} from '../../../../experiments/columns/paths'
+import { buildMetricOrParamPath } from '../../../../experiments/columns/paths'
 import { timestampColumn } from '../../../../experiments/columns/constants'
 
 const nestedParamsFile = join('nested', 'params.yaml')
-
-export const dataColumnOrder: string[] = [
-  'id',
-  'branch',
-  'commit',
-  'Created',
-  'metrics:summary.json:accuracy',
-  'metrics:summary.json:loss',
-  'metrics:summary.json:val_accuracy',
-  'metrics:summary.json:val_loss',
-  join('params:nested', 'params.yaml:test'),
-  'params:params.yaml:code_names',
-  'params:params.yaml:dropout',
-  'params:params.yaml:dvc_logs_dir',
-  'params:params.yaml:epochs',
-  'params:params.yaml:learning_rate',
-  'params:params.yaml:log_file',
-  'params:params.yaml:process.test_arg',
-  'params:params.yaml:process.threshold',
-  join('deps:data', 'data.xml'),
-  join('deps:data', 'features'),
-  join('deps:data', 'prepared'),
-  'deps:model.pkl',
-  join('deps:src', 'evaluate.py'),
-  join('deps:src', 'featurization.py'),
-  join('deps:src', 'prepare.py'),
-  join('deps:src', 'train.py')
-]
 
 const data: Column[] = [
   timestampColumn,
@@ -206,92 +175,6 @@ const data: Column[] = [
     path: buildMetricOrParamPath(ColumnType.PARAMS, nestedParamsFile, 'test'),
     pathArray: [ColumnType.PARAMS, nestedParamsFile, 'test'],
     firstValueType: 'boolean'
-  },
-  {
-    hasChildren: true,
-    label: 'data',
-    parentPath: ColumnType.DEPS,
-    path: buildDepPath('data'),
-    type: ColumnType.DEPS
-  },
-  {
-    hasChildren: false,
-    label: 'data.xml',
-    parentPath: buildDepPath('data'),
-    path: buildDepPath('data', 'data.xml'),
-    pathArray: [ColumnType.DEPS, join('data', 'data.xml')],
-    type: ColumnType.DEPS,
-    firstValueType: 'string'
-  },
-  {
-    hasChildren: true,
-    label: 'src',
-    parentPath: ColumnType.DEPS,
-    path: buildDepPath('src'),
-    type: ColumnType.DEPS
-  },
-  {
-    hasChildren: false,
-    label: 'prepare.py',
-    parentPath: buildDepPath('src'),
-    path: buildDepPath('src', 'prepare.py'),
-    pathArray: [ColumnType.DEPS, join('src', 'prepare.py')],
-    type: ColumnType.DEPS,
-    firstValueType: 'string'
-  },
-  {
-    hasChildren: false,
-    label: 'prepared',
-    parentPath: buildDepPath('data'),
-    path: buildDepPath('data', 'prepared'),
-    pathArray: [ColumnType.DEPS, join('data', 'prepared')],
-    type: ColumnType.DEPS,
-    firstValueType: 'string'
-  },
-  {
-    hasChildren: false,
-    label: 'featurization.py',
-    parentPath: buildDepPath('src'),
-    path: buildDepPath('src', 'featurization.py'),
-    pathArray: [ColumnType.DEPS, join('src', 'featurization.py')],
-    type: ColumnType.DEPS,
-    firstValueType: 'string'
-  },
-  {
-    hasChildren: false,
-    label: 'features',
-    parentPath: buildDepPath('data'),
-    path: buildDepPath('data', 'features'),
-    pathArray: [ColumnType.DEPS, join('data', 'features')],
-    type: ColumnType.DEPS,
-    firstValueType: 'string'
-  },
-  {
-    hasChildren: false,
-    label: 'train.py',
-    parentPath: buildDepPath('src'),
-    path: buildDepPath('src', 'train.py'),
-    pathArray: [ColumnType.DEPS, join('src', 'train.py')],
-    type: ColumnType.DEPS,
-    firstValueType: 'string'
-  },
-  {
-    hasChildren: false,
-    label: 'model.pkl',
-    parentPath: ColumnType.DEPS,
-    path: buildDepPath('model.pkl'),
-    pathArray: [ColumnType.DEPS, 'model.pkl'],
-    type: ColumnType.DEPS,
-    firstValueType: 'string'
-  },
-  {
-    hasChildren: false,
-    label: 'evaluate.py',
-    parentPath: buildDepPath('src'),
-    path: buildDepPath('src', 'evaluate.py'),
-    pathArray: [ColumnType.DEPS, join('src', 'evaluate.py')],
-    type: ColumnType.DEPS,
-    firstValueType: 'string'
   },
   {
     type: ColumnType.PARAMS,

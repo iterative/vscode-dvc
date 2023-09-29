@@ -8,7 +8,11 @@ import { TableHeaderCellContents } from './TableHeaderCellContents'
 import { ContextMenuContent } from './ContextMenuContent'
 import { getSortDetails } from './util'
 import styles from '../styles.module.scss'
-import { isExperimentColumn, isFirstLevelHeader } from '../../../util/columns'
+import {
+  isDefaultColumn,
+  isExperimentColumn,
+  isFirstLevelHeader
+} from '../../../util/columns'
 import { ExperimentsState } from '../../../store'
 import { ContextMenu } from '../../../../shared/components/contextMenu/ContextMenu'
 import { DragFunction } from '../../../../shared/components/dragDrop/Draggable'
@@ -117,7 +121,7 @@ export const TableHeaderCell: React.FC<{
   const { isSortable, sortOrder } = useMemo(() => {
     return getSortDetails(header, sorts)
   }, [header, sorts])
-  const isDraggable = !isPlaceholder && !isExperimentColumn(id)
+  const isDraggable = !isPlaceholder && !isDefaultColumn(id)
 
   const hasFilter = !!(header.id && filters.includes(header.id))
 
