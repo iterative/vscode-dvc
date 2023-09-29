@@ -1,5 +1,10 @@
 import get from 'lodash.get'
-import { createSpec, CustomPlotsOrderValue, getFullValuePath } from './custom'
+import {
+  getContent,
+  CustomPlotsOrderValue,
+  getFullValuePath,
+  getSpecDataType
+} from './custom'
 import {
   ColorScale,
   ImagePlot,
@@ -21,7 +26,6 @@ import {
 import { splitColumnPath } from '../../experiments/columns/paths'
 import { ColumnType, Experiment } from '../../experiments/webview/contract'
 import { TemplateOrder } from '../paths/collect'
-import { truncateVerticalTitle } from '../vega/util'
 import { definedAndNonEmpty } from '../../util/array'
 import { exists } from '../../fileSystem'
 import { MULTI_IMAGE_PATH_REG } from '../../cli/dvc/constants'
@@ -127,24 +131,26 @@ const getCustomPlotData = (
   const completeColorScale = fillColorScale(experiments, colorScale, valueIds)
 
   const [{ param: paramVal, metric: metricVal }] = values
-  const yTitle = truncateVerticalTitle(metric, nbItemsPerRow, height)
 
-  const spec = createSpec(
-    yTitle,
-    metric,
-    param,
-    typeof metricVal,
-    typeof paramVal,
-    completeColorScale
-  )
+  const content = getContent()
 
   return {
+    anchor_definitions: {
+      '<DVC_METRIC_COLOR>': JSON.stringify({
+        field: 'id',
+        scale: completeColorScale
+      }),
+      '<DVC_METRIC_DATA>': JSON.stringify(values),
+      '<DVC_METRIC_TYPE>': getSpecDataType(typeof metricVal),
+      '<DVC_METRIC_X_LABEL>': param,
+      '<DVC_METRIC_Y_LABEL>': metric,
+      '<DVC_PARAM_TYPE>': getSpecDataType(typeof paramVal)
+    },
+    content,
     id: getCustomPlotId(metric, param),
     metric,
-    param,
-    spec,
-    values
-  } as CustomPlotData
+    param
+  }
 }
 
 export const collectCustomPlots = ({

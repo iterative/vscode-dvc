@@ -136,12 +136,15 @@ export const isImagePlotOutput = (plot: {
 }): plot is ImagePlotOutput => plot.type === PlotsType.IMAGE
 
 export type AnchorDefinitions = {
+  '<DVC_METRIC_COLOR>'?: string
   '<DVC_METRIC_DATA>': string
   '<DVC_METRIC_SHAPE>'?: string
   '<DVC_METRIC_STROKE_DASH>'?: string
-  '<DVC_METRIC_COLOR>'?: string
-  // fun '<DVC_METRIC_X_LABEL>': string
-  // '<DVC_METRIC_Y_LABEL>': string
+  '<DVC_METRIC_TYPE>'?: 'quantitative' | 'nominal'
+  '<DVC_METRIC_TITLE>'?: string
+  '<DVC_METRIC_X_LABEL>'?: string
+  '<DVC_METRIC_Y_LABEL>'?: string
+  '<DVC_PARAM_TYPE>'?: 'quantitative' | 'nominal'
 }
 
 export type TemplatePlot = {

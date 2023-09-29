@@ -63,7 +63,10 @@ describe('collectCustomPlots', () => {
       nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,
       plotsOrderValues: customPlotsOrderFixture
     })
-    expect(data[0].values.slice(-1)[0].id).toStrictEqual('main')
+    expect(
+      JSON.parse(data[0].anchor_definitions['<DVC_METRIC_DATA>']).slice(-1)[0]
+        .id
+    ).toStrictEqual('main')
   })
 
   it('should create custom plot scales that match the collected values', () => {

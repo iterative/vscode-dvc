@@ -32,7 +32,6 @@ export const CustomPlot: React.FC<CustomPlotProps> = ({ id }) => {
   return (
     <div className={styles.plot} data-testid={key} id={id} style={withScale(1)}>
       <ZoomablePlot
-        spec={plot.spec}
         id={id}
         changeDisabledDragIds={changeDisabledDragIds}
         currentSnapPoint={nbItemsPerRow}

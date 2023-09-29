@@ -98,32 +98,11 @@ const data: CustomPlotsData = {
       id: 'custom-summary.json:loss-params.yaml:log_file',
       metric: 'summary.json:loss',
       param: 'params.yaml:log_file',
-      spec: {
+      content: JSON.stringify({
         $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-        data: { name: 'values' },
+        data: { values: '<DVC_METRIC_DATA>' },
         encoding: {
-          color: {
-            field: 'id',
-            legend: null,
-            scale: {
-              domain: [
-                'main',
-                'exp-e7a67',
-                'test-branch',
-                'exp-83425',
-                'fe2919b',
-                '7df876c'
-              ],
-              range: [
-                '#13adc7',
-                '#f46837',
-                '#48bb78',
-                '#4299e1',
-                '#4c78a8',
-                '#4c78a8'
-              ]
-            }
-          },
+          color: '<DVC_METRIC_COLOR>',
           x: {
             axis: {
               labelLimit: 75,
@@ -133,8 +112,8 @@ const data: CustomPlotsData = {
             scale: {
               zero: false
             },
-            title: 'params.yaml:log_file',
-            type: 'nominal'
+            title: '<DVC_METRIC_X_LABEL>',
+            type: '<DVC_PARAM_TYPE>'
           },
           y: {
             axis: {
@@ -145,8 +124,8 @@ const data: CustomPlotsData = {
             scale: {
               zero: false
             },
-            title: 'summary.json:loss',
-            type: 'quantitative'
+            title: '<DVC_METRIC_Y_LABEL>',
+            type: '<DVC_METRIC_TYPE>'
           }
         },
         height: 'container',
@@ -160,11 +139,11 @@ const data: CustomPlotsData = {
                 },
                 {
                   field: 'metric',
-                  title: 'summary.json:loss'
+                  title: '<DVC_METRIC_Y_LABEL>'
                 },
                 {
                   field: 'param',
-                  title: 'params.yaml:log_file'
+                  title: '<DVC_METRIC_X_LABEL>'
                 }
               ]
             },
@@ -176,86 +155,119 @@ const data: CustomPlotsData = {
           }
         ],
         width: 'container'
-      },
-      values: [
-        { id: '7df876c', metric: 2.048856019973755, param: 'logs.csv' },
-        {
-          id: 'fe2919b',
-          metric: 2.048856019973755,
-          param: 'logs.csv'
-        },
-        { id: 'main', metric: 2.048856019973755, param: 'logs.csv' },
-        { id: 'exp-e7a67', metric: 2.0205044746398926, param: 'logs.csv' },
-        { id: 'test-branch', metric: 1.9293040037155151, param: 'logs.csv' },
-        {
-          id: 'exp-83425',
-          metric: 1.775016188621521,
-          param: 'logs.csv'
-        }
-      ]
+      }),
+      anchor_definitions: {
+        '<DVC_PARAM_TYPE>': 'nominal',
+        '<DVC_METRIC_X_LABEL>': 'params.yaml:log_file',
+        '<DVC_METRIC_Y_LABEL>': 'summary.json:loss',
+        '<DVC_METRIC_TYPE>': 'quantitative',
+        '<DVC_METRIC_COLOR>': JSON.stringify({
+          field: 'id',
+          scale: {
+            domain: [
+              'main',
+              'exp-e7a67',
+              'test-branch',
+              'exp-83425',
+              'fe2919b',
+              '7df876c'
+            ],
+            range: [
+              '#13adc7',
+              '#f46837',
+              '#48bb78',
+              '#4299e1',
+              '#4c78a8',
+              '#4c78a8'
+            ]
+          }
+        }),
+        '<DVC_METRIC_DATA>': JSON.stringify([
+          { id: '7df876c', metric: 2.048856019973755, param: 'logs.csv' },
+          {
+            id: 'fe2919b',
+            metric: 2.048856019973755,
+            param: 'logs.csv'
+          },
+          { id: 'main', metric: 2.048856019973755, param: 'logs.csv' },
+          { id: 'exp-e7a67', metric: 2.0205044746398926, param: 'logs.csv' },
+          { id: 'test-branch', metric: 1.9293040037155151, param: 'logs.csv' },
+          {
+            id: 'exp-83425',
+            metric: 1.775016188621521,
+            param: 'logs.csv'
+          }
+        ])
+      }
     },
     {
       id: 'custom-summary.json:accuracy-params.yaml:epochs',
       metric: 'summary.json:accuracy',
       param: 'params.yaml:epochs',
-      values: [
-        {
-          id: '7df876c',
-          metric: 0.3484833240509033,
-          param: 5
-        },
-        {
-          id: 'fe2919b',
-          metric: 0.3484833240509033,
-          param: 5
-        },
-        {
-          id: 'main',
-          metric: 0.3484833240509033,
-          param: 5
-        },
-        {
-          id: 'exp-e7a67',
-          metric: 0.3724166750907898,
-          param: 2
-        },
-        {
-          id: 'test-branch',
-          metric: 0.4668000042438507,
-          param: 2
-        },
-        {
-          id: 'exp-83425',
-          metric: 0.5926499962806702,
-          param: 5
-        }
-      ],
-      spec: {
-        $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-        data: { name: 'values' },
-        encoding: {
-          color: {
-            field: 'id',
-            legend: null,
-            scale: {
-              domain: [
-                'main',
-                'exp-e7a67',
-                'test-branch',
-                'exp-83425',
-                'fe2919b',
-                '7df876c'
-              ],
-              range: [
-                '#13adc7',
-                '#f46837',
-                '#48bb78',
-                '#4299e1',
-                '#4c78a8',
-                '#4c78a8'
-              ]
-            }
+      anchor_definitions: {
+        '<DVC_PARAM_TYPE>': 'quantitative',
+        '<DVC_METRIC_COLOR>': JSON.stringify({
+          field: 'id',
+          scale: {
+            domain: [
+              'main',
+              'exp-e7a67',
+              'test-branch',
+              'exp-83425',
+              'fe2919b',
+              '7df876c'
+            ],
+            range: [
+              '#13adc7',
+              '#f46837',
+              '#48bb78',
+              '#4299e1',
+              '#4c78a8',
+              '#4c78a8'
+            ]
+          }
+        }),
+        '<DVC_METRIC_DATA>': JSON.stringify([
+          {
+            id: '7df876c',
+            metric: 0.3484833240509033,
+            param: 5
           },
+          {
+            id: 'fe2919b',
+            metric: 0.3484833240509033,
+            param: 5
+          },
+          {
+            id: 'main',
+            metric: 0.3484833240509033,
+            param: 5
+          },
+          {
+            id: 'exp-e7a67',
+            metric: 0.3724166750907898,
+            param: 2
+          },
+          {
+            id: 'test-branch',
+            metric: 0.4668000042438507,
+            param: 2
+          },
+          {
+            id: 'exp-83425',
+            metric: 0.5926499962806702,
+            param: 5
+          }
+        ]),
+        '<DVC_METRIC_TYPE>': 'quantitative',
+        '<DVC_METRIC_X_LABEL>': 'params.yaml:epochs',
+        '<DVC_METRIC_Y_LABEL>': 'summary.json:accuracy'
+      },
+      content: JSON.stringify({
+        $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+        data: { values: '<DVC_METRIC_DATA>' },
+        encoding: {
+          color: '<DVC_METRIC_COLOR>',
           x: {
             axis: {
               labelLimit: 75,
@@ -265,8 +277,8 @@ const data: CustomPlotsData = {
             scale: {
               zero: false
             },
-            title: 'params.yaml:epochs',
-            type: 'quantitative'
+            title: '<DVC_METRIC_X_LABEL>',
+            type: '<DVC_PARAM_TYPE>'
           },
           y: {
             axis: {
@@ -277,8 +289,8 @@ const data: CustomPlotsData = {
             scale: {
               zero: false
             },
-            title: 'summary.json:accuracy',
-            type: 'quantitative'
+            title: '<DVC_METRIC_Y_LABEL>',
+            type: '<DVC_METRIC_TYPE>'
           }
         },
         height: 'container',
@@ -292,11 +304,11 @@ const data: CustomPlotsData = {
                 },
                 {
                   field: 'metric',
-                  title: 'summary.json:accuracy'
+                  title: '<DVC_METRIC_Y_LABEL>'
                 },
                 {
                   field: 'param',
-                  title: 'params.yaml:epochs'
+                  title: '<DVC_METRIC_X_LABEL>'
                 }
               ]
             },
@@ -308,7 +320,7 @@ const data: CustomPlotsData = {
           }
         ],
         width: 'container'
-      }
+      })
     }
   ],
   nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,

@@ -1,6 +1,5 @@
 import { VisualizationSpec } from 'react-vega'
 import { TopLevelSpec } from 'vega-lite'
-import { truncate } from 'vega-util'
 import {
   GenericHConcatSpec,
   GenericVConcatSpec,
@@ -114,12 +113,6 @@ export type Encoding = {
   detail?: { field: string }
   color?: { scale: ColorScale } & LegendDisabled
 }
-
-export const truncateVerticalTitle = (
-  title: string,
-  width: number,
-  height: number
-) => truncate(title, Math.floor((50 - (width - height) * 5) * 0.75), 'left')
 
 export const reverseOfLegendSuppressionUpdate = () => ({
   spec: {

@@ -1727,7 +1727,6 @@
     "process-exists": "4.1.0",
     "tree-kill": "1.2.2",
     "uuid": "9.0.1",
-    "vega-util": "1.17.2",
     "vscode-languageclient": "9.0.1",
     "yaml": "2.3.2"
   },

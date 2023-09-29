@@ -1,6 +1,6 @@
-import { VisualizationSpec } from 'react-vega'
 import { Color } from '../../experiments/model/status/colors'
 import {
+  AnchorDefinitions,
   ImagePlotOutput,
   PlotsType,
   TemplatePlot
@@ -95,11 +95,11 @@ export type CustomPlot = {
   id: string
   metric: string
   param: string
-  values: CustomPlotValues
 }
 
 export type CustomPlotData = CustomPlot & {
-  spec: VisualizationSpec
+  content: string
+  anchor_definitions: AnchorDefinitions
 }
 
 export type CustomPlotsData = {

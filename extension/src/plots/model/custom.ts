@@ -1,8 +1,6 @@
-import { VisualizationSpec } from 'react-vega'
 import { getCustomPlotId } from './collect'
 import { Column, ColumnType } from '../../experiments/webview/contract'
 import { FILE_SEPARATOR } from '../../experiments/columns/paths'
-import { ColorScale } from '../webview/contract'
 
 export type CustomPlotsOrderValue = {
   metric: string
@@ -52,22 +50,15 @@ export const getCustomPlotPathsFromColumns = (
   return { metrics, params }
 }
 
-const getSpecDataType = (type: string) =>
+export const getSpecDataType = (type: string) =>
   type === 'number' ? 'quantitative' : 'nominal'
 
-export const createSpec = (
-  title: string,
-  metric: string,
-  param: string,
-  metricType: string,
-  paramType: string,
-  colorScale: ColorScale
-) =>
-  ({
+export const getContent = (): string =>
+  JSON.stringify({
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-    data: { name: 'values' },
+    data: { values: '<DVC_METRIC_DATA>' },
     encoding: {
-      color: { field: 'id', legend: null, scale: colorScale },
+      color: '<DVC_METRIC_COLOR>',
       x: {
         axis: {
           labelLimit: 75,
@@ -77,8 +68,8 @@ export const createSpec = (
         scale: {
           zero: false
         },
-        title: param,
-        type: getSpecDataType(paramType)
+        title: '<DVC_METRIC_X_LABEL>',
+        type: '<DVC_PARAM_TYPE>'
       },
       y: {
         axis: {
@@ -89,8 +80,8 @@ export const createSpec = (
         scale: {
           zero: false
         },
-        title,
-        type: getSpecDataType(metricType)
+        title: '<DVC_METRIC_Y_LABEL>',
+        type: '<DVC_METRIC_TYPE>'
       }
     },
     height: 'container',
@@ -104,11 +95,11 @@ export const createSpec = (
             },
             {
               field: 'metric',
-              title: metric
+              title: '<DVC_METRIC_Y_LABEL>'
             },
             {
               field: 'param',
-              title: param
+              title: '<DVC_METRIC_X_LABEL>'
             }
           ]
         },
@@ -120,4 +111,4 @@ export const createSpec = (
       }
     ],
     width: 'container'
-  }) as VisualizationSpec
+  })

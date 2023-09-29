@@ -3,6 +3,7 @@ import React from 'react'
 import { Provider, useDispatch } from 'react-redux'
 import type { StoryFn, Meta } from '@storybook/react'
 import { userEvent, within, fireEvent } from '@storybook/testing-library'
+import { truncate } from 'vega-util'
 import {
   PlotsData,
   DEFAULT_SECTION_COLLAPSED,
@@ -18,7 +19,6 @@ import manyTemplatePlots from 'dvc/src/test/fixtures/plotsDiff/template/virtuali
 import comparisonPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
 import smoothTemplatePlotContent from 'dvc/src/test/fixtures/plotsDiff/template/smoothTemplatePlot'
-import { truncateVerticalTitle } from 'dvc/src/plots/vega/util'
 import {
   CHROMATIC_VIEWPORTS_WITH_DELAY,
   DISABLE_CHROMATIC_SNAPSHOTS
@@ -39,11 +39,13 @@ const manyCustomPlots = (length: number) =>
     return {
       ...plot,
       id,
-      yTitle: truncateVerticalTitle(
+      yTitle: truncate(
         id,
-        DEFAULT_NB_ITEMS_PER_ROW,
-        DEFAULT_PLOT_HEIGHT
-      ) as string
+        Math.floor(
+          (50 - (DEFAULT_NB_ITEMS_PER_ROW - DEFAULT_PLOT_HEIGHT) * 5) * 0.75
+        ),
+        'left'
+      )
     }
   })
 

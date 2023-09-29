@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react'
-import VegaLite, { VegaLiteProps } from 'react-vega/lib/VegaLite'
+import { VegaLiteProps } from 'react-vega/lib/VegaLite'
 import { Config } from 'vega-lite'
 import merge from 'lodash.merge'
 import cloneDeep from 'lodash.clonedeep'
@@ -106,15 +106,11 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
       data-testid="zoomed-in-plot"
       ref={zoomedInPlotRef}
     >
-      {isTemplatePlot ? (
-        <TemplateVegaLite
-          id={id}
-          vegaLiteProps={vegaLiteProps}
-          onNewView={onNewView}
-        />
-      ) : (
-        <VegaLite {...vegaLiteProps} onNewView={onNewView} />
-      )}
+      <TemplateVegaLite
+        id={id}
+        vegaLiteProps={vegaLiteProps}
+        onNewView={onNewView}
+      />
     </div>
   )
 }

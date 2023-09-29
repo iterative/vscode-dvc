@@ -589,7 +589,13 @@ suite('Plots Test Suite', () => {
       expect(mockWriteJson).to.be.calledOnce
       expect(mockWriteJson).to.be.calledWithExactly(
         exportFile.path,
-        [...customPlot.values].sort(
+        [
+          ...(JSON.parse(
+            customPlot.anchor_definitions['<DVC_METRIC_DATA>']
+          ) as {
+            id: string
+          }[])
+        ].sort(
           (a, b) => expectedOrder.indexOf(a.id) - expectedOrder.indexOf(b.id)
         ),
         true
@@ -689,7 +695,13 @@ suite('Plots Test Suite', () => {
       expect(mockWriteTsv).to.be.calledOnce
       expect(mockWriteTsv).to.be.calledWithExactly(
         exportFile.path,
-        [...customPlot.values].sort(
+        [
+          ...(JSON.parse(
+            customPlot.anchor_definitions['<DVC_METRIC_DATA>']
+          ) as {
+            id: string
+          }[])
+        ].sort(
           (a, b) => expectedOrder.indexOf(a.id) - expectedOrder.indexOf(b.id)
         )
       )

@@ -1986,18 +1986,18 @@ describe('App', () => {
       for (let i = 0; i < nbOfPlots; i++) {
         const id = `plot-${i}`
         plots.push({
-          id,
-          metric: '',
-          param: '',
-          spec: {
+          anchor_definitions: { '<DVC_METRIC_DATA>': '[]' },
+          content: JSON.stringify({
             $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
             encoding: {},
             height: 100,
             layer: [],
             transform: [],
             width: 100
-          },
-          values: []
+          }),
+          id,
+          metric: '',
+          param: ''
         })
       }
       return {
