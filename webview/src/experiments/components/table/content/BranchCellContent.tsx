@@ -28,8 +28,6 @@ export const BranchCellContent: React.FC<
     )
   }
 
-  const hasMultiBranches = otherBranches.length > 0
-
   return (
     <Tooltip
       content={[branch, ...otherBranches].join(', ')}
@@ -39,18 +37,17 @@ export const BranchCellContent: React.FC<
       <div
         className={styles.branchInnerCell}
         style={{ width: cell.column.getSize() }}
-        data-testid="try-to-get-tooltip"
       >
         <div className={styles.cellContents}>
           <Icon icon={GitMerge} width={13} height={13} />
           <ul
             className={cx(
               styles.branchCellList,
-              !hasMultiBranches && styles.branchCellListSingleItem
+              otherBranches.length === 0 && styles.branchCellListSingleItem
             )}
           >
             <li>{branch}</li>
-            {hasMultiBranches && (
+            {otherBranches.length > 0 && (
               <li>
                 {otherBranches[0]}
                 {otherBranches.length > 1 &&
