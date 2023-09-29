@@ -66,6 +66,34 @@ describe('collectCustomPlots', () => {
     })
     expect(data[0].values.slice(-1)[0].id).toStrictEqual('main')
   })
+
+  it('should create custom plot scales that match the collected values', () => {
+    const expectedOutput: CustomPlotData[] = customPlotsFixture.plots
+    const data = collectCustomPlots({
+      colorScale: {
+        domain: ['main', 'exp-e7a67', 'test-branch', 'exp-83425', 'failed-exp'],
+        range: ['#13adc7', '#f46837', '#48bb78', '#4299e1', '#f56565']
+      },
+      experiments: [
+        ...experimentsWithCommits,
+        {
+          branch: 'main',
+          id: 'weird-exp',
+          label: 'exp with no metrics or params'
+        },
+        {
+          branch: 'main',
+          error: 'failed to run',
+          id: 'failed-exp',
+          label: '123'
+        }
+      ],
+      height: DEFAULT_PLOT_HEIGHT,
+      nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,
+      plotsOrderValues: customPlotsOrderFixture
+    })
+    expect(data).toStrictEqual(expectedOutput)
+  })
 })
 
 describe('collectData', () => {

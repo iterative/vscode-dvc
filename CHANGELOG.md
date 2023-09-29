@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.58] - 2023-09-27
+
+### 🚀 New Features and Enhancements
+
+- Add action buttons to empty plot sections [#4694](https://github.com/iterative/vscode-dvc/pull/4694) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Fix broken "With Multiple Branches"  table storybook [#4722](https://github.com/iterative/vscode-dvc/pull/4722) by [@julieg18](https://github.com/julieg18)
+- Fix experiments table move to start functionality [#4724](https://github.com/iterative/vscode-dvc/pull/4724) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.57] - 2023-09-20
 
 ### 🚀 New Features and Enhancements

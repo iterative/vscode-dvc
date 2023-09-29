@@ -26,6 +26,7 @@ import { vsCodeApi } from '../../shared/api'
 import {
   commonColumnFields,
   expectHeaders,
+  getHeaders,
   tableData as simplifiedSortedTableDataFixture
 } from '../../test/sort'
 import {
@@ -223,6 +224,30 @@ describe('App', () => {
     expect(screen.getByTestId('commit___exp-83425').textContent).toStrictEqual(
       '53c3851'
     )
+  })
+
+  it('should be able to move columns to the start', async () => {
+    renderTable({
+      ...simplifiedSortedTableDataFixture,
+      columnOrder: ['id', 'Created', 'params:A', 'params:B', 'params:C']
+    })
+
+    await expectHeaders(['A', 'B', 'C'])
+
+    const moveBCtoStart = ['id', 'params:B', 'params:C', 'Created', 'params:A']
+
+    setTableData({
+      ...simplifiedSortedTableDataFixture,
+      columnOrder: moveBCtoStart
+    })
+
+    expect(await getHeaders()).toStrictEqual([
+      'Experiment',
+      'B',
+      'C',
+      'Created',
+      'A'
+    ])
   })
 
   describe('Row expansion', () => {
