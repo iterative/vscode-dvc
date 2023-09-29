@@ -899,22 +899,25 @@ $badge-size: 0.85rem;
   }
 }
 
-.branchCellText {
+.branchCellList {
   @extend %truncateLeftParent;
 
   display: flex;
   flex-direction: column;
   gap: 2px;
   font-weight: 600;
-  font-size: 0.65rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.6rem;
 
-  span {
+  li {
     @extend %truncateLeftChild;
   }
 }
 
-.branchCellTextMultiLine {
-  font-size: 0.6rem;
+.branchCellListSingleItem {
+  font-size: 0.65rem;
 }
 
 .cellTooltip {

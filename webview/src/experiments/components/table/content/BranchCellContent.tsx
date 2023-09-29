@@ -33,30 +33,31 @@ export const BranchCellContent: React.FC<
   return (
     <Tooltip
       content={[branch, ...otherBranches].join(', ')}
-      placement="bottom-end"
+      placement="bottom-start"
       delay={NORMAL_TOOLTIP_DELAY}
     >
       <div
         className={styles.branchInnerCell}
         style={{ width: cell.column.getSize() }}
+        data-testid="try-to-get-tooltip"
       >
         <div className={styles.cellContents}>
           <Icon icon={GitMerge} width={13} height={13} />
-          <span
+          <ul
             className={cx(
-              styles.branchCellText,
-              hasMultiBranches && styles.branchCellTextMultiLine
+              styles.branchCellList,
+              !hasMultiBranches && styles.branchCellListSingleItem
             )}
           >
-            <span>{branch}</span>
+            <li>{branch}</li>
             {hasMultiBranches && (
-              <span>
+              <li>
                 {otherBranches[0]}
                 {otherBranches.length > 1 &&
                   ` + ${otherBranches.length - 1} more`}
-              </span>
+              </li>
             )}
-          </span>
+          </ul>
         </div>
       </div>
     </Tooltip>

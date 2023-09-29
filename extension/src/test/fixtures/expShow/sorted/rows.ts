@@ -28,6 +28,7 @@ const rowsFixture: Commit[] = [
         val_accuracy: 0.6704000234603882
       }
     },
+    otherBranches: [],
     params: {
       'params.yaml': {
         code_names: [0, 1],
@@ -45,6 +46,86 @@ const rowsFixture: Commit[] = [
     executorStatus: ExecutorStatus.RUNNING,
     selected: false,
     starred: false
+  },
+  {
+    branch: 'main',
+    commit: {
+      author: 'Julie G',
+      date: '5 days ago',
+      message: 'Drop checkpoint: true (#74)\n\n',
+      tags: []
+    },
+    description: 'Drop checkpoint: true (#74)\n\n',
+    displayColor: undefined,
+    id: 'fe2919b',
+    label: 'fe2919b',
+    metrics: {
+      'summary.json': {
+        loss: 2.048856019973755,
+        accuracy: 0.3484833240509033,
+        val_loss: 1.9979369640350342,
+        val_accuracy: 0.4277999997138977
+      }
+    },
+    otherBranches: [],
+    params: {
+      'params.yaml': {
+        code_names: [0, 1],
+        epochs: 10,
+        learning_rate: 2.1e-7,
+        dvc_logs_dir: 'dvc_logs',
+        log_file: 'logs.csv',
+        dropout: 0.122,
+        process: { threshold: 0.86, test_arg: 'string' }
+      },
+      [join('nested', 'params.yaml')]: {
+        test: true
+      }
+    },
+    selected: false,
+    sha: 'fe2919bb4394b30494bea905c253e10077b9a1bd',
+    starred: false,
+    Created: '2020-11-16T19:58:22'
+  },
+  {
+    branch: 'main',
+    commit: {
+      author: 'Matt Seddon',
+      date: '3 days ago',
+      message: 'Update dependency dvclive to v2.6.4 (#75)\n\n',
+      tags: []
+    },
+    description: 'Update dependency dvclive to v2.6.4 (#75)\n\n',
+    displayColor: undefined,
+    id: '7df876c',
+    label: '7df876c',
+    metrics: {
+      'summary.json': {
+        loss: 2.048856019973755,
+        accuracy: 0.3484833240509033,
+        val_loss: 1.9979369640350342,
+        val_accuracy: 0.4277999997138977
+      }
+    },
+    otherBranches: [],
+    params: {
+      'params.yaml': {
+        code_names: [0, 1],
+        epochs: 7,
+        learning_rate: 2.1e-7,
+        dvc_logs_dir: 'dvc_logs',
+        log_file: 'logs.csv',
+        dropout: 0.122,
+        process: { threshold: 0.86, test_arg: 'string' }
+      },
+      [join('nested', 'params.yaml')]: {
+        test: true
+      }
+    },
+    selected: false,
+    sha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
+    starred: false,
+    Created: '2020-11-18T19:58:22'
   },
   {
     branch: 'main',
@@ -67,6 +148,7 @@ const rowsFixture: Commit[] = [
         val_accuracy: 0.4277999997138977
       }
     },
+    otherBranches: [],
     params: {
       'params.yaml': {
         code_names: [0, 1],
@@ -102,6 +184,7 @@ const rowsFixture: Commit[] = [
         val_accuracy: 0.6704000234603882
       }
     },
+    otherBranches: [],
     params: {
       'params.yaml': {
         code_names: [0, 1],
@@ -130,6 +213,7 @@ const rowsFixture: Commit[] = [
     error: "unable to read: 'summary.json', JSON file structure is corrupted",
     label: 'f0f9186',
     metrics: {},
+    otherBranches: [],
     params: {
       'params.yaml': {
         code_names: [0, 1],
@@ -158,6 +242,7 @@ const rowsFixture: Commit[] = [
     id: '55d492c',
     label: '55d492c',
     metrics: {},
+    otherBranches: [],
     params: {
       'params.yaml': {
         code_names: [0, 2],
@@ -189,8 +274,8 @@ const rowsFixture: Commit[] = [
     },
     description: 'Improve "Get Started" walkthrough (#4020) ...',
     displayColor: undefined,
-    id: 'fe2919b',
-    label: 'fe2919b',
+    id: 'other-branch',
+    label: 'other-branch',
     metrics: {
       'summary.json': {
         loss: 2.048856019973755,
@@ -199,6 +284,7 @@ const rowsFixture: Commit[] = [
         val_accuracy: 0.4277999997138977
       }
     },
+    otherBranches: ['other-branch'],
     params: {
       'params.yaml': {
         code_names: [0, 1],
@@ -214,7 +300,7 @@ const rowsFixture: Commit[] = [
       }
     },
     selected: false,
-    sha: 'fe2919bb4394b30494bea905c253e10077b9a1bd',
+    sha: '90aea7f2482117a55dfcadcdb901aaa6610fbbc9',
     starred: false,
     Created: '2020-11-21T19:58:22'
   },
@@ -230,8 +316,8 @@ const rowsFixture: Commit[] = [
     description:
       'Add capabilities to text mentioning storage provider extensions (#4015)',
     displayColor: undefined,
-    id: '7df876c',
-    label: '7df876c',
+    id: 'another-branch',
+    label: 'another-branch',
     metrics: {
       'summary.json': {
         loss: 2.048856019973755,
@@ -240,6 +326,7 @@ const rowsFixture: Commit[] = [
         val_accuracy: 0.4277999997138977
       }
     },
+    otherBranches: ['other-branch', 'another-branch'],
     params: {
       'params.yaml': {
         code_names: [0, 1],
@@ -255,7 +342,7 @@ const rowsFixture: Commit[] = [
       }
     },
     selected: false,
-    sha: '7df876cb5147800cd3e489d563bc6dcd67188621',
+    sha: '55d492c9c633912685351b32df91bfe1f9ecefb9',
     starred: false,
     Created: '2020-11-21T19:58:22'
   },
@@ -275,6 +362,7 @@ const rowsFixture: Commit[] = [
         val_accuracy: 0.4277999997138977
       }
     },
+    otherBranches: [],
     params: {
       'params.yaml': {
         code_names: [0, 1],
@@ -310,6 +398,7 @@ const rowsFixture: Commit[] = [
         val_accuracy: 0.5608000159263611
       }
     },
+    otherBranches: [],
     params: {
       'params.yaml': {
         code_names: [0, 1],
@@ -339,6 +428,7 @@ const rowsFixture: Commit[] = [
     sha: '489fd8bdaa709f7330aac342e051a9431c625481',
     label: '489fd8b',
     error: "unable to read: 'params.yaml', YAML file structure is corrupted",
+    otherBranches: [],
     selected: false,
     starred: false,
     executorStatus: ExecutorStatus.FAILED
