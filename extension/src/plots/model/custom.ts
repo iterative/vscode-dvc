@@ -50,7 +50,7 @@ export const getCustomPlotPathsFromColumns = (
   return { metrics, params }
 }
 
-export const getSpecDataType = (type: string) =>
+export const getDataType = (type: string) =>
   type === 'number' ? 'quantitative' : 'nominal'
 
 export const getContent = (): string =>

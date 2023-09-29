@@ -14,12 +14,7 @@ import customPlotsFixture, {
 } from '../../test/fixtures/expShow/base/customPlots'
 import { EXPERIMENT_WORKSPACE_ID, TemplatePlot } from '../../cli/dvc/contract'
 import { sameContents } from '../../util/array'
-import {
-  CustomPlotData,
-  DEFAULT_NB_ITEMS_PER_ROW,
-  DEFAULT_PLOT_HEIGHT,
-  ImagePlot
-} from '../webview/contract'
+import { CustomPlotData, ImagePlot } from '../webview/contract'
 import { exists } from '../../fileSystem'
 import { REVISIONS } from '../../test/fixtures/plotsDiff'
 
@@ -45,8 +40,6 @@ describe('collectCustomPlots', () => {
         range: ['#13adc7', '#f46837', '#48bb78', '#4299e1']
       },
       experiments: experimentsWithCommits,
-      height: DEFAULT_PLOT_HEIGHT,
-      nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,
       plotsOrderValues: customPlotsOrderFixture
     })
     expect(data).toStrictEqual(expectedOutput)
@@ -59,8 +52,6 @@ describe('collectCustomPlots', () => {
         range: ['#13adc7']
       },
       experiments: experimentsWithCommits,
-      height: DEFAULT_PLOT_HEIGHT,
-      nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,
       plotsOrderValues: customPlotsOrderFixture
     })
     expect(
@@ -90,8 +81,6 @@ describe('collectCustomPlots', () => {
           label: '123'
         }
       ],
-      height: DEFAULT_PLOT_HEIGHT,
-      nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,
       plotsOrderValues: customPlotsOrderFixture
     })
     expect(data).toStrictEqual(expectedOutput)
@@ -154,7 +143,6 @@ describe('collectTemplates', () => {
       'predictions.json'
     ])
 
-    // probably need to delete color entry to get to match
     expect(templates[logsLossPath]).toStrictEqual({
       anchorDefinitions: anchor_definitions,
       content

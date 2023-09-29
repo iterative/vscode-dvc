@@ -3,7 +3,7 @@ import {
   getContent,
   CustomPlotsOrderValue,
   getFullValuePath,
-  getSpecDataType
+  getDataType
 } from './custom'
 import {
   ColorScale,
@@ -117,8 +117,6 @@ const fillColorScale = (
 const getCustomPlotData = (
   orderValue: CustomPlotsOrderValue,
   experiments: Experiment[],
-  height: number,
-  nbItemsPerRow: number,
   colorScale: ColorScale | undefined
 ): CustomPlotData => {
   const { metric, param } = orderValue
@@ -141,10 +139,10 @@ const getCustomPlotData = (
         scale: completeColorScale
       }),
       '<DVC_METRIC_DATA>': JSON.stringify(values),
-      '<DVC_METRIC_TYPE>': getSpecDataType(typeof metricVal),
+      '<DVC_METRIC_TYPE>': getDataType(typeof metricVal),
       '<DVC_METRIC_X_LABEL>': param,
       '<DVC_METRIC_Y_LABEL>': metric,
-      '<DVC_PARAM_TYPE>': getSpecDataType(typeof paramVal)
+      '<DVC_PARAM_TYPE>': getDataType(typeof paramVal)
     },
     content,
     id: getCustomPlotId(metric, param),
@@ -156,22 +154,16 @@ const getCustomPlotData = (
 export const collectCustomPlots = ({
   colorScale,
   plotsOrderValues,
-  experiments,
-  height,
-  nbItemsPerRow
+  experiments
 }: {
   colorScale: ColorScale | undefined
   plotsOrderValues: CustomPlotsOrderValue[]
   experiments: Experiment[]
-  height: number
-  nbItemsPerRow: number
 }): CustomPlotData[] => {
   const plots = []
 
   for (const value of plotsOrderValues) {
-    plots.push(
-      getCustomPlotData(value, experiments, height, nbItemsPerRow, colorScale)
-    )
+    plots.push(getCustomPlotData(value, experiments, colorScale))
   }
 
   return plots

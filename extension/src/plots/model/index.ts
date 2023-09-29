@@ -149,10 +149,6 @@ export class PlotsModel extends ModelWithPersistence {
     const experiments = this.experiments.getUnfilteredCommitsAndExperiments()
     const hasUnfilteredExperiments = experiments.length > 0
     const plotsOrderValues = this.getCustomPlotsOrder()
-    const height = this.getHeight(PlotsSection.CUSTOM_PLOTS)
-    const nbItemsPerRow = this.getNbItemsPerRowOrWidth(
-      PlotsSection.CUSTOM_PLOTS
-    )
     const hasAddedPlots = plotsOrderValues.length > 0
 
     const colorScale = getColorScale(
@@ -164,14 +160,12 @@ export class PlotsModel extends ModelWithPersistence {
     return {
       hasAddedPlots,
       hasUnfilteredExperiments,
-      height,
-      nbItemsPerRow,
+      height: this.getHeight(PlotsSection.CUSTOM_PLOTS),
+      nbItemsPerRow: this.getNbItemsPerRowOrWidth(PlotsSection.CUSTOM_PLOTS),
       plots: hasUnfilteredExperiments
         ? collectCustomPlots({
             colorScale,
             experiments,
-            height,
-            nbItemsPerRow,
             plotsOrderValues
           })
         : []

@@ -1,20 +1,12 @@
-import {
-  DEFAULT_NB_ITEMS_PER_ROW,
-  PlotsSection,
-  TemplatePlotEntry
-} from 'dvc/src/plots/webview/contract'
+import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import { useCallback, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { VisualizationSpec } from 'react-vega'
-import { truncate } from 'vega-util'
 import { plotDataStore } from '../components/plotDataStore'
 import { PlotsState } from '../store'
+import { fillTemplate } from '../util/vega'
 
-export const useGetPlot = (
-  section: PlotsSection,
-  id: string
-  // eslint-disable-next-line sonarjs/cognitive-complexity
-) => {
+export const useGetPlot = (section: PlotsSection, id: string) => {
   const isTemplatePlot = section === PlotsSection.TEMPLATE_PLOTS
   const storeSection = isTemplatePlot ? 'template' : 'custom'
   const {
@@ -23,60 +15,16 @@ export const useGetPlot = (
     height
   } = useSelector((state: PlotsState) => state[storeSection])
 
-  const [content, setContent] = useState<VisualizationSpec | undefined>()
+  const [spec, setSpec] = useState<VisualizationSpec | undefined>()
 
   const setPlotData = useCallback(() => {
     const plot = plotDataStore[section][id]
-    if (!plot) {
+    const spec = fillTemplate(plot, nbItemsPerRow, height, true)
+    if (!spec) {
       return
     }
 
-    const { content, anchor_definitions } = plot as TemplatePlotEntry
-    const width = nbItemsPerRow > DEFAULT_NB_ITEMS_PER_ROW ? 30 : 50
-    let specStr = content
-
-    for (const [key, value] of Object.entries(anchor_definitions)) {
-      if (['<DVC_METRIC_TITLE>', '<DVC_METRIC_X_LABEL>'].includes(key)) {
-        const truncatedValue = truncate(value, width, 'left')
-        specStr = specStr.replace(new RegExp(key, 'g'), truncatedValue)
-      }
-
-      if (key === '<DVC_METRIC_Y_LABEL>') {
-        const truncatedVerticalValue = truncate(
-          value,
-          Math.floor((50 - (nbItemsPerRow - height) * 5) * 0.75),
-          'left'
-        )
-        specStr = specStr.replace(new RegExp(key, 'g'), truncatedVerticalValue)
-      }
-
-      if (
-        [
-          '<DVC_METRIC_COLOR>',
-          '<DVC_METRIC_SHAPE>',
-          '<DVC_METRIC_STROKE_DASH>'
-        ].includes(key)
-      ) {
-        const obj = JSON.parse(value) as { [key: string]: unknown }
-        obj.legend = null
-        specStr = specStr.replace(
-          new RegExp(`"${key}"`, 'g'),
-          JSON.stringify(obj)
-        )
-      }
-
-      if (key === '<DVC_METRIC_DATA>') {
-        specStr = specStr.replace(`"${key}"`, value)
-      }
-
-      if (['<DVC_PARAM_TYPE>', '<DVC_METRIC_TYPE>'].includes(key)) {
-        specStr = specStr.replace(key, value)
-      }
-    }
-
-    const spec = JSON.parse(specStr) as VisualizationSpec
-
-    setContent({
+    setSpec({
       ...spec,
       height: 'container',
       width: 'container'
@@ -87,5 +35,5 @@ export const useGetPlot = (
     setPlotData()
   }, [snapshot, setPlotData])
 
-  return { content, isTemplatePlot }
+  return spec
 }

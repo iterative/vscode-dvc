@@ -1,16 +1,16 @@
 import { AnyAction } from '@reduxjs/toolkit'
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
-import React, { useEffect, useRef } from 'react'
+import React, { useRef } from 'react'
 import { useDispatch } from 'react-redux'
 import { VegaLiteProps } from 'react-vega/lib/VegaLite'
 import { TemplateVegaLite } from './templatePlots/TemplateVegaLite'
 import { setZoomedInPlot } from './webviewSlice'
 import styles from './styles.module.scss'
-import { config } from './constants'
 import { zoomPlot } from '../util/messages'
 import { useGetPlot } from '../hooks/useGetPlot'
 import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
 import { Ellipsis } from '../../shared/components/icons'
+import { getVegaLiteProps } from '../util/vega'
 
 interface ZoomablePlotProps {
   id: string
@@ -26,36 +26,17 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
   onViewReady,
   section
 }) => {
-  const { content: spec, isTemplatePlot } = useGetPlot(section, id)
+  const spec = useGetPlot(section, id)
   const dispatch = useDispatch()
   const currentPlotProps = useRef<VegaLiteProps>()
 
-  const plotProps: VegaLiteProps = {
-    actions: false,
-    config,
-    'data-testid': `${id}-vega`,
-    renderer: 'svg',
-    spec
-  } as VegaLiteProps
-  currentPlotProps.current = plotProps
-
-  useEffect(() => {
-    dispatch(
-      setZoomedInPlot({
-        id,
-        isTemplatePlot,
-        plot: currentPlotProps.current,
-        refresh: true
-      })
-    )
-  }, [spec, dispatch, id, isTemplatePlot])
+  const vegaLiteProps = getVegaLiteProps(id, spec, false)
+  currentPlotProps.current = vegaLiteProps
 
   const handleOnClick = (openActionsMenu?: boolean) => {
     zoomPlot()
 
-    return dispatch(
-      setZoomedInPlot({ id, isTemplatePlot, openActionsMenu, plot: plotProps })
-    )
+    return dispatch(setZoomedInPlot({ id, openActionsMenu, section }))
   }
 
   if (!spec) {
@@ -94,7 +75,7 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
       </span>
       {currentPlotProps.current && (
         <TemplateVegaLite
-          vegaLiteProps={plotProps}
+          vegaLiteProps={vegaLiteProps}
           id={id}
           onNewView={onNewView}
         />

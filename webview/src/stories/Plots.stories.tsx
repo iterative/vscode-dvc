@@ -3,13 +3,11 @@ import React from 'react'
 import { Provider, useDispatch } from 'react-redux'
 import type { StoryFn, Meta } from '@storybook/react'
 import { userEvent, within, fireEvent } from '@storybook/testing-library'
-import { truncate } from 'vega-util'
 import {
   PlotsData,
   DEFAULT_SECTION_COLLAPSED,
   TemplatePlotGroup,
   TemplatePlotSection,
-  DEFAULT_PLOT_HEIGHT,
   DEFAULT_NB_ITEMS_PER_ROW
 } from 'dvc/src/plots/webview/contract'
 import { MessageToWebviewType } from 'dvc/src/webview/contract'
@@ -38,14 +36,7 @@ const manyCustomPlots = (length: number) =>
     const id = plot.id + i.toString()
     return {
       ...plot,
-      id,
-      yTitle: truncate(
-        id,
-        Math.floor(
-          (50 - (DEFAULT_NB_ITEMS_PER_ROW - DEFAULT_PLOT_HEIGHT) * 5) * 0.75
-        ),
-        'left'
-      )
+      id
     }
   })
 
