@@ -8,20 +8,29 @@
     "demo/",
     "extension/src/test/",
     "languageServer/src/test/",
-    "webview/src/shared/components/icons/"
+    "webview/src/shared/components/icons/",
+    "webview/src/test/mockRowModel.ts"
   ],
   "checks": {
     "file-lines": {
-      "config": { "threshold": 300 }
+      "config": {
+        "threshold": 300
+      }
     },
-    "method-count": { "config": { "threshold": 30 } },
+    "method-count": {
+      "config": {
+        "threshold": 30
+      }
+    },
     "method-lines": {
       "config": {
         "threshold": 40
       }
     },
     "method-complexity": {
-      "config": { "threshold": 6 }
+      "config": {
+        "threshold": 6
+      }
     }
   }
 }
