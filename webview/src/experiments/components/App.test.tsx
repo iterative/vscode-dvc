@@ -671,7 +671,6 @@ describe('App', () => {
       const tooltip = screen.getByRole('tooltip')
       expect(tooltip).toBeInTheDocument()
 
-      expect(screen.getByRole('tooltip')).toBeInTheDocument() // unable to find...
       fireEvent.mouseLeave(testParamCell, { bubbles: true })
       fireEvent.mouseEnter(tooltip, { bubbles: true })
 
