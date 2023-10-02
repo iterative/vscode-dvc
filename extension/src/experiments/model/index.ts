@@ -859,16 +859,15 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   private getFlattenedRowData(workspaceRow: Commit): Commit[] {
     const branchesBySha: { [sha: string]: string[] } = {}
-
     for (const { branch, sha } of this.rowOrder) {
       if (!branchesBySha[sha]) {
         branchesBySha[sha] = []
       }
       branchesBySha[sha].push(branch)
     }
+
     const commitsBySha: { [sha: string]: Commit[] } =
       this.applyFiltersToFlattenedCommits()
-
     const rows: Commit[] = []
     for (const [sha, commitAndExps] of Object.entries(commitsBySha)) {
       const flatBranches = branchesBySha[sha]
@@ -881,7 +880,6 @@ export class ExperimentsModel extends ModelWithPersistence {
         ...commitAndExps.map(commitOrExp => ({ ...commitOrExp, flatBranches }))
       )
     }
-
     return [workspaceRow, ...sortExperiments(this.getSorts(), rows)]
   }
 }
