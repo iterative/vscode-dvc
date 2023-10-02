@@ -1,6 +1,6 @@
 import { resolve } from 'path'
 import { Uri, window } from 'vscode'
-import { pickFile, pickResources } from './resourcePicker'
+import { pickFile, pickResources, pickFiles } from './resourcePicker'
 import { Title } from './title'
 
 jest.mock('vscode')
@@ -65,5 +65,18 @@ describe('pickResources', () => {
     const pickedResources = await pickResources(mockedTitle)
 
     expect(pickedResources).toStrictEqual([mockedUri])
+  })
+})
+
+describe('pickFiles', () => {
+  it('should return an array of selected file paths', async () => {
+    const files = [resolve('mock', 'file'), resolve('mock', 'file2')]
+    const mockedPickedUris = files.map(file => Uri.file(file))
+    const mockedTitle = 'insert great title here' as Title
+    mockedShowOpenDialog.mockResolvedValueOnce(mockedPickedUris)
+
+    const pickedResources = await pickFiles(mockedTitle)
+
+    expect(pickedResources).toStrictEqual(files)
   })
 })
