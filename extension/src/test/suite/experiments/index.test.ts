@@ -1969,14 +1969,12 @@ suite('Experiments Test Suite', () => {
           id: 'exp-2'
         }
       ])
-      expect(
-        sortedRows.map(({ otherBranches }) => otherBranches)
-      ).to.deep.equal([
+      expect(sortedRows.map(({ flatBranches }) => flatBranches)).to.deep.equal([
         undefined,
-        ['other-branch'],
-        ['other-branch'],
-        ['other-branch'],
-        ['other-branch']
+        ['main', 'other-branch'],
+        ['main', 'other-branch'],
+        ['main', 'other-branch'],
+        ['main', 'other-branch']
       ])
       expect(sorts).to.deep.equal([{ descending: true, path: paramPath }])
     })

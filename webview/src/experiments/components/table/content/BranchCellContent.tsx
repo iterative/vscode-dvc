@@ -15,11 +15,11 @@ export const BranchCellContent: React.FC<
 > = cell => {
   const {
     row: {
-      original: { branch, otherBranches = [] }
+      original: { flatBranches = [] }
     }
   } = cell as unknown as CellContext<Experiment, CellValue>
 
-  if (!branch) {
+  if (flatBranches.length === 0) {
     return (
       <div
         className={styles.branchInnerCell}
@@ -28,9 +28,12 @@ export const BranchCellContent: React.FC<
     )
   }
 
+  const isSingleBranch = flatBranches.length === 1
+  const [firstBranch, secondBranch, ...restOfBranches] = flatBranches
+
   return (
     <Tooltip
-      content={[branch, ...otherBranches].join(', ')}
+      content={[flatBranches].join(', ')}
       placement="bottom-start"
       delay={NORMAL_TOOLTIP_DELAY}
     >
@@ -43,15 +46,15 @@ export const BranchCellContent: React.FC<
           <ul
             className={cx(
               styles.branchCellList,
-              otherBranches.length === 0 && styles.branchCellListSingleItem
+              isSingleBranch && styles.branchCellListSingleItem
             )}
           >
-            <li>{branch}</li>
-            {otherBranches.length > 0 && (
+            <li>{firstBranch}</li>
+            {secondBranch && (
               <li>
-                {otherBranches[0]}
-                {otherBranches.length > 1 &&
-                  ` + ${otherBranches.length - 1} more`}
+                {secondBranch}
+                {restOfBranches.length > 0 &&
+                  ` + ${restOfBranches.length} more`}
               </li>
             )}
           </ul>

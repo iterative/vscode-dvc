@@ -28,7 +28,6 @@ const rowsFixture: Commit[] = [
         val_accuracy: 0.6704000234603882
       }
     },
-    otherBranches: [],
     params: {
       'params.yaml': {
         code_names: [0, 1],
@@ -48,7 +47,6 @@ const rowsFixture: Commit[] = [
     starred: false
   },
   {
-    branch: 'main',
     commit: {
       author: 'Julie G',
       date: '5 days ago',
@@ -57,6 +55,7 @@ const rowsFixture: Commit[] = [
     },
     description: 'Drop checkpoint: true (#74)\n\n',
     displayColor: undefined,
+    flatBranches: ['main'],
     id: 'fe2919b',
     label: 'fe2919b',
     metrics: {
@@ -67,7 +66,6 @@ const rowsFixture: Commit[] = [
         val_accuracy: 0.4277999997138977
       }
     },
-    otherBranches: [],
     params: {
       'params.yaml': {
         code_names: [0, 1],
@@ -88,7 +86,6 @@ const rowsFixture: Commit[] = [
     Created: '2020-11-16T19:58:22'
   },
   {
-    branch: 'main',
     commit: {
       author: 'Matt Seddon',
       date: '3 days ago',
@@ -97,6 +94,7 @@ const rowsFixture: Commit[] = [
     },
     description: 'Update dependency dvclive to v2.6.4 (#75)\n\n',
     displayColor: undefined,
+    flatBranches: ['main'],
     id: '7df876c',
     label: '7df876c',
     metrics: {
@@ -107,7 +105,6 @@ const rowsFixture: Commit[] = [
         val_accuracy: 0.4277999997138977
       }
     },
-    otherBranches: [],
     params: {
       'params.yaml': {
         code_names: [0, 1],
@@ -128,7 +125,6 @@ const rowsFixture: Commit[] = [
     Created: '2020-11-18T19:58:22'
   },
   {
-    branch: 'main',
     commit: {
       author: 'github-actions[bot]',
       date: '6 hours ago',
@@ -138,6 +134,7 @@ const rowsFixture: Commit[] = [
     },
     description: 'Update version and CHANGELOG for release (#4022) ...',
     displayColor: undefined,
+    flatBranches: ['main'],
     id: 'main',
     label: 'main',
     metrics: {
@@ -148,7 +145,6 @@ const rowsFixture: Commit[] = [
         val_accuracy: 0.4277999997138977
       }
     },
-    otherBranches: [],
     params: {
       'params.yaml': {
         code_names: [0, 1],
@@ -169,11 +165,11 @@ const rowsFixture: Commit[] = [
     Created: '2020-11-21T19:58:22'
   },
   {
-    branch: 'main',
     baselineSha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
     displayColor: undefined,
     description: '[exp-83425]',
     executor: Executor.WORKSPACE,
+    flatBranches: ['main'],
     id: 'exp-83425',
     label: EXPERIMENT_WORKSPACE_ID,
     metrics: {
@@ -184,7 +180,6 @@ const rowsFixture: Commit[] = [
         val_accuracy: 0.6704000234603882
       }
     },
-    otherBranches: [],
     params: {
       'params.yaml': {
         code_names: [0, 1],
@@ -205,15 +200,14 @@ const rowsFixture: Commit[] = [
     Created: '2020-12-29T15:27:02'
   },
   {
-    branch: 'main',
     baselineSha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
     displayColor: undefined,
     description: '[exp-f13bca]',
     id: 'exp-f13bca',
     error: "unable to read: 'summary.json', JSON file structure is corrupted",
+    flatBranches: ['main'],
     label: 'f0f9186',
     metrics: {},
-    otherBranches: [],
     params: {
       'params.yaml': {
         code_names: [0, 1],
@@ -235,14 +229,13 @@ const rowsFixture: Commit[] = [
     Created: '2020-12-29T15:26:36'
   },
   {
-    branch: 'main',
     baselineSha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
     displayColor: undefined,
     error: 'Experiment run failed.',
+    flatBranches: ['main'],
     id: '55d492c',
     label: '55d492c',
     metrics: {},
-    otherBranches: [],
     params: {
       'params.yaml': {
         code_names: [0, 2],
@@ -264,7 +257,6 @@ const rowsFixture: Commit[] = [
     Created: '2020-12-29T15:25:27'
   },
   {
-    branch: 'main',
     commit: {
       author: 'Julie G',
       date: '6 hours ago',
@@ -274,6 +266,7 @@ const rowsFixture: Commit[] = [
     },
     description: 'Improve "Get Started" walkthrough (#4020) ...',
     displayColor: undefined,
+    flatBranches: ['main', 'other-branch'],
     id: 'other-branch',
     label: 'other-branch',
     metrics: {
@@ -284,7 +277,6 @@ const rowsFixture: Commit[] = [
         val_accuracy: 0.4277999997138977
       }
     },
-    otherBranches: ['other-branch'],
     params: {
       'params.yaml': {
         code_names: [0, 1],
@@ -305,7 +297,6 @@ const rowsFixture: Commit[] = [
     Created: '2020-11-21T19:58:22'
   },
   {
-    branch: 'main',
     commit: {
       author: 'Matt Seddon',
       date: '8 hours ago',
@@ -316,6 +307,7 @@ const rowsFixture: Commit[] = [
     description:
       'Add capabilities to text mentioning storage provider extensions (#4015)',
     displayColor: undefined,
+    flatBranches: ['main', 'other-branch', 'another-branch'],
     id: 'another-branch',
     label: 'another-branch',
     metrics: {
@@ -326,7 +318,6 @@ const rowsFixture: Commit[] = [
         val_accuracy: 0.4277999997138977
       }
     },
-    otherBranches: ['other-branch', 'another-branch'],
     params: {
       'params.yaml': {
         code_names: [0, 1],
@@ -347,11 +338,11 @@ const rowsFixture: Commit[] = [
     Created: '2020-11-21T19:58:22'
   },
   {
-    branch: 'main',
     baselineSha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
     displayColor: undefined,
     description: '[exp-e7a67]',
     executor: Executor.DVC_TASK,
+    flatBranches: ['main'],
     id: 'exp-e7a67',
     label: '4fb124a',
     metrics: {
@@ -362,7 +353,6 @@ const rowsFixture: Commit[] = [
         val_accuracy: 0.4277999997138977
       }
     },
-    otherBranches: [],
     params: {
       'params.yaml': {
         code_names: [0, 1],
@@ -384,10 +374,10 @@ const rowsFixture: Commit[] = [
     Created: '2020-12-29T15:31:52'
   },
   {
-    branch: 'main',
     baselineSha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
     displayColor: undefined,
     description: '[test-branch]',
+    flatBranches: ['main'],
     id: 'test-branch',
     label: '42b8736',
     metrics: {
@@ -398,7 +388,6 @@ const rowsFixture: Commit[] = [
         val_accuracy: 0.5608000159263611
       }
     },
-    otherBranches: [],
     params: {
       'params.yaml': {
         code_names: [0, 1],
@@ -421,14 +410,13 @@ const rowsFixture: Commit[] = [
     Created: '2020-12-29T15:28:59'
   },
   {
-    branch: 'main',
     baselineSha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
     displayColor: undefined,
+    flatBranches: ['main'],
     id: '489fd8b',
     sha: '489fd8bdaa709f7330aac342e051a9431c625481',
     label: '489fd8b',
     error: "unable to read: 'params.yaml', YAML file structure is corrupted",
-    otherBranches: [],
     selected: false,
     starred: false,
     executorStatus: ExecutorStatus.FAILED

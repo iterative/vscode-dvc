@@ -857,34 +857,31 @@ export class ExperimentsModel extends ModelWithPersistence {
     return commitsBySha
   }
 
-  private addBranchToFlattenedCommit(commitAndExps: Commit[], branch: string) {
-    return commitAndExps.map(commitOrExp => ({
-      ...commitOrExp,
-      branch: commitOrExp.branch || branch,
-      otherBranches: commitOrExp?.otherBranches
-        ? [...commitOrExp.otherBranches, branch]
-        : []
-    }))
-  }
-
   private getFlattenedRowData(workspaceRow: Commit): Commit[] {
-    const commitsBySha: { [sha: string]: Commit[] } =
-      this.applyFiltersToFlattenedCommits()
-    const rowsBySha: { [sha: string]: Commit[] } = {}
+    const branchesBySha: { [sha: string]: string[] } = {}
 
     for (const { branch, sha } of this.rowOrder) {
-      if (!commitsBySha[sha]) {
+      if (!branchesBySha[sha]) {
+        branchesBySha[sha] = []
+      }
+      branchesBySha[sha].push(branch)
+    }
+    const commitsBySha: { [sha: string]: Commit[] } =
+      this.applyFiltersToFlattenedCommits()
+
+    const rows: Commit[] = []
+    for (const [sha, commitAndExps] of Object.entries(commitsBySha)) {
+      const flatBranches = branchesBySha[sha]
+
+      if (!flatBranches) {
         continue
       }
 
-      const commitAndExps = rowsBySha[sha] || commitsBySha[sha]
-
-      rowsBySha[sha] = this.addBranchToFlattenedCommit(commitAndExps, branch)
+      rows.push(
+        ...commitAndExps.map(commitOrExp => ({ ...commitOrExp, flatBranches }))
+      )
     }
 
-    return [
-      workspaceRow,
-      ...sortExperiments(this.getSorts(), Object.values(rowsBySha).flat())
-    ]
+    return [workspaceRow, ...sortExperiments(this.getSorts(), rows)]
   }
 }
