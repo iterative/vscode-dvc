@@ -6336,10 +6336,10 @@
   resolved "https://registry.yarnpkg.com/@types/webpack-env/-/webpack-env-1.16.3.tgz#b776327a73e561b71e7881d0cd6d34a1424db86a"
   integrity sha512-9gtOPPkfyNoEqCQgx4qJKkuNm/x0R2hKR7fdl7zvTJyHnIisuE/LfvXOsYWL0o3qq6uiBnKZNNNzi3l0y/X+xw==
 
-"@types/webpack@5.28.2":
-  version "5.28.2"
-  resolved "https://registry.yarnpkg.com/@types/webpack/-/webpack-5.28.2.tgz#a4db514f30b1b593278fbae6d6f9654c3d53c4c8"
-  integrity sha512-7tcxyrIOd7WGimZIcWU6pDsNh2edGGnwYExOvd3l/nMvuxqwVPrFXnnTbYCnplqV9BJoU7Mo2mfFtiH8CNFvYw==
+"@types/webpack@5.28.3":
+  version "5.28.3"
+  resolved "https://registry.yarnpkg.com/@types/webpack/-/webpack-5.28.3.tgz#1e84a1d70dcc89396e3217015e923cf2a865f15f"
+  integrity sha512-Hd0GBzpP0mO2ZKChw2V7flK45m01/2g9FalpMum2X66uouzG3P1vkxvOtLVzAWLna4N9h0s2sVjND9Slnlef8A==
   dependencies:
     "@types/node" "*"
     tapable "^2.2.0"
