@@ -68,7 +68,7 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
   }
 
   const plot = plotDataStore[section][id]
-  const spec = fillTemplate(plot, 1, PlotHeight.VERTICAL_NORMAL, false)
+  const spec = fillTemplate(plot, 1, PlotHeight.VERTICAL_NORMAL, true)
   if (!spec) {
     return
   }

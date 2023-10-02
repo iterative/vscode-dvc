@@ -151,16 +151,14 @@ const data: CustomPlotsData = {
               filled: true,
               size: 60,
               type: 'point'
-            }
+            },
+            params: ['<DVC_METRIC_ZOOM_AND_PAN>']
           }
         ],
         width: 'container'
       }),
       anchor_definitions: {
         '<DVC_PARAM_TYPE>': 'nominal',
-        '<DVC_METRIC_X_LABEL>': 'params.yaml:log_file',
-        '<DVC_METRIC_Y_LABEL>': 'summary.json:loss',
-        '<DVC_METRIC_TYPE>': 'quantitative',
         '<DVC_METRIC_COLOR>': JSON.stringify({
           field: 'id',
           scale: {
@@ -197,7 +195,15 @@ const data: CustomPlotsData = {
             metric: 1.775016188621521,
             param: 'logs.csv'
           }
-        ])
+        ]),
+        '<DVC_METRIC_TYPE>': 'quantitative',
+        '<DVC_METRIC_X_LABEL>': 'params.yaml:log_file',
+        '<DVC_METRIC_Y_LABEL>': 'summary.json:loss',
+        '<DVC_METRIC_ZOOM_AND_PAN>': JSON.stringify({
+          bind: 'scales',
+          name: 'grid',
+          select: 'interval'
+        })
       }
     },
     {
@@ -261,7 +267,12 @@ const data: CustomPlotsData = {
         ]),
         '<DVC_METRIC_TYPE>': 'quantitative',
         '<DVC_METRIC_X_LABEL>': 'params.yaml:epochs',
-        '<DVC_METRIC_Y_LABEL>': 'summary.json:accuracy'
+        '<DVC_METRIC_Y_LABEL>': 'summary.json:accuracy',
+        '<DVC_METRIC_ZOOM_AND_PAN>': JSON.stringify({
+          bind: 'scales',
+          name: 'grid',
+          select: 'interval'
+        })
       },
       content: JSON.stringify({
         $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
@@ -316,7 +327,8 @@ const data: CustomPlotsData = {
               filled: true,
               size: 60,
               type: 'point'
-            }
+            },
+            params: ['<DVC_METRIC_ZOOM_AND_PAN>']
           }
         ],
         width: 'container'

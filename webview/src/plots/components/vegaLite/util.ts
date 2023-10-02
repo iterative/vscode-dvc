@@ -12,7 +12,7 @@ export const fillTemplate = (
     | undefined,
   nbItemsPerRow: number,
   height: number,
-  suppressLegend: boolean
+  plotFocused: boolean
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ): VisualizationSpec | undefined => {
   if (!plot) {
@@ -39,6 +39,14 @@ export const fillTemplate = (
       specStr = specStr.replace(new RegExp(key, 'g'), truncatedVerticalValue)
     }
 
+    if (key === '<DVC_METRIC_ZOOM_AND_PAN>') {
+      const suppressZoomAndPan = !plotFocused
+      specStr = specStr.replace(
+        new RegExp(`"${key}"`, 'g'),
+        suppressZoomAndPan ? '' : value
+      )
+    }
+
     if (
       [
         '<DVC_METRIC_COLOR>',
@@ -46,6 +54,7 @@ export const fillTemplate = (
         '<DVC_METRIC_STROKE_DASH>'
       ].includes(key)
     ) {
+      const suppressLegend = !plotFocused
       if (suppressLegend) {
         const obj = JSON.parse(value) as { [key: string]: unknown }
         obj.legend = null

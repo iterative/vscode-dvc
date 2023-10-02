@@ -107,7 +107,8 @@ export const getContent = (): string =>
           filled: true,
           size: 60,
           type: 'point'
-        }
+        },
+        params: ['<DVC_METRIC_ZOOM_AND_PAN>']
       }
     ],
     width: 'container'

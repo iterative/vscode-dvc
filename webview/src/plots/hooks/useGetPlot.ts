@@ -19,7 +19,7 @@ export const useGetPlot = (section: PlotsSection, id: string) => {
 
   const setPlotData = useCallback(() => {
     const plot = plotDataStore[section][id]
-    const spec = fillTemplate(plot, nbItemsPerRow, height, true)
+    const spec = fillTemplate(plot, nbItemsPerRow, height, false)
     if (!spec) {
       return
     }

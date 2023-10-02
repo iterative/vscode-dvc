@@ -142,6 +142,11 @@ const getCustomPlotData = (
       '<DVC_METRIC_TYPE>': getDataType(typeof metricVal),
       '<DVC_METRIC_X_LABEL>': param,
       '<DVC_METRIC_Y_LABEL>': metric,
+      '<DVC_METRIC_ZOOM_AND_PAN>': JSON.stringify({
+        bind: 'scales',
+        name: 'grid',
+        select: 'interval'
+      }),
       '<DVC_PARAM_TYPE>': getDataType(typeof paramVal)
     },
     content,

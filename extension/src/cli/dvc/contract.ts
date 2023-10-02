@@ -144,6 +144,7 @@ export type AnchorDefinitions = {
   '<DVC_METRIC_TITLE>'?: string
   '<DVC_METRIC_X_LABEL>'?: string
   '<DVC_METRIC_Y_LABEL>'?: string
+  '<DVC_METRIC_ZOOM_AND_PAN>'?: string
   '<DVC_PARAM_TYPE>'?: 'quantitative' | 'nominal'
 }
 
