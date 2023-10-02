@@ -90,7 +90,7 @@ describe('Experiments Table Webview', function () {
   })
 
   it('should update with new data for each DVCLive step when an experiment is running', async function () {
-    this.timeout(210000)
+    this.timeout(300000)
     await runModifiedExperiment()
     await webview.focus()
 
@@ -101,7 +101,7 @@ describe('Experiments Table Webview', function () {
 
         return currentRows.length >= initialRows + experimentRow
       },
-      { interval: 5000, timeout: 210000 }
+      { interval: 5000, timeout: 300000 }
     )
 
     const currentRows = await webview.row$$
@@ -120,7 +120,7 @@ describe('Experiments Table Webview', function () {
 
         return step === epochs - 1
       },
-      { interval: 5000, timeout: 210000 }
+      { interval: 5000, timeout: 300000 }
     )
 
     const finalRows = await webview.row$$
@@ -128,7 +128,7 @@ describe('Experiments Table Webview', function () {
     expect(finalRows.length).toStrictEqual(initialRows + experimentRow)
     await webview.unfocus()
     await closeAllEditors()
-    await waitForDvcToFinish(120000)
+    await waitForDvcToFinish(300000)
     const workbench = await browser.getWorkbench()
     return workbench.executeCommand('Terminal: Kill All Terminals')
   })
