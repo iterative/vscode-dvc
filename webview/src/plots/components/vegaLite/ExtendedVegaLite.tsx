@@ -1,24 +1,42 @@
 import React, { useEffect, useRef } from 'react'
 import VegaLite, { VegaLiteProps } from 'react-vega/lib/VegaLite'
 import { useSelector } from 'react-redux'
-import { View } from 'react-vega'
+import { View, VisualizationSpec } from 'react-vega'
 import { PlotsState } from '../../store'
 import { setSmoothPlotValues } from '../../util/messages'
+import { config } from '../constants'
 
 interface VegaState {
   signals?: { [name: string]: number | undefined }
   data?: unknown
 }
 
-export const TemplateVegaLite = ({
+export const ExtendedVegaLite = ({
+  actions,
   id,
   onNewView,
-  vegaLiteProps
+  spec
 }: {
+  actions:
+    | false
+    | {
+        compiled: false
+        editor: false
+        export: true
+        source: false
+      }
   id: string
   onNewView: () => void
-  vegaLiteProps: VegaLiteProps
+  spec: VisualizationSpec
 }) => {
+  const vegaLiteProps: VegaLiteProps = {
+    actions,
+    config,
+    'data-testid': `${id}-vega`,
+    renderer: 'svg',
+    spec: spec || {}
+  } as VegaLiteProps
+
   const vegaView = useRef<View>()
   const plotWrapperEl = useRef<HTMLSpanElement>(null)
   const smoothPlotValues = useSelector(

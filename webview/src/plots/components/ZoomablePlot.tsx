@@ -2,15 +2,14 @@ import { AnyAction } from '@reduxjs/toolkit'
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import React, { useRef } from 'react'
 import { useDispatch } from 'react-redux'
-import { VegaLiteProps } from 'react-vega/lib/VegaLite'
-import { TemplateVegaLite } from './templatePlots/TemplateVegaLite'
+import { VisualizationSpec } from 'react-vega'
+import { ExtendedVegaLite } from './vegaLite/ExtendedVegaLite'
 import { setZoomedInPlot } from './webviewSlice'
 import styles from './styles.module.scss'
 import { zoomPlot } from '../util/messages'
 import { useGetPlot } from '../hooks/useGetPlot'
 import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
 import { Ellipsis } from '../../shared/components/icons'
-import { getVegaLiteProps } from '../util/vega'
 
 interface ZoomablePlotProps {
   id: string
@@ -28,10 +27,9 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
 }) => {
   const spec = useGetPlot(section, id)
   const dispatch = useDispatch()
-  const currentPlotProps = useRef<VegaLiteProps>()
+  const currentPlotProps = useRef<VisualizationSpec>()
 
-  const vegaLiteProps = getVegaLiteProps(id, spec, false)
-  currentPlotProps.current = vegaLiteProps
+  currentPlotProps.current = spec
 
   const handleOnClick = (openActionsMenu?: boolean) => {
     zoomPlot()
@@ -74,10 +72,11 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
         <Ellipsis />
       </span>
       {currentPlotProps.current && (
-        <TemplateVegaLite
-          vegaLiteProps={vegaLiteProps}
+        <ExtendedVegaLite
           id={id}
           onNewView={onNewView}
+          spec={spec}
+          actions={false}
         />
       )}
     </button>

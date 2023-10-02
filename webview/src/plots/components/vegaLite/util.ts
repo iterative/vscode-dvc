@@ -1,29 +1,7 @@
-import { VegaLiteProps } from 'react-vega/lib/VegaLite'
 import { AnchorDefinitions } from 'dvc/src/cli/dvc/contract'
 import { DEFAULT_NB_ITEMS_PER_ROW } from 'dvc/src/plots/webview/contract'
 import { VisualizationSpec } from 'react-vega'
 import { truncate } from 'vega-util'
-import { config } from '../components/constants'
-
-export const getVegaLiteProps = (
-  id: string,
-  spec: VisualizationSpec | undefined,
-  actions:
-    | false
-    | {
-        compiled: false
-        editor: false
-        export: true
-        source: false
-      }
-) =>
-  ({
-    actions,
-    config,
-    'data-testid': `${id}-vega`,
-    renderer: 'svg',
-    spec: spec || {}
-  }) as VegaLiteProps
 
 export const fillTemplate = (
   plot:
@@ -81,11 +59,11 @@ export const fillTemplate = (
     }
 
     if (key === '<DVC_METRIC_DATA>') {
-      specStr = specStr.replace(`"${key}"`, value)
+      specStr = specStr.replace(new RegExp(`"${key}"`, 'g'), value)
     }
 
     if (['<DVC_PARAM_TYPE>', '<DVC_METRIC_TYPE>'].includes(key)) {
-      specStr = specStr.replace(key, value)
+      specStr = specStr.replace(new RegExp(key, 'g'), value)
     }
   }
 

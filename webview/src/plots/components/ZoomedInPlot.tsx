@@ -1,14 +1,14 @@
 import React, { useEffect, useRef } from 'react'
 import { PlotHeight, PlotsSection } from 'dvc/src/plots/webview/contract'
-import { TemplateVegaLite } from './templatePlots/TemplateVegaLite'
+import { ExtendedVegaLite } from './vegaLite/ExtendedVegaLite'
 import styles from './styles.module.scss'
 import { plotDataStore } from './plotDataStore'
+import { fillTemplate } from './vegaLite/util'
 import {
   exportPlotDataAsCsv,
   exportPlotDataAsJson,
   exportPlotDataAsTsv
 } from '../util/messages'
-import { fillTemplate, getVegaLiteProps } from '../util/vega'
 
 type ZoomedInPlotProps = {
   id: string
@@ -72,12 +72,6 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
   if (!spec) {
     return
   }
-  const vegaLiteProps = getVegaLiteProps(id, spec, {
-    compiled: false,
-    editor: false,
-    export: true,
-    source: false
-  })
 
   return (
     <div
@@ -85,10 +79,16 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
       data-testid="zoomed-in-plot"
       ref={zoomedInPlotRef}
     >
-      <TemplateVegaLite
+      <ExtendedVegaLite
+        actions={{
+          compiled: false,
+          editor: false,
+          export: true,
+          source: false
+        }}
         id={id}
-        vegaLiteProps={vegaLiteProps}
         onNewView={onNewView}
+        spec={spec}
       />
     </div>
   )

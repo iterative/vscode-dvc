@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux'
 import { VisualizationSpec } from 'react-vega'
 import { plotDataStore } from '../components/plotDataStore'
 import { PlotsState } from '../store'
-import { fillTemplate } from '../util/vega'
+import { fillTemplate } from '../components/vegaLite/util'
 
 export const useGetPlot = (section: PlotsSection, id: string) => {
   const isTemplatePlot = section === PlotsSection.TEMPLATE_PLOTS
@@ -24,11 +24,7 @@ export const useGetPlot = (section: PlotsSection, id: string) => {
       return
     }
 
-    setSpec({
-      ...spec,
-      height: 'container',
-      width: 'container'
-    } as VisualizationSpec)
+    setSpec(spec)
   }, [section, id, nbItemsPerRow, height])
 
   useEffect(() => {
