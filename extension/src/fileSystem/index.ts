@@ -214,13 +214,30 @@ const loadYamlAsDoc = (
   }
 }
 
+const getPlotYamlObj = (cwd: string, plot: PlotConfigData) => {
+  const { x, y, template } = plot
+  const usesSingleFile = x.file === y.file
+  if (usesSingleFile) {
+    const dataFile = x.file
+    const plotName = relative(cwd, dataFile)
+    return { [plotName]: { template, x: x.key, y: y.key } }
+  }
+
+  const plotName = `${template}_plot`
+  return {
+    [plotName]: {
+      template,
+      x: { [relative(cwd, x.file)]: x.key },
+      y: { [relative(cwd, y.file)]: y.key }
+    }
+  }
+}
+
 const getPlotsYaml = (
   cwd: string,
   plotObj: PlotConfigData,
   indentSearchLines: string[]
 ) => {
-  const { dataFile, ...plot } = plotObj
-  const plotName = relative(cwd, dataFile)
   const indentReg = /^( +)[^ ]/
   const indentLine = indentSearchLines.find(line => indentReg.test(line)) || ''
   const spacesMatches = indentLine.match(indentReg)
@@ -228,7 +245,7 @@ const getPlotsYaml = (
 
   return yaml
     .stringify(
-      { plots: [{ [plotName]: plot }] },
+      { plots: [getPlotYamlObj(cwd, plotObj)] },
       { indent: spaces ? spaces.length : 2 }
     )
     .split('\n')
@@ -315,7 +332,7 @@ const loadTsv = (path: string) => {
   }
 }
 
-export const loadDataFile = (file: string): unknown => {
+const loadDataFile = (file: string): unknown => {
   const ext = getFileExtension(file)
 
   switch (ext) {
@@ -328,6 +345,22 @@ export const loadDataFile = (file: string): unknown => {
     case '.yaml':
       return loadYaml<Record<string, unknown>>(file)
   }
+}
+
+export const loadDataFiles = async (
+  files: string[]
+): Promise<{ file: string; data: unknown }[] | undefined> => {
+  const filesData: { file: string; data: unknown }[] = []
+  for (const file of files) {
+    const data = await loadDataFile(file)
+
+    if (!data) {
+      return undefined
+    }
+
+    filesData.push({ data, file })
+  }
+  return filesData
 }
 
 export const writeJson = <

@@ -25,12 +25,30 @@ export const pickFile = async (
   }
 }
 
-export const pickResources = (title: Title): Thenable<Uri[] | undefined> => {
-  return window.showOpenDialog({
+export const pickResources = (
+  title: Title,
+  filters?: OpenDialogOptions['filters']
+): Thenable<Uri[] | undefined> => {
+  const opts: OpenDialogOptions = {
     canSelectFiles: true,
     canSelectFolders: true,
     canSelectMany: true,
     openLabel: 'Select',
     title
-  })
+  }
+
+  if (!filters) {
+    opts.filters = filters
+  }
+
+  return window.showOpenDialog(opts)
+}
+
+export const pickFiles = async (
+  title: Title,
+  filters?: OpenDialogOptions['filters']
+): Promise<string[] | undefined> => {
+  const files = await pickResources(title, filters)
+
+  return files?.map(({ fsPath }) => fsPath)
 }

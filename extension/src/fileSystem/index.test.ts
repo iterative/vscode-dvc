@@ -23,7 +23,7 @@ import {
   getPidFromFile,
   getEntryFromJsonFile,
   addPlotToDvcYamlFile,
-  loadDataFile
+  loadDataFiles
 } from '.'
 import { dvcDemoPath } from '../test/util'
 import { DOT_DVC } from '../cli/dvc/constants'
@@ -63,17 +63,22 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-describe('loadDataFile', () => {
+describe('loadDataFiles', () => {
   it('should load in csv file contents', async () => {
     const mockCsvContent = ['epoch,acc', '10,0.69', '11,0.345'].join('\n')
 
     mockedReadFileSync.mockReturnValueOnce(mockCsvContent)
 
-    const result = await loadDataFile('values.csv')
+    const result = await loadDataFiles(['values.csv'])
 
     expect(result).toStrictEqual([
-      { acc: 0.69, epoch: 10 },
-      { acc: 0.345, epoch: 11 }
+      {
+        data: [
+          { acc: 0.69, epoch: 10 },
+          { acc: 0.345, epoch: 11 }
+        ],
+        file: 'values.csv'
+      }
     ])
   })
 
@@ -85,11 +90,16 @@ describe('loadDataFile', () => {
 
     mockedReadFileSync.mockReturnValueOnce(mockJsonContent)
 
-    const result = await loadDataFile('values.json')
+    const result = await loadDataFiles(['values.json'])
 
     expect(result).toStrictEqual([
-      { acc: 0.69, epoch: 10 },
-      { acc: 0.345, epoch: 11 }
+      {
+        data: [
+          { acc: 0.69, epoch: 10 },
+          { acc: 0.345, epoch: 11 }
+        ],
+        file: 'values.json'
+      }
     ])
   })
 
@@ -98,11 +108,16 @@ describe('loadDataFile', () => {
 
     mockedReadFileSync.mockReturnValueOnce(mockTsvContent)
 
-    const result = await loadDataFile('values.tsv')
+    const result = await loadDataFiles(['values.tsv'])
 
     expect(result).toStrictEqual([
-      { acc: 0.69, epoch: 10 },
-      { acc: 0.345, epoch: 11 }
+      {
+        data: [
+          { acc: 0.69, epoch: 10 },
+          { acc: 0.345, epoch: 11 }
+        ],
+        file: 'values.tsv'
+      }
     ])
   })
 
@@ -115,15 +130,20 @@ describe('loadDataFile', () => {
 
     mockedReadFileSync.mockReturnValueOnce(mockYamlContent)
 
-    const result = await loadDataFile('dvc.yaml')
+    const result = await loadDataFiles(['dvc.yaml'])
 
-    expect(result).toStrictEqual({
-      stages: {
-        train: {
-          cmd: 'python train.py'
-        }
+    expect(result).toStrictEqual([
+      {
+        data: {
+          stages: {
+            train: {
+              cmd: 'python train.py'
+            }
+          }
+        },
+        file: 'dvc.yaml'
       }
-    })
+    ])
   })
 
   it('should catch any errors thrown during file parsing', async () => {
@@ -133,7 +153,7 @@ describe('loadDataFile', () => {
     })
 
     for (const file of dataFiles) {
-      const resultWithErr = await loadDataFile(file)
+      const resultWithErr = await loadDataFiles([file])
 
       expect(resultWithErr).toStrictEqual(undefined)
     }
@@ -541,10 +561,9 @@ describe('addPlotToDvcYamlFile', () => {
     mockedReadFileSync.mockReturnValueOnce(mockDvcYamlContent)
 
     addPlotToDvcYamlFile('/', {
-      dataFile: '/data.json',
       template: 'simple',
-      x: 'epochs',
-      y: 'accuracy'
+      x: { file: '/data.json', key: 'epochs' },
+      y: { file: '/data.json', key: 'accuracy' }
     })
 
     expect(mockedWriteFileSync).toHaveBeenCalledWith(
@@ -560,10 +579,9 @@ describe('addPlotToDvcYamlFile', () => {
     mockedReadFileSync.mockReturnValueOnce(mockDvcYamlContent.join('\n'))
 
     addPlotToDvcYamlFile('/', {
-      dataFile: '/data.json',
       template: 'simple',
-      x: 'epochs',
-      y: 'accuracy'
+      x: { file: '/data.json', key: 'epochs' },
+      y: { file: '/data.json', key: 'accuracy' }
     })
 
     mockDvcYamlContent.splice(7, 0, ...mockPlotYamlContent)
@@ -583,10 +601,9 @@ describe('addPlotToDvcYamlFile', () => {
     mockedReadFileSync.mockReturnValueOnce(mockDvcYamlContent)
 
     addPlotToDvcYamlFile('/', {
-      dataFile: '/data.json',
       template: 'simple',
-      x: 'epochs',
-      y: 'accuracy'
+      x: { file: '/data.json', key: 'epochs' },
+      y: { file: '/data.json', key: 'accuracy' }
     })
 
     expect(mockedWriteFileSync).toHaveBeenCalledWith(
@@ -620,10 +637,9 @@ describe('addPlotToDvcYamlFile', () => {
     mockedReadFileSync.mockReturnValueOnce(mockDvcYamlContent)
 
     addPlotToDvcYamlFile('/', {
-      dataFile: '/data.json',
       template: 'simple',
-      x: 'epochs',
-      y: 'accuracy'
+      x: { file: '/data.json', key: 'epochs' },
+      y: { file: '/data.json', key: 'accuracy' }
     })
 
     expect(mockedWriteFileSync).toHaveBeenCalledWith(
