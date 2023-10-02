@@ -632,6 +632,34 @@ describe('addPlotToDvcYamlFile', () => {
     )
   })
 
+  it('should add the new plot with fields coming from different fiels', () => {
+    const mockDvcYamlContent = mockStagesLines.join('\n')
+    const mockPlotYamlContent = [
+      '',
+      'plots:',
+      '  - simple_plot:',
+      '      template: simple',
+      '      x:',
+      '        data.json: epochs',
+      '      y:',
+      '        acc.json: accuracy',
+      ''
+    ].join('\n')
+    mockedReadFileSync.mockReturnValueOnce(mockDvcYamlContent)
+    mockedReadFileSync.mockReturnValueOnce(mockDvcYamlContent)
+
+    addPlotToDvcYamlFile('/', {
+      template: 'simple',
+      x: { file: '/data.json', key: 'epochs' },
+      y: { file: '/acc.json', key: 'accuracy' }
+    })
+
+    expect(mockedWriteFileSync).toHaveBeenCalledWith(
+      '//dvc.yaml',
+      mockDvcYamlContent + mockPlotYamlContent
+    )
+  })
+
   it('should add the new plot if the dvc.yaml file already has plots', () => {
     const mockDvcYamlContent = [...mockPlotsListLines, ...mockStagesLines]
     const mockPlotYamlContent = [...mockNewPlotLines, '']
