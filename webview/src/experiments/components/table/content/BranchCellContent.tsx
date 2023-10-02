@@ -33,7 +33,7 @@ export const BranchCellContent: React.FC<
 
   return (
     <Tooltip
-      content={[flatBranches].join(', ')}
+      content={flatBranches.join(', ')}
       placement="bottom-start"
       delay={NORMAL_TOOLTIP_DELAY}
     >

@@ -185,6 +185,14 @@ describe('App', () => {
   })
 
   describe('Sorted (Flattened) Table', () => {
+    beforeAll(() => {
+      jest.useFakeTimers()
+    })
+
+    afterAll(() => {
+      jest.useRealTimers()
+    })
+
     it('should add a "branch/tags" column', () => {
       renderTable(sortedTableStateFixture)
 
@@ -203,6 +211,17 @@ describe('App', () => {
 
       const branchCell = screen.getByTestId('branch___main')
       expect(branchCell).toHaveTextContent('main')
+
+      fireEvent.mouseLeave(branchHeaderTextContent, { bubbles: true })
+      fireEvent.mouseEnter(within(branchCell).getByText('main'), {
+        bubbles: true
+      })
+
+      advanceTimersByTime(NORMAL_TOOLTIP_DELAY[0])
+
+      const tooltip = screen.getByRole('tooltip')
+      expect(tooltip).toBeInTheDocument()
+      expect(tooltip).toHaveTextContent('main')
     })
 
     it('should show two branches in the "branch/tags" column cell if the row belongs to two branches', () => {
@@ -214,6 +233,14 @@ describe('App', () => {
 
       expect(cellBranches[0]).toHaveTextContent('main')
       expect(cellBranches[1]).toHaveTextContent('other-branch')
+
+      fireEvent.mouseEnter(cellBranches[0], { bubbles: true })
+
+      advanceTimersByTime(NORMAL_TOOLTIP_DELAY[0])
+
+      const tooltip = screen.getByRole('tooltip')
+      expect(tooltip).toBeInTheDocument()
+      expect(tooltip).toHaveTextContent('main, other-branch')
     })
 
     it('should show two branches plus the amount remaining in the "branch/tags" column cell if the row belongs to more than two branches', () => {
@@ -225,6 +252,14 @@ describe('App', () => {
 
       expect(cellBranches[0]).toHaveTextContent('main')
       expect(cellBranches[1]).toHaveTextContent('other-branch + 1 more')
+
+      fireEvent.mouseEnter(cellBranches[0], { bubbles: true })
+
+      advanceTimersByTime(NORMAL_TOOLTIP_DELAY[0])
+
+      const tooltip = screen.getByRole('tooltip')
+      expect(tooltip).toBeInTheDocument()
+      expect(tooltip).toHaveTextContent('main, other-branch, another-branch')
     })
 
     it('should add a "parent" column', () => {
