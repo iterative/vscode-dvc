@@ -47,7 +47,9 @@ const pickTemplateAndFields = async (fields: {
   }
 
   const y = await quickPickValue(
-    items.filter(item => item.value?.key !== x.key),
+    items.filter(
+      item => item.value?.key !== x.key && item.value?.file !== x.file
+    ),
     { title: Title.SELECT_PLOT_Y_METRIC }
   )
 
