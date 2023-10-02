@@ -1744,7 +1744,7 @@
     "@types/mock-require": "2.0.1",
     "@types/node": "16.x",
     "@types/react-vega": "7.0.0",
-    "@types/sinon-chai": "3.2.9",
+    "@types/sinon-chai": "3.2.10",
     "@types/uuid": "9.0.4",
     "@types/vega": "3.2.0",
     "@types/vscode": "1.64.0",
