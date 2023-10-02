@@ -146,6 +146,33 @@ describe('loadDataFiles', () => {
     ])
   })
 
+  it('should load in the contents of multiple files', async () => {
+    const mockTsvContent = ['epoch\tacc', '10\t0.69', '11\t0.345'].join('\n')
+    const mockCsvContent = ['epoch2,acc2', '10,0.679', '11,0.3'].join('\n')
+
+    mockedReadFileSync.mockReturnValueOnce(mockTsvContent)
+    mockedReadFileSync.mockReturnValueOnce(mockCsvContent)
+
+    const result = await loadDataFiles(['values.tsv', 'values2.csv'])
+
+    expect(result).toStrictEqual([
+      {
+        data: [
+          { acc: 0.69, epoch: 10 },
+          { acc: 0.345, epoch: 11 }
+        ],
+        file: 'values.tsv'
+      },
+      {
+        data: [
+          { acc2: 0.679, epoch2: 10 },
+          { acc2: 0.3, epoch2: 11 }
+        ],
+        file: 'values2.csv'
+      }
+    ])
+  })
+
   it('should catch any errors thrown during file parsing', async () => {
     const dataFiles = ['values.csv', 'file.json', 'file.tsv', 'dvc.yaml']
     mockedReadFileSync.mockImplementation(() => {
@@ -157,6 +184,39 @@ describe('loadDataFiles', () => {
 
       expect(resultWithErr).toStrictEqual(undefined)
     }
+  })
+
+  it('should catch any errors thrown during the parsing of multiple files', async () => {
+    const dataFiles = ['values.csv', 'file.tsv', 'file.json']
+    const mockCsvContent = ['epoch,acc', '10,0.69', '11,0.345'].join('\n')
+    const mockJsonContent = JSON.stringify([
+      { acc: 0.69, epoch: 10 },
+      { acc: 0.345, epoch: 11 }
+    ])
+    mockedReadFileSync
+      .mockReturnValueOnce(mockCsvContent)
+      .mockImplementationOnce(() => {
+        throw new Error('fake error')
+      })
+      .mockReturnValueOnce(mockJsonContent)
+
+    const resultWithErr = await loadDataFiles(dataFiles)
+    expect(resultWithErr).toStrictEqual([
+      {
+        data: [
+          { acc: 0.69, epoch: 10 },
+          { acc: 0.345, epoch: 11 }
+        ],
+        file: 'values.csv'
+      },
+      {
+        data: [
+          { acc: 0.69, epoch: 10 },
+          { acc: 0.345, epoch: 11 }
+        ],
+        file: 'file.json'
+      }
+    ])
   })
 })
 

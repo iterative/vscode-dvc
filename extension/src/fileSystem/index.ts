@@ -355,12 +355,12 @@ export const loadDataFiles = async (
     const data = await loadDataFile(file)
 
     if (!data) {
-      return undefined
+      continue
     }
 
     filesData.push({ data, file })
   }
-  return filesData
+  return filesData.length === 0 ? undefined : filesData
 }
 
 export const writeJson = <
