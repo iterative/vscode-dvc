@@ -69,7 +69,7 @@ describe('pickPlotConfiguration', () => {
     expect(result).toStrictEqual(undefined)
   })
 
-  it('should show a toast message if files(s) fail to parse', async () => {
+  it('should show a toast message if the file or files fail to parse', async () => {
     mockedPickFiles.mockResolvedValueOnce(['data.csv'])
     mockedLoadDataFiles.mockResolvedValueOnce(undefined)
 
@@ -82,7 +82,7 @@ describe('pickPlotConfiguration', () => {
     )
   })
 
-  it('should show a toast message if an array of objects (with atleast two keys total) are not found within a file', async () => {
+  it('should show a toast message if an array of objects (with atleast two keys) are not found within a single chosen file', async () => {
     mockedPickFiles.mockResolvedValue(['file.yaml'])
     const invalidValues: unknown[] = [
       'string',
@@ -133,16 +133,16 @@ describe('pickPlotConfiguration', () => {
     }
   })
 
-  it('should show a toast message if atleast two fields are not found with multiple files', async () => {
+  it('should show a toast message if an array of objects (with atleast one key) are not found within multiple chosen files', async () => {
     mockedPickFiles.mockResolvedValueOnce([
       'file.yaml',
       'file2.yaml',
       'file3.yaml'
     ])
     mockedLoadDataFiles.mockResolvedValueOnce([
-      { data: '', file: 'file.yaml' },
-      { data: { val: [{ field1: 'only one field' }] }, file: 'file2.yaml' },
-      { data: [], file: 'file3.yaml' }
+      { data: { val: [{ field1: 1, field2: 2 }] }, file: 'file2.yaml' },
+      { data: [], file: 'file3.yaml' },
+      { data: { val: [{ field1: 1, field2: 2 }] }, file: 'file2.yaml' }
     ])
 
     const result = await pickPlotConfiguration()
@@ -183,36 +183,21 @@ describe('pickPlotConfiguration', () => {
     }
   })
 
-  it('should parse fields from a mixture of valid and invalid files if atleast 2 fields are found in total', async () => {
+  it('should parse fields from multiple valid data files (if atleast two fields are found total)', async () => {
     mockedPickFiles.mockResolvedValueOnce([
       'file.yaml',
       'file2.yaml',
       'file3.yaml'
     ])
     mockedLoadDataFiles.mockResolvedValueOnce([
-      {
-        data: [
-          { field1: 1, field2: 2, field3: 1, field4: 2 },
-          { field1: 1, field2: 2, field3: 1, field4: 2 }
-        ],
-        file: 'file.yaml'
-      },
-      {
-        data: {
-          field1: [{ field1: 1 }, { field1: 3 }]
-        },
-        file: 'file3.yaml'
-      },
-      {
-        data: undefined,
-        file: 'file3.yaml'
-      }
+      { data: { val: [{ field1: 1, field2: 2 }] }, file: 'file2.yaml' },
+      { data: { val: [{ field1: 1 }] }, file: 'file2.yaml' }
     ])
 
-    await pickPlotConfiguration()
+    const result = await pickPlotConfiguration()
 
+    expect(result).toStrictEqual(undefined)
     expect(mockedShowError).not.toHaveBeenCalled()
-    expect(mockedQuickPickOne).toHaveBeenCalledTimes(1)
   })
 
   it('should let the user pick a template, x field, and y field', async () => {

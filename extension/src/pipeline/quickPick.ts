@@ -104,7 +104,7 @@ const getFieldOptionsFromArr = (
     const fields = getFieldOptions(data)
 
     if (fields.length === 0) {
-      continue
+      return { keys: {}, keysAmount: 0 }
     }
 
     keysAmount += fields.length

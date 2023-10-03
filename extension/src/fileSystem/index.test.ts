@@ -201,22 +201,7 @@ describe('loadDataFiles', () => {
       .mockReturnValueOnce(mockJsonContent)
 
     const resultWithErr = await loadDataFiles(dataFiles)
-    expect(resultWithErr).toStrictEqual([
-      {
-        data: [
-          { acc: 0.69, epoch: 10 },
-          { acc: 0.345, epoch: 11 }
-        ],
-        file: 'values.csv'
-      },
-      {
-        data: [
-          { acc: 0.69, epoch: 10 },
-          { acc: 0.345, epoch: 11 }
-        ],
-        file: 'file.json'
-      }
-    ])
+    expect(resultWithErr).toStrictEqual(undefined)
   })
 })
 
@@ -632,7 +617,7 @@ describe('addPlotToDvcYamlFile', () => {
     )
   })
 
-  it('should add the new plot with fields coming from different fiels', () => {
+  it('should add the new plot with fields coming from different files', () => {
     const mockDvcYamlContent = mockStagesLines.join('\n')
     const mockPlotYamlContent = [
       '',

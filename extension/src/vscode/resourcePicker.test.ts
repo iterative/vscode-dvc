@@ -70,13 +70,15 @@ describe('pickResources', () => {
 
 describe('pickFiles', () => {
   it('should return an array of selected file paths', async () => {
-    const files = [resolve('mock', 'file'), resolve('mock', 'file2')]
-    const mockedPickedUris = files.map(file => Uri.file(file))
+    const uris = [
+      Uri.file(resolve('mock', 'file')),
+      Uri.file(resolve('mock', 'file2'))
+    ]
     const mockedTitle = 'insert great title here' as Title
-    mockedShowOpenDialog.mockResolvedValueOnce(mockedPickedUris)
+    mockedShowOpenDialog.mockResolvedValueOnce(uris)
 
     const pickedResources = await pickFiles(mockedTitle)
 
-    expect(pickedResources).toStrictEqual(files)
+    expect(pickedResources).toStrictEqual(uris.map(uri => uri.fsPath))
   })
 })
