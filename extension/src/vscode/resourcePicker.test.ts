@@ -69,16 +69,32 @@ describe('pickResources', () => {
 })
 
 describe('pickFiles', () => {
-  it('should return an array of selected file paths', async () => {
-    const uris = [
-      Uri.file(resolve('mock', 'file')),
-      Uri.file(resolve('mock', 'file2'))
+  it('should call window.showOpenDialog with the correct options', async () => {
+    const mockedTitle = 'I decided to not decide' as Title
+    mockedShowOpenDialog.mockResolvedValueOnce(undefined)
+
+    await pickFiles(mockedTitle, { Images: ['png', 'jpg'] })
+
+    expect(mockedShowOpenDialog).toHaveBeenCalledWith({
+      canSelectFiles: true,
+      canSelectFolders: false,
+      canSelectMany: true,
+      filters: { Images: ['png', 'jpg'] },
+      openLabel: 'Select',
+      title: mockedTitle
+    })
+  })
+
+  it('should return an array of paths if any are selected', async () => {
+    const mockedUris = [
+      Uri.file(resolve('mock', 'file1.json')),
+      Uri.file(resolve('mock', 'file2.json'))
     ]
-    const mockedTitle = 'insert great title here' as Title
-    mockedShowOpenDialog.mockResolvedValueOnce(uris)
+    const mockedTitle = 'this is even more fun' as Title
+    mockedShowOpenDialog.mockResolvedValueOnce(mockedUris)
 
     const pickedResources = await pickFiles(mockedTitle)
 
-    expect(pickedResources).toStrictEqual(uris.map(uri => uri.fsPath))
+    expect(pickedResources).toStrictEqual(mockedUris.map(uri => uri.fsPath))
   })
 })
