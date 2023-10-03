@@ -1723,7 +1723,7 @@
     "tree-kill": "1.2.2",
     "uuid": "9.0.1",
     "vega-util": "1.17.2",
-    "vscode-languageclient": "9.0.0",
+    "vscode-languageclient": "9.0.1",
     "yaml": "2.3.2"
   },
   "devDependencies": {
