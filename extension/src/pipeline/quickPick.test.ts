@@ -54,7 +54,7 @@ describe('pickPlotConfiguration', () => {
       { data: mockValidData, file: 'file.json' }
     ])
 
-    await pickPlotConfiguration()
+    await pickPlotConfiguration('/')
 
     expect(mockedPickFiles).toHaveBeenCalledWith(Title.SELECT_PLOT_DATA, {
       'Data Formats': ['json', 'csv', 'tsv', 'yaml']
@@ -64,7 +64,7 @@ describe('pickPlotConfiguration', () => {
   it('should return early if user does not select a file', async () => {
     mockedPickFiles.mockResolvedValueOnce(undefined)
 
-    const result = await pickPlotConfiguration()
+    const result = await pickPlotConfiguration('/')
 
     expect(result).toStrictEqual(undefined)
   })
@@ -72,7 +72,7 @@ describe('pickPlotConfiguration', () => {
   it('should show a toast message if the files are not the same data type', async () => {
     mockedPickFiles.mockResolvedValueOnce(['file.json', 'file.csv'])
 
-    const result = await pickPlotConfiguration()
+    const result = await pickPlotConfiguration('/')
 
     expect(result).toStrictEqual(undefined)
     expect(mockedShowError).toHaveBeenCalledTimes(1)
@@ -83,7 +83,7 @@ describe('pickPlotConfiguration', () => {
     mockedPickFiles.mockResolvedValueOnce(['data.csv'])
     mockedLoadDataFiles.mockResolvedValueOnce(undefined)
 
-    const result = await pickPlotConfiguration()
+    const result = await pickPlotConfiguration('/')
 
     expect(result).toStrictEqual(undefined)
     expect(mockedShowError).toHaveBeenCalledTimes(1)
@@ -133,7 +133,7 @@ describe('pickPlotConfiguration', () => {
         { data: invalidVal, file: 'file.yaml' }
       ])
 
-      result = await pickPlotConfiguration()
+      result = await pickPlotConfiguration('/')
 
       expect(result).toStrictEqual(undefined)
       expect(mockedShowError).toHaveBeenCalledTimes(1 + ind)
@@ -155,7 +155,7 @@ describe('pickPlotConfiguration', () => {
       { data: { val: [{ field1: 1, field2: 2 }] }, file: 'file2.yaml' }
     ])
 
-    const result = await pickPlotConfiguration()
+    const result = await pickPlotConfiguration('/')
 
     expect(result).toStrictEqual(undefined)
     expect(mockedShowError).toHaveBeenCalledTimes(1)
@@ -186,7 +186,7 @@ describe('pickPlotConfiguration', () => {
         { data: val, file: 'file.yaml' }
       ])
 
-      await pickPlotConfiguration()
+      await pickPlotConfiguration('/')
 
       expect(mockedShowError).not.toHaveBeenCalled()
       expect(mockedQuickPickOne).toHaveBeenCalledTimes(ind + 1)
@@ -204,23 +204,23 @@ describe('pickPlotConfiguration', () => {
       { data: { val: [{ field1: 1 }] }, file: 'file2.yaml' }
     ])
 
-    const result = await pickPlotConfiguration()
+    const result = await pickPlotConfiguration('/')
 
     expect(result).toStrictEqual(undefined)
     expect(mockedShowError).not.toHaveBeenCalled()
   })
 
   it('should let the user pick a template, x field, and y field', async () => {
-    mockedPickFiles.mockResolvedValueOnce(['file.json'])
+    mockedPickFiles.mockResolvedValueOnce(['/file.json'])
     mockedLoadDataFiles.mockResolvedValueOnce([
-      { data: mockValidData, file: 'file.json' }
+      { data: mockValidData, file: '/file.json' }
     ])
     mockedQuickPickOne.mockResolvedValueOnce('simple')
     mockedQuickPickValue
-      .mockResolvedValueOnce({ file: 'file.json', key: 'actual' })
-      .mockResolvedValueOnce({ file: 'file.json', key: 'prob' })
+      .mockResolvedValueOnce({ file: '/file.json', key: 'actual' })
+      .mockResolvedValueOnce({ file: '/file.json', key: 'prob' })
 
-    const result = await pickPlotConfiguration()
+    const result = await pickPlotConfiguration('/')
 
     expect(mockedQuickPickOne).toHaveBeenNthCalledWith(
       1,
@@ -245,8 +245,8 @@ describe('pickPlotConfiguration', () => {
           label: 'file.json',
           value: undefined
         },
-        { label: 'actual', value: { file: 'file.json', key: 'actual' } },
-        { label: 'prob', value: { file: 'file.json', key: 'prob' } }
+        { label: 'actual', value: { file: '/file.json', key: 'actual' } },
+        { label: 'prob', value: { file: '/file.json', key: 'prob' } }
       ],
       { title: Title.SELECT_PLOT_X_METRIC }
     )
@@ -258,7 +258,7 @@ describe('pickPlotConfiguration', () => {
           label: 'file.json',
           value: undefined
         },
-        { label: 'prob', value: { file: 'file.json', key: 'prob' } }
+        { label: 'prob', value: { file: '/file.json', key: 'prob' } }
       ],
       {
         title: Title.SELECT_PLOT_Y_METRIC
@@ -266,23 +266,23 @@ describe('pickPlotConfiguration', () => {
     )
     expect(result).toStrictEqual({
       template: 'simple',
-      x: { file: 'file.json', key: 'actual' },
-      y: { file: 'file.json', key: 'prob' }
+      x: { file: '/file.json', key: 'actual' },
+      y: { file: '/file.json', key: 'prob' }
     })
   })
 
   it('should let the user pick a x field and y field from multiple files', async () => {
-    mockedPickFiles.mockResolvedValueOnce(['file.json', 'file2.json'])
+    mockedPickFiles.mockResolvedValueOnce(['/file.json', '/file2.json'])
     mockedLoadDataFiles.mockResolvedValueOnce([
-      { data: mockValidData, file: 'file.json' },
-      { data: mockValidData, file: 'file2.json' }
+      { data: mockValidData, file: '/file.json' },
+      { data: mockValidData, file: '/file2.json' }
     ])
     mockedQuickPickOne.mockResolvedValueOnce('simple')
     mockedQuickPickValue
-      .mockResolvedValueOnce({ file: 'file.json', key: 'actual' })
-      .mockResolvedValueOnce({ file: 'file2.json', key: 'prob' })
+      .mockResolvedValueOnce({ file: '/file.json', key: 'actual' })
+      .mockResolvedValueOnce({ file: '/file2.json', key: 'prob' })
 
-    const result = await pickPlotConfiguration()
+    const result = await pickPlotConfiguration('/')
 
     expect(mockedQuickPickValue).toHaveBeenNthCalledWith(
       1,
@@ -292,15 +292,15 @@ describe('pickPlotConfiguration', () => {
           label: 'file.json',
           value: undefined
         },
-        { label: 'actual', value: { file: 'file.json', key: 'actual' } },
-        { label: 'prob', value: { file: 'file.json', key: 'prob' } },
+        { label: 'actual', value: { file: '/file.json', key: 'actual' } },
+        { label: 'prob', value: { file: '/file.json', key: 'prob' } },
         {
           kind: QuickPickItemKind.Separator,
           label: 'file2.json',
           value: undefined
         },
-        { label: 'actual', value: { file: 'file2.json', key: 'actual' } },
-        { label: 'prob', value: { file: 'file2.json', key: 'prob' } }
+        { label: 'actual', value: { file: '/file2.json', key: 'actual' } },
+        { label: 'prob', value: { file: '/file2.json', key: 'prob' } }
       ],
       { title: Title.SELECT_PLOT_X_METRIC }
     )
@@ -312,14 +312,14 @@ describe('pickPlotConfiguration', () => {
           label: 'file.json',
           value: undefined
         },
-        { label: 'prob', value: { file: 'file.json', key: 'prob' } },
+        { label: 'prob', value: { file: '/file.json', key: 'prob' } },
         {
           kind: QuickPickItemKind.Separator,
           label: 'file2.json',
           value: undefined
         },
-        { label: 'actual', value: { file: 'file2.json', key: 'actual' } },
-        { label: 'prob', value: { file: 'file2.json', key: 'prob' } }
+        { label: 'actual', value: { file: '/file2.json', key: 'actual' } },
+        { label: 'prob', value: { file: '/file2.json', key: 'prob' } }
       ],
       {
         title: Title.SELECT_PLOT_Y_METRIC
@@ -327,8 +327,8 @@ describe('pickPlotConfiguration', () => {
     )
     expect(result).toStrictEqual({
       template: 'simple',
-      x: { file: 'file.json', key: 'actual' },
-      y: { file: 'file2.json', key: 'prob' }
+      x: { file: '/file.json', key: 'actual' },
+      y: { file: '/file2.json', key: 'prob' }
     })
   })
 
@@ -339,7 +339,7 @@ describe('pickPlotConfiguration', () => {
     ])
     mockedQuickPickOne.mockResolvedValueOnce(undefined)
 
-    const result = await pickPlotConfiguration()
+    const result = await pickPlotConfiguration('/')
 
     expect(mockedQuickPickOne).toHaveBeenCalledTimes(1)
 
@@ -354,7 +354,7 @@ describe('pickPlotConfiguration', () => {
     mockedQuickPickOne.mockResolvedValueOnce('simple')
     mockedQuickPickValue.mockResolvedValueOnce(undefined)
 
-    const result = await pickPlotConfiguration()
+    const result = await pickPlotConfiguration('/')
 
     expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
     expect(result).toStrictEqual(undefined)
@@ -370,7 +370,7 @@ describe('pickPlotConfiguration', () => {
       .mockResolvedValueOnce('actual')
       .mockResolvedValueOnce(undefined)
 
-    const result = await pickPlotConfiguration()
+    const result = await pickPlotConfiguration('/')
 
     expect(mockedQuickPickValue).toHaveBeenCalledTimes(2)
     expect(result).toStrictEqual(undefined)

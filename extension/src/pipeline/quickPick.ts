@@ -1,3 +1,4 @@
+import { relative } from 'path'
 import isEqual from 'lodash.isequal'
 import { QuickPickItemKind } from 'vscode'
 import {
@@ -11,16 +12,18 @@ import { quickPickOne, quickPickValue } from '../vscode/quickPick'
 import { pickFiles } from '../vscode/resourcePicker'
 import { Title } from '../vscode/title'
 import { Toast } from '../vscode/toast'
-import { getFileName } from '../fileSystem/util'
 
 const pickDataFiles = (): Thenable<string[] | undefined> =>
   pickFiles(Title.SELECT_PLOT_DATA, {
     'Data Formats': ['json', 'csv', 'tsv', 'yaml']
   })
 
-const pickTemplateAndFields = async (fields: {
-  [file: string]: string[]
-}): Promise<PlotConfigData | undefined> => {
+const pickTemplateAndFields = async (
+  cwd: string,
+  fields: {
+    [file: string]: string[]
+  }
+): Promise<PlotConfigData | undefined> => {
   const template = await quickPickOne(PLOT_TEMPLATES, 'Pick a Plot Template')
 
   if (!template) {
@@ -33,7 +36,7 @@ const pickTemplateAndFields = async (fields: {
     items.push(
       {
         kind: QuickPickItemKind.Separator,
-        label: getFileName(file),
+        label: relative(cwd, file),
         value: undefined
       },
       ...keys.map(key => ({ label: key, value: { file, key } }))
@@ -129,9 +132,9 @@ const getFieldsFromDataFiles = (
   return keys
 }
 
-export const pickPlotConfiguration = async (): Promise<
-  PlotConfigData | undefined
-> => {
+export const pickPlotConfiguration = async (
+  cwd: string
+): Promise<PlotConfigData | undefined> => {
   const files = await pickDataFiles()
 
   if (!files) {
@@ -160,7 +163,7 @@ export const pickPlotConfiguration = async (): Promise<
     return
   }
 
-  const templateAndFields = await pickTemplateAndFields(keys)
+  const templateAndFields = await pickTemplateAndFields(cwd, keys)
 
   if (!templateAndFields) {
     return
