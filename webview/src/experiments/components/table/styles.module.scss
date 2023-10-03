@@ -888,17 +888,36 @@ $badge-size: 0.85rem;
 }
 
 .branchInnerCell .cellContents {
-  font-size: 0.65rem;
-  font-weight: 600;
-
-  > * {
-    vertical-align: middle;
-  }
+  display: flex;
+  align-items: center;
 
   svg {
     fill: $accent-color;
-    margin-right: 1px;
+    margin-right: 2px;
+    min-width: 13px;
+    min-height: 13px;
   }
+}
+
+.branchCellList {
+  @extend %truncateLeftParent;
+
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-weight: 600;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.6rem;
+
+  li {
+    @extend %truncateLeftChild;
+  }
+}
+
+.branchCellListSingleItem {
+  font-size: 0.65rem;
 }
 
 .cellTooltip {

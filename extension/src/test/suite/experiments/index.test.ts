@@ -1904,6 +1904,80 @@ suite('Experiments Test Suite', () => {
 
       expect(sorts).to.deep.equal([{ descending: true, path: paramPath }])
     }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should not show duplicate rows when sorted', async () => {
+      const { experiments, messageSpy } = await buildExperimentsWebview({
+        disposer: disposable,
+        availableNbCommits: { main: 20 },
+        expShow: mockExpShowOutput,
+        rowOrder: [
+          { sha: '2d879497587b80b2d9e61f072d9dbe9c07a65357', branch: 'main' },
+          {
+            sha: '2d879497587b80b2d9e61f072d9dbe9c07a65357',
+            branch: 'other-branch'
+          }
+        ]
+      })
+
+      const { rows, sorts: noSorts } = messageSpy.lastCall.args[0]
+
+      expect(getIds(rows)).to.deep.equal([
+        { id: EXPERIMENT_WORKSPACE_ID },
+        {
+          id: '2d879497587b80b2d9e61f072d9dbe9c07a65357',
+          subRows: ['exp-1', 'exp-2', 'exp-3']
+        },
+        {
+          id: '2d879497587b80b2d9e61f072d9dbe9c07a65357',
+          subRows: ['exp-1', 'exp-2', 'exp-3']
+        }
+      ])
+
+      expect(noSorts).to.deep.equal([])
+
+      const paramPath = buildMetricOrParamPath(
+        ColumnType.PARAMS,
+        'params.yaml',
+        'test'
+      )
+
+      stub(SortQuickPicks, 'pickSortToAdd').onFirstCall().resolves({
+        descending: true,
+        path: paramPath
+      })
+
+      messageSpy.resetHistory()
+      const messageSent = waitForSpyCall(messageSpy, messageSpy.callCount)
+
+      await experiments.addSort()
+      await messageSent
+
+      const { rows: sortedRows, sorts } = messageSpy.lastCall.args[0]
+
+      expect(getIds(sortedRows)).to.deep.equal([
+        { id: EXPERIMENT_WORKSPACE_ID },
+        {
+          id: '2d879497587b80b2d9e61f072d9dbe9c07a65357'
+        },
+        {
+          id: 'exp-3'
+        },
+        {
+          id: 'exp-1'
+        },
+        {
+          id: 'exp-2'
+        }
+      ])
+      expect(sortedRows.map(({ flatBranches }) => flatBranches)).to.deep.equal([
+        undefined,
+        ['main', 'other-branch'],
+        ['main', 'other-branch'],
+        ['main', 'other-branch'],
+        ['main', 'other-branch']
+      ])
+      expect(sorts).to.deep.equal([{ descending: true, path: paramPath }])
+    })
   })
 
   describe('persisted state', () => {
