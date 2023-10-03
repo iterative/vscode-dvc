@@ -22,6 +22,4 @@ export const getParent = (pathArray: string[], idx: number) => {
 export const removeTrailingSlash = (path: string): string =>
   path.endsWith(sep) ? path.slice(0, -1) : path
 
-export const getFileName = (path: string) => parse(path).base
-
 export const getFileNameWithoutExt = (path: string) => parse(path).name
