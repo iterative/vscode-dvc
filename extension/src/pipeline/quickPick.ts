@@ -6,7 +6,7 @@ import {
   ValueTree,
   isValueTree
 } from '../cli/dvc/contract'
-import { loadDataFiles } from '../fileSystem'
+import { getFileExtension, loadDataFiles } from '../fileSystem'
 import { quickPickOne, quickPickValue } from '../vscode/quickPick'
 import { pickFiles } from '../vscode/resourcePicker'
 import { Title } from '../vscode/title'
@@ -78,7 +78,7 @@ const getFieldsFromArr = (dataArr: UnknownValue[]) => {
   return objsHaveSameKeys ? fieldObjKeys : []
 }
 
-const getFieldOptions = (data: UnknownValue): string[] => {
+const getFieldsFromValue = (data: UnknownValue): string[] => {
   const isArray = Array.isArray(data)
   const isObj = isValueTree(data)
   if (!isArray && !isObj) {
@@ -92,7 +92,12 @@ const getFieldOptions = (data: UnknownValue): string[] => {
     : []
 }
 
-const getFieldOptionsFromArr = (
+const showNotEnoughKeysToast = () =>
+  Toast.showError(
+    'The requested file(s) does not contain enough keys (columns) to generate a plot. Does the file or files follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
+  )
+
+const getFieldsFromDataFiles = (
   dataArr: { data: UnknownValue; file: string }[]
 ) => {
   const keys: {
@@ -101,10 +106,11 @@ const getFieldOptionsFromArr = (
   let keysAmount = 0
 
   for (const { file, data } of dataArr) {
-    const fields = getFieldOptions(data)
+    const fields = getFieldsFromValue(data)
 
     if (fields.length === 0) {
-      return { keys: {}, keysAmount: 0 }
+      void showNotEnoughKeysToast()
+      return
     }
 
     keysAmount += fields.length
@@ -115,7 +121,12 @@ const getFieldOptionsFromArr = (
     keys[file].push(...fields)
   }
 
-  return { keys, keysAmount }
+  if (keysAmount < 2) {
+    void showNotEnoughKeysToast()
+    return
+  }
+
+  return keys
 }
 
 export const pickPlotConfiguration = async (): Promise<
@@ -127,6 +138,12 @@ export const pickPlotConfiguration = async (): Promise<
     return
   }
 
+  const fileExts = new Set(files.map(file => getFileExtension(file)))
+
+  if (fileExts.size > 1) {
+    return Toast.showError('Files must of the same type.')
+  }
+
   const filesData = await loadDataFiles(files)
 
   if (!filesData) {
@@ -135,14 +152,12 @@ export const pickPlotConfiguration = async (): Promise<
     )
   }
 
-  const { keys, keysAmount } = getFieldOptionsFromArr(
+  const keys = getFieldsFromDataFiles(
     filesData as { data: UnknownValue; file: string }[]
   )
 
-  if (keysAmount < 2) {
-    return Toast.showError(
-      'The requested file(s) does not contain enough keys (columns) to generate a plot. Does the file or files follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
-    )
+  if (!keys) {
+    return
   }
 
   const templateAndFields = await pickTemplateAndFields(keys)

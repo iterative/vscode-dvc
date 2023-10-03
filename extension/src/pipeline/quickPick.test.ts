@@ -69,6 +69,16 @@ describe('pickPlotConfiguration', () => {
     expect(result).toStrictEqual(undefined)
   })
 
+  it('should show a toast message if the files are not the same data type', async () => {
+    mockedPickFiles.mockResolvedValueOnce(['file.json', 'file.csv'])
+
+    const result = await pickPlotConfiguration()
+
+    expect(result).toStrictEqual(undefined)
+    expect(mockedShowError).toHaveBeenCalledTimes(1)
+    expect(mockedShowError).toHaveBeenCalledWith('Files must of the same type.')
+  })
+
   it('should show a toast message if the file or files fail to parse', async () => {
     mockedPickFiles.mockResolvedValueOnce(['data.csv'])
     mockedLoadDataFiles.mockResolvedValueOnce(undefined)
