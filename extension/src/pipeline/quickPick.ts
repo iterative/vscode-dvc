@@ -13,6 +13,16 @@ import { pickFiles } from '../vscode/resourcePicker'
 import { Title } from '../vscode/title'
 import { Toast } from '../vscode/toast'
 
+export type PlotConfigData = {
+  x: { file: string; key: string }
+  template: string
+  y: { file: string; key: string }
+}
+
+type UnknownValue = Value | ValueTree
+
+type fileFields = { [file: string]: string[] }
+
 const pickDataFiles = (): Thenable<string[] | undefined> =>
   pickFiles(Title.SELECT_PLOT_DATA, {
     'Data Formats': ['json', 'csv', 'tsv', 'yaml']
@@ -20,9 +30,7 @@ const pickDataFiles = (): Thenable<string[] | undefined> =>
 
 const pickTemplateAndFields = async (
   cwd: string,
-  fields: {
-    [file: string]: string[]
-  }
+  fields: fileFields
 ): Promise<PlotConfigData | undefined> => {
   const template = await quickPickOne(PLOT_TEMPLATES, 'Pick a Plot Template')
 
@@ -61,109 +69,181 @@ const pickTemplateAndFields = async (
   return { template, x, y }
 }
 
-export type PlotConfigData = {
-  x: { file: string; key: string }
-  template: string
-  y: { file: string; key: string }
+const joinList = (items: string[]) => {
+  if (items.length <= 2) {
+    return items.join(' and ')
+  }
+
+  return `${[items.slice(0, -1)].join(', ')}, and ${items[items.length - 1]}`
 }
 
-type UnknownValue = Value | ValueTree
+const validateFileNames = (files: string[] | undefined) => {
+  if (!files) {
+    return []
+  }
 
-const getFieldsFromArr = (dataArr: UnknownValue[]) => {
+  const fileExts = [...new Set(files.map(file => getFileExtension(file)))]
+
+  if (fileExts.length > 1) {
+    void Toast.showError(
+      `Found files with ${joinList(
+        fileExts
+      )} extensions. Files must be of the same type.`
+    )
+    return files
+  }
+  return files
+}
+
+const getFieldsFromArr = (
+  dataArr: UnknownValue[]
+): { arrLength: number; fields: string[] } | undefined => {
   const firstArrVal: UnknownValue = dataArr[0]
   if (!isValueTree(firstArrVal)) {
-    return []
+    return
   }
   const fieldObjKeys = Object.keys(firstArrVal)
   const objsHaveSameKeys = dataArr.every(
     val => isValueTree(val) && isEqual(fieldObjKeys, Object.keys(val))
   )
-  return objsHaveSameKeys ? fieldObjKeys : []
+  if (!objsHaveSameKeys) {
+    return
+  }
+  return { arrLength: dataArr.length, fields: fieldObjKeys }
 }
 
-const getFieldsFromValue = (data: UnknownValue): string[] => {
+const getFieldsFromValue = (
+  data: UnknownValue
+): { arrLength: number; fields: string[] } | undefined => {
   const isArray = Array.isArray(data)
   const isObj = isValueTree(data)
   if (!isArray && !isObj) {
-    return []
+    return
   }
 
   const maybeFieldsObjArr = isArray ? data : data[Object.keys(data)[0]]
 
-  return Array.isArray(maybeFieldsObjArr)
-    ? getFieldsFromArr(maybeFieldsObjArr)
-    : []
+  if (!Array.isArray(maybeFieldsObjArr)) {
+    return
+  }
+
+  return getFieldsFromArr(maybeFieldsObjArr)
 }
 
-const showNotEnoughKeysToast = () =>
-  Toast.showError(
-    'The requested file or files do not contain enough keys (columns) to generate a plot. Does the file or files follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
+const showNotEnoughKeysToast = (files: string[]) => {
+  const isSingle = files.length === 1
+  return Toast.showError(
+    `${joinList(files)} ${
+      isSingle ? 'does' : 'do'
+    } not contain enough keys (columns) to generate a plot. Does the ${
+      isSingle ? 'file' : 'files'
+    } follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?`
   )
+}
+
+const validateSingleDataFileFields = ({
+  file,
+  data
+}: {
+  file: string
+  data: UnknownValue
+}) => {
+  const { fields = [] } = getFieldsFromValue(data) || {}
+
+  if (fields.length < 2) {
+    void showNotEnoughKeysToast([file])
+    return
+  }
+
+  return { [file]: fields }
+}
 
 const getFieldsFromDataFiles = (
   dataArr: { data: UnknownValue; file: string }[]
 ) => {
-  const keys: {
-    [file: string]: string[]
-  } = {}
-  let keysAmount = 0
+  const failedFiles: string[] = []
+  const filesArrLength: Set<number> = new Set()
+  const keys: fileFields = {}
 
   for (const { file, data } of dataArr) {
-    const fields = getFieldsFromValue(data)
+    const fileFields = getFieldsFromValue(data)
 
-    if (fields.length === 0) {
-      void showNotEnoughKeysToast()
-      return
+    if (!fileFields) {
+      failedFiles.push(file)
+      continue
     }
 
-    keysAmount += fields.length
+    const { fields, arrLength } = fileFields
 
     if (!keys[file]) {
       keys[file] = []
     }
+    filesArrLength.add(arrLength)
     keys[file].push(...fields)
   }
 
-  if (keysAmount < 2) {
-    void showNotEnoughKeysToast()
+  return { failedFiles, filesArrLength, keys }
+}
+
+const validateMultiDataFileFields = (
+  dataArr: { data: UnknownValue; file: string }[]
+) => {
+  const { keys, failedFiles, filesArrLength } = getFieldsFromDataFiles(dataArr)
+
+  if (failedFiles) {
+    void showNotEnoughKeysToast(failedFiles)
     return
   }
 
+  if (filesArrLength.size > 1) {
+    void Toast.showError(
+      'The files must have the same array (or row in tsv/csv) length.'
+    )
+  }
+
   return keys
+}
+
+const validateFilesData = async (files: string[]) => {
+  const filesData = (await loadDataFiles(files)) as {
+    data: UnknownValue
+    file: string
+  }[]
+
+  const failedFiles = filesData.filter(({ data }) => !!data)
+
+  if (failedFiles.length > 0) {
+    const files = joinList(failedFiles.map(({ file }) => file))
+    void Toast.showError(
+      `Failed to parse ${files}. ${
+        files.length === 1 ? 'Does the file' : 'Do the files'
+      } contain data and follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?`
+    )
+    return false
+  }
+
+  return files.length === 1
+    ? validateSingleDataFileFields(filesData[0])
+    : validateMultiDataFileFields(filesData)
 }
 
 export const pickPlotConfiguration = async (
   cwd: string
 ): Promise<PlotConfigData | undefined> => {
   const files = await pickDataFiles()
+  const validFileNames = validateFileNames(files)
 
-  if (!files) {
+  if (validFileNames.length === 0) {
     return
   }
 
-  const fileExts = new Set(files.map(file => getFileExtension(file)))
+  const validFileFields = await validateFilesData(validFileNames)
 
-  if (fileExts.size > 1) {
-    return Toast.showError('Files must of the same type.')
-  }
-
-  const filesData = await loadDataFiles(files)
-
-  if (!filesData) {
-    return Toast.showError(
-      'Failed to parse the requested file or files. Does the file or files contain data and follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
-    )
-  }
-
-  const keys = getFieldsFromDataFiles(
-    filesData as { data: UnknownValue; file: string }[]
-  )
-
-  if (!keys) {
+  if (!validFileFields) {
     return
   }
 
-  const templateAndFields = await pickTemplateAndFields(cwd, keys)
+  const templateAndFields = await pickTemplateAndFields(cwd, validFileFields)
 
   if (!templateAndFields) {
     return

@@ -342,17 +342,14 @@ const loadDataFile = (file: string): unknown => {
 
 export const loadDataFiles = async (
   files: string[]
-): Promise<{ file: string; data: unknown }[] | undefined> => {
+): Promise<{ file: string; data: unknown }[]> => {
   const filesData: { file: string; data: unknown }[] = []
+
   for (const file of files) {
     const data = await loadDataFile(file)
-
-    if (!data) {
-      return undefined
-    }
-
     filesData.push({ data, file })
   }
+
   return filesData
 }
 
