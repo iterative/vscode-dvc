@@ -568,10 +568,16 @@ suite('Experiments Test Suite', () => {
       const mockNewExperimentName = 'new-experiment-name'
       const inputEvent = getInputBoxEvent(mockNewExperimentName)
 
-      const mockRenameExperiment = stub(
-        DvcExecutor.prototype,
-        'expRename'
-      ).resolves('undefined')
+      stub(Setup.prototype, 'getCliVersion').resolves('3.22.0')
+
+      const mockRenameExperiment = stub(DvcExecutor.prototype, 'expRename')
+
+      const mockRenameCalled = new Promise(resolve =>
+        mockRenameExperiment.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve('Renamed experiments:')
+        })
+      )
 
       const mockExperimentId = 'exp-e7a67'
 
@@ -580,7 +586,7 @@ suite('Experiments Test Suite', () => {
         type: MessageFromWebviewType.RENAME_EXPERIMENT
       })
 
-      await inputEvent
+      await Promise.all([inputEvent, mockRenameCalled])
       expect(mockRenameExperiment).to.be.calledOnce
       expect(mockRenameExperiment).to.be.calledWithExactly(
         dvcDemoPath,
