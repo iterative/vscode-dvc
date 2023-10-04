@@ -97,7 +97,7 @@ const getFieldsFromValue = (data: UnknownValue): string[] => {
 
 const showNotEnoughKeysToast = () =>
   Toast.showError(
-    'The requested file(s) does not contain enough keys (columns) to generate a plot. Does the file or files follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
+    'The requested file or files do not contain enough keys (columns) to generate a plot. Does the file or files follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
   )
 
 const getFieldsFromDataFiles = (
@@ -151,7 +151,7 @@ export const pickPlotConfiguration = async (
 
   if (!filesData) {
     return Toast.showError(
-      'Failed to parse the requested file(s). Does the file or files contain data and follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
+      'Failed to parse the requested file or files. Does the file or files contain data and follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
     )
   }
 
