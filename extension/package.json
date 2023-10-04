@@ -345,7 +345,7 @@
         "title": "Remove",
         "command": "dvc.removeTarget",
         "category": "DVC",
-        "icon": "$(trash)"
+        "icon": "$(discard)"
       },
       {
         "title": "Rename",
@@ -1066,6 +1066,11 @@
           "command": "dvc.addTarget",
           "group": "inline",
           "when": "scmProvider == dvc && scmResourceGroup == untracked && dvc.commands.available && !dvc.scm.command.running"
+        },
+        {
+          "command": "dvc.removeTarget",
+          "group": "inline",
+          "when": "scmProvider == dvc && scmResourceState =~ /^.*?Added$/ && dvc.commands.available && !dvc.scm.command.running"
         },
         {
           "command": "dvc.checkoutTarget",

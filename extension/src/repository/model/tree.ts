@@ -234,14 +234,13 @@ export class RepositoriesTree
 
     this.internalCommands.registerExternalCliCommand<Resource>(
       RegisteredCliCommands.REMOVE_TARGET,
-      async ({ dvcRoot, resourceUri }) => {
+      ({ dvcRoot, resourceUri }) => {
         const relPath = relative(dvcRoot, this.getDataPlaceholder(resourceUri))
-        await this.internalCommands.executeCommand(
+        return this.internalCommands.executeCommand(
           AvailableCommands.REMOVE,
           dvcRoot,
           relPath
         )
-        return deleteTarget(resourceUri)
       }
     )
 
