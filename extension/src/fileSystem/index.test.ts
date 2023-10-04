@@ -592,10 +592,11 @@ describe('addPlotToDvcYamlFile', () => {
     '        eval/prc/test.json: precision'
   ]
   const mockNewPlotLines = [
-    '  - data.json:',
+    '  - simple_plot:',
     '      template: simple',
     '      x: epochs',
-    '      y: accuracy'
+    '      y:',
+    '        data.json: accuracy'
   ]
   it('should add a plots list with the new plot if the dvc.yaml file has no plots', () => {
     const mockDvcYamlContent = mockStagesLines.join('\n')
@@ -700,10 +701,11 @@ describe('addPlotToDvcYamlFile', () => {
     ].join('\n')
     const mockPlotYamlContent = [
       '',
-      '    - data.json:',
+      '    - simple_plot:',
       '          template: simple',
       '          x: epochs',
-      '          y: accuracy',
+      '          y:',
+      '              data.json: accuracy',
       ''
     ].join('\n')
     mockedReadFileSync.mockReturnValueOnce(mockDvcYamlContent)

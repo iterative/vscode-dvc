@@ -21,6 +21,7 @@ describe('pickFile', () => {
     await pickFile(mockedTitle)
 
     expect(mockedShowOpenDialog).toHaveBeenCalledWith({
+      canSelectFiles: true,
       canSelectFolders: false,
       canSelectMany: false,
       openLabel: 'Select',

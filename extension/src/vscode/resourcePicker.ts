@@ -1,42 +1,16 @@
 import { OpenDialogOptions, Uri, window } from 'vscode'
 import { Title } from './title'
 
-export const pickFile = async (
+export const pickResources = (
   title: Title,
+  canSelectFolders = true,
+  canSelectMany = true,
   filters?: OpenDialogOptions['filters']
-): Promise<string | undefined> => {
-  const uris = await window.showOpenDialog({
-    canSelectFolders: false,
-    canSelectMany: false,
-    filters,
-    openLabel: 'Select',
-    title
-  })
-
-  if (uris) {
-    const [{ fsPath }] = uris
-    return fsPath
-  }
-}
-
-export const pickResources = (title: Title): Thenable<Uri[] | undefined> => {
-  return window.showOpenDialog({
-    canSelectFiles: true,
-    canSelectFolders: true,
-    canSelectMany: true,
-    openLabel: 'Select',
-    title
-  })
-}
-
-export const pickFiles = async (
-  title: Title,
-  filters?: OpenDialogOptions['filters']
-): Promise<string[] | undefined> => {
+): Thenable<Uri[] | undefined> => {
   const opts: OpenDialogOptions = {
     canSelectFiles: true,
-    canSelectFolders: false,
-    canSelectMany: true,
+    canSelectFolders,
+    canSelectMany,
     openLabel: 'Select',
     title
   }
@@ -45,7 +19,22 @@ export const pickFiles = async (
     opts.filters = filters
   }
 
-  const uris = await window.showOpenDialog(opts)
+  return window.showOpenDialog(opts)
+}
+
+export const pickFile = async (title: Title): Promise<string | undefined> => {
+  const uris = await pickResources(title, false, false)
+  if (uris) {
+    const [{ fsPath }] = uris
+    return fsPath
+  }
+}
+
+export const pickFiles = async (
+  title: Title,
+  filters?: OpenDialogOptions['filters']
+): Promise<string[] | undefined> => {
+  const uris = await pickResources(title, false, true, filters)
 
   if (uris) {
     return uris.map(({ fsPath }) => fsPath)
