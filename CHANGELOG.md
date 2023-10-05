@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.2] - 2023-10-05
+
+### 🚀 New Features and Enhancements
+
+- Add remove as inline SCM action for added resources [#4768](https://github.com/iterative/vscode-dvc/pull/4768) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Remove unused function [#4769](https://github.com/iterative/vscode-dvc/pull/4769) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.1.1] - 2023-10-05
 
 ### 🚀 New Features and Enhancements
