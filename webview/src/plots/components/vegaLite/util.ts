@@ -28,6 +28,7 @@ export const fillTemplate = (
     if (['<DVC_METRIC_TITLE>', '<DVC_METRIC_X_LABEL>'].includes(key)) {
       const truncatedValue = truncate(value, width, 'left')
       specStr = specStr.replace(new RegExp(key, 'g'), truncatedValue)
+      continue
     }
 
     if (key === '<DVC_METRIC_Y_LABEL>') {
@@ -37,6 +38,7 @@ export const fillTemplate = (
         'left'
       )
       specStr = specStr.replace(new RegExp(key, 'g'), truncatedVerticalValue)
+      continue
     }
 
     if (key === '<DVC_METRIC_ZOOM_AND_PAN>') {
@@ -45,6 +47,7 @@ export const fillTemplate = (
         new RegExp(`"${key}"`, 'g'),
         suppressZoomAndPan ? '' : value
       )
+      continue
     }
 
     if (
@@ -65,15 +68,15 @@ export const fillTemplate = (
       } else {
         specStr = specStr.replace(new RegExp(`"${key}"`, 'g'), value)
       }
-    }
-
-    if (key === '<DVC_METRIC_DATA>') {
-      specStr = specStr.replace(new RegExp(`"${key}"`, 'g'), value)
+      continue
     }
 
     if (['<DVC_PARAM_TYPE>', '<DVC_METRIC_TYPE>'].includes(key)) {
       specStr = specStr.replace(new RegExp(key, 'g'), value)
+      continue
     }
+
+    specStr = specStr.replace(new RegExp(`"${key}"`, 'g'), value)
   }
 
   const spec = JSON.parse(specStr) as { [key: string]: unknown }
