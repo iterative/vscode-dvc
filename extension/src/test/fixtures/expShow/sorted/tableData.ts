@@ -6,6 +6,7 @@ import { TableData } from '../../../../experiments/webview/contract'
 const data: TableData = {
   ...defaultData,
   columns,
+  hasMoreCommits: { 'another-branch': true, main: true, 'other-branch': true },
   rows,
   selectedForPlotsCount: 0,
   sorts: [

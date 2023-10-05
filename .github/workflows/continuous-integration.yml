@@ -42,16 +42,25 @@ jobs:
 
       - run: yarn run lint
 
-      - uses: paambaati/codeclimate-action@v5.0.0
+      - name: Run Coverage Report
+        if: '!github.event.pull_request.head.repo.fork'
+        uses: paambaati/codeclimate-action@v5.0.0
         env:
           CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
         with:
           coverageCommand: xvfb-run -a yarn run cover
           coverageLocations: ${{github.workspace}}/coverage/lcov.info:lcov
 
-      - run: yarn build-storybook
+      - name: Run Fork Coverage
+        if: 'github.event.pull_request.head.repo.fork'
+        run: xvfb-run -a yarn run cover
+
+      - name: Build Storybook
+        if: '!github.event.pull_request.head.repo.fork'
+        run: yarn build-storybook
 
       - name: Publish to Chromatic
+        if: '!github.event.pull_request.head.repo.fork'
         uses: chromaui/action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}

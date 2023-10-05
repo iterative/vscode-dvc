@@ -47,7 +47,84 @@ const rowsFixture: Commit[] = [
     starred: false
   },
   {
-    branch: 'main',
+    commit: {
+      author: 'Julie G',
+      date: '5 days ago',
+      message: 'Drop checkpoint: true (#74)\n\n',
+      tags: []
+    },
+    description: 'Drop checkpoint: true (#74)\n\n',
+    displayColor: undefined,
+    flatBranches: ['main'],
+    id: 'fe2919b',
+    label: 'fe2919b',
+    metrics: {
+      'summary.json': {
+        loss: 2.048856019973755,
+        accuracy: 0.3484833240509033,
+        val_loss: 1.9979369640350342,
+        val_accuracy: 0.4277999997138977
+      }
+    },
+    params: {
+      'params.yaml': {
+        code_names: [0, 1],
+        epochs: 10,
+        learning_rate: 2.1e-7,
+        dvc_logs_dir: 'dvc_logs',
+        log_file: 'logs.csv',
+        dropout: 0.122,
+        process: { threshold: 0.86, test_arg: 'string' }
+      },
+      [join('nested', 'params.yaml')]: {
+        test: true
+      }
+    },
+    selected: false,
+    sha: 'fe2919bb4394b30494bea905c253e10077b9a1bd',
+    starred: false,
+    Created: '2020-11-16T19:58:22'
+  },
+  {
+    commit: {
+      author: 'Matt Seddon',
+      date: '3 days ago',
+      message: 'Update dependency dvclive to v2.6.4 (#75)\n\n',
+      tags: []
+    },
+    description: 'Update dependency dvclive to v2.6.4 (#75)\n\n',
+    displayColor: undefined,
+    flatBranches: ['main'],
+    id: '7df876c',
+    label: '7df876c',
+    metrics: {
+      'summary.json': {
+        loss: 2.048856019973755,
+        accuracy: 0.3484833240509033,
+        val_loss: 1.9979369640350342,
+        val_accuracy: 0.4277999997138977
+      }
+    },
+    params: {
+      'params.yaml': {
+        code_names: [0, 1],
+        epochs: 7,
+        learning_rate: 2.1e-7,
+        dvc_logs_dir: 'dvc_logs',
+        log_file: 'logs.csv',
+        dropout: 0.122,
+        process: { threshold: 0.86, test_arg: 'string' }
+      },
+      [join('nested', 'params.yaml')]: {
+        test: true
+      }
+    },
+    selected: false,
+    sha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
+    starred: false,
+    Created: '2020-11-18T19:58:22'
+  },
+  {
     commit: {
       author: 'github-actions[bot]',
       date: '6 hours ago',
@@ -57,6 +134,7 @@ const rowsFixture: Commit[] = [
     },
     description: 'Update version and CHANGELOG for release (#4022) ...',
     displayColor: undefined,
+    flatBranches: ['main'],
     id: 'main',
     label: 'main',
     metrics: {
@@ -87,11 +165,11 @@ const rowsFixture: Commit[] = [
     Created: '2020-11-21T19:58:22'
   },
   {
-    branch: 'main',
     baselineSha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
     displayColor: undefined,
     description: '[exp-83425]',
     executor: Executor.WORKSPACE,
+    flatBranches: ['main'],
     id: 'exp-83425',
     label: EXPERIMENT_WORKSPACE_ID,
     metrics: {
@@ -122,12 +200,12 @@ const rowsFixture: Commit[] = [
     Created: '2020-12-29T15:27:02'
   },
   {
-    branch: 'main',
     baselineSha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
     displayColor: undefined,
     description: '[exp-f13bca]',
     id: 'exp-f13bca',
     error: "unable to read: 'summary.json', JSON file structure is corrupted",
+    flatBranches: ['main'],
     label: 'f0f9186',
     metrics: {},
     params: {
@@ -151,10 +229,10 @@ const rowsFixture: Commit[] = [
     Created: '2020-12-29T15:26:36'
   },
   {
-    branch: 'main',
     baselineSha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
     displayColor: undefined,
     error: 'Experiment run failed.',
+    flatBranches: ['main'],
     id: '55d492c',
     label: '55d492c',
     metrics: {},
@@ -179,7 +257,6 @@ const rowsFixture: Commit[] = [
     Created: '2020-12-29T15:25:27'
   },
   {
-    branch: 'main',
     commit: {
       author: 'Julie G',
       date: '6 hours ago',
@@ -189,8 +266,9 @@ const rowsFixture: Commit[] = [
     },
     description: 'Improve "Get Started" walkthrough (#4020) ...',
     displayColor: undefined,
-    id: 'fe2919b',
-    label: 'fe2919b',
+    flatBranches: ['main', 'other-branch'],
+    id: 'other-branch',
+    label: 'other-branch',
     metrics: {
       'summary.json': {
         loss: 2.048856019973755,
@@ -214,12 +292,11 @@ const rowsFixture: Commit[] = [
       }
     },
     selected: false,
-    sha: 'fe2919bb4394b30494bea905c253e10077b9a1bd',
+    sha: '90aea7f2482117a55dfcadcdb901aaa6610fbbc9',
     starred: false,
     Created: '2020-11-21T19:58:22'
   },
   {
-    branch: 'main',
     commit: {
       author: 'Matt Seddon',
       date: '8 hours ago',
@@ -230,8 +307,9 @@ const rowsFixture: Commit[] = [
     description:
       'Add capabilities to text mentioning storage provider extensions (#4015)',
     displayColor: undefined,
-    id: '7df876c',
-    label: '7df876c',
+    flatBranches: ['main', 'other-branch', 'another-branch'],
+    id: 'another-branch',
+    label: 'another-branch',
     metrics: {
       'summary.json': {
         loss: 2.048856019973755,
@@ -255,16 +333,16 @@ const rowsFixture: Commit[] = [
       }
     },
     selected: false,
-    sha: '7df876cb5147800cd3e489d563bc6dcd67188621',
+    sha: '55d492c9c633912685351b32df91bfe1f9ecefb9',
     starred: false,
     Created: '2020-11-21T19:58:22'
   },
   {
-    branch: 'main',
     baselineSha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
     displayColor: undefined,
     description: '[exp-e7a67]',
     executor: Executor.DVC_TASK,
+    flatBranches: ['main'],
     id: 'exp-e7a67',
     label: '4fb124a',
     metrics: {
@@ -296,10 +374,10 @@ const rowsFixture: Commit[] = [
     Created: '2020-12-29T15:31:52'
   },
   {
-    branch: 'main',
     baselineSha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
     displayColor: undefined,
     description: '[test-branch]',
+    flatBranches: ['main'],
     id: 'test-branch',
     label: '42b8736',
     metrics: {
@@ -332,9 +410,9 @@ const rowsFixture: Commit[] = [
     Created: '2020-12-29T15:28:59'
   },
   {
-    branch: 'main',
     baselineSha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
     displayColor: undefined,
+    flatBranches: ['main'],
     id: '489fd8b',
     sha: '489fd8bdaa709f7330aac342e051a9431c625481',
     label: '489fd8b',

@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0] - 2023-10-02
+
+### 🚀 New Features and Enhancements
+
+- Flatten table on sort [#4685](https://github.com/iterative/vscode-dvc/pull/4685) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Ensure custom plots legend matches plot values [#4729](https://github.com/iterative/vscode-dvc/pull/4729) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (3.23.0) [#4736](https://github.com/iterative/vscode-dvc/pull/4736) by [@julieg18](https://github.com/julieg18)
+
 ## [1.0.58] - 2023-09-27
 
 ### 🚀 New Features and Enhancements
