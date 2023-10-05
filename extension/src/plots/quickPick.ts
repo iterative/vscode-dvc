@@ -11,7 +11,7 @@ export const pickPlotType = () =>
     [
       {
         description:
-          'Create a data series plot definition by selecting data from a file',
+          'Create a data series plot definition by selecting data from one or more files (To select multiple files, hold the Ctrl/Command key and click on the files.).',
         label: 'Data Series',
         value: PLOT_TYPE.DATA_SERIES
       },

@@ -1,40 +1,57 @@
+import { relative } from 'path'
 import isEqual from 'lodash.isequal'
+import { QuickPickItemKind } from 'vscode'
 import {
   PLOT_TEMPLATES,
   Value,
   ValueTree,
   isValueTree
 } from '../cli/dvc/contract'
-import { loadDataFile } from '../fileSystem'
-import { quickPickOne } from '../vscode/quickPick'
-import { pickFile } from '../vscode/resourcePicker'
+import { getFileExtension, loadDataFiles } from '../fileSystem'
+import { quickPickOne, quickPickValue } from '../vscode/quickPick'
+import { pickFiles } from '../vscode/resourcePicker'
 import { Title } from '../vscode/title'
 import { Toast } from '../vscode/toast'
 
-const pickDataFile = () => {
-  return pickFile(Title.SELECT_PLOT_DATA, {
+const pickDataFiles = (): Thenable<string[] | undefined> =>
+  pickFiles(Title.SELECT_PLOT_DATA, {
     'Data Formats': ['json', 'csv', 'tsv', 'yaml']
   })
-}
 
 const pickTemplateAndFields = async (
-  fields: string[]
-): Promise<{ x: string; y: string; template: string } | undefined> => {
+  cwd: string,
+  fields: {
+    [file: string]: string[]
+  }
+): Promise<PlotConfigData | undefined> => {
   const template = await quickPickOne(PLOT_TEMPLATES, 'Pick a Plot Template')
 
   if (!template) {
     return
   }
 
-  const x = await quickPickOne(fields, 'Pick a Metric for X')
+  const items = []
+
+  for (const [file, keys] of Object.entries(fields)) {
+    items.push(
+      {
+        kind: QuickPickItemKind.Separator,
+        label: relative(cwd, file),
+        value: undefined
+      },
+      ...keys.map(key => ({ label: key, value: { file, key } }))
+    )
+  }
+
+  const x = await quickPickValue(items, { title: Title.SELECT_PLOT_X_METRIC })
 
   if (!x) {
     return
   }
 
-  const y = await quickPickOne(
-    fields.filter(field => x !== field),
-    'Pick a Metric for Y'
+  const y = await quickPickValue(
+    items.filter(item => !isEqual(item.value, x)),
+    { title: Title.SELECT_PLOT_Y_METRIC }
   )
 
   if (!y) {
@@ -45,10 +62,9 @@ const pickTemplateAndFields = async (
 }
 
 export type PlotConfigData = {
-  dataFile: string
+  x: { file: string; key: string }
   template: string
-  x: string
-  y: string
+  y: { file: string; key: string }
 }
 
 type UnknownValue = Value | ValueTree
@@ -65,7 +81,7 @@ const getFieldsFromArr = (dataArr: UnknownValue[]) => {
   return objsHaveSameKeys ? fieldObjKeys : []
 }
 
-const getFieldOptions = (data: UnknownValue): string[] => {
+const getFieldsFromValue = (data: UnknownValue): string[] => {
   const isArray = Array.isArray(data)
   const isObj = isValueTree(data)
   if (!isArray && !isObj) {
@@ -79,36 +95,79 @@ const getFieldOptions = (data: UnknownValue): string[] => {
     : []
 }
 
-export const pickPlotConfiguration = async (): Promise<
-  PlotConfigData | undefined
-> => {
-  const file = await pickDataFile()
+const showNotEnoughKeysToast = () =>
+  Toast.showError(
+    'The requested file or files do not contain enough keys (columns) to generate a plot. Does the file or files follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
+  )
 
-  if (!file) {
+const getFieldsFromDataFiles = (
+  dataArr: { data: UnknownValue; file: string }[]
+) => {
+  const keys: {
+    [file: string]: string[]
+  } = {}
+  let keysAmount = 0
+
+  for (const { file, data } of dataArr) {
+    const fields = getFieldsFromValue(data)
+
+    if (fields.length === 0) {
+      void showNotEnoughKeysToast()
+      return
+    }
+
+    keysAmount += fields.length
+
+    if (!keys[file]) {
+      keys[file] = []
+    }
+    keys[file].push(...fields)
+  }
+
+  if (keysAmount < 2) {
+    void showNotEnoughKeysToast()
     return
   }
 
-  const data = await loadDataFile(file)
+  return keys
+}
 
-  if (!data) {
+export const pickPlotConfiguration = async (
+  cwd: string
+): Promise<PlotConfigData | undefined> => {
+  const files = await pickDataFiles()
+
+  if (!files) {
+    return
+  }
+
+  const fileExts = new Set(files.map(file => getFileExtension(file)))
+
+  if (fileExts.size > 1) {
+    return Toast.showError('Files must of the same type.')
+  }
+
+  const filesData = await loadDataFiles(files)
+
+  if (!filesData) {
     return Toast.showError(
-      'Failed to parse the requested file. Does the file contain data and follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
+      'Failed to parse the requested file or files. Does the file or files contain data and follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
     )
   }
 
-  const keys = getFieldOptions(data as UnknownValue)
+  const keys = getFieldsFromDataFiles(
+    filesData as { data: UnknownValue; file: string }[]
+  )
 
-  if (keys.length < 2) {
-    return Toast.showError(
-      'The requested file does not contain enough keys (columns) to generate a plot. Does the file follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
-    )
+  if (!keys) {
+    return
   }
 
-  const templateAndFields = await pickTemplateAndFields(keys)
+  const templateAndFields = await pickTemplateAndFields(cwd, keys)
 
   if (!templateAndFields) {
     return
   }
 
-  return { ...templateAndFields, dataFile: file }
+  return { ...templateAndFields }
 }

@@ -119,7 +119,7 @@ export class Pipeline extends DeferredDisposable {
       return
     }
 
-    const plotConfiguration = await pickPlotConfiguration()
+    const plotConfiguration = await pickPlotConfiguration(cwd)
 
     if (!plotConfiguration) {
       return
