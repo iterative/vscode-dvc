@@ -310,10 +310,9 @@ suite('Pipeline Test Suite', () => {
     expect(mockAddPlotToDvcFile).not.to.be.called
 
     mockPickPlotConfiguration.onSecondCall().resolves({
-      dataFile: 'results.json',
       template: 'simple',
-      x: 'step',
-      y: 'acc'
+      x: { file: 'results.json', key: 'step' },
+      y: { file: 'results.json', key: 'acc' }
     })
 
     await pipeline.addDataSeriesPlot()
