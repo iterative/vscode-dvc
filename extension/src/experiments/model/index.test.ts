@@ -210,6 +210,12 @@ describe('ExperimentsModel', () => {
       [{ branch: 'main', sha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77' }],
       { main: 10 }
     )
+
+    model.addSort({
+      path: 'params:params.yaml:nested1.doubled',
+      descending: true
+    })
+
     expect(model.getRowData()).toStrictEqual(
       expect.objectContaining(deeplyNestedRowsFixture)
     )

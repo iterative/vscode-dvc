@@ -184,46 +184,104 @@ describe('App', () => {
     await expectHeaders(['A', 'C', 'D', 'B'])
   })
 
-  it('should add a "branch/tags" column if the table is sorted', () => {
-    renderTable(sortedTableStateFixture)
+  describe('Sorted (Flattened) Table', () => {
+    beforeAll(() => {
+      jest.useFakeTimers()
+    })
 
-    const branchHeader = screen.getByTestId('header-branch')
-    expect(branchHeader).toBeInTheDocument()
+    afterAll(() => {
+      jest.useRealTimers()
+    })
 
-    const branchHeaderTextContent =
-      within(branchHeader).getByText('Branch/Tags')
-    expect(branchHeader).toBeInTheDocument()
+    it('should add a "branch/tags" column', () => {
+      renderTable(sortedTableStateFixture)
 
-    fireEvent.mouseEnter(branchHeaderTextContent, { bubbles: true })
-    expect(screen.getByRole('tooltip')).toBeInTheDocument()
-    expect(screen.getByRole('tooltip')).toHaveTextContent(
-      'The table has limited functionality while sorted. Clear all sorts to have nested rows and increase/decrease commits.'
-    )
+      const branchHeader = screen.getByTestId('header-branch')
+      expect(branchHeader).toBeInTheDocument()
 
-    expect(screen.getByTestId('branch___main').textContent).toStrictEqual(
-      'main'
-    )
-  })
+      const branchHeaderTextContent =
+        within(branchHeader).getByText('Branch/Tags')
+      expect(branchHeader).toBeInTheDocument()
 
-  it('should add a "parent" column if the table is sorted', () => {
-    renderTable(sortedTableStateFixture)
+      fireEvent.mouseEnter(branchHeaderTextContent, { bubbles: true })
+      expect(screen.getByRole('tooltip')).toBeInTheDocument()
+      expect(screen.getByRole('tooltip')).toHaveTextContent(
+        'The table has limited functionality while sorted. Clear all sorts to have nested rows and increase/decrease commits.'
+      )
 
-    const commitHeader = screen.getByTestId('header-commit')
-    expect(commitHeader).toBeInTheDocument()
+      const branchCell = screen.getByTestId('branch___main')
+      expect(branchCell).toHaveTextContent('main')
 
-    const commitHeaderTextContent = within(commitHeader).getByText('Parent')
-    expect(commitHeader).toBeInTheDocument()
+      fireEvent.mouseLeave(branchHeaderTextContent, { bubbles: true })
+      fireEvent.mouseEnter(within(branchCell).getByText('main'), {
+        bubbles: true
+      })
 
-    fireEvent.mouseEnter(commitHeaderTextContent, { bubbles: true })
-    expect(screen.getByRole('tooltip')).toBeInTheDocument()
-    expect(screen.getByRole('tooltip')).toHaveTextContent(
-      'The table has limited functionality while sorted. Clear all sorts to have nested rows and increase/decrease commits.'
-    )
+      advanceTimersByTime(NORMAL_TOOLTIP_DELAY[0])
 
-    expect(screen.getByTestId('commit___main').textContent).toStrictEqual('')
-    expect(screen.getByTestId('commit___exp-83425').textContent).toStrictEqual(
-      '53c3851'
-    )
+      const tooltip = screen.getByRole('tooltip')
+      expect(tooltip).toBeInTheDocument()
+      expect(tooltip).toHaveTextContent('main')
+    })
+
+    it('should show two branches in the "branch/tags" column cell if the row belongs to two branches', () => {
+      renderTable(sortedTableStateFixture)
+
+      const cellBranches = within(
+        screen.getByTestId('branch___other-branch')
+      ).getAllByRole('listitem')
+
+      expect(cellBranches[0]).toHaveTextContent('main')
+      expect(cellBranches[1]).toHaveTextContent('other-branch')
+
+      fireEvent.mouseEnter(cellBranches[0], { bubbles: true })
+
+      advanceTimersByTime(NORMAL_TOOLTIP_DELAY[0])
+
+      const tooltip = screen.getByRole('tooltip')
+      expect(tooltip).toBeInTheDocument()
+      expect(tooltip).toHaveTextContent('main, other-branch')
+    })
+
+    it('should show two branches plus the amount remaining in the "branch/tags" column cell if the row belongs to more than two branches', () => {
+      renderTable(sortedTableStateFixture)
+
+      const cellBranches = within(
+        screen.getByTestId('branch___another-branch')
+      ).getAllByRole('listitem')
+
+      expect(cellBranches[0]).toHaveTextContent('main')
+      expect(cellBranches[1]).toHaveTextContent('other-branch + 1 more')
+
+      fireEvent.mouseEnter(cellBranches[0], { bubbles: true })
+
+      advanceTimersByTime(NORMAL_TOOLTIP_DELAY[0])
+
+      const tooltip = screen.getByRole('tooltip')
+      expect(tooltip).toBeInTheDocument()
+      expect(tooltip).toHaveTextContent('main, other-branch, another-branch')
+    })
+
+    it('should add a "parent" column', () => {
+      renderTable(sortedTableStateFixture)
+
+      const commitHeader = screen.getByTestId('header-commit')
+      expect(commitHeader).toBeInTheDocument()
+
+      const commitHeaderTextContent = within(commitHeader).getByText('Parent')
+      expect(commitHeader).toBeInTheDocument()
+
+      fireEvent.mouseEnter(commitHeaderTextContent, { bubbles: true })
+      expect(screen.getByRole('tooltip')).toBeInTheDocument()
+      expect(screen.getByRole('tooltip')).toHaveTextContent(
+        'The table has limited functionality while sorted. Clear all sorts to have nested rows and increase/decrease commits.'
+      )
+
+      expect(screen.getByTestId('commit___main').textContent).toStrictEqual('')
+      expect(
+        screen.getByTestId('commit___exp-83425').textContent
+      ).toStrictEqual('53c3851')
+    })
   })
 
   it('should be able to move columns to the start', async () => {
