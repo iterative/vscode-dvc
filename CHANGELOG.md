@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.1] - 2023-10-05
+
+### 🚀 New Features and Enhancements
+
+- Allow Multi File Select on Plot Wizard [#4748](https://github.com/iterative/vscode-dvc/pull/4748) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Collapse duplicate rows when table is flattened [#4735](https://github.com/iterative/vscode-dvc/pull/4735) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Handle pull requests from forks [#4762](https://github.com/iterative/vscode-dvc/pull/4762) by [@mattseddon](https://github.com/mattseddon)
+- Update demo project and latest tested CLI version (3.24.0) [#4771](https://github.com/iterative/vscode-dvc/pull/4771) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.1.0] - 2023-10-02
 
 ### 🚀 New Features and Enhancements
