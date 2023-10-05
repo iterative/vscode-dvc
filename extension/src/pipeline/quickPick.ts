@@ -23,13 +23,12 @@ type UnknownValue = Value | ValueTree
 
 type fileFields = { [file: string]: string[] }
 
-const pickDataFiles = (): Thenable<string[] | undefined> =>
+const pickDataFiles = (): Promise<string[] | undefined> =>
   pickFiles(Title.SELECT_PLOT_DATA, {
     'Data Formats': ['json', 'csv', 'tsv', 'yaml']
   })
 
 const pickTemplateAndFields = async (
-  cwd: string,
   fields: fileFields
 ): Promise<PlotConfigData | undefined> => {
   const template = await quickPickOne(PLOT_TEMPLATES, 'Pick a Plot Template')
@@ -44,7 +43,7 @@ const pickTemplateAndFields = async (
     items.push(
       {
         kind: QuickPickItemKind.Separator,
-        label: relative(cwd, file),
+        label: file,
         value: undefined
       },
       ...keys.map(key => ({ label: key, value: { file, key } }))
@@ -81,7 +80,6 @@ const validateFileNames = (files: string[] | undefined) => {
   if (!files) {
     return []
   }
-
   const fileExts = [...new Set(files.map(file => getFileExtension(file)))]
 
   if (fileExts.length > 1) {
@@ -90,12 +88,12 @@ const validateFileNames = (files: string[] | undefined) => {
         fileExts
       )} extensions. Files must be of the same type.`
     )
-    return files
+    return []
   }
   return files
 }
 
-const getFieldsFromArr = (
+const getMetricInfoFromArr = (
   dataArr: UnknownValue[]
 ): { arrLength: number; fields: string[] } | undefined => {
   const firstArrVal: UnknownValue = dataArr[0]
@@ -112,7 +110,7 @@ const getFieldsFromArr = (
   return { arrLength: dataArr.length, fields: fieldObjKeys }
 }
 
-const getFieldsFromValue = (
+const getMetricInfoFromValue = (
   data: UnknownValue
 ): { arrLength: number; fields: string[] } | undefined => {
   const isArray = Array.isArray(data)
@@ -127,7 +125,7 @@ const getFieldsFromValue = (
     return
   }
 
-  return getFieldsFromArr(maybeFieldsObjArr)
+  return getMetricInfoFromArr(maybeFieldsObjArr)
 }
 
 const showNotEnoughKeysToast = (files: string[]) => {
@@ -148,7 +146,7 @@ const validateSingleDataFileFields = ({
   file: string
   data: UnknownValue
 }) => {
-  const { fields = [] } = getFieldsFromValue(data) || {}
+  const { fields = [] } = getMetricInfoFromValue(data) || {}
 
   if (fields.length < 2) {
     void showNotEnoughKeysToast([file])
@@ -166,14 +164,14 @@ const getFieldsFromDataFiles = (
   const keys: fileFields = {}
 
   for (const { file, data } of dataArr) {
-    const fileFields = getFieldsFromValue(data)
+    const metricInfo = getMetricInfoFromValue(data)
 
-    if (!fileFields) {
+    if (!metricInfo) {
       failedFiles.push(file)
       continue
     }
 
-    const { fields, arrLength } = fileFields
+    const { fields, arrLength } = metricInfo
 
     if (!keys[file]) {
       keys[file] = []
@@ -190,7 +188,7 @@ const validateMultiDataFileFields = (
 ) => {
   const { keys, failedFiles, filesArrLength } = getFieldsFromDataFiles(dataArr)
 
-  if (failedFiles) {
+  if (failedFiles.length > 0) {
     void showNotEnoughKeysToast(failedFiles)
     return
   }
@@ -204,13 +202,16 @@ const validateMultiDataFileFields = (
   return keys
 }
 
-const validateFilesData = async (files: string[]) => {
+const validateFilesData = async (cwd: string, files: string[]) => {
   const filesData = (await loadDataFiles(files)) as {
     data: UnknownValue
     file: string
   }[]
-
-  const failedFiles = filesData.filter(({ data }) => !!data)
+  const relativeFilesData = filesData.map(({ data, file }) => ({
+    data,
+    file: relative(cwd, file)
+  }))
+  const failedFiles = relativeFilesData.filter(({ data }) => !data)
 
   if (failedFiles.length > 0) {
     const files = joinList(failedFiles.map(({ file }) => file))
@@ -223,8 +224,8 @@ const validateFilesData = async (files: string[]) => {
   }
 
   return files.length === 1
-    ? validateSingleDataFileFields(filesData[0])
-    : validateMultiDataFileFields(filesData)
+    ? validateSingleDataFileFields(relativeFilesData[0])
+    : validateMultiDataFileFields(relativeFilesData)
 }
 
 export const pickPlotConfiguration = async (
@@ -237,13 +238,13 @@ export const pickPlotConfiguration = async (
     return
   }
 
-  const validFileFields = await validateFilesData(validFileNames)
+  const validFileFields = await validateFilesData(cwd, validFileNames)
 
   if (!validFileFields) {
     return
   }
 
-  const templateAndFields = await pickTemplateAndFields(cwd, validFileFields)
+  const templateAndFields = await pickTemplateAndFields(validFileFields)
 
   if (!templateAndFields) {
     return

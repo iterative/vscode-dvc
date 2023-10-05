@@ -182,7 +182,7 @@ describe('loadDataFiles', () => {
     for (const file of dataFiles) {
       const resultWithErr = await loadDataFiles([file])
 
-      expect(resultWithErr).toStrictEqual(undefined)
+      expect(resultWithErr).toStrictEqual([{ data: undefined, file }])
     }
   })
 
@@ -201,7 +201,23 @@ describe('loadDataFiles', () => {
       .mockReturnValueOnce(mockJsonContent)
 
     const resultWithErr = await loadDataFiles(dataFiles)
-    expect(resultWithErr).toStrictEqual(undefined)
+    expect(resultWithErr).toStrictEqual([
+      {
+        data: [
+          { acc: 0.69, epoch: 10 },
+          { acc: 0.345, epoch: 11 }
+        ],
+        file: 'values.csv'
+      },
+      { data: undefined, file: 'file.tsv' },
+      {
+        data: [
+          { acc: 0.69, epoch: 10 },
+          { acc: 0.345, epoch: 11 }
+        ],
+        file: 'file.json'
+      }
+    ])
   })
 })
 
@@ -608,8 +624,8 @@ describe('addPlotToDvcYamlFile', () => {
 
     addPlotToDvcYamlFile('/', {
       template: 'simple',
-      x: { file: '/data.json', key: 'epochs' },
-      y: { file: '/data.json', key: 'accuracy' }
+      x: { file: 'data.json', key: 'epochs' },
+      y: { file: 'data.json', key: 'accuracy' }
     })
 
     expect(mockedWriteFileSync).toHaveBeenCalledWith(
@@ -636,8 +652,8 @@ describe('addPlotToDvcYamlFile', () => {
 
     addPlotToDvcYamlFile('/', {
       template: 'simple',
-      x: { file: '/data.json', key: 'epochs' },
-      y: { file: '/acc.json', key: 'accuracy' }
+      x: { file: 'data.json', key: 'epochs' },
+      y: { file: 'acc.json', key: 'accuracy' }
     })
 
     expect(mockedWriteFileSync).toHaveBeenCalledWith(
@@ -654,8 +670,8 @@ describe('addPlotToDvcYamlFile', () => {
 
     addPlotToDvcYamlFile('/', {
       template: 'simple',
-      x: { file: '/data.json', key: 'epochs' },
-      y: { file: '/data.json', key: 'accuracy' }
+      x: { file: 'data.json', key: 'epochs' },
+      y: { file: 'data.json', key: 'accuracy' }
     })
 
     mockDvcYamlContent.splice(7, 0, ...mockPlotYamlContent)
@@ -676,8 +692,8 @@ describe('addPlotToDvcYamlFile', () => {
 
     addPlotToDvcYamlFile('/', {
       template: 'simple',
-      x: { file: '/data.json', key: 'epochs' },
-      y: { file: '/data.json', key: 'accuracy' }
+      x: { file: 'data.json', key: 'epochs' },
+      y: { file: 'data.json', key: 'accuracy' }
     })
 
     expect(mockedWriteFileSync).toHaveBeenCalledWith(
@@ -713,8 +729,8 @@ describe('addPlotToDvcYamlFile', () => {
 
     addPlotToDvcYamlFile('/', {
       template: 'simple',
-      x: { file: '/data.json', key: 'epochs' },
-      y: { file: '/data.json', key: 'accuracy' }
+      x: { file: 'data.json', key: 'epochs' },
+      y: { file: 'data.json', key: 'accuracy' }
     })
 
     expect(mockedWriteFileSync).toHaveBeenCalledWith(
