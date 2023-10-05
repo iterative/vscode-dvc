@@ -73,7 +73,7 @@ const joinList = (items: string[]) => {
     return items.join(' and ')
   }
 
-  return `${[items.slice(0, -1)].join(', ')}, and ${items[items.length - 1]}`
+  return `${items.slice(0, -1).join(', ')}, and ${items[items.length - 1]}`
 }
 
 const validateFileNames = (files: string[] | undefined) => {
@@ -128,16 +128,10 @@ const getMetricInfoFromValue = (
   return getMetricInfoFromArr(maybeFieldsObjArr)
 }
 
-const showNotEnoughKeysToast = (files: string[]) => {
-  const isSingle = files.length === 1
-  return Toast.showError(
-    `${joinList(files)} ${
-      isSingle ? 'does' : 'do'
-    } not contain enough keys (columns) to generate a plot. Does the ${
-      isSingle ? 'file' : 'files'
-    } follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?`
-  )
-}
+const getFileGuidelinesQuestion = (isSingleFile: boolean) =>
+  `${
+    isSingleFile ? 'Does the file' : 'Do the files'
+  } follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?`
 
 const validateSingleDataFileFields = ({
   file,
@@ -149,17 +143,21 @@ const validateSingleDataFileFields = ({
   const { fields = [] } = getMetricInfoFromValue(data) || {}
 
   if (fields.length < 2) {
-    void showNotEnoughKeysToast([file])
+    void Toast.showError(
+      `${file} does not contain enough keys (columns) to generate a plot. ${getFileGuidelinesQuestion(
+        true
+      )}`
+    )
     return
   }
 
   return { [file]: fields }
 }
 
-const getFieldsFromDataFiles = (
+const getMetricInfoFromDataFiles = (
   dataArr: { data: UnknownValue; file: string }[]
 ) => {
-  const failedFiles: string[] = []
+  const invalidFiles: string[] = []
   const filesArrLength: Set<number> = new Set()
   const keys: fileFields = {}
 
@@ -167,7 +165,7 @@ const getFieldsFromDataFiles = (
     const metricInfo = getMetricInfoFromValue(data)
 
     if (!metricInfo) {
-      failedFiles.push(file)
+      invalidFiles.push(file)
       continue
     }
 
@@ -180,22 +178,31 @@ const getFieldsFromDataFiles = (
     keys[file].push(...fields)
   }
 
-  return { failedFiles, filesArrLength, keys }
+  return { filesArrLength, invalidFiles, keys }
 }
 
 const validateMultiDataFileFields = (
   dataArr: { data: UnknownValue; file: string }[]
 ) => {
-  const { keys, failedFiles, filesArrLength } = getFieldsFromDataFiles(dataArr)
+  const { keys, invalidFiles, filesArrLength } =
+    getMetricInfoFromDataFiles(dataArr)
 
-  if (failedFiles.length > 0) {
-    void showNotEnoughKeysToast(failedFiles)
+  if (invalidFiles.length > 0) {
+    void Toast.showError(
+      `${joinList(
+        invalidFiles
+      )} do not contain any keys (columns) for plot generation. ${getFileGuidelinesQuestion(
+        invalidFiles.length === 1
+      )}`
+    )
     return
   }
 
   if (filesArrLength.size > 1) {
     void Toast.showError(
-      'The files must have the same array (or row in tsv/csv) length.'
+      `All files must have the same array (row) length. ${getFileGuidelinesQuestion(
+        false
+      )}`
     )
   }
 
@@ -211,13 +218,13 @@ const validateFilesData = async (cwd: string, files: string[]) => {
     data,
     file: relative(cwd, file)
   }))
-  const failedFiles = relativeFilesData.filter(({ data }) => !data)
+  const invalidFilesData = relativeFilesData.filter(({ data }) => !data)
 
-  if (failedFiles.length > 0) {
-    const files = joinList(failedFiles.map(({ file }) => file))
+  if (invalidFilesData.length > 0) {
+    const invalidFiles = joinList(invalidFilesData.map(({ file }) => file))
     void Toast.showError(
-      `Failed to parse ${files}. ${
-        files.length === 1 ? 'Does the file' : 'Do the files'
+      `Failed to parse ${invalidFiles}. ${
+        invalidFilesData.length === 1 ? 'Does the file' : 'Do the files'
       } contain data and follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?`
     )
     return false
