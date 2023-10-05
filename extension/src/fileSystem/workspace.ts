@@ -1,8 +1,5 @@
 import { basename } from 'path'
 import { Uri, workspace, WorkspaceEdit } from 'vscode'
-import { isSameOrChild } from '.'
-import { definedAndNonEmpty } from '../util/array'
-import { getWorkspaceFolders } from '../vscode/workspaceFolders'
 
 export const deleteTarget = (uri: Uri) => {
   const edit = new WorkspaceEdit()
@@ -17,14 +14,6 @@ export const moveTargets = (targets: Uri[], destination: Uri) => {
   }
 
   return workspace.applyEdit(edit)
-}
-
-export const isInWorkspace = (pathOrGlob: string): boolean => {
-  const isContained = getWorkspaceFolders()
-    .map(workspaceFolder => isSameOrChild(workspaceFolder, pathOrGlob))
-    .filter(Boolean)
-
-  return definedAndNonEmpty(isContained)
 }
 
 export const findFiles = async (

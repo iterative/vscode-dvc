@@ -14,7 +14,6 @@ import {
   workspace
 } from 'vscode'
 import { Disposable } from '../../../../extension'
-import * as Workspace from '../../../../fileSystem/workspace'
 import { DvcExecutor } from '../../../../cli/dvc/executor'
 import {
   activeTextEditorChangedEvent,
@@ -249,7 +248,6 @@ suite('Repositories Tree Test Suite', () => {
       const relPath = join('mock', 'data', 'MNIST', 'raw')
       stub(path, 'relative').returns(relPath)
 
-      const mockDeleteTarget = stub(Workspace, 'deleteTarget').resolves(true)
       const mockRemove = stub(DvcExecutor.prototype, 'remove').resolves(
         'target destroyed!'
       )
@@ -258,7 +256,6 @@ suite('Repositories Tree Test Suite', () => {
         RegisteredCliCommands.REMOVE_TARGET,
         getPathItem(relPath)
       )
-      expect(mockDeleteTarget).to.be.calledOnce
       expect(mockRemove).to.be.calledOnce
     })
 
