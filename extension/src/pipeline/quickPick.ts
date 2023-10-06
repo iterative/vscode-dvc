@@ -21,7 +21,7 @@ export type PlotConfigData = {
 
 type UnknownValue = Value | ValueTree
 
-type fileFields = { [file: string]: string[] }
+type FileFields = { file: string; fields: string[] }[]
 
 const pickDataFiles = (): Promise<string[] | undefined> =>
   pickFiles(Title.SELECT_PLOT_DATA, {
@@ -29,7 +29,7 @@ const pickDataFiles = (): Promise<string[] | undefined> =>
   })
 
 const pickTemplateAndFields = async (
-  fields: fileFields
+  fileFields: FileFields
 ): Promise<PlotConfigData | undefined> => {
   const template = await quickPickOne(PLOT_TEMPLATES, 'Pick a Plot Template')
 
@@ -39,14 +39,14 @@ const pickTemplateAndFields = async (
 
   const items = []
 
-  for (const [file, keys] of Object.entries(fields)) {
+  for (const { file, fields } of fileFields) {
     items.push(
       {
         kind: QuickPickItemKind.Separator,
         label: file,
         value: undefined
       },
-      ...keys.map(key => ({ label: key, value: { file, key } }))
+      ...fields.map(key => ({ label: key, value: { file, key } }))
     )
   }
 
@@ -128,82 +128,54 @@ const getMetricInfoFromValue = (
   return getMetricInfoFromArr(maybeFieldsObjArr)
 }
 
-const getFileGuidelinesQuestion = (isSingleFile: boolean) =>
-  `${
-    isSingleFile ? 'Does the file' : 'Do the files'
-  } follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?`
+const getDvcGuidelinesQuestion = () =>
+  'Does the file contain data and follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
 
-const validateSingleDataFileFields = ({
+const validateSingleFileData = ({
   file,
   data
 }: {
-  file: string
   data: UnknownValue
+  file: string
 }) => {
   const { fields = [] } = getMetricInfoFromValue(data) || {}
 
   if (fields.length < 2) {
     void Toast.showError(
-      `${file} does not contain enough keys (columns) to generate a plot. ${getFileGuidelinesQuestion(
-        true
-      )}`
+      `${file} does not contain enough keys (columns) to generate a plot. ${getDvcGuidelinesQuestion()}`
     )
     return
   }
 
-  return { [file]: fields }
+  return [{ fields, file }]
 }
 
-const getMetricInfoFromDataFiles = (
-  dataArr: { data: UnknownValue; file: string }[]
+const validateMultiFilesData = (
+  filesData: { data: UnknownValue; file: string }[]
 ) => {
-  const invalidFiles: string[] = []
   const filesArrLength: Set<number> = new Set()
-  const keys: fileFields = {}
+  const keys: FileFields = []
 
-  for (const { file, data } of dataArr) {
+  for (const { file, data } of filesData) {
     const metricInfo = getMetricInfoFromValue(data)
-
     if (!metricInfo) {
-      invalidFiles.push(file)
-      continue
+      void Toast.showError(
+        `${file} does not contain any keys (columns) to generate a plot. ${getDvcGuidelinesQuestion()}`
+      )
+      return
     }
 
-    const { fields, arrLength } = metricInfo
-
-    if (!keys[file]) {
-      keys[file] = []
-    }
+    const { arrLength, fields } = metricInfo
+    keys.push({ fields, file })
     filesArrLength.add(arrLength)
-    keys[file].push(...fields)
-  }
-
-  return { filesArrLength, invalidFiles, keys }
-}
-
-const validateMultiDataFileFields = (
-  dataArr: { data: UnknownValue; file: string }[]
-) => {
-  const { keys, invalidFiles, filesArrLength } =
-    getMetricInfoFromDataFiles(dataArr)
-
-  if (invalidFiles.length > 0) {
-    void Toast.showError(
-      `${joinList(
-        invalidFiles
-      )} do not contain any keys (columns) for plot generation. ${getFileGuidelinesQuestion(
-        invalidFiles.length === 1
-      )}`
-    )
-    return
   }
 
   if (filesArrLength.size > 1) {
     void Toast.showError(
-      `All files must have the same array (row) length. ${getFileGuidelinesQuestion(
-        false
-      )}`
+      'All files must have the same array (list) length. See [examples](https://dvc.org/doc/command-reference/plots/show#sourcing-x-and-y-from-different-files) of multiple files being used in DVC plots.'
     )
+
+    return
   }
 
   return keys
@@ -214,25 +186,23 @@ const validateFilesData = async (cwd: string, files: string[]) => {
     data: UnknownValue
     file: string
   }[]
-  const relativeFilesData = filesData.map(({ data, file }) => ({
-    data,
-    file: relative(cwd, file)
-  }))
-  const invalidFilesData = relativeFilesData.filter(({ data }) => !data)
+  const relativeFilesData = []
 
-  if (invalidFilesData.length > 0) {
-    const invalidFiles = joinList(invalidFilesData.map(({ file }) => file))
-    void Toast.showError(
-      `Failed to parse ${invalidFiles}. ${
-        invalidFilesData.length === 1 ? 'Does the file' : 'Do the files'
-      } contain data and follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?`
-    )
-    return false
+  for (const { file, data } of filesData) {
+    const relativeFile = relative(cwd, file)
+    if (!data) {
+      void Toast.showError(
+        `Failed to parse ${relativeFile}. ${getDvcGuidelinesQuestion()}`
+      )
+      return
+    }
+
+    relativeFilesData.push({ data, file: relativeFile })
   }
 
-  return files.length === 1
-    ? validateSingleDataFileFields(relativeFilesData[0])
-    : validateMultiDataFileFields(relativeFilesData)
+  return relativeFilesData.length === 1
+    ? validateSingleFileData(relativeFilesData[0])
+    : validateMultiFilesData(relativeFilesData)
 }
 
 export const pickPlotConfiguration = async (

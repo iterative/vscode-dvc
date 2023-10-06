@@ -72,18 +72,34 @@ describe('pickPlotConfiguration', () => {
   it('should show a toast message if the files are not the same data type', async () => {
     mockedPickFiles.mockResolvedValueOnce(['/file.json', '/file.csv'])
 
-    const result = await pickPlotConfiguration('/')
+    const twoExtsResult = await pickPlotConfiguration('/')
 
-    expect(result).toStrictEqual(undefined)
+    expect(twoExtsResult).toStrictEqual(undefined)
     expect(mockedShowError).toHaveBeenCalledTimes(1)
     expect(mockedShowError).toHaveBeenCalledWith(
       'Found files with .json and .csv extensions. Files must be of the same type.'
     )
+
+    mockedPickFiles.mockResolvedValueOnce([
+      '/file.json',
+      '/file.csv',
+      '/file.tsv'
+    ])
+
+    const threeExtsResult = await pickPlotConfiguration('/')
+
+    expect(threeExtsResult).toStrictEqual(undefined)
+    expect(mockedShowError).toHaveBeenCalledTimes(2)
+    expect(mockedShowError).toHaveBeenNthCalledWith(
+      2,
+      'Found files with .json, .csv, and .tsv extensions. Files must be of the same type.'
+    )
   })
 
-  it('should show a toast message if a single file to parse', async () => {
+  it('should show a toast message if a file to parse', async () => {
     mockedPickFiles.mockResolvedValueOnce(['/data.csv'])
     mockedLoadDataFiles.mockResolvedValueOnce([
+      { data: [{ field1: 'only one field' }], file: '/results.csv' },
       { data: undefined, file: '/data.csv' }
     ])
 
@@ -93,29 +109,6 @@ describe('pickPlotConfiguration', () => {
     expect(mockedShowError).toHaveBeenCalledTimes(1)
     expect(mockedShowError).toHaveBeenCalledWith(
       'Failed to parse data.csv. Does the file contain data and follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
-    )
-  })
-
-  it('should show a toast message if a multiple files to parse', async () => {
-    mockedPickFiles.mockResolvedValueOnce([
-      '/data.csv',
-      '/nested/values.csv',
-      '/results.csv',
-      '/props.csv'
-    ])
-    mockedLoadDataFiles.mockResolvedValueOnce([
-      { data: undefined, file: '/data.csv' },
-      { data: undefined, file: '/nested/values.csv' },
-      { data: [{ field1: 'only one field' }], file: '/results.csv' },
-      { data: undefined, file: '/props.csv' }
-    ])
-
-    const result = await pickPlotConfiguration('/')
-
-    expect(result).toStrictEqual(undefined)
-    expect(mockedShowError).toHaveBeenCalledTimes(1)
-    expect(mockedShowError).toHaveBeenCalledWith(
-      'Failed to parse data.csv, nested/values.csv, and props.csv. Do the files contain data and follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
     )
   })
 
@@ -165,7 +158,7 @@ describe('pickPlotConfiguration', () => {
       expect(result).toStrictEqual(undefined)
       expect(mockedShowError).toHaveBeenCalledTimes(1 + ind)
       expect(mockedShowError).toHaveBeenCalledWith(
-        'file.yaml does not contain enough keys (columns) to generate a plot. Does the file follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
+        'file.yaml does not contain enough keys (columns) to generate a plot. Does the file contain data and follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
       )
     }
   })
@@ -187,7 +180,7 @@ describe('pickPlotConfiguration', () => {
     expect(result).toStrictEqual(undefined)
     expect(mockedShowError).toHaveBeenCalledTimes(1)
     expect(mockedShowError).toHaveBeenCalledWith(
-      'file2.yaml and file3.yaml do not contain any keys (columns) for plot generation. Do the files follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
+      'file2.yaml does not contain any keys (columns) to generate a plot. Does the file contain data and follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
     )
   })
 
@@ -211,7 +204,7 @@ describe('pickPlotConfiguration', () => {
     expect(result).toStrictEqual(undefined)
     expect(mockedShowError).toHaveBeenCalledTimes(1)
     expect(mockedShowError).toHaveBeenCalledWith(
-      'All files must have the same array (row) length. Do the files follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
+      'All files must have the same array (list) length. See [examples](https://dvc.org/doc/command-reference/plots/show#sourcing-x-and-y-from-different-files) of multiple files being used in DVC plots.'
     )
   })
 
