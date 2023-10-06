@@ -78,7 +78,7 @@ const joinList = (items: string[]) => {
 
 const validateFileNames = (files: string[] | undefined) => {
   if (!files) {
-    return []
+    return
   }
   const fileExts = [...new Set(files.map(file => getFileExtension(file)))]
 
@@ -88,7 +88,7 @@ const validateFileNames = (files: string[] | undefined) => {
         fileExts
       )} extensions. Files must be of the same type.`
     )
-    return []
+    return
   }
   return files
 }
@@ -211,7 +211,7 @@ export const pickPlotConfiguration = async (
   const files = await pickDataFiles()
   const validFileNames = validateFileNames(files)
 
-  if (validFileNames.length === 0) {
+  if (!validFileNames) {
     return
   }
 
