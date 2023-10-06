@@ -128,7 +128,7 @@ const getMetricInfoFromValue = (
   return getMetricInfoFromArr(maybeFieldsObjArr)
 }
 
-const getDvcGuidelinesQuestion = () =>
+const dvcPlotGuidelinesQuestion =
   'Does the file contain data and follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
 
 const validateSingleFileData = ({
@@ -142,7 +142,7 @@ const validateSingleFileData = ({
 
   if (fields.length < 2) {
     void Toast.showError(
-      `${file} does not contain enough keys (columns) to generate a plot. ${getDvcGuidelinesQuestion()}`
+      `${file} does not contain enough keys (columns) to generate a plot. ${dvcPlotGuidelinesQuestion}`
     )
     return
   }
@@ -160,7 +160,7 @@ const validateMultiFilesData = (
     const metricInfo = getMetricInfoFromValue(data)
     if (!metricInfo) {
       void Toast.showError(
-        `${file} does not contain any keys (columns) to generate a plot. ${getDvcGuidelinesQuestion()}`
+        `${file} does not contain any keys (columns) to generate a plot. ${dvcPlotGuidelinesQuestion}`
       )
       return
     }
@@ -192,7 +192,7 @@ const validateFilesData = async (cwd: string, files: string[]) => {
     const relativeFile = relative(cwd, file)
     if (!data) {
       void Toast.showError(
-        `Failed to parse ${relativeFile}. ${getDvcGuidelinesQuestion()}`
+        `Failed to parse ${relativeFile}. ${dvcPlotGuidelinesQuestion}`
       )
       return
     }
