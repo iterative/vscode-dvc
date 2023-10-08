@@ -150,7 +150,7 @@ const registerExperimentInputCommands = (
         )
       ) {
         const response = await Toast.warnWithOptions(
-          'To rename experiments you need DVC version 3.22.0 or greater. Please update your DVC installation.',
+          'To rename experiments, you need DVC version 3.22.0 or greater. Please update your DVC installation.',
           Response.SHOW_SETUP
         )
         if (response === Response.SHOW_SETUP) {

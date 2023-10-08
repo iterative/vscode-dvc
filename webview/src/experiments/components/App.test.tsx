@@ -1201,6 +1201,8 @@ describe('App', () => {
       expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
     })
 
+    const menuItemLength = 14
+
     it('should not close when a disabled item is clicked', () => {
       renderTableWithoutRunningExperiments()
 
@@ -1216,7 +1218,7 @@ describe('App', () => {
       expect(disabledMenuItem).toBeDefined()
 
       disabledMenuItem && fireEvent.click(disabledMenuItem, { bubbles: true })
-      expect(screen.queryAllByRole('menuitem')).toHaveLength(14)
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(menuItemLength)
     })
 
     it('should be removed with a left click', () => {
@@ -1226,7 +1228,7 @@ describe('App', () => {
       fireEvent.contextMenu(row, { bubbles: true })
 
       advanceTimersByTime(100)
-      expect(screen.getAllByRole('menuitem')).toHaveLength(14)
+      expect(screen.getAllByRole('menuitem')).toHaveLength(menuItemLength)
 
       fireEvent.click(row, {
         bubbles: true
@@ -1243,7 +1245,7 @@ describe('App', () => {
       fireEvent.contextMenu(row, { bubbles: true })
 
       advanceTimersByTime(100)
-      expect(screen.getAllByRole('menuitem')).toHaveLength(14)
+      expect(screen.getAllByRole('menuitem')).toHaveLength(menuItemLength)
 
       const commit = getRow('main')
       fireEvent.click(commit, { bubbles: true })
@@ -1258,13 +1260,13 @@ describe('App', () => {
       fireEvent.contextMenu(row, { bubbles: true })
 
       advanceTimersByTime(100)
-      expect(screen.queryAllByRole('menuitem')).toHaveLength(14)
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(menuItemLength)
 
       fireEvent.contextMenu(within(row).getByText('[exp-e7a67]'), {
         bubbles: true
       })
       advanceTimersByTime(200)
-      expect(screen.queryAllByRole('menuitem')).toHaveLength(14)
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(menuItemLength)
     })
 
     it('should enable the remove option for an experiment', () => {

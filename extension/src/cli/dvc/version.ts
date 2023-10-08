@@ -24,7 +24,7 @@ const checkCLIVersion = (
     minor: number
     patch: number
   },
-  minSemVer?: string
+  minSemVer = MIN_CLI_VERSION
 ): CliCompatible => {
   const {
     major: currentMajor,
@@ -52,7 +52,7 @@ const checkCLIVersion = (
 
 export const isVersionCompatible = (
   version: string | undefined,
-  required_version?: string | undefined
+  requiredVersion = MIN_CLI_VERSION
 ): CliCompatible => {
   if (!version) {
     return CliCompatible.NO_NOT_FOUND
@@ -69,8 +69,8 @@ export const isVersionCompatible = (
     return CliCompatible.NO_CANNOT_VERIFY
   }
 
-  if (required_version) {
-    return checkCLIVersion(currentSemVer, required_version)
+  if (requiredVersion) {
+    return checkCLIVersion(currentSemVer, requiredVersion)
   }
 
   return checkCLIVersion(currentSemVer)
