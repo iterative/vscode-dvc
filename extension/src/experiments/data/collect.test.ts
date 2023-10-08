@@ -10,9 +10,17 @@ describe('collectFiles', () => {
     files.sort()
 
     expect(files).toStrictEqual([
+      join('data', 'data.xml'),
+      join('data', 'features'),
+      join('data', 'prepared'),
       'metrics.json',
+      'model.pkl',
       join('nested', 'params.yaml'),
       'params.yaml',
+      join('src', 'evaluate.py'),
+      join('src', 'featurization.py'),
+      join('src', 'prepare.py'),
+      join('src', 'train.py'),
       'summary.json'
     ])
   })
