@@ -562,8 +562,13 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to rename an experiment', async () => {
-      const { mockMessageReceived } =
+      const { mockMessageReceived, experimentsModel } =
         await stubWorkspaceGettersWebview(disposable)
+      const transferDetailsSpy = spy(experimentsModel, 'transferDetails')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const persistStatusSpy = spy(experimentsModel as any, 'persistStatus')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const persistStarsSpy = spy(experimentsModel as any, 'persistStars')
 
       const mockNewExperimentName = 'new-experiment-name'
       const inputEvent = getInputBoxEvent(mockNewExperimentName)
@@ -575,11 +580,15 @@ suite('Experiments Test Suite', () => {
       const mockRenameCalled = new Promise(resolve =>
         mockRenameExperiment.callsFake(() => {
           resolve(undefined)
-          return Promise.resolve('Renamed experiments:')
+          return Promise.resolve('Experiment renamed successfully')
         })
       )
 
-      const mockExperimentId = 'exp-e7a67'
+      const mockExperimentId = 'exp-83425'
+      const selectedColor = experimentsModel
+        .getSelectedRevisions()
+        .find(({ id }) => id === mockExperimentId)?.displayColor
+      expect(selectedColor).not.to.be.undefined
 
       mockMessageReceived.fire({
         payload: mockExperimentId,
@@ -593,6 +602,14 @@ suite('Experiments Test Suite', () => {
         mockExperimentId,
         mockNewExperimentName
       )
+      expect(transferDetailsSpy).to.be.calledOnce
+      expect(persistStatusSpy).to.be.calledOnce
+      expect(persistStarsSpy).to.be.calledOnce
+
+      expect(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (experimentsModel as any).coloredStatus[mockNewExperimentName]
+      ).to.equal(selectedColor)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a message to show the logs of an experiment', async () => {
