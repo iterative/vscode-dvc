@@ -89,6 +89,7 @@ export enum ExperimentSubCommand {
   GARBAGE_COLLECT = 'gc',
   PUSH = 'push',
   REMOVE = 'remove',
+  RENAME = 'rename',
   RUN = 'run'
 }
 

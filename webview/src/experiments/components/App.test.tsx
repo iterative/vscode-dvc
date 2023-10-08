@@ -1161,6 +1161,7 @@ describe('App', () => {
       expect(getEnabledOptions()).toStrictEqual([
         'Apply to Workspace',
         'Create new Branch',
+        'Rename Experiment',
         'Copy Sha',
         'Copy Experiment Name',
         'Push',
@@ -1200,6 +1201,8 @@ describe('App', () => {
       expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
     })
 
+    const menuItemLength = 14
+
     it('should not close when a disabled item is clicked', () => {
       renderTableWithoutRunningExperiments()
 
@@ -1215,7 +1218,7 @@ describe('App', () => {
       expect(disabledMenuItem).toBeDefined()
 
       disabledMenuItem && fireEvent.click(disabledMenuItem, { bubbles: true })
-      expect(screen.queryAllByRole('menuitem')).toHaveLength(13)
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(menuItemLength)
     })
 
     it('should be removed with a left click', () => {
@@ -1225,7 +1228,7 @@ describe('App', () => {
       fireEvent.contextMenu(row, { bubbles: true })
 
       advanceTimersByTime(100)
-      expect(screen.getAllByRole('menuitem')).toHaveLength(13)
+      expect(screen.getAllByRole('menuitem')).toHaveLength(menuItemLength)
 
       fireEvent.click(row, {
         bubbles: true
@@ -1242,7 +1245,7 @@ describe('App', () => {
       fireEvent.contextMenu(row, { bubbles: true })
 
       advanceTimersByTime(100)
-      expect(screen.getAllByRole('menuitem')).toHaveLength(13)
+      expect(screen.getAllByRole('menuitem')).toHaveLength(menuItemLength)
 
       const commit = getRow('main')
       fireEvent.click(commit, { bubbles: true })
@@ -1257,13 +1260,13 @@ describe('App', () => {
       fireEvent.contextMenu(row, { bubbles: true })
 
       advanceTimersByTime(100)
-      expect(screen.queryAllByRole('menuitem')).toHaveLength(13)
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(menuItemLength)
 
       fireEvent.contextMenu(within(row).getByText('[exp-e7a67]'), {
         bubbles: true
       })
       advanceTimersByTime(200)
-      expect(screen.queryAllByRole('menuitem')).toHaveLength(13)
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(menuItemLength)
     })
 
     it('should enable the remove option for an experiment', () => {
@@ -1501,6 +1504,27 @@ describe('App', () => {
       expect(sendMessage).toHaveBeenCalledWith({
         payload: ['exp-e7a67'],
         type: MessageFromWebviewType.PUSH_EXPERIMENT
+      })
+    })
+
+    it('should enable the user to rename an experiment', () => {
+      renderTableWithoutRunningExperiments()
+
+      const target = screen.getByText('4fb124a')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      advanceTimersByTime(100)
+      const menuitems = screen.getAllByRole('menuitem')
+      const renameOption = menuitems.find(
+        item => item.textContent?.includes('Rename')
+      )
+
+      expect(renameOption).toBeDefined()
+      renameOption && fireEvent.click(renameOption)
+
+      expect(sendMessage).toHaveBeenCalledWith({
+        payload: 'exp-e7a67',
+        type: MessageFromWebviewType.RENAME_EXPERIMENT
       })
     })
 

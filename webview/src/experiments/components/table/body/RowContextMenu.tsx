@@ -269,6 +269,12 @@ const getSingleSelectMenuOptions = (
       'Create new Branch',
       MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT
     ),
+    disableIfRunning(
+      'Rename Experiment',
+      MessageFromWebviewType.RENAME_EXPERIMENT,
+      isNotExperiment,
+      true
+    ),
     {
       disabled: isWorkspace || !sha,
       divider: true,

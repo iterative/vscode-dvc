@@ -661,4 +661,25 @@ describe('CliExecutor', () => {
       )
     })
   })
+
+  describe('rename', () => {
+    it('should call createProcess with the correct parameters to rename the experiment', async () => {
+      const cwd = __dirname
+
+      const stdout = 'Experiment renamed successfully.'
+
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
+
+      const output = await dvcExecutor.expRename(cwd, 'old-name', 'new-name')
+
+      expect(output).toStrictEqual(stdout)
+
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
+        args: ['exp', 'rename', 'old-name', 'new-name'],
+        cwd,
+        env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
+  })
 })
