@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.3] - 2023-10-09
+
+### 🚀 New Features and Enhancements
+
+- Improve Plot Wizard Error Handling [#4770](https://github.com/iterative/vscode-dvc/pull/4770) by [@julieg18](https://github.com/julieg18)
+
 ## [1.1.2] - 2023-10-05
 
 ### 🚀 New Features and Enhancements
