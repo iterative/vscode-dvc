@@ -215,10 +215,9 @@ const loadYamlAsDoc = (
 }
 
 const getPlotYamlObj = (plot: PlotConfigData) => {
-  const { x, y, template } = plot
-  const plotName = `${template}_plot`
+  const { x, y, template, title } = plot
   return {
-    [plotName]: {
+    [title]: {
       template,
       x: x.file === y.file ? x.key : { [x.file]: x.key },
       y: { [y.file]: y.key }

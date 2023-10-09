@@ -1,5 +1,6 @@
 import { QuickPickItemKind } from 'vscode'
 import { pickPlotConfiguration } from './quickPick'
+import { getInput } from '../vscode/inputBox'
 import { pickFiles } from '../vscode/resourcePicker'
 import { quickPickOne, quickPickValue } from '../vscode/quickPick'
 import { getFileExtension, loadDataFiles } from '../fileSystem'
@@ -9,6 +10,7 @@ import { Toast } from '../vscode/toast'
 const mockedPickFiles = jest.mocked(pickFiles)
 const mockedLoadDataFiles = jest.mocked(loadDataFiles)
 const mockedGetFileExt = jest.mocked(getFileExtension)
+const mockedGetInput = jest.mocked(getInput)
 const mockedQuickPickOne = jest.mocked(quickPickOne)
 const mockedQuickPickValue = jest.mocked(quickPickValue)
 const mockedToast = jest.mocked(Toast)
@@ -16,6 +18,7 @@ const mockedShowError = jest.fn()
 mockedToast.showError = mockedShowError
 
 jest.mock('../fileSystem')
+jest.mock('../vscode/inputBox')
 jest.mock('../vscode/resourcePicker')
 jest.mock('../vscode/quickPick')
 
@@ -250,18 +253,23 @@ describe('pickPlotConfiguration', () => {
     expect(mockedShowError).not.toHaveBeenCalled()
   })
 
-  it('should let the user pick a template, x field, and y field', async () => {
+  it('should let the user pick a template, title, x field, and y field', async () => {
     mockedPickFiles.mockResolvedValueOnce(['/file.json'])
     mockedLoadDataFiles.mockResolvedValueOnce([
       { data: mockValidData, file: '/file.json' }
     ])
     mockedQuickPickOne.mockResolvedValueOnce('simple')
+    mockedGetInput.mockResolvedValueOnce('Simple Plot')
     mockedQuickPickValue
       .mockResolvedValueOnce({ file: 'file.json', key: 'actual' })
       .mockResolvedValueOnce({ file: 'file.json', key: 'prob' })
 
     const result = await pickPlotConfiguration('/')
 
+    expect(mockedGetInput).toHaveBeenCalledWith(
+      Title.ENTER_PLOT_TITLE,
+      'simple_plot'
+    )
     expect(mockedQuickPickOne).toHaveBeenNthCalledWith(
       1,
       [
@@ -306,6 +314,7 @@ describe('pickPlotConfiguration', () => {
     )
     expect(result).toStrictEqual({
       template: 'simple',
+      title: 'Simple Plot',
       x: { file: 'file.json', key: 'actual' },
       y: { file: 'file.json', key: 'prob' }
     })
@@ -318,6 +327,7 @@ describe('pickPlotConfiguration', () => {
       { data: mockValidData, file: '/file2.json' }
     ])
     mockedQuickPickOne.mockResolvedValueOnce('simple')
+    mockedGetInput.mockResolvedValueOnce('simple_plot')
     mockedQuickPickValue
       .mockResolvedValueOnce({ file: 'file.json', key: 'actual' })
       .mockResolvedValueOnce({ file: 'file2.json', key: 'prob' })
@@ -367,6 +377,7 @@ describe('pickPlotConfiguration', () => {
     )
     expect(result).toStrictEqual({
       template: 'simple',
+      title: 'simple_plot',
       x: { file: 'file.json', key: 'actual' },
       y: { file: 'file2.json', key: 'prob' }
     })
@@ -386,12 +397,27 @@ describe('pickPlotConfiguration', () => {
     expect(result).toStrictEqual(undefined)
   })
 
+  it('should return early if the user does not pick a title', async () => {
+    mockedPickFiles.mockResolvedValueOnce(['/file.json'])
+    mockedLoadDataFiles.mockResolvedValueOnce([
+      { data: mockValidData, file: 'file.json' }
+    ])
+    mockedQuickPickOne.mockResolvedValueOnce('linear')
+    mockedGetInput.mockResolvedValueOnce(undefined)
+
+    const result = await pickPlotConfiguration('/')
+
+    expect(mockedGetInput).toHaveBeenCalledTimes(1)
+    expect(result).toStrictEqual(undefined)
+  })
+
   it('should return early if the user does not pick a x field', async () => {
     mockedPickFiles.mockResolvedValueOnce(['/file.json'])
     mockedLoadDataFiles.mockResolvedValueOnce([
       { data: mockValidData, file: 'file.json' }
     ])
     mockedQuickPickOne.mockResolvedValueOnce('simple')
+    mockedGetInput.mockResolvedValueOnce('simple_plot')
     mockedQuickPickValue.mockResolvedValueOnce(undefined)
 
     const result = await pickPlotConfiguration('/')
@@ -406,6 +432,7 @@ describe('pickPlotConfiguration', () => {
       { data: mockValidData, file: 'file.json' }
     ])
     mockedQuickPickOne.mockResolvedValueOnce('simple')
+    mockedGetInput.mockResolvedValueOnce('simple_plot')
     mockedQuickPickValue
       .mockResolvedValueOnce('actual')
       .mockResolvedValueOnce(undefined)

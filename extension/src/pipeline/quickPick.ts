@@ -12,10 +12,12 @@ import { quickPickOne, quickPickValue } from '../vscode/quickPick'
 import { pickFiles } from '../vscode/resourcePicker'
 import { Title } from '../vscode/title'
 import { Toast } from '../vscode/toast'
+import { getInput } from '../vscode/inputBox'
 
 export type PlotConfigData = {
   x: { file: string; key: string }
   template: string
+  title: string
   y: { file: string; key: string }
 }
 
@@ -28,15 +30,27 @@ const pickDataFiles = (): Promise<string[] | undefined> =>
     'Data Formats': ['json', 'csv', 'tsv', 'yaml']
   })
 
-const pickTemplateAndFields = async (
-  fileFields: FileFields
-): Promise<PlotConfigData | undefined> => {
+const pickTemplateAndTitle = async (): Promise<
+  Omit<PlotConfigData, 'x' | 'y'> | undefined
+> => {
   const template = await quickPickOne(PLOT_TEMPLATES, 'Pick a Plot Template')
 
   if (!template) {
     return
   }
 
+  const title = await getInput(Title.ENTER_PLOT_TITLE, `${template}_plot`)
+
+  if (!title) {
+    return
+  }
+
+  return { template, title }
+}
+
+const pickFields = async (
+  fileFields: FileFields
+): Promise<Omit<PlotConfigData, 'title' | 'template'> | undefined> => {
   const items = []
 
   for (const { file, fields } of fileFields) {
@@ -65,7 +79,25 @@ const pickTemplateAndFields = async (
     return
   }
 
-  return { template, x, y }
+  return { x, y }
+}
+
+const pickPlotConfigData = async (
+  fileFields: FileFields
+): Promise<PlotConfigData | undefined> => {
+  const templateAndTitle = await pickTemplateAndTitle()
+
+  if (!templateAndTitle) {
+    return
+  }
+
+  const fields = await pickFields(fileFields)
+
+  if (!fields) {
+    return
+  }
+
+  return { ...templateAndTitle, ...fields }
 }
 
 const joinList = (items: string[]) => {
@@ -222,11 +254,5 @@ export const pickPlotConfiguration = async (
     return
   }
 
-  const templateAndFields = await pickTemplateAndFields(validFileFields)
-
-  if (!templateAndFields) {
-    return
-  }
-
-  return { ...templateAndFields }
+  return pickPlotConfigData(validFileFields)
 }
