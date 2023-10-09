@@ -76,11 +76,20 @@ export const fillTemplate = (
       continue
     }
 
+    if (['<DVC_METRIC_PLOT_HEIGHT>', '<DVC_METRIC_PLOT_WIDTH>'].includes(key)) {
+      specStr = specStr.replace(new RegExp(key, 'g'), 'container')
+      continue
+    }
+
+    if (
+      ['<DVC_METRIC_COLUMN_WIDTH>', '<DVC_METRIC_ROW_HEIGHT>'].includes(key)
+    ) {
+      specStr = specStr.replace(new RegExp(`"${key}"`, 'g'), '300')
+      continue
+    }
+
     specStr = specStr.replace(new RegExp(`"${key}"`, 'g'), value)
   }
 
-  const spec = JSON.parse(specStr) as { [key: string]: unknown }
-  spec.width = 'container'
-  spec.height = 'container'
-  return spec as VisualizationSpec
+  return JSON.parse(specStr) as VisualizationSpec
 }
