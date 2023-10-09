@@ -134,6 +134,11 @@ export class WebviewMessages {
           RegisteredCliCommands.EXPERIMENT_VIEW_BRANCH,
           { dvcRoot: this.dvcRoot, id: message.payload }
         )
+      case MessageFromWebviewType.RENAME_EXPERIMENT:
+        return commands.executeCommand(
+          RegisteredCliCommands.EXPERIMENT_VIEW_RENAME,
+          { dvcRoot: this.dvcRoot, id: message.payload }
+        )
       case MessageFromWebviewType.MODIFY_WORKSPACE_PARAMS_AND_QUEUE:
         return commands.executeCommand(
           RegisteredCliCommands.EXPERIMENT_VIEW_QUEUE,

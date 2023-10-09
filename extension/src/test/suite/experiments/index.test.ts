@@ -561,6 +561,40 @@ suite('Experiments Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
+    it('should be able to handle a message to rename an experiment', async () => {
+      const { mockMessageReceived } =
+        await stubWorkspaceGettersWebview(disposable)
+
+      const mockNewExperimentName = 'new-experiment-name'
+      const inputEvent = getInputBoxEvent(mockNewExperimentName)
+
+      stub(Setup.prototype, 'getCliVersion').resolves('3.22.0')
+
+      const mockRenameExperiment = stub(DvcExecutor.prototype, 'expRename')
+
+      const mockRenameCalled = new Promise(resolve =>
+        mockRenameExperiment.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve('Renamed experiments:')
+        })
+      )
+
+      const mockExperimentId = 'exp-e7a67'
+
+      mockMessageReceived.fire({
+        payload: mockExperimentId,
+        type: MessageFromWebviewType.RENAME_EXPERIMENT
+      })
+
+      await Promise.all([inputEvent, mockRenameCalled])
+      expect(mockRenameExperiment).to.be.calledOnce
+      expect(mockRenameExperiment).to.be.calledWithExactly(
+        dvcDemoPath,
+        mockExperimentId,
+        mockNewExperimentName
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
     it('should handle a message to show the logs of an experiment', async () => {
       const { experiments } = buildExperiments({ disposer: disposable })
       await experiments.isReady()
