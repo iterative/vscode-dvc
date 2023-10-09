@@ -216,11 +216,21 @@ const loadYamlAsDoc = (
 
 const getPlotYamlObj = (plot: PlotConfigData) => {
   const { x, y, template, title } = plot
+
+  const yFiles = Object.keys(y)
+  const oneFileUsed = yFiles.length === 1 && yFiles[0] === x.file
+
+  const formattedY: { [file: string]: string | string[] } = {}
+
+  for (const [file, keys] of Object.entries(y)) {
+    formattedY[file] = keys.length === 1 ? keys[0] : keys
+  }
+
   return {
     [title]: {
       template,
-      x: x.file === y.file ? x.key : { [x.file]: x.key },
-      y: { [y.file]: y.key }
+      x: oneFileUsed ? x.key : { [x.file]: x.key },
+      y: formattedY
     }
   }
 }

@@ -8,7 +8,11 @@ import {
   isValueTree
 } from '../cli/dvc/contract'
 import { getFileExtension, loadDataFiles } from '../fileSystem'
-import { quickPickOne, quickPickValue } from '../vscode/quickPick'
+import {
+  quickPickManyValues,
+  quickPickOne,
+  quickPickValue
+} from '../vscode/quickPick'
 import { pickFiles } from '../vscode/resourcePicker'
 import { Title } from '../vscode/title'
 import { Toast } from '../vscode/toast'
@@ -18,7 +22,7 @@ export type PlotConfigData = {
   x: { file: string; key: string }
   template: string
   title: string
-  y: { file: string; key: string }
+  y: { [file: string]: string[] }
 }
 
 type UnknownValue = Value | ValueTree
@@ -70,13 +74,23 @@ const pickFields = async (
     return
   }
 
-  const y = await quickPickValue(
+  const yValues = (await quickPickManyValues(
     items.filter(item => !isEqual(item.value, x)),
     { title: Title.SELECT_PLOT_Y_METRIC }
-  )
+  )) as { file: string; key: string }[] | undefined
 
-  if (!y) {
+  if (!yValues) {
     return
+  }
+
+  const y: PlotConfigData['y'] = {}
+
+  for (const { file, key } of yValues) {
+    if (!y[file]) {
+      y[file] = []
+    }
+
+    y[file].push(key)
   }
 
   return { x, y }

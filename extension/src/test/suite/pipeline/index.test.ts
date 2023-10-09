@@ -313,7 +313,7 @@ suite('Pipeline Test Suite', () => {
       template: 'simple',
       title: 'Great Plot Name',
       x: { file: 'results.json', key: 'step' },
-      y: { file: 'results.json', key: 'acc' }
+      y: { 'results.json': ['acc'] }
     })
 
     await pipeline.addDataSeriesPlot()
