@@ -22,7 +22,7 @@ export type PlotConfigData = {
   x: { file: string; key: string }
   template: string
   title: string
-  y: { [file: string]: string[] }
+  y: { [file: string]: string[] | string }
 }
 
 type UnknownValue = Value | ValueTree
@@ -50,6 +50,25 @@ const pickTemplateAndTitle = async (): Promise<
   }
 
   return { template, title }
+}
+
+const formatYQuickPickValues = (values: { file: string; key: string }[]) => {
+  const y: PlotConfigData['y'] = {}
+
+  for (const { file, key } of values) {
+    if (!y[file]) {
+      y[file] = key
+      continue
+    }
+
+    const prevFileValue = y[file]
+    y[file] = [
+      ...(typeof prevFileValue === 'string' ? [prevFileValue] : prevFileValue),
+      key
+    ]
+  }
+
+  return y
 }
 
 const pickFields = async (
@@ -83,17 +102,7 @@ const pickFields = async (
     return
   }
 
-  const y: PlotConfigData['y'] = {}
-
-  for (const { file, key } of yValues) {
-    if (!y[file]) {
-      y[file] = []
-    }
-
-    y[file].push(key)
-  }
-
-  return { x, y }
+  return { x, y: formatYQuickPickValues(yValues) }
 }
 
 const pickPlotConfigData = async (

@@ -323,7 +323,7 @@ describe('pickPlotConfiguration', () => {
       template: 'simple',
       title: 'Simple Plot',
       x: { file: 'file.json', key: 'actual' },
-      y: { 'file.json': ['prob'] }
+      y: { 'file.json': 'prob' }
     })
   })
 
@@ -331,7 +331,10 @@ describe('pickPlotConfiguration', () => {
     mockedPickFiles.mockResolvedValueOnce(['/file.json', '/file2.json'])
     mockedLoadDataFiles.mockResolvedValueOnce([
       { data: mockValidData, file: '/file.json' },
-      { data: mockValidData, file: '/file2.json' }
+      {
+        data: mockValidData,
+        file: '/file2.json'
+      }
     ])
     mockedQuickPickOne.mockResolvedValueOnce('simple')
     mockedGetInput.mockResolvedValueOnce('simple_plot')
@@ -388,7 +391,7 @@ describe('pickPlotConfiguration', () => {
       template: 'simple',
       title: 'simple_plot',
       x: { file: 'file.json', key: 'actual' },
-      y: { 'file2.json': ['prob'] }
+      y: { 'file2.json': 'prob' }
     })
   })
 
@@ -396,7 +399,10 @@ describe('pickPlotConfiguration', () => {
     mockedPickFiles.mockResolvedValueOnce(['/file.json', '/file2.json'])
     mockedLoadDataFiles.mockResolvedValueOnce([
       { data: mockValidData, file: '/file.json' },
-      { data: mockValidData, file: '/file2.json' }
+      {
+        data: mockValidData.map((value, ind) => ({ ...value, step: ind })),
+        file: '/file2.json'
+      }
     ])
     mockedQuickPickOne.mockResolvedValueOnce('simple')
     mockedGetInput.mockResolvedValueOnce('simple_plot')
@@ -406,7 +412,8 @@ describe('pickPlotConfiguration', () => {
     })
     mockedQuickPickValues.mockResolvedValueOnce([
       { file: 'file2.json', key: 'prob' },
-      { file: 'file2.json', key: 'actual' }
+      { file: 'file2.json', key: 'actual' },
+      { file: 'file2.json', key: 'step' }
     ])
 
     const result = await pickPlotConfiguration('/')
@@ -426,7 +433,8 @@ describe('pickPlotConfiguration', () => {
           value: undefined
         },
         { label: 'actual', value: { file: 'file2.json', key: 'actual' } },
-        { label: 'prob', value: { file: 'file2.json', key: 'prob' } }
+        { label: 'prob', value: { file: 'file2.json', key: 'prob' } },
+        { label: 'step', value: { file: 'file2.json', key: 'step' } }
       ],
       { title: Title.SELECT_PLOT_X_METRIC }
     )
@@ -444,7 +452,8 @@ describe('pickPlotConfiguration', () => {
           value: undefined
         },
         { label: 'actual', value: { file: 'file2.json', key: 'actual' } },
-        { label: 'prob', value: { file: 'file2.json', key: 'prob' } }
+        { label: 'prob', value: { file: 'file2.json', key: 'prob' } },
+        { label: 'step', value: { file: 'file2.json', key: 'step' } }
       ],
       {
         title: Title.SELECT_PLOT_Y_METRIC
@@ -454,7 +463,7 @@ describe('pickPlotConfiguration', () => {
       template: 'simple',
       title: 'simple_plot',
       x: { file: 'file.json', key: 'actual' },
-      y: { 'file2.json': ['prob', 'actual'] }
+      y: { 'file2.json': ['prob', 'actual', 'step'] }
     })
   })
 
