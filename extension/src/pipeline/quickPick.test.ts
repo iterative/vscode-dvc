@@ -49,7 +49,7 @@ const mockValidData = [
 
 describe('pickPlotConfiguration', () => {
   it('should let the user pick from files with accepted data types', async () => {
-    mockedPickFiles.mockResolvedValueOnce(['file.json'])
+    mockedPickFiles.mockResolvedValueOnce(['/file.json'])
     mockedLoadDataFiles.mockResolvedValueOnce([
       { data: mockValidData, file: 'file.json' }
     ])
@@ -70,30 +70,50 @@ describe('pickPlotConfiguration', () => {
   })
 
   it('should show a toast message if the files are not the same data type', async () => {
-    mockedPickFiles.mockResolvedValueOnce(['file.json', 'file.csv'])
+    mockedPickFiles.mockResolvedValueOnce(['/file.json', '/file.csv'])
 
-    const result = await pickPlotConfiguration('/')
+    const twoExtsResult = await pickPlotConfiguration('/')
 
-    expect(result).toStrictEqual(undefined)
+    expect(twoExtsResult).toStrictEqual(undefined)
     expect(mockedShowError).toHaveBeenCalledTimes(1)
-    expect(mockedShowError).toHaveBeenCalledWith('Files must of the same type.')
+    expect(mockedShowError).toHaveBeenCalledWith(
+      'Found files with .json and .csv extensions. Files must be of the same type.'
+    )
+
+    mockedPickFiles.mockResolvedValueOnce([
+      '/file.json',
+      '/file.csv',
+      '/file.tsv'
+    ])
+
+    const threeExtsResult = await pickPlotConfiguration('/')
+
+    expect(threeExtsResult).toStrictEqual(undefined)
+    expect(mockedShowError).toHaveBeenCalledTimes(2)
+    expect(mockedShowError).toHaveBeenNthCalledWith(
+      2,
+      'Found files with .json, .csv, and .tsv extensions. Files must be of the same type.'
+    )
   })
 
-  it('should show a toast message if the file or files fail to parse', async () => {
-    mockedPickFiles.mockResolvedValueOnce(['data.csv'])
-    mockedLoadDataFiles.mockResolvedValueOnce(undefined)
+  it('should show a toast message if parsing a file failed', async () => {
+    mockedPickFiles.mockResolvedValueOnce(['/data.csv'])
+    mockedLoadDataFiles.mockResolvedValueOnce([
+      { data: [{ field1: 'only one field' }], file: '/results.csv' },
+      { data: undefined, file: '/data.csv' }
+    ])
 
     const result = await pickPlotConfiguration('/')
 
     expect(result).toStrictEqual(undefined)
     expect(mockedShowError).toHaveBeenCalledTimes(1)
     expect(mockedShowError).toHaveBeenCalledWith(
-      'Failed to parse the requested file or files. Does the file or files contain data and follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
+      'Failed to parse data.csv. Does the file contain data and follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
     )
   })
 
   it('should show a toast message if an array of objects (with atleast two keys) are not found within a single chosen file', async () => {
-    mockedPickFiles.mockResolvedValue(['file.yaml'])
+    mockedPickFiles.mockResolvedValue(['/file.yaml'])
     const invalidValues: unknown[] = [
       'string',
       13,
@@ -130,7 +150,7 @@ describe('pickPlotConfiguration', () => {
 
     for (const [ind, invalidVal] of invalidValues.entries()) {
       mockedLoadDataFiles.mockResolvedValueOnce([
-        { data: invalidVal, file: 'file.yaml' }
+        { data: invalidVal, file: '/file.yaml' }
       ])
 
       result = await pickPlotConfiguration('/')
@@ -138,21 +158,21 @@ describe('pickPlotConfiguration', () => {
       expect(result).toStrictEqual(undefined)
       expect(mockedShowError).toHaveBeenCalledTimes(1 + ind)
       expect(mockedShowError).toHaveBeenCalledWith(
-        'The requested file or files do not contain enough keys (columns) to generate a plot. Does the file or files follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
+        'file.yaml does not contain enough keys (columns) to generate a plot. Does the file contain data and follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
       )
     }
   })
 
   it('should show a toast message if an array of objects (with atleast one key) are not found within multiple chosen files', async () => {
     mockedPickFiles.mockResolvedValueOnce([
-      'file.yaml',
-      'file2.yaml',
-      'file3.yaml'
+      '/file.yaml',
+      '/file2.yaml',
+      '/file3.yaml'
     ])
     mockedLoadDataFiles.mockResolvedValueOnce([
-      { data: { val: [{ field1: 1, field2: 2 }] }, file: 'file2.yaml' },
-      { data: [], file: 'file3.yaml' },
-      { data: { val: [{ field1: 1, field2: 2 }] }, file: 'file2.yaml' }
+      { data: { val: [{ field1: 1, field2: 2 }] }, file: '/file.yaml' },
+      { data: [], file: '/file2.yaml' },
+      { data: { val: 2 }, file: '/file3.yaml' }
     ])
 
     const result = await pickPlotConfiguration('/')
@@ -160,12 +180,36 @@ describe('pickPlotConfiguration', () => {
     expect(result).toStrictEqual(undefined)
     expect(mockedShowError).toHaveBeenCalledTimes(1)
     expect(mockedShowError).toHaveBeenCalledWith(
-      'The requested file or files do not contain enough keys (columns) to generate a plot. Does the file or files follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
+      'file2.yaml does not contain enough keys (columns) to generate a plot. Does the file contain data and follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
+    )
+  })
+
+  it("should show a toast message if the multiple chosen files' object arrays are not the same length", async () => {
+    mockedPickFiles.mockResolvedValueOnce(['/file.yaml', '/file2.yaml'])
+    mockedLoadDataFiles.mockResolvedValueOnce([
+      { data: { val: [{ field1: 1, field2: 2 }] }, file: '/file.yaml' },
+      {
+        data: {
+          val: [
+            { field1: 1, field2: 2 },
+            { field1: 1, field2: 2 }
+          ]
+        },
+        file: '/file3.yaml'
+      }
+    ])
+
+    const result = await pickPlotConfiguration('/')
+
+    expect(result).toStrictEqual(undefined)
+    expect(mockedShowError).toHaveBeenCalledTimes(1)
+    expect(mockedShowError).toHaveBeenCalledWith(
+      'All files must have the same array (list) length. See [examples](https://dvc.org/doc/command-reference/plots/show#sourcing-x-and-y-from-different-files) of multiple files being used in DVC plots.'
     )
   })
 
   it('should parse fields from a valid data file', async () => {
-    mockedPickFiles.mockResolvedValue(['file.yaml'])
+    mockedPickFiles.mockResolvedValue(['/file.yaml'])
     const validValues: unknown[] = [
       [{ field1: 1, field2: 2 }],
       [
@@ -183,7 +227,7 @@ describe('pickPlotConfiguration', () => {
 
     for (const [ind, val] of validValues.entries()) {
       mockedLoadDataFiles.mockResolvedValueOnce([
-        { data: val, file: 'file.yaml' }
+        { data: val, file: '/file.yaml' }
       ])
 
       await pickPlotConfiguration('/')
@@ -193,15 +237,11 @@ describe('pickPlotConfiguration', () => {
     }
   })
 
-  it('should parse fields from multiple valid data files (if atleast two fields are found total)', async () => {
-    mockedPickFiles.mockResolvedValueOnce([
-      'file.yaml',
-      'file2.yaml',
-      'file3.yaml'
-    ])
+  it('should parse fields from multiple valid data files', async () => {
+    mockedPickFiles.mockResolvedValueOnce(['/file.yaml', '/file2.yaml'])
     mockedLoadDataFiles.mockResolvedValueOnce([
-      { data: { val: [{ field1: 1, field2: 2 }] }, file: 'file2.yaml' },
-      { data: { val: [{ field1: 1 }] }, file: 'file2.yaml' }
+      { data: { val: [{ field1: 1, field2: 2 }] }, file: '/file.yaml' },
+      { data: { val: [{ field1: 1 }] }, file: '/file2.yaml' }
     ])
 
     const result = await pickPlotConfiguration('/')
@@ -217,8 +257,8 @@ describe('pickPlotConfiguration', () => {
     ])
     mockedQuickPickOne.mockResolvedValueOnce('simple')
     mockedQuickPickValue
-      .mockResolvedValueOnce({ file: '/file.json', key: 'actual' })
-      .mockResolvedValueOnce({ file: '/file.json', key: 'prob' })
+      .mockResolvedValueOnce({ file: 'file.json', key: 'actual' })
+      .mockResolvedValueOnce({ file: 'file.json', key: 'prob' })
 
     const result = await pickPlotConfiguration('/')
 
@@ -245,8 +285,8 @@ describe('pickPlotConfiguration', () => {
           label: 'file.json',
           value: undefined
         },
-        { label: 'actual', value: { file: '/file.json', key: 'actual' } },
-        { label: 'prob', value: { file: '/file.json', key: 'prob' } }
+        { label: 'actual', value: { file: 'file.json', key: 'actual' } },
+        { label: 'prob', value: { file: 'file.json', key: 'prob' } }
       ],
       { title: Title.SELECT_PLOT_X_METRIC }
     )
@@ -258,7 +298,7 @@ describe('pickPlotConfiguration', () => {
           label: 'file.json',
           value: undefined
         },
-        { label: 'prob', value: { file: '/file.json', key: 'prob' } }
+        { label: 'prob', value: { file: 'file.json', key: 'prob' } }
       ],
       {
         title: Title.SELECT_PLOT_Y_METRIC
@@ -266,8 +306,8 @@ describe('pickPlotConfiguration', () => {
     )
     expect(result).toStrictEqual({
       template: 'simple',
-      x: { file: '/file.json', key: 'actual' },
-      y: { file: '/file.json', key: 'prob' }
+      x: { file: 'file.json', key: 'actual' },
+      y: { file: 'file.json', key: 'prob' }
     })
   })
 
@@ -279,8 +319,8 @@ describe('pickPlotConfiguration', () => {
     ])
     mockedQuickPickOne.mockResolvedValueOnce('simple')
     mockedQuickPickValue
-      .mockResolvedValueOnce({ file: '/file.json', key: 'actual' })
-      .mockResolvedValueOnce({ file: '/file2.json', key: 'prob' })
+      .mockResolvedValueOnce({ file: 'file.json', key: 'actual' })
+      .mockResolvedValueOnce({ file: 'file2.json', key: 'prob' })
 
     const result = await pickPlotConfiguration('/')
 
@@ -292,15 +332,15 @@ describe('pickPlotConfiguration', () => {
           label: 'file.json',
           value: undefined
         },
-        { label: 'actual', value: { file: '/file.json', key: 'actual' } },
-        { label: 'prob', value: { file: '/file.json', key: 'prob' } },
+        { label: 'actual', value: { file: 'file.json', key: 'actual' } },
+        { label: 'prob', value: { file: 'file.json', key: 'prob' } },
         {
           kind: QuickPickItemKind.Separator,
           label: 'file2.json',
           value: undefined
         },
-        { label: 'actual', value: { file: '/file2.json', key: 'actual' } },
-        { label: 'prob', value: { file: '/file2.json', key: 'prob' } }
+        { label: 'actual', value: { file: 'file2.json', key: 'actual' } },
+        { label: 'prob', value: { file: 'file2.json', key: 'prob' } }
       ],
       { title: Title.SELECT_PLOT_X_METRIC }
     )
@@ -312,14 +352,14 @@ describe('pickPlotConfiguration', () => {
           label: 'file.json',
           value: undefined
         },
-        { label: 'prob', value: { file: '/file.json', key: 'prob' } },
+        { label: 'prob', value: { file: 'file.json', key: 'prob' } },
         {
           kind: QuickPickItemKind.Separator,
           label: 'file2.json',
           value: undefined
         },
-        { label: 'actual', value: { file: '/file2.json', key: 'actual' } },
-        { label: 'prob', value: { file: '/file2.json', key: 'prob' } }
+        { label: 'actual', value: { file: 'file2.json', key: 'actual' } },
+        { label: 'prob', value: { file: 'file2.json', key: 'prob' } }
       ],
       {
         title: Title.SELECT_PLOT_Y_METRIC
@@ -327,13 +367,13 @@ describe('pickPlotConfiguration', () => {
     )
     expect(result).toStrictEqual({
       template: 'simple',
-      x: { file: '/file.json', key: 'actual' },
-      y: { file: '/file2.json', key: 'prob' }
+      x: { file: 'file.json', key: 'actual' },
+      y: { file: 'file2.json', key: 'prob' }
     })
   })
 
   it('should return early if the user does not pick a template', async () => {
-    mockedPickFiles.mockResolvedValueOnce(['file.json'])
+    mockedPickFiles.mockResolvedValueOnce(['/file.json'])
     mockedLoadDataFiles.mockResolvedValueOnce([
       { data: mockValidData, file: 'file.json' }
     ])
@@ -347,7 +387,7 @@ describe('pickPlotConfiguration', () => {
   })
 
   it('should return early if the user does not pick a x field', async () => {
-    mockedPickFiles.mockResolvedValueOnce(['file.json'])
+    mockedPickFiles.mockResolvedValueOnce(['/file.json'])
     mockedLoadDataFiles.mockResolvedValueOnce([
       { data: mockValidData, file: 'file.json' }
     ])
@@ -361,7 +401,7 @@ describe('pickPlotConfiguration', () => {
   })
 
   it('should return early if the user does not pick a y field', async () => {
-    mockedPickFiles.mockResolvedValueOnce(['file.json'])
+    mockedPickFiles.mockResolvedValueOnce(['/file.json'])
     mockedLoadDataFiles.mockResolvedValueOnce([
       { data: mockValidData, file: 'file.json' }
     ])

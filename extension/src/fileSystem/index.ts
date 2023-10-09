@@ -214,23 +214,19 @@ const loadYamlAsDoc = (
   }
 }
 
-const getPlotYamlObj = (cwd: string, plot: PlotConfigData) => {
+const getPlotYamlObj = (plot: PlotConfigData) => {
   const { x, y, template } = plot
   const plotName = `${template}_plot`
   return {
     [plotName]: {
       template,
-      x: x.file === y.file ? x.key : { [relative(cwd, x.file)]: x.key },
-      y: { [relative(cwd, y.file)]: y.key }
+      x: x.file === y.file ? x.key : { [x.file]: x.key },
+      y: { [y.file]: y.key }
     }
   }
 }
 
-const getPlotsYaml = (
-  cwd: string,
-  plotObj: PlotConfigData,
-  indentSearchLines: string[]
-) => {
+const getPlotsYaml = (plotObj: PlotConfigData, indentSearchLines: string[]) => {
   const indentReg = /^( +)[^ ]/
   const indentLine = indentSearchLines.find(line => indentReg.test(line)) || ''
   const spacesMatches = indentLine.match(indentReg)
@@ -238,7 +234,7 @@ const getPlotsYaml = (
 
   return yaml
     .stringify(
-      { plots: [getPlotYamlObj(cwd, plotObj)] },
+      { plots: [getPlotYamlObj(plotObj)] },
       { indent: spaces ? spaces.length : 2 }
     )
     .split('\n')
@@ -258,7 +254,7 @@ export const addPlotToDvcYamlFile = (cwd: string, plotObj: PlotConfigData) => {
   const plots = doc.get('plots', true) as yaml.YAMLSeq | undefined
 
   if (!plots?.range) {
-    const plotYaml = getPlotsYaml(cwd, plotObj, dvcYamlLines)
+    const plotYaml = getPlotsYaml(plotObj, dvcYamlLines)
     dvcYamlLines.push(...plotYaml)
     writeFileSync(dvcYamlFile, dvcYamlLines.join('\n'))
     return
@@ -272,7 +268,6 @@ export const addPlotToDvcYamlFile = (cwd: string, plotObj: PlotConfigData) => {
 
   const plotsStartPos = lineCounter.linePos(plots.range[0]).line - 1
   const plotYaml = getPlotsYaml(
-    cwd,
     plotObj,
     dvcYamlLines.slice(plotsStartPos, insertLineNum)
   )
@@ -342,15 +337,10 @@ const loadDataFile = (file: string): unknown => {
 
 export const loadDataFiles = async (
   files: string[]
-): Promise<{ file: string; data: unknown }[] | undefined> => {
+): Promise<{ file: string; data: unknown }[]> => {
   const filesData: { file: string; data: unknown }[] = []
   for (const file of files) {
     const data = await loadDataFile(file)
-
-    if (!data) {
-      return undefined
-    }
-
     filesData.push({ data, file })
   }
   return filesData
