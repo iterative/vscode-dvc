@@ -131,6 +131,11 @@ const getMetricInfoFromValue = (
 const dvcPlotGuidelinesQuestion =
   'Does the file contain data and follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
 
+const showNotEnoughKeysToast = (file: string) =>
+  Toast.showError(
+    `${file} does not contain enough keys (columns) to generate a plot. ${dvcPlotGuidelinesQuestion}`
+  )
+
 const validateSingleFileData = ({
   file,
   data
@@ -141,9 +146,7 @@ const validateSingleFileData = ({
   const { fields = [] } = getMetricInfoFromValue(data) || {}
 
   if (fields.length < 2) {
-    void Toast.showError(
-      `${file} does not contain enough keys (columns) to generate a plot. ${dvcPlotGuidelinesQuestion}`
-    )
+    void showNotEnoughKeysToast(file)
     return
   }
 
@@ -159,9 +162,7 @@ const validateMultiFilesData = (
   for (const { file, data } of filesData) {
     const metricInfo = getMetricInfoFromValue(data)
     if (!metricInfo) {
-      void Toast.showError(
-        `${file} does not contain any keys (columns) to generate a plot. ${dvcPlotGuidelinesQuestion}`
-      )
+      void showNotEnoughKeysToast(file)
       return
     }
 

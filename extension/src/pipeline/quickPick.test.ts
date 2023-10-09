@@ -96,7 +96,7 @@ describe('pickPlotConfiguration', () => {
     )
   })
 
-  it('should show a toast message if a file to parse', async () => {
+  it('should show a toast message if parsing a file failed', async () => {
     mockedPickFiles.mockResolvedValueOnce(['/data.csv'])
     mockedLoadDataFiles.mockResolvedValueOnce([
       { data: [{ field1: 'only one field' }], file: '/results.csv' },
@@ -180,7 +180,7 @@ describe('pickPlotConfiguration', () => {
     expect(result).toStrictEqual(undefined)
     expect(mockedShowError).toHaveBeenCalledTimes(1)
     expect(mockedShowError).toHaveBeenCalledWith(
-      'file2.yaml does not contain any keys (columns) to generate a plot. Does the file contain data and follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
+      'file2.yaml does not contain enough keys (columns) to generate a plot. Does the file contain data and follow the DVC plot guidelines for [JSON/YAML](https://dvc.org/doc/command-reference/plots/show#example-hierarchical-data) or [CSV/TSV](https://dvc.org/doc/command-reference/plots/show#example-tabular-data) files?'
     )
   })
 
