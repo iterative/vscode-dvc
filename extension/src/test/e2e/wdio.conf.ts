@@ -51,7 +51,8 @@ export const config: Options.Testrunner = {
       'wdio:vscodeOptions': {
         extensionPath,
         userSettings: {
-          'dvc.pythonPath': getVenvBinPath(dvcDemoPath, '.env', 'python')
+          'dvc.pythonPath': getVenvBinPath(dvcDemoPath, '.env', 'python'),
+          'window.commandCenter': false
         },
         verboseLogging: false,
         workspacePath: dvcDemoPath
