@@ -1,4 +1,5 @@
 import { QuickPickOptions, QuickPickItem, window, QuickPick } from 'vscode'
+import isEqual from 'lodash.isequal'
 import { Response } from './response'
 import { Title } from './title'
 
@@ -208,6 +209,45 @@ export const quickPickLimitedValues = <T>(
 
     quickPick.onDidAccept(() => {
       resolve(collectResult(quickPick.selectedItems))
+      quickPick.dispose()
+    })
+
+    quickPick.onDidHide(() => {
+      resolve(undefined)
+      quickPick.dispose()
+    })
+
+    quickPick.show()
+  })
+
+export const quickPickUserOrderedValues = <T>(
+  items: QuickPickItemWithValue<T>[],
+  options: QuickPickOptions & { title: Title }
+): Promise<T[] | undefined> =>
+  new Promise(resolve => {
+    const quickPick = createQuickPick(items, [], {
+      ...DEFAULT_OPTIONS,
+      canSelectMany: true,
+      ...options
+    })
+
+    let orderedSelection: T[] = []
+
+    quickPick.onDidChangeSelection(selectedItems => {
+      const itemValues: T[] = []
+      for (const item of selectedItems) {
+        if (!orderedSelection.includes(item.value)) {
+          orderedSelection.push(item.value)
+        }
+        itemValues.push(item.value)
+      }
+      orderedSelection = orderedSelection.filter(item =>
+        itemValues.some(val => isEqual(item, val))
+      )
+    })
+
+    quickPick.onDidAccept(() => {
+      resolve(orderedSelection)
       quickPick.dispose()
     })
 

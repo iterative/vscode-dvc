@@ -8,11 +8,7 @@ import {
   isValueTree
 } from '../cli/dvc/contract'
 import { getFileExtension, loadDataFiles } from '../fileSystem'
-import {
-  quickPickManyValues,
-  quickPickOne,
-  quickPickValue
-} from '../vscode/quickPick'
+import { quickPickOne, quickPickUserOrderedValues } from '../vscode/quickPick'
 import { pickFiles } from '../vscode/resourcePicker'
 import { Title } from '../vscode/title'
 import { Toast } from '../vscode/toast'
@@ -78,16 +74,18 @@ const pickFields = async (
     )
   }
 
-  const xValue = await quickPickValue(items, {
+  const xValues = (await quickPickUserOrderedValues(items, {
     title: Title.SELECT_PLOT_X_METRIC
-  })
+  })) as { file: string; key: string }[] | undefined
 
-  if (!xValue) {
+  if (!xValues) {
     return
   }
 
-  const yValues = (await quickPickManyValues(
-    items.filter(item => !isEqual(item.value, xValue)),
+  // validate that x values are all from different files
+
+  const yValues = (await quickPickUserOrderedValues(
+    items.filter(item => xValues.every(val => !isEqual(val, item.value))),
     { title: Title.SELECT_PLOT_Y_METRIC }
   )) as { file: string; key: string }[] | undefined
 
@@ -95,12 +93,14 @@ const pickFields = async (
     return
   }
 
+  // validate that IF X VALUES IS MORE THAN 1: y values are all from different files and the same length as x values
+
   return {
     fields: {
-      x: { [xValue.file]: xValue.key },
+      x: formatFieldQuickPickValues(xValues),
       y: formatFieldQuickPickValues(yValues)
     },
-    firstXKey: xValue.key,
+    firstXKey: xValues[0].key,
     firstYKey: yValues[0].key
   }
 }
