@@ -10,6 +10,7 @@ export enum Title {
   ENTER_REMOTE_NAME = 'Enter a Name for the Remote',
   ENTER_REMOTE_URL = 'Enter the URL for the Remote',
   ENTER_PATH_OR_CHOOSE_FILE = 'Enter the path to your training script or select it',
+  ENTER_PLOT_TITLE = 'Enter a Name for Your Plot',
   ENTER_STUDIO_USERNAME = 'Enter your Studio username',
   ENTER_STUDIO_TOKEN = 'Enter your Studio access token',
   ENTER_STAGE_NAME = 'Enter a Name for the Main Stage of your Pipeline',
