@@ -213,6 +213,20 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.coloredStatus[id]
   }
 
+  public transferDetails(oldName: string, newName: string) {
+    const starred = this.starredExperiments[oldName]
+    const selected = this.coloredStatus[oldName]
+
+    this.starredExperiments[newName] = starred
+    this.coloredStatus[newName] = selected
+
+    delete this.starredExperiments[oldName]
+    delete this.coloredStatus[oldName]
+
+    this.persistStatus()
+    this.persistStars()
+  }
+
   public hasRunningExperiment() {
     return this.running.length > 0
   }
