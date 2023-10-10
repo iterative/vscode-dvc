@@ -641,6 +641,10 @@ export class Experiments extends BaseRepository<TableData> {
     this.notifyChanged()
   }
 
+  public transferExperimentDetails(oldName: string, newName: string) {
+    return this.experiments.transferDetails(oldName, newName)
+  }
+
   protected sendInitialWebviewData() {
     return this.webviewMessages.sendWebviewMessage()
   }
