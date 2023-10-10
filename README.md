@@ -21,6 +21,9 @@ Code. This extension uses [DVC](https://dvc.org/), an open-source data
 versioning and ML experiment management tool. No additional services or
 databases are required.
 
+🔔 Stay up-to-date with the latest product updates and tutorials by subscribing
+to the [DVC YouTube channel](https://www.youtube.com/@dvcorg8370/videos)!
+
 ![Extension Overview](https://raw.githubusercontent.com/iterative/vscode-dvc/main/extension/docs/overview.gif)
 
 - **Experiment tracking**: Record training data, parameters, and metrics on top
