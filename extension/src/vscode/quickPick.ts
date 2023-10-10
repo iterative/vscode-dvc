@@ -220,6 +220,22 @@ export const quickPickLimitedValues = <T>(
     quickPick.show()
   })
 
+const getUserOrderedSelection = <T>(
+  orderedSelection: T[],
+  newSelection: readonly QuickPickItemWithValue<T>[]
+) => {
+  const itemValues: T[] = []
+  for (const item of newSelection) {
+    if (!orderedSelection.includes(item.value)) {
+      orderedSelection.push(item.value)
+    }
+    itemValues.push(item.value)
+  }
+  return orderedSelection.filter(item =>
+    itemValues.some(val => isEqual(item, val))
+  )
+}
+
 export const quickPickUserOrderedValues = <T>(
   items: QuickPickItemWithValue<T>[],
   options: QuickPickOptions & { title: Title }
@@ -234,20 +250,14 @@ export const quickPickUserOrderedValues = <T>(
     let orderedSelection: T[] = []
 
     quickPick.onDidChangeSelection(selectedItems => {
-      const itemValues: T[] = []
-      for (const item of selectedItems) {
-        if (!orderedSelection.includes(item.value)) {
-          orderedSelection.push(item.value)
-        }
-        itemValues.push(item.value)
-      }
-      orderedSelection = orderedSelection.filter(item =>
-        itemValues.some(val => isEqual(item, val))
+      orderedSelection = getUserOrderedSelection(
+        orderedSelection,
+        selectedItems
       )
     })
 
     quickPick.onDidAccept(() => {
-      resolve(orderedSelection)
+      resolve(orderedSelection.length === 0 ? undefined : orderedSelection)
       quickPick.dispose()
     })
 
