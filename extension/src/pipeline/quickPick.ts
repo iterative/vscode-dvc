@@ -30,24 +30,6 @@ const pickDataFiles = (): Promise<string[] | undefined> =>
     'Data Formats': ['json', 'csv', 'tsv', 'yaml']
   })
 
-const pickTemplateAndTitle = async (): Promise<
-  Omit<PlotConfigData, 'x' | 'y'> | undefined
-> => {
-  const template = await quickPickOne(PLOT_TEMPLATES, 'Pick a Plot Template')
-
-  if (!template) {
-    return
-  }
-
-  const title = await getInput(Title.ENTER_PLOT_TITLE, `${template}_plot`)
-
-  if (!title) {
-    return
-  }
-
-  return { template, title }
-}
-
 const pickFields = async (
   fileFields: FileFields
 ): Promise<Omit<PlotConfigData, 'title' | 'template'> | undefined> => {
@@ -85,9 +67,9 @@ const pickFields = async (
 const pickPlotConfigData = async (
   fileFields: FileFields
 ): Promise<PlotConfigData | undefined> => {
-  const templateAndTitle = await pickTemplateAndTitle()
+  const template = await quickPickOne(PLOT_TEMPLATES, 'Pick a Plot Template')
 
-  if (!templateAndTitle) {
+  if (!template) {
     return
   }
 
@@ -97,7 +79,16 @@ const pickPlotConfigData = async (
     return
   }
 
-  return { ...templateAndTitle, ...fields }
+  const title = await getInput(
+    Title.ENTER_PLOT_TITLE,
+    `${fields.x.key} vs ${fields.y.key}`
+  )
+
+  if (!title) {
+    return
+  }
+
+  return { template, title, ...fields }
 }
 
 const joinList = (items: string[]) => {
