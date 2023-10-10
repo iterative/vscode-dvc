@@ -82,8 +82,6 @@ const pickFields = async (
     return
   }
 
-  // validate that x values are all from different files
-
   const yValues = (await quickPickUserOrderedValues(
     items.filter(item => xValues.every(val => !isEqual(val, item.value))),
     { title: Title.SELECT_PLOT_Y_METRIC }
@@ -93,11 +91,9 @@ const pickFields = async (
     return
   }
 
-  // validate that IF X VALUES IS MORE THAN 1: y values are all from different files and the same length as x values
-
   return {
     fields: {
-      x: formatFieldQuickPickValues(xValues),
+      x: formatFieldQuickPickValues(xValues) as PlotConfigData['x'],
       y: formatFieldQuickPickValues(yValues)
     },
     firstXKey: xValues[0].key,
