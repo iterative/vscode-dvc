@@ -34,24 +34,6 @@ const pickDataFiles = (): Promise<string[] | undefined> =>
     'Data Formats': ['json', 'csv', 'tsv', 'yaml']
   })
 
-const pickTemplateAndTitle = async (): Promise<
-  Omit<PlotConfigData, 'x' | 'y'> | undefined
-> => {
-  const template = await quickPickOne(PLOT_TEMPLATES, 'Pick a Plot Template')
-
-  if (!template) {
-    return
-  }
-
-  const title = await getInput(Title.ENTER_PLOT_TITLE, `${template}_plot`)
-
-  if (!title) {
-    return
-  }
-
-  return { template, title }
-}
-
 const formatYQuickPickValues = (values: { file: string; key: string }[]) => {
   const y: PlotConfigData['y'] = {}
 
@@ -73,7 +55,13 @@ const formatYQuickPickValues = (values: { file: string; key: string }[]) => {
 
 const pickFields = async (
   fileFields: FileFields
-): Promise<Omit<PlotConfigData, 'title' | 'template'> | undefined> => {
+): Promise<
+  | {
+      fields: Omit<PlotConfigData, 'title' | 'template'>
+      firstYKey: string
+    }
+  | undefined
+> => {
   const items = []
 
   for (const { file, fields } of fileFields) {
@@ -102,25 +90,39 @@ const pickFields = async (
     return
   }
 
-  return { x, y: formatYQuickPickValues(yValues) }
+  return {
+    fields: { x, y: formatYQuickPickValues(yValues) },
+    firstYKey: yValues[0].key
+  }
 }
 
 const pickPlotConfigData = async (
   fileFields: FileFields
 ): Promise<PlotConfigData | undefined> => {
-  const templateAndTitle = await pickTemplateAndTitle()
+  const template = await quickPickOne(PLOT_TEMPLATES, 'Pick a Plot Template')
 
-  if (!templateAndTitle) {
+  if (!template) {
     return
   }
 
-  const fields = await pickFields(fileFields)
+  const fieldsInfo = await pickFields(fileFields)
 
-  if (!fields) {
+  if (!fieldsInfo) {
     return
   }
 
-  return { ...templateAndTitle, ...fields }
+  const { fields, firstYKey } = fieldsInfo
+
+  const title = await getInput(
+    Title.ENTER_PLOT_TITLE,
+    `${fields.x.key} vs ${firstYKey}`
+  )
+
+  if (!title) {
+    return
+  }
+
+  return { template, title, ...fields }
 }
 
 const joinList = (items: string[]) => {
