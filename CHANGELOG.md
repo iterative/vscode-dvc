@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.5] - 2023-10-10
+
+### 🚀 New Features and Enhancements
+
+- Add title option to plot wizard [#4786](https://github.com/iterative/vscode-dvc/pull/4786) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Add subscribe to YouTube message to README [#4794](https://github.com/iterative/vscode-dvc/pull/4794) by [@mattseddon](https://github.com/mattseddon)
+- Remove banner from README [#4795](https://github.com/iterative/vscode-dvc/pull/4795) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.1.4] - 2023-10-09
 
 ### 🐛 Bug Fixes
