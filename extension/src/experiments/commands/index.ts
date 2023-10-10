@@ -17,6 +17,22 @@ export const getBranchExperimentCommand =
   (cwd: string, name: string, input: string) =>
     experiments.runCommand(AvailableCommands.EXP_BRANCH, cwd, name, input)
 
+export const getRenameExperimentCommand =
+  (experiments: WorkspaceExperiments) =>
+  async (cwd: string, oldName: string, newName: string) => {
+    const output = await experiments.runCommand(
+      AvailableCommands.EXP_RENAME,
+      cwd,
+      oldName,
+      newName
+    )
+    if (!output) {
+      return
+    }
+    const repository = experiments.getRepository(cwd)
+    return repository.transferExperimentDetails(oldName, newName)
+  }
+
 const promptToAddStudioToken = async () => {
   const response = await Toast.askShowOrCloseOrNever(
     `Experiments can be automatically shared to [Studio](${STUDIO_URL}) by setting the studio.token in your config.`

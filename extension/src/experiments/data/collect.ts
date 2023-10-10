@@ -1,9 +1,14 @@
-import { ExpData, ExpShowOutput, MetricsOrParams } from '../../cli/dvc/contract'
+import {
+  Deps,
+  ExpData,
+  ExpShowOutput,
+  MetricsOrParams
+} from '../../cli/dvc/contract'
 import { getExpData } from '../columns/collect'
 
 const collectFilesFromKeys = (
   acc: Set<string>,
-  metricsOrParams: MetricsOrParams | null | undefined
+  metricsOrParams: MetricsOrParams | Deps | null | undefined
 ): void => {
   for (const file of Object.keys(metricsOrParams || {})) {
     if (!file) {
@@ -22,6 +27,8 @@ const collectFilesFromExperiment = (
   }
   collectFilesFromKeys(acc, data.params)
   collectFilesFromKeys(acc, data.metrics)
+  collectFilesFromKeys(acc, data.deps)
+  collectFilesFromKeys(acc, data.outs)
 }
 
 export const collectFiles = (

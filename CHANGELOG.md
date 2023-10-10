@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.4] - 2023-10-09
+
+### 🐛 Bug Fixes
+
+- Transfer selection/starred status to renamed experiment [#4783](https://github.com/iterative/vscode-dvc/pull/4783) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Watch deps and outs files for experiment updates [#4784](https://github.com/iterative/vscode-dvc/pull/4784) by [@mattseddon](https://github.com/mattseddon)
+- Update demo project and latest tested CLI version (3.25.0) [#4788](https://github.com/iterative/vscode-dvc/pull/4788) by [@julieg18](https://github.com/julieg18)
+
+## [1.1.3] - 2023-10-09
+
+### 🚀 New Features and Enhancements
+
+- Improve Plot Wizard Error Handling [#4770](https://github.com/iterative/vscode-dvc/pull/4770) by [@julieg18](https://github.com/julieg18)
+
+## [1.1.2] - 2023-10-05
+
+### 🚀 New Features and Enhancements
+
+- Add remove as inline SCM action for added resources [#4768](https://github.com/iterative/vscode-dvc/pull/4768) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Remove unused function [#4769](https://github.com/iterative/vscode-dvc/pull/4769) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.1.1] - 2023-10-05
 
 ### 🚀 New Features and Enhancements

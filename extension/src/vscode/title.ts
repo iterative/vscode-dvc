@@ -1,6 +1,7 @@
 export enum Title {
   CHOOSE_RESOURCES = 'Choose Resources to Add to the Dataset',
   ENTER_BRANCH_NAME = 'Enter a Name for the New Branch',
+  ENTER_NEW_EXPERIMENT_NAME = 'Enter a New Name for the Experiment',
   ENTER_COMMAND_TO_RUN = 'Enter the Command to Run your Script (e.g., python, sh, go run...)',
   ENTER_COMMIT_MESSAGE = 'Enter a Commit Message',
   ENTER_EXPERIMENT_WORKER_COUNT = 'Enter the Number of Queue Workers',
