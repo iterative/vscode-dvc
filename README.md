@@ -1,5 +1,3 @@
-![banner](https://raw.githubusercontent.com/iterative/vscode-dvc/main/extension/resources/banner.png)
-
 # DVC Extension for Visual Studio Code
 
 ![Version](https://img.shields.io/visual-studio-marketplace/v/iterative.dvc)
