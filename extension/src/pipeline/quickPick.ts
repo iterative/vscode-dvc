@@ -51,6 +51,60 @@ const formatFieldQuickPickValues = (
   return formattedFields
 }
 
+const verifyXFields = (
+  xValues: { file: string; key: string }[] | undefined
+) => {
+  if (!xValues) {
+    return
+  }
+
+  const x = formatFieldQuickPickValues(xValues)
+
+  for (const [file, fields] of Object.entries(x)) {
+    if (Array.isArray(fields)) {
+      void Toast.showError(
+        `${file} cannot have more than one field selected. See [an example](https://dvc.org/doc/user-guide/project-structure/dvcyaml-files#available-configuration-fields) of a plot with an x dict.`
+      )
+      return
+    }
+  }
+
+  return { firstXKey: xValues[0].key, x }
+}
+
+const verifyYFields = (
+  yValues: { file: string; key: string }[] | undefined,
+  xFieldsLength: number
+) => {
+  if (!yValues) {
+    return
+  }
+
+  const y = formatFieldQuickPickValues(yValues)
+
+  if (xFieldsLength === 1) {
+    return { firstYKey: yValues[0].key, y }
+  }
+
+  if (yValues.length !== xFieldsLength) {
+    void Toast.showError(
+      'The amount of Y metrics needs to match the amount of X metrics. See [an example](https://dvc.org/doc/user-guide/project-structure/dvcyaml-files#available-configuration-fields) of a plot with a x dict.'
+    )
+    return
+  }
+
+  for (const [file, fields] of Object.entries(y)) {
+    if (Array.isArray(fields)) {
+      void Toast.showError(
+        `${file} has more than one field selected. See [an example](https://dvc.org/doc/user-guide/project-structure/dvcyaml-files#available-configuration-fields) of a plot with a x dict.`
+      )
+      return
+    }
+  }
+
+  return { firstYKey: yValues[0].key, y }
+}
+
 const pickFields = async (
   fileFields: FileFields
 ): Promise<
@@ -78,26 +132,34 @@ const pickFields = async (
     title: Title.SELECT_PLOT_X_METRIC
   })) as { file: string; key: string }[] | undefined
 
-  if (!xValues) {
+  const xFieldInfo = verifyXFields(xValues)
+
+  if (!xFieldInfo) {
     return
   }
 
+  const { x, firstXKey } = xFieldInfo
+
   const yValues = (await quickPickUserOrderedValues(
-    items.filter(item => xValues.every(val => !isEqual(val, item.value))),
+    items.filter(item => xValues?.every(val => !isEqual(val, item.value))),
     { title: Title.SELECT_PLOT_Y_METRIC }
   )) as { file: string; key: string }[] | undefined
 
-  if (!yValues) {
+  const yFieldInfo = verifyYFields(yValues, xValues?.length || 0)
+
+  if (!yFieldInfo) {
     return
   }
 
+  const { y, firstYKey } = yFieldInfo
+
   return {
     fields: {
-      x: formatFieldQuickPickValues(xValues) as PlotConfigData['x'],
-      y: formatFieldQuickPickValues(yValues)
+      x: x as PlotConfigData['x'],
+      y
     },
-    firstXKey: xValues[0].key,
-    firstYKey: yValues[0].key
+    firstXKey,
+    firstYKey
   }
 }
 
