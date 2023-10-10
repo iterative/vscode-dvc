@@ -218,12 +218,13 @@ const getPlotYamlObj = (plot: PlotConfigData) => {
   const { x, y, template, title } = plot
 
   const yFiles = Object.keys(y)
-  const oneFileUsed = yFiles.length === 1 && yFiles[0] === x.file
+  const [xFile, xKey] = Object.entries(x)[0]
+  const oneFileUsed = yFiles.length === 1 && yFiles[0] === xFile
 
   return {
     [title]: {
       template,
-      x: oneFileUsed ? x.key : { [x.file]: x.key },
+      x: oneFileUsed ? xKey : x,
       y
     }
   }

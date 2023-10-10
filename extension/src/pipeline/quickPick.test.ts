@@ -322,7 +322,7 @@ describe('pickPlotConfiguration', () => {
     expect(result).toStrictEqual({
       template: 'simple',
       title: 'Simple Plot',
-      x: { file: 'file.json', key: 'actual' },
+      x: { 'file.json': 'actual' },
       y: { 'file.json': 'prob' }
     })
   })
@@ -390,7 +390,7 @@ describe('pickPlotConfiguration', () => {
     expect(result).toStrictEqual({
       template: 'simple',
       title: 'simple_plot',
-      x: { file: 'file.json', key: 'actual' },
+      x: { 'file.json': 'actual' },
       y: { 'file2.json': 'prob' }
     })
   })
@@ -462,7 +462,7 @@ describe('pickPlotConfiguration', () => {
     expect(result).toStrictEqual({
       template: 'simple',
       title: 'simple_plot',
-      x: { file: 'file.json', key: 'actual' },
+      x: { 'file.json': 'actual' },
       y: { 'file2.json': ['prob', 'actual', 'step'] }
     })
   })

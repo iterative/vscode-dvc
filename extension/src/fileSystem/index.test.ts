@@ -625,7 +625,7 @@ describe('addPlotToDvcYamlFile', () => {
     addPlotToDvcYamlFile('/', {
       template: 'simple',
       title: 'Simple Plot',
-      x: { file: 'data.json', key: 'epochs' },
+      x: { 'data.json': 'epochs' },
       y: { 'data.json': 'accuracy' }
     })
 
@@ -654,7 +654,7 @@ describe('addPlotToDvcYamlFile', () => {
     addPlotToDvcYamlFile('/', {
       template: 'simple',
       title: 'simple_plot',
-      x: { file: 'data.json', key: 'epochs' },
+      x: { 'data.json': 'epochs' },
       y: { 'acc.json': 'accuracy' }
     })
 
@@ -673,7 +673,7 @@ describe('addPlotToDvcYamlFile', () => {
     addPlotToDvcYamlFile('/', {
       template: 'simple',
       title: 'Simple Plot',
-      x: { file: 'data.json', key: 'epochs' },
+      x: { 'data.json': 'epochs' },
       y: { 'data.json': 'accuracy' }
     })
 
@@ -696,7 +696,7 @@ describe('addPlotToDvcYamlFile', () => {
     addPlotToDvcYamlFile('/', {
       template: 'simple',
       title: 'Simple Plot',
-      x: { file: 'data.json', key: 'epochs' },
+      x: { 'data.json': 'epochs' },
       y: { 'data.json': 'accuracy' }
     })
 
@@ -734,7 +734,7 @@ describe('addPlotToDvcYamlFile', () => {
     addPlotToDvcYamlFile('/', {
       template: 'simple',
       title: 'simple_plot',
-      x: { file: 'data.json', key: 'epochs' },
+      x: { 'data.json': 'epochs' },
       y: { 'data.json': 'accuracy' }
     })
 

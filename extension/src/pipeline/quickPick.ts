@@ -19,7 +19,7 @@ import { Toast } from '../vscode/toast'
 import { getInput } from '../vscode/inputBox'
 
 export type PlotConfigData = {
-  x: { file: string; key: string }
+  x: { [file: string]: string }
   template: string
   title: string
   y: { [file: string]: string[] | string }
@@ -34,23 +34,25 @@ const pickDataFiles = (): Promise<string[] | undefined> =>
     'Data Formats': ['json', 'csv', 'tsv', 'yaml']
   })
 
-const formatYQuickPickValues = (values: { file: string; key: string }[]) => {
-  const y: PlotConfigData['y'] = {}
+const formatFieldQuickPickValues = (
+  values: { file: string; key: string }[]
+) => {
+  const formattedFields: PlotConfigData['y'] = {}
 
   for (const { file, key } of values) {
-    if (!y[file]) {
-      y[file] = key
+    if (!formattedFields[file]) {
+      formattedFields[file] = key
       continue
     }
 
-    const prevFileValue = y[file]
-    y[file] = [
+    const prevFileValue = formattedFields[file]
+    formattedFields[file] = [
       ...(typeof prevFileValue === 'string' ? [prevFileValue] : prevFileValue),
       key
     ]
   }
 
-  return y
+  return formattedFields
 }
 
 const pickFields = async (
@@ -58,6 +60,7 @@ const pickFields = async (
 ): Promise<
   | {
       fields: Omit<PlotConfigData, 'title' | 'template'>
+      firstXKey: string
       firstYKey: string
     }
   | undefined
@@ -75,14 +78,16 @@ const pickFields = async (
     )
   }
 
-  const x = await quickPickValue(items, { title: Title.SELECT_PLOT_X_METRIC })
+  const xValue = await quickPickValue(items, {
+    title: Title.SELECT_PLOT_X_METRIC
+  })
 
-  if (!x) {
+  if (!xValue) {
     return
   }
 
   const yValues = (await quickPickManyValues(
-    items.filter(item => !isEqual(item.value, x)),
+    items.filter(item => !isEqual(item.value, xValue)),
     { title: Title.SELECT_PLOT_Y_METRIC }
   )) as { file: string; key: string }[] | undefined
 
@@ -91,7 +96,11 @@ const pickFields = async (
   }
 
   return {
-    fields: { x, y: formatYQuickPickValues(yValues) },
+    fields: {
+      x: { [xValue.file]: xValue.key },
+      y: formatFieldQuickPickValues(yValues)
+    },
+    firstXKey: xValue.key,
     firstYKey: yValues[0].key
   }
 }
@@ -111,11 +120,11 @@ const pickPlotConfigData = async (
     return
   }
 
-  const { fields, firstYKey } = fieldsInfo
+  const { fields, firstYKey, firstXKey } = fieldsInfo
 
   const title = await getInput(
     Title.ENTER_PLOT_TITLE,
-    `${fields.x.key} vs ${firstYKey}`
+    `${firstXKey} vs ${firstYKey}`
   )
 
   if (!title) {
