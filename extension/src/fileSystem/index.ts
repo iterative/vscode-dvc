@@ -22,6 +22,7 @@ import { Uri, workspace, window, commands, ViewColumn } from 'vscode'
 import { csv2json, json2csv } from 'json-2-csv'
 import yaml from 'yaml'
 import { standardizePath } from './path'
+import { findFiles } from './workspace'
 import { definedAndNonEmpty, sortCollectedArray } from '../util/array'
 import { Logger } from '../common/logger'
 import { gitPath } from '../cli/git/constants'
@@ -31,7 +32,6 @@ import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
 import { DOT_DVC, FULLY_NESTED_DVC, NESTED_DVC } from '../cli/dvc/constants'
 import { delay } from '../util/time'
 import { PlotConfigData } from '../pipeline/quickPick'
-import { findFiles } from './workspace'
 
 export const exists = (path: string): boolean => existsSync(path)
 
