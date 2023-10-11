@@ -51,22 +51,34 @@ const formatFieldQuickPickValues = (
   return formattedFields
 }
 
+const verifyFilesHavingSingleField = (files: {
+  [file: string]: string[] | string
+}) => {
+  for (const [file, fields] of Object.entries(files)) {
+    if (Array.isArray(fields)) {
+      void Toast.showError(
+        `${file} cannot have more than one metric selected. See [an example](https://dvc.org/doc/user-guide/project-structure/dvcyaml-files#available-configuration-fields) of a plot with multipe x metrics.`
+      )
+      return
+    }
+  }
+
+  return files
+}
+
 const verifyXFields = (
   xValues: { file: string; key: string }[] | undefined
 ) => {
-  if (!xValues) {
+  if (!xValues || xValues.length === 0) {
     return
   }
 
   const x = formatFieldQuickPickValues(xValues)
 
-  for (const [file, fields] of Object.entries(x)) {
-    if (Array.isArray(fields)) {
-      void Toast.showError(
-        `${file} cannot have more than one field selected. See [an example](https://dvc.org/doc/user-guide/project-structure/dvcyaml-files#available-configuration-fields) of a plot with an x dict.`
-      )
-      return
-    }
+  const doFilesHaveOneField = verifyFilesHavingSingleField(x)
+
+  if (!doFilesHaveOneField) {
+    return
   }
 
   return { firstXKey: xValues[0].key, x }
@@ -76,7 +88,7 @@ const verifyYFields = (
   yValues: { file: string; key: string }[] | undefined,
   xFieldsLength: number
 ) => {
-  if (!yValues) {
+  if (!yValues || yValues.length === 0) {
     return
   }
 
@@ -88,18 +100,15 @@ const verifyYFields = (
 
   if (yValues.length !== xFieldsLength) {
     void Toast.showError(
-      'The amount of Y metrics needs to match the amount of X metrics. See [an example](https://dvc.org/doc/user-guide/project-structure/dvcyaml-files#available-configuration-fields) of a plot with a x dict.'
+      'The amount of y metrics needs to match the amount of x metrics. See [an example](https://dvc.org/doc/user-guide/project-structure/dvcyaml-files#available-configuration-fields) of a plot with multiple x metrics.'
     )
     return
   }
 
-  for (const [file, fields] of Object.entries(y)) {
-    if (Array.isArray(fields)) {
-      void Toast.showError(
-        `${file} has more than one field selected. See [an example](https://dvc.org/doc/user-guide/project-structure/dvcyaml-files#available-configuration-fields) of a plot with a x dict.`
-      )
-      return
-    }
+  const doFilesHaveOneField = verifyFilesHavingSingleField(y)
+
+  if (!doFilesHaveOneField) {
+    return
   }
 
   return { firstYKey: yValues[0].key, y }
