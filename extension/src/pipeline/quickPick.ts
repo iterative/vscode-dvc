@@ -8,17 +8,21 @@ import {
   isValueTree
 } from '../cli/dvc/contract'
 import { getFileExtension, loadDataFiles } from '../fileSystem'
-import { quickPickOne, quickPickValue } from '../vscode/quickPick'
+import {
+  quickPickManyValues,
+  quickPickOne,
+  quickPickValue
+} from '../vscode/quickPick'
 import { pickFiles } from '../vscode/resourcePicker'
 import { Title } from '../vscode/title'
 import { Toast } from '../vscode/toast'
 import { getInput } from '../vscode/inputBox'
 
 export type PlotConfigData = {
-  x: { file: string; key: string }
+  x: { [file: string]: string }
   template: string
   title: string
-  y: { file: string; key: string }
+  y: { [file: string]: string[] | string }
 }
 
 type UnknownValue = Value | ValueTree
@@ -30,9 +34,38 @@ const pickDataFiles = (): Promise<string[] | undefined> =>
     'Data Formats': ['json', 'csv', 'tsv', 'yaml']
   })
 
+const formatFieldQuickPickValues = (
+  values: { file: string; key: string }[]
+) => {
+  const formattedFields: PlotConfigData['y'] = {}
+
+  for (const { file, key } of values) {
+    if (!formattedFields[file]) {
+      formattedFields[file] = key
+      continue
+    }
+
+    const prevFileValue = formattedFields[file]
+    if (typeof prevFileValue === 'string') {
+      formattedFields[file] = [prevFileValue]
+    }
+
+    ;(formattedFields[file] as string[]).push(key)
+  }
+
+  return formattedFields
+}
+
 const pickFields = async (
   fileFields: FileFields
-): Promise<Omit<PlotConfigData, 'title' | 'template'> | undefined> => {
+): Promise<
+  | {
+      fields: Omit<PlotConfigData, 'title' | 'template'>
+      firstXKey: string
+      firstYKey: string
+    }
+  | undefined
+> => {
   const items = []
 
   for (const { file, fields } of fileFields) {
@@ -46,22 +79,31 @@ const pickFields = async (
     )
   }
 
-  const x = await quickPickValue(items, { title: Title.SELECT_PLOT_X_METRIC })
+  const xValue = await quickPickValue(items, {
+    title: Title.SELECT_PLOT_X_METRIC
+  })
 
-  if (!x) {
+  if (!xValue) {
     return
   }
 
-  const y = await quickPickValue(
-    items.filter(item => !isEqual(item.value, x)),
+  const yValues = (await quickPickManyValues(
+    items.filter(item => !isEqual(item.value, xValue)),
     { title: Title.SELECT_PLOT_Y_METRIC }
-  )
+  )) as { file: string; key: string }[] | undefined
 
-  if (!y) {
+  if (!yValues) {
     return
   }
 
-  return { x, y }
+  return {
+    fields: {
+      x: { [xValue.file]: xValue.key },
+      y: formatFieldQuickPickValues(yValues)
+    },
+    firstXKey: xValue.key,
+    firstYKey: yValues[0].key
+  }
 }
 
 const pickPlotConfigData = async (
@@ -73,15 +115,17 @@ const pickPlotConfigData = async (
     return
   }
 
-  const fields = await pickFields(fileFields)
+  const fieldsInfo = await pickFields(fileFields)
 
-  if (!fields) {
+  if (!fieldsInfo) {
     return
   }
 
+  const { fields, firstYKey, firstXKey } = fieldsInfo
+
   const title = await getInput(
     Title.ENTER_PLOT_TITLE,
-    `${fields.x.key} vs ${fields.y.key}`
+    `${firstXKey} vs ${firstYKey}`
   )
 
   if (!title) {
