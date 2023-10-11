@@ -46,10 +46,11 @@ const formatFieldQuickPickValues = (
     }
 
     const prevFileValue = formattedFields[file]
-    formattedFields[file] = [
-      ...(typeof prevFileValue === 'string' ? [prevFileValue] : prevFileValue),
-      key
-    ]
+    if (typeof prevFileValue === 'string') {
+      formattedFields[file] = [prevFileValue]
+    }
+
+    ;(formattedFields[file] as string[]).push(key)
   }
 
   return formattedFields
