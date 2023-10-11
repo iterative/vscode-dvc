@@ -15,7 +15,7 @@ import { Toast } from '../vscode/toast'
 import { getInput } from '../vscode/inputBox'
 
 export type PlotConfigData = {
-  x: { [file: string]: string }
+  x: { [file: string]: string[] | string }
   template: string
   title: string
   y: { [file: string]: string[] | string }
@@ -33,7 +33,7 @@ const pickDataFiles = (): Promise<string[] | undefined> =>
 const formatFieldQuickPickValues = (
   values: { file: string; key: string }[]
 ) => {
-  const formattedFields: PlotConfigData['y'] = {}
+  const formattedFields: { [file: string]: string[] | string } = {}
 
   for (const { file, key } of values) {
     if (!formattedFields[file]) {
@@ -94,7 +94,7 @@ const pickFields = async (
 
   return {
     fields: {
-      x: formatFieldQuickPickValues(xValues) as PlotConfigData['x'],
+      x: formatFieldQuickPickValues(xValues),
       y: formatFieldQuickPickValues(yValues)
     },
     firstXKey: xValues[0].key,
