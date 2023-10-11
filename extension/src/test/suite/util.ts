@@ -85,6 +85,22 @@ export const selectQuickPickItem = async (number: number) => {
   return commands.executeCommand('workbench.action.acceptSelectedQuickOpenItem')
 }
 
+export const selectQuickPickItems = async (
+  numbers: number[],
+  itemsLength: number
+) => {
+  for (const number of numbers) {
+    for (let itemInd = 1; itemInd <= itemsLength; itemInd++) {
+      await commands.executeCommand('workbench.action.quickOpenSelectNext')
+
+      if (itemInd === number) {
+        await commands.executeCommand('workbench.action.quickPickManyToggle')
+      }
+    }
+  }
+  return commands.executeCommand('workbench.action.acceptSelectedQuickOpenItem')
+}
+
 export const experimentsUpdatedEvent = (experiments: Experiments) =>
   new Promise(resolve => {
     experiments.dispose.track(experiments.onDidChangeExperiments(resolve))

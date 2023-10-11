@@ -257,7 +257,7 @@ export const quickPickUserOrderedValues = <T>(
     })
 
     quickPick.onDidAccept(() => {
-      resolve(orderedSelection.length === 0 ? undefined : orderedSelection)
+      resolve(orderedSelection)
       quickPick.dispose()
     })
 
