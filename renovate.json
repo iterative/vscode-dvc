@@ -1,5 +1,11 @@
 {
-  "ignoreDeps": ["@types/node", "@types/vscode", "execa", "process-exists"],
+  "ignoreDeps": [
+    "@types/node",
+    "@types/vscode",
+    "execa",
+    "process-exists",
+    "webdriverio-monorepo"
+  ],
   "extends": ["config:base"],
   "packageRules": [
     {
