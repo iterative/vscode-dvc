@@ -88,7 +88,7 @@ const pickFields = async (
     { title: Title.SELECT_PLOT_Y_METRIC }
   )) as { file: string; key: string }[] | undefined
 
-  if (!yValues) {
+  if (!yValues || yValues.length === 0) {
     return
   }
 

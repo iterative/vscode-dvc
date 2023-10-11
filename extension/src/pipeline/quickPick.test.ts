@@ -2,11 +2,7 @@ import { QuickPickItemKind } from 'vscode'
 import { pickPlotConfiguration } from './quickPick'
 import { getInput } from '../vscode/inputBox'
 import { pickFiles } from '../vscode/resourcePicker'
-import {
-  quickPickOne,
-  quickPickValue,
-  quickPickUserOrderedValues
-} from '../vscode/quickPick'
+import { quickPickOne, quickPickUserOrderedValues } from '../vscode/quickPick'
 import { getFileExtension, loadDataFiles } from '../fileSystem'
 import { Title } from '../vscode/title'
 import { Toast } from '../vscode/toast'
@@ -16,7 +12,6 @@ const mockedLoadDataFiles = jest.mocked(loadDataFiles)
 const mockedGetFileExt = jest.mocked(getFileExtension)
 const mockedGetInput = jest.mocked(getInput)
 const mockedQuickPickOne = jest.mocked(quickPickOne)
-const mockedQuickPickValue = jest.mocked(quickPickValue)
 const mockedQuickPickUserOrderedValues = jest.mocked(quickPickUserOrderedValues)
 const mockedToast = jest.mocked(Toast)
 const mockedShowError = jest.fn()
@@ -586,19 +581,24 @@ describe('pickPlotConfiguration', () => {
     expect(noFieldsResult).toStrictEqual(undefined)
   })
   it('should return early if the user does not pick a y field', async () => {
-    mockedPickFiles.mockResolvedValueOnce(['/file.json'])
-    mockedLoadDataFiles.mockResolvedValueOnce([
+    mockedPickFiles.mockResolvedValue(['/file.json'])
+    mockedLoadDataFiles.mockResolvedValue([
       { data: mockValidData, file: 'file.json' }
     ])
-    mockedQuickPickOne.mockResolvedValueOnce('simple')
-    mockedGetInput.mockResolvedValueOnce('simple_plot')
-    mockedQuickPickValue.mockResolvedValueOnce('actual')
-    mockedQuickPickUserOrderedValues.mockResolvedValueOnce(undefined)
+    mockedQuickPickOne.mockResolvedValue('simple')
+    mockedGetInput.mockResolvedValue('simple_plot')
+    mockedQuickPickUserOrderedValues
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce([])
 
-    const result = await pickPlotConfiguration('/')
-
+    const undefinedResult = await pickPlotConfiguration('/')
     expect(mockedQuickPickUserOrderedValues).toHaveBeenCalledTimes(1)
-    expect(result).toStrictEqual(undefined)
+    expect(undefinedResult).toStrictEqual(undefined)
+
+    const emptyFieldsResult = await pickPlotConfiguration('/')
+
+    expect(mockedQuickPickUserOrderedValues).toHaveBeenCalledTimes(2)
+    expect(emptyFieldsResult).toStrictEqual(undefined)
   })
 
   it('should return early if the user does not pick a title', async () => {
