@@ -79,7 +79,7 @@ const pickFields = async (
     title: Title.SELECT_PLOT_X_METRIC
   })) as { file: string; key: string }[] | undefined
 
-  if (!xValues) {
+  if (!xValues || xValues.length === 0) {
     return
   }
 
