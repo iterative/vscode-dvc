@@ -1,5 +1,3 @@
-![banner](https://raw.githubusercontent.com/iterative/vscode-dvc/main/extension/resources/banner.png)
-
 # DVC Extension for Visual Studio Code
 
 ![Version](https://img.shields.io/visual-studio-marketplace/v/iterative.dvc)
@@ -20,6 +18,9 @@ Run, compare, visualize, and track machine learning experiments right in VS
 Code. This extension uses [DVC](https://dvc.org/), an open-source data
 versioning and ML experiment management tool. No additional services or
 databases are required.
+
+🔔 Stay up-to-date with the latest product updates and tutorials by subscribing
+to the [DVC YouTube channel](https://www.youtube.com/@dvcorg8370/videos)!
 
 ![Extension Overview](https://raw.githubusercontent.com/iterative/vscode-dvc/main/extension/docs/overview.gif)
 

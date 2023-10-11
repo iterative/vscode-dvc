@@ -241,7 +241,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   }
 
   public async getInputAndRun(
-    runCommand: (...args: Args) => Promise<void> | void,
+    runCommand: (...args: Args) => Promise<void | string>,
     title: Title,
     defaultValue: string,
     ...args: Args
@@ -273,9 +273,10 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   }
 
   public runCommand(commandId: CommandId, cwd: string, ...args: Args) {
-    return Toast.showOutput(
-      this.internalCommands.executeCommand(commandId, cwd, ...args)
-    )
+    const output = this.internalCommands.executeCommand(commandId, cwd, ...args)
+
+    void Toast.showOutput(output)
+    return output
   }
 
   public createRepository(

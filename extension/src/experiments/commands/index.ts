@@ -19,8 +19,19 @@ export const getBranchExperimentCommand =
 
 export const getRenameExperimentCommand =
   (experiments: WorkspaceExperiments) =>
-  (cwd: string, oldName: string, newName: string) =>
-    experiments.runCommand(AvailableCommands.EXP_RENAME, cwd, oldName, newName)
+  async (cwd: string, oldName: string, newName: string) => {
+    const output = await experiments.runCommand(
+      AvailableCommands.EXP_RENAME,
+      cwd,
+      oldName,
+      newName
+    )
+    if (!output) {
+      return
+    }
+    const repository = experiments.getRepository(cwd)
+    return repository.transferExperimentDetails(oldName, newName)
+  }
 
 const promptToAddStudioToken = async () => {
   const response = await Toast.askShowOrCloseOrNever(
