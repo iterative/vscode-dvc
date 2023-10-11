@@ -58,7 +58,7 @@ const verifyFilesHavingSingleField = (files: {
   for (const [file, fields] of Object.entries(files)) {
     if (Array.isArray(fields)) {
       void Toast.showError(
-        `${file} cannot have more than one metric selected. See [an example](https://dvc.org/doc/user-guide/project-structure/dvcyaml-files#available-configuration-fields) of a plot with multipe x metrics.`
+        `${file} cannot have more than one metric selected. See [an example](https://dvc.org/doc/user-guide/project-structure/dvcyaml-files#available-configuration-fields) of a plot with multiple x metrics.`
       )
       return
     }

@@ -604,6 +604,9 @@ describe('pickPlotConfiguration', () => {
     expect(mockedQuickPickUserOrderedValues).toHaveBeenCalledTimes(1)
     expect(result).toStrictEqual(undefined)
     expect(mockedShowError).toHaveBeenCalledTimes(1)
+    expect(mockedShowError).toHaveBeenCalledWith(
+      'file.json cannot have more than one metric selected. See [an example](https://dvc.org/doc/user-guide/project-structure/dvcyaml-files#available-configuration-fields) of a plot with multiple x metrics.'
+    )
   })
 
   it('should return early if the user does not pick a y field', async () => {
@@ -638,6 +641,42 @@ describe('pickPlotConfiguration', () => {
 
     expect(mockedQuickPickUserOrderedValues).toHaveBeenCalledTimes(4)
     expect(noFieldsResult).toStrictEqual(undefined)
+  })
+
+  it('should show a toast if user does not select the same amount of x and y fields (if there are multiple x fields)', async () => {
+    mockedPickFiles.mockResolvedValueOnce(['/file.json'])
+    mockedLoadDataFiles.mockResolvedValueOnce([
+      { data: mockValidData, file: 'file.json' },
+      { data: mockValidData, file: 'file2.json' }
+    ])
+    mockedQuickPickOne.mockResolvedValueOnce('simple')
+    mockedGetInput.mockResolvedValueOnce('simple_plot')
+    mockedQuickPickUserOrderedValues
+      .mockResolvedValueOnce([
+        {
+          file: 'file.json',
+          key: 'actual'
+        },
+        {
+          file: 'file2.json',
+          key: 'prob'
+        }
+      ])
+      .mockResolvedValueOnce([
+        {
+          file: 'file.json',
+          key: 'prob'
+        }
+      ])
+
+    const result = await pickPlotConfiguration('/')
+
+    expect(mockedQuickPickUserOrderedValues).toHaveBeenCalledTimes(2)
+    expect(result).toStrictEqual(undefined)
+    expect(mockedShowError).toHaveBeenCalledTimes(1)
+    expect(mockedShowError).toHaveBeenCalledWith(
+      'The amount of y metrics needs to match the amount of x metrics. See [an example](https://dvc.org/doc/user-guide/project-structure/dvcyaml-files#available-configuration-fields) of a plot with multiple x metrics.'
+    )
   })
 
   it('should show a toast if user selects multiple x fields and more than one key in a file for an y field', async () => {
@@ -678,39 +717,9 @@ describe('pickPlotConfiguration', () => {
     expect(mockedQuickPickUserOrderedValues).toHaveBeenCalledTimes(2)
     expect(result).toStrictEqual(undefined)
     expect(mockedShowError).toHaveBeenCalledTimes(1)
-  })
-
-  it('should show a toast if user does not select the same amount of x and y fields (if there are multiple x fields)', async () => {
-    mockedPickFiles.mockResolvedValueOnce(['/file.json'])
-    mockedLoadDataFiles.mockResolvedValueOnce([
-      { data: mockValidData, file: 'file.json' },
-      { data: mockValidData, file: 'file2.json' }
-    ])
-    mockedQuickPickOne.mockResolvedValueOnce('simple')
-    mockedGetInput.mockResolvedValueOnce('simple_plot')
-    mockedQuickPickUserOrderedValues
-      .mockResolvedValueOnce([
-        {
-          file: 'file.json',
-          key: 'actual'
-        },
-        {
-          file: 'file2.json',
-          key: 'prob'
-        }
-      ])
-      .mockResolvedValueOnce([
-        {
-          file: 'file.json',
-          key: 'prob'
-        }
-      ])
-
-    const result = await pickPlotConfiguration('/')
-
-    expect(mockedQuickPickUserOrderedValues).toHaveBeenCalledTimes(2)
-    expect(result).toStrictEqual(undefined)
-    expect(mockedShowError).toHaveBeenCalledTimes(1)
+    expect(mockedShowError).toHaveBeenCalledWith(
+      'file2.json cannot have more than one metric selected. See [an example](https://dvc.org/doc/user-guide/project-structure/dvcyaml-files#available-configuration-fields) of a plot with multiple x metrics.'
+    )
   })
 
   it('should return early if the user does not pick a title', async () => {
