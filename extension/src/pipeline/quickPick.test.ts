@@ -565,18 +565,25 @@ describe('pickPlotConfiguration', () => {
   })
 
   it('should return early if the user does not pick a x field', async () => {
-    mockedPickFiles.mockResolvedValueOnce(['/file.json'])
-    mockedLoadDataFiles.mockResolvedValueOnce([
+    mockedPickFiles.mockResolvedValue(['/file.json'])
+    mockedLoadDataFiles.mockResolvedValue([
       { data: mockValidData, file: 'file.json' }
     ])
-    mockedQuickPickOne.mockResolvedValueOnce('simple')
-    mockedGetInput.mockResolvedValueOnce('simple_plot')
-    mockedQuickPickUserOrderedValues.mockResolvedValueOnce(undefined)
+    mockedQuickPickOne.mockResolvedValue('simple')
+    mockedGetInput.mockResolvedValue('simple_plot')
+    mockedQuickPickUserOrderedValues
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce([])
 
-    const result = await pickPlotConfiguration('/')
+    const undefinedResult = await pickPlotConfiguration('/')
 
     expect(mockedQuickPickUserOrderedValues).toHaveBeenCalledTimes(1)
-    expect(result).toStrictEqual(undefined)
+    expect(undefinedResult).toStrictEqual(undefined)
+
+    const noFieldsResult = await pickPlotConfiguration('/')
+
+    expect(mockedQuickPickUserOrderedValues).toHaveBeenCalledTimes(2)
+    expect(noFieldsResult).toStrictEqual(undefined)
   })
 
   it('should show a toast if user selects more than one key in a file for an x field', async () => {

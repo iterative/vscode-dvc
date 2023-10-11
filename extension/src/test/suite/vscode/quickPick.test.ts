@@ -6,9 +6,10 @@ import { Disposable } from '../../../extension'
 import {
   QuickPickItemWithValue,
   quickPickLimitedValues,
-  quickPickOneOrInput
+  quickPickOneOrInput,
+  quickPickUserOrderedValues
 } from '../../../vscode/quickPick'
-import { selectQuickPickItem } from '../util'
+import { selectQuickPickItem, selectQuickPickItems } from '../util'
 import { Title } from '../../../vscode/title'
 
 suite('Quick Pick Test Suite', () => {
@@ -138,6 +139,52 @@ suite('Quick Pick Test Suite', () => {
         'less than the max number of items are selected'
       ).to.have.lengthOf.lessThan(maxSelectedItems)
       expect(quickPick.items, 'all items are shown').to.deep.equal(items)
+    })
+  })
+
+  describe('quickPickUserOrderedValues', () => {
+    it('should return selected values in the order that the user selected', async () => {
+      const items = [
+        { label: 'J', value: 1 },
+        { label: 'K', value: 2 },
+        { label: 'L', value: 3 },
+        { label: 'M', value: 4 },
+        { label: 'N', value: 5 }
+      ]
+
+      const resultPromise = quickPickUserOrderedValues(items, {
+        title: 'Select some values' as Title
+      })
+
+      await selectQuickPickItems([5, 2, 1], items.length)
+
+      const result = await resultPromise
+
+      expect(result).to.deep.equal([5, 2, 1])
+    })
+
+    it('should return undefined if user cancels the quick pick', async () => {
+      const quickPick = disposable.track(
+        window.createQuickPick<QuickPickItemWithValue<number>>()
+      )
+      stub(window, 'createQuickPick').returns(quickPick)
+      const items = [
+        { label: 'J', value: 1 },
+        { label: 'K', value: 2 },
+        { label: 'L', value: 3 },
+        { label: 'M', value: 4 },
+        { label: 'N', value: 5 }
+      ]
+
+      const resultPromise = quickPickUserOrderedValues(items, {
+        title: 'Select some values' as Title
+      })
+
+      quickPick.hide()
+
+      const result = await resultPromise
+
+      expect(result).to.deep.equal(undefined)
     })
   })
 })

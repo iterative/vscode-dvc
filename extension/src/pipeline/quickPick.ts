@@ -15,7 +15,7 @@ import { Toast } from '../vscode/toast'
 import { getInput } from '../vscode/inputBox'
 
 export type PlotConfigData = {
-  x: { [file: string]: string }
+  x: { [file: string]: string[] | string }
   template: string
   title: string
   y: { [file: string]: string[] | string }
@@ -33,7 +33,7 @@ const pickDataFiles = (): Promise<string[] | undefined> =>
 const formatFieldQuickPickValues = (
   values: { file: string; key: string }[]
 ) => {
-  const formattedFields: PlotConfigData['y'] = {}
+  const formattedFields: { [file: string]: string[] | string } = {}
 
   for (const { file, key } of values) {
     if (!formattedFields[file]) {
@@ -42,10 +42,11 @@ const formatFieldQuickPickValues = (
     }
 
     const prevFileValue = formattedFields[file]
-    formattedFields[file] = [
-      ...(typeof prevFileValue === 'string' ? [prevFileValue] : prevFileValue),
-      key
-    ]
+    if (typeof prevFileValue === 'string') {
+      formattedFields[file] = [prevFileValue]
+    }
+
+    ;(formattedFields[file] as string[]).push(key)
   }
 
   return formattedFields
@@ -81,7 +82,7 @@ const verifyXFields = (
     return
   }
 
-  return { firstXKey: xValues[0].key, x }
+  return { firstXKey: xValues[0].key, x: x as PlotConfigData['x'] }
 }
 
 const verifyYFields = (
@@ -163,10 +164,7 @@ const pickFields = async (
   const { y, firstYKey } = yFieldInfo
 
   return {
-    fields: {
-      x: x as PlotConfigData['x'],
-      y
-    },
+    fields: { x, y },
     firstXKey,
     firstYKey
   }

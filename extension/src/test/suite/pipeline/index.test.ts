@@ -309,12 +309,14 @@ suite('Pipeline Test Suite', () => {
     expect(mockPickPlotConfiguration).to.be.calledOnce
     expect(mockAddPlotToDvcFile).not.to.be.called
 
-    mockPickPlotConfiguration.onSecondCall().resolves({
+    const mockPlotConfig: PipelineQuickPick.PlotConfigData = {
       template: 'simple',
       title: 'Great Plot Name',
-      x: { file: 'results.json', key: 'step' },
+      x: { 'results.json': 'step' },
       y: { 'results.json': 'acc' }
-    })
+    }
+
+    mockPickPlotConfiguration.onSecondCall().resolves(mockPlotConfig)
 
     await pipeline.addDataSeriesPlot()
 
