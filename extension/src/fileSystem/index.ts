@@ -28,9 +28,10 @@ import { gitPath } from '../cli/git/constants'
 import { createValidInteger } from '../util/number'
 import { processExists } from '../process/execution'
 import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
-import { DOT_DVC } from '../cli/dvc/constants'
+import { DOT_DVC, FULLY_NESTED_DVC, NESTED_DVC } from '../cli/dvc/constants'
 import { delay } from '../util/time'
 import { PlotConfigData } from '../pipeline/quickPick'
+import { findFiles } from './workspace'
 
 export const exists = (path: string): boolean => existsSync(path)
 
@@ -76,6 +77,13 @@ export const findDvcRootPaths = async (cwd: string): Promise<string[]> => {
 
   if (definedAndNonEmpty(subRoots)) {
     dvcRoots.push(...subRoots)
+  } else {
+    const nested = await findFiles(FULLY_NESTED_DVC)
+    if (definedAndNonEmpty(nested)) {
+      dvcRoots.push(
+        ...nested.map(nestedRoot => nestedRoot.replace(NESTED_DVC, ''))
+      )
+    }
   }
 
   return sortCollectedArray(dvcRoots)
