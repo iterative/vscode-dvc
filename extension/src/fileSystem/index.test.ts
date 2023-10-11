@@ -55,8 +55,10 @@ const mockedWorkspace = jest.mocked(workspace)
 const mockedWindow = jest.mocked(window)
 const mockedOpenTextDocument = jest.fn()
 const mockedShowTextDocument = jest.fn()
+const mockedFindFiles = jest.fn()
 
 mockedWorkspace.openTextDocument = mockedOpenTextDocument
+mockedWorkspace.findFiles = mockedFindFiles
 mockedWindow.showTextDocument = mockedShowTextDocument
 
 beforeEach(() => {
@@ -276,6 +278,7 @@ describe('writeTsv', () => {
 
 describe('findDvcRootPaths', () => {
   it('should find the dvc root if it exists in the given folder', async () => {
+    mockedFindFiles.mockResolvedValue([])
     const dvcRoots = await findDvcRootPaths(dvcDemoPath)
 
     expect(dvcRoots).toStrictEqual([dvcDemoPath])
