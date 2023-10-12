@@ -45,7 +45,7 @@ export const fillTemplate = (
       const suppressZoomAndPan = !plotFocused
       specStr = specStr.replace(
         new RegExp(`"${key}"`, 'g'),
-        suppressZoomAndPan ? '' : value
+        suppressZoomAndPan ? '{}' : value
       )
       continue
     }
