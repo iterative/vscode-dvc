@@ -625,8 +625,8 @@ describe('addPlotToDvcYamlFile', () => {
     addPlotToDvcYamlFile('/', {
       template: 'simple',
       title: 'Simple Plot',
-      x: { 'data.json': 'epochs' },
-      y: { 'data.json': 'accuracy' }
+      x: { 'data.json': ['epochs'] },
+      y: { 'data.json': ['accuracy'] }
     })
 
     expect(mockedWriteFileSync).toHaveBeenCalledWith(
@@ -654,8 +654,38 @@ describe('addPlotToDvcYamlFile', () => {
     addPlotToDvcYamlFile('/', {
       template: 'simple',
       title: 'simple_plot',
-      x: { 'data.json': 'epochs' },
-      y: { 'acc.json': 'accuracy' }
+      x: { 'data.json': ['epochs'] },
+      y: { 'acc.json': ['accuracy'] }
+    })
+
+    expect(mockedWriteFileSync).toHaveBeenCalledWith(
+      '//dvc.yaml',
+      mockDvcYamlContent + mockPlotYamlContent
+    )
+  })
+
+  it('should add the new plot with an axis having multiple fields', () => {
+    const mockDvcYamlContent = mockStagesLines.join('\n')
+    const mockPlotYamlContent = [
+      '',
+      'plots:',
+      '  - simple_plot:',
+      '      template: simple',
+      '      x: epochs',
+      '      y:',
+      '        data.json:',
+      '          - accuracy',
+      '          - epochs',
+      ''
+    ].join('\n')
+    mockedReadFileSync.mockReturnValueOnce(mockDvcYamlContent)
+    mockedReadFileSync.mockReturnValueOnce(mockDvcYamlContent)
+
+    addPlotToDvcYamlFile('/', {
+      template: 'simple',
+      title: 'simple_plot',
+      x: { 'data.json': ['epochs'] },
+      y: { 'data.json': ['accuracy', 'epochs'] }
     })
 
     expect(mockedWriteFileSync).toHaveBeenCalledWith(
@@ -673,8 +703,8 @@ describe('addPlotToDvcYamlFile', () => {
     addPlotToDvcYamlFile('/', {
       template: 'simple',
       title: 'Simple Plot',
-      x: { 'data.json': 'epochs' },
-      y: { 'data.json': 'accuracy' }
+      x: { 'data.json': ['epochs'] },
+      y: { 'data.json': ['accuracy'] }
     })
 
     mockDvcYamlContent.splice(7, 0, ...mockPlotYamlContent)
@@ -696,8 +726,8 @@ describe('addPlotToDvcYamlFile', () => {
     addPlotToDvcYamlFile('/', {
       template: 'simple',
       title: 'Simple Plot',
-      x: { 'data.json': 'epochs' },
-      y: { 'data.json': 'accuracy' }
+      x: { 'data.json': ['epochs'] },
+      y: { 'data.json': ['accuracy'] }
     })
 
     expect(mockedWriteFileSync).toHaveBeenCalledWith(
@@ -734,8 +764,8 @@ describe('addPlotToDvcYamlFile', () => {
     addPlotToDvcYamlFile('/', {
       template: 'simple',
       title: 'simple_plot',
-      x: { 'data.json': 'epochs' },
-      y: { 'data.json': 'accuracy' }
+      x: { 'data.json': ['epochs'] },
+      y: { 'data.json': ['accuracy'] }
     })
 
     expect(mockedWriteFileSync).toHaveBeenCalledWith(

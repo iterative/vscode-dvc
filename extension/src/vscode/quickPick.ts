@@ -1,5 +1,4 @@
 import { QuickPickOptions, QuickPickItem, window, QuickPick } from 'vscode'
-import isEqual from 'lodash.isequal'
 import { Response } from './response'
 import { Title } from './title'
 
@@ -220,7 +219,7 @@ export const quickPickLimitedValues = <T>(
     quickPick.show()
   })
 
-const getUserOrderedSelection = <T>(
+const addNewUserOrderedItems = <T>(
   orderedSelection: T[],
   newSelection: readonly QuickPickItemWithValue<T>[]
 ) => {
@@ -231,10 +230,14 @@ const getUserOrderedSelection = <T>(
     }
     itemValues.push(item.value)
   }
-  return orderedSelection.filter(item =>
-    itemValues.some(val => isEqual(item, val))
-  )
+
+  return itemValues
 }
+
+const removeMissingUserOrderedItems = <T>(
+  orderedSelection: T[],
+  newSelection: T[]
+) => orderedSelection.filter(item => newSelection.includes(item))
 
 export const quickPickUserOrderedValues = <T>(
   items: QuickPickItemWithValue<T>[],
@@ -250,9 +253,14 @@ export const quickPickUserOrderedValues = <T>(
     let orderedSelection: T[] = []
 
     quickPick.onDidChangeSelection(selectedItems => {
-      orderedSelection = getUserOrderedSelection(
+      const selectedItemValues = addNewUserOrderedItems(
         orderedSelection,
         selectedItems
+      )
+
+      orderedSelection = removeMissingUserOrderedItems(
+        orderedSelection,
+        selectedItemValues
       )
     })
 
