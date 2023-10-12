@@ -29,7 +29,7 @@ import { gitPath } from '../cli/git/constants'
 import { createValidInteger } from '../util/number'
 import { processExists } from '../process/execution'
 import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
-import { DOT_DVC, FULLY_NESTED_DVC, NESTED_DVC } from '../cli/dvc/constants'
+import { DOT_DVC, FULLY_NESTED_DVC } from '../cli/dvc/constants'
 import { delay } from '../util/time'
 import { PlotConfigData } from '../pipeline/quickPick'
 
@@ -81,7 +81,12 @@ export const findDvcRootPaths = async (cwd: string): Promise<string[]> => {
     const nested = await findFiles(FULLY_NESTED_DVC)
     if (definedAndNonEmpty(nested)) {
       dvcRoots.push(
-        ...nested.map(nestedRoot => nestedRoot.replace(NESTED_DVC, ''))
+        ...nested.map(nestedRoot =>
+          parse(nestedRoot)
+            .dir.split(sep)
+            .filter(part => part !== DOT_DVC)
+            .join(sep)
+        )
       )
     }
   }

@@ -305,13 +305,42 @@ describe('findDvcRootPaths', () => {
 
     const dvcRoots = await findDvcRootPaths(parentDir)
 
-    void remove(mockFirstDvcRoot)
-    void remove(mockSecondDvcRoot)
+    await remove(mockFirstDvcRoot)
+    await remove(mockSecondDvcRoot)
 
     expect([...dvcRoots]).toStrictEqual([
       dvcDemoPath,
       mockFirstDvcRoot,
       mockSecondDvcRoot
+    ])
+  })
+
+  it('should find deeply nested roots if available', async () => {
+    const parentDir = dvcDemoPath
+    const mockFirstDvcRootPath = join(
+      parentDir,
+      'deep',
+      'deeper',
+      'really_deep',
+      'one'
+    )
+    const mockSecondDvcRootPath = join(parentDir, 'one_deep', 'two')
+
+    const mockFirstDvcRoot = {
+      fsPath: join(mockFirstDvcRootPath, DOT_DVC, 'config')
+    }
+    const mockSecondDvcRoot = {
+      fsPath: join(mockSecondDvcRootPath, DOT_DVC, 'config')
+    }
+
+    mockedFindFiles.mockResolvedValue([mockFirstDvcRoot, mockSecondDvcRoot])
+
+    const dvcRoots = await findDvcRootPaths(parentDir)
+
+    expect([...dvcRoots]).toStrictEqual([
+      dvcDemoPath,
+      mockFirstDvcRootPath,
+      mockSecondDvcRootPath
     ])
   })
 })
