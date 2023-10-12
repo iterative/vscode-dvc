@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.6] - 2023-10-12
+
+### 🚀 New Features and Enhancements
+
+- Add Multiple Y Field Selection to Plot Wizard [#4787](https://github.com/iterative/vscode-dvc/pull/4787) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Fix error when user chooses no Y fields in the Plot Wizard [#4808](https://github.com/iterative/vscode-dvc/pull/4808) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Added webdriverio-monorepo to ignored dependencies for Renovate [#4806](https://github.com/iterative/vscode-dvc/pull/4806) by [@sroy3](https://github.com/sroy3)
+
 ## [1.1.5] - 2023-10-10
 
 ### 🚀 New Features and Enhancements

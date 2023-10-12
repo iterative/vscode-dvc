@@ -497,19 +497,26 @@ describe('pickPlotConfiguration', () => {
   })
 
   it('should return early if the user does not pick a y field', async () => {
-    mockedPickFiles.mockResolvedValueOnce(['/file.json'])
-    mockedLoadDataFiles.mockResolvedValueOnce([
+    mockedPickFiles.mockResolvedValue(['/file.json'])
+    mockedLoadDataFiles.mockResolvedValue([
       { data: mockValidData, file: 'file.json' }
     ])
-    mockedQuickPickOne.mockResolvedValueOnce('simple')
-    mockedGetInput.mockResolvedValueOnce('simple_plot')
-    mockedQuickPickValue.mockResolvedValueOnce('actual')
-    mockedQuickPickValues.mockResolvedValueOnce(undefined)
+    mockedQuickPickOne.mockResolvedValue('simple')
+    mockedGetInput.mockResolvedValue('simple_plot')
+    mockedQuickPickValue.mockResolvedValue('actual')
+    mockedQuickPickValues
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce([])
 
-    const result = await pickPlotConfiguration('/')
+    const undefinedResult = await pickPlotConfiguration('/')
 
     expect(mockedQuickPickValues).toHaveBeenCalledTimes(1)
-    expect(result).toStrictEqual(undefined)
+    expect(undefinedResult).toStrictEqual(undefined)
+
+    const emptyFieldsResult = await pickPlotConfiguration('/')
+
+    expect(mockedQuickPickValues).toHaveBeenCalledTimes(2)
+    expect(emptyFieldsResult).toStrictEqual(undefined)
   })
 
   it('should return early if the user does not pick a title', async () => {
