@@ -85,18 +85,22 @@ export const selectQuickPickItem = async (number: number) => {
   return commands.executeCommand('workbench.action.acceptSelectedQuickOpenItem')
 }
 
-export const selectQuickPickItems = async (
+const toggleQuickPickItem = async (number: number, itemsLength: number) => {
+  for (let itemInd = 1; itemInd <= itemsLength; itemInd++) {
+    await commands.executeCommand('workbench.action.quickOpenSelectNext')
+
+    if (itemInd === number) {
+      await commands.executeCommand('workbench.action.quickPickManyToggle')
+    }
+  }
+}
+
+export const selectMultipleQuickPickItems = async (
   numbers: number[],
   itemsLength: number
 ) => {
   for (const number of numbers) {
-    for (let itemInd = 1; itemInd <= itemsLength; itemInd++) {
-      await commands.executeCommand('workbench.action.quickOpenSelectNext')
-
-      if (itemInd === number) {
-        await commands.executeCommand('workbench.action.quickPickManyToggle')
-      }
-    }
+    await toggleQuickPickItem(number, itemsLength)
   }
   return commands.executeCommand('workbench.action.acceptSelectedQuickOpenItem')
 }

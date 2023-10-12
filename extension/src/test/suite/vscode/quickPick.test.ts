@@ -9,7 +9,7 @@ import {
   quickPickOneOrInput,
   quickPickUserOrderedValues
 } from '../../../vscode/quickPick'
-import { selectQuickPickItem, selectQuickPickItems } from '../util'
+import { selectQuickPickItem, selectMultipleQuickPickItems } from '../util'
 import { Title } from '../../../vscode/title'
 
 suite('Quick Pick Test Suite', () => {
@@ -156,7 +156,7 @@ suite('Quick Pick Test Suite', () => {
         title: 'Select some values' as Title
       })
 
-      await selectQuickPickItems([5, 2, 1], items.length)
+      await selectMultipleQuickPickItems([5, 2, 1], items.length)
 
       const result = await resultPromise
 

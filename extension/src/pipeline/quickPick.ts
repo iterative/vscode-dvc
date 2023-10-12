@@ -14,11 +14,13 @@ import { Title } from '../vscode/title'
 import { Toast } from '../vscode/toast'
 import { getInput } from '../vscode/inputBox'
 
+export type PlotConfigDataAxis = { [file: string]: string[] }
+
 export type PlotConfigData = {
-  x: { [file: string]: string[] | string }
+  x: PlotConfigDataAxis
   template: string
   title: string
-  y: { [file: string]: string[] | string }
+  y: PlotConfigDataAxis
 }
 
 type UnknownValue = Value | ValueTree
@@ -31,22 +33,17 @@ const pickDataFiles = (): Promise<string[] | undefined> =>
   })
 
 const formatFieldQuickPickValues = (
-  values: { file: string; key: string }[]
+  values: { file: string; field: string }[]
 ) => {
-  const formattedFields: { [file: string]: string[] | string } = {}
+  const formattedFields: PlotConfigDataAxis = {}
 
-  for (const { file, key } of values) {
+  for (const { file, field } of values) {
     if (!formattedFields[file]) {
-      formattedFields[file] = key
+      formattedFields[file] = [field]
       continue
     }
 
-    const prevFileValue = formattedFields[file]
-    if (typeof prevFileValue === 'string') {
-      formattedFields[file] = [prevFileValue]
-    }
-
-    ;(formattedFields[file] as string[]).push(key)
+    formattedFields[file].push(field)
   }
 
   return formattedFields
@@ -71,22 +68,26 @@ const pickFields = async (
         label: file,
         value: undefined
       },
-      ...fields.map(key => ({ label: key, value: { file, key } }))
+      ...fields.map(field => ({ label: field, value: { field, file } }))
     )
   }
 
   const xValues = (await quickPickUserOrderedValues(items, {
     title: Title.SELECT_PLOT_X_METRIC
-  })) as { file: string; key: string }[] | undefined
+  })) as { file: string; field: string }[] | undefined
 
   if (!xValues || xValues.length === 0) {
     return
   }
 
   const yValues = (await quickPickUserOrderedValues(
-    items.filter(item => xValues.every(val => !isEqual(val, item.value))),
-    { title: Title.SELECT_PLOT_Y_METRIC }
-  )) as { file: string; key: string }[] | undefined
+    items.filter(
+      item => item.value === undefined || !xValues.includes(item.value)
+    ),
+    {
+      title: Title.SELECT_PLOT_Y_METRIC
+    }
+  )) as { file: string; field: string }[] | undefined
 
   if (!yValues || yValues.length === 0) {
     return
@@ -97,8 +98,8 @@ const pickFields = async (
       x: formatFieldQuickPickValues(xValues),
       y: formatFieldQuickPickValues(yValues)
     },
-    firstXKey: xValues[0].key,
-    firstYKey: yValues[0].key
+    firstXKey: xValues[0].field,
+    firstYKey: yValues[0].field
   }
 }
 
@@ -220,7 +221,7 @@ const validateMultiFilesData = (
   filesData: { data: UnknownValue; file: string }[]
 ) => {
   const filesArrLength: Set<number> = new Set()
-  const keys: FileFields = []
+  const fileFields: FileFields = []
 
   for (const { file, data } of filesData) {
     const metricInfo = getMetricInfoFromValue(data)
@@ -230,7 +231,7 @@ const validateMultiFilesData = (
     }
 
     const { arrLength, fields } = metricInfo
-    keys.push({ fields, file })
+    fileFields.push({ fields, file })
     filesArrLength.add(arrLength)
   }
 
@@ -242,7 +243,7 @@ const validateMultiFilesData = (
     return
   }
 
-  return keys
+  return fileFields
 }
 
 const validateFilesData = async (cwd: string, files: string[]) => {
