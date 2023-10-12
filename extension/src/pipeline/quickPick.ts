@@ -48,11 +48,9 @@ const formatFieldQuickPickValues = (values: QuickPickFieldValues) => {
   return formattedFields
 }
 
-const verifyFilesHavingSingleField = (files: {
-  [file: string]: string[] | string
-}) => {
+const verifyFilesHavingSingleField = (files: PlotConfigDataAxis) => {
   for (const [file, fields] of Object.entries(files)) {
-    if (Array.isArray(fields)) {
+    if (fields.length > 1) {
       void Toast.showError(
         `${file} cannot have more than one metric selected. See [an example](https://dvc.org/doc/user-guide/project-structure/dvcyaml-files#available-configuration-fields) of a plot with multiple x metrics.`
       )
@@ -137,13 +135,11 @@ const pickFields = async (
   })) as QuickPickFieldValues | undefined
 
   const xFieldInfo = verifyXFields(xValues)
-
   if (!xFieldInfo) {
     return
   }
 
   const { x, firstXKey } = xFieldInfo
-
   const yValues = (await quickPickUserOrderedValues(
     items.filter(
       item => item.value === undefined || !xValues?.includes(item.value)
