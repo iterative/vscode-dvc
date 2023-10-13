@@ -97,12 +97,17 @@ const toggleQuickPickItem = async (number: number, itemsLength: number) => {
 
 export const selectMultipleQuickPickItems = async (
   numbers: number[],
-  itemsLength: number
+  itemsLength: number,
+  acceptItems = true
 ) => {
   for (const number of numbers) {
     await toggleQuickPickItem(number, itemsLength)
   }
-  return commands.executeCommand('workbench.action.acceptSelectedQuickOpenItem')
+  if (acceptItems) {
+    return commands.executeCommand(
+      'workbench.action.acceptSelectedQuickOpenItem'
+    )
+  }
 }
 
 export const experimentsUpdatedEvent = (experiments: Experiments) =>

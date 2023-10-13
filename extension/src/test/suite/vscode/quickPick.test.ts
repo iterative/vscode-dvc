@@ -186,5 +186,43 @@ suite('Quick Pick Test Suite', () => {
 
       expect(result).to.deep.equal(undefined)
     })
+
+    it('should limit the number of values that can be selected to the max selected items', async () => {
+      const quickPick = disposable.track(
+        window.createQuickPick<QuickPickItemWithValue<number>>()
+      )
+      stub(window, 'createQuickPick').returns(quickPick)
+
+      const maxSelectedItems = 3
+
+      const items = [
+        { label: 'A', value: 1 },
+        { label: 'B', value: 2 },
+        { label: 'C', value: 3 },
+        { label: 'D', value: 4 },
+        { label: 'E', value: 5 },
+        { label: 'F', value: 6 },
+        { label: 'G', value: 7 },
+        { label: 'H', value: 8 },
+        { label: 'I', value: 9 }
+      ]
+
+      void quickPickUserOrderedValues(
+        items,
+        { title: 'select up to 3 values' as Title },
+        maxSelectedItems
+      )
+
+      await selectMultipleQuickPickItems([5, 2, 1], items.length, false)
+
+      expect(
+        quickPick.selectedItems,
+        'the max number of items are selected'
+      ).to.have.lengthOf(maxSelectedItems)
+      expect(
+        quickPick.items,
+        'all items which could be selected are hidden'
+      ).to.have.lengthOf(maxSelectedItems)
+    })
   })
 })
