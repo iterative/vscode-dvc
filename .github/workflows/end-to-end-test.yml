@@ -23,13 +23,13 @@ jobs:
       - name: Setup Python environment
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: '3.11'
           cache: 'pip'
 
       - name: Setup Node.js environment
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '18'
           cache: 'yarn'
 
       - name: Turbo cache
