@@ -26,6 +26,10 @@ export type PlotConfigData = {
 type UnknownValue = Value | ValueTree
 
 type FileFields = { file: string; fields: string[] }[]
+type QuickPickFieldValues = { file: string; field: string }[]
+
+const multipleXMetricsExample =
+  'See [an example](https://dvc.org/doc/user-guide/project-structure/dvcyaml-files#available-configuration-fields) of a plot with multiple x metrics.'
 
 const pickDataFiles = (): Promise<string[] | undefined> =>
   pickFiles(Title.SELECT_PLOT_DATA, {
@@ -33,8 +37,12 @@ const pickDataFiles = (): Promise<string[] | undefined> =>
   })
 
 const formatFieldQuickPickValues = (
-  values: { file: string; field: string }[]
+  values: QuickPickFieldValues | undefined
 ) => {
+  if (!values || values.length === 0) {
+    return
+  }
+
   const formattedFields: PlotConfigDataAxis = {}
 
   for (const { file, field } of values) {
@@ -47,6 +55,77 @@ const formatFieldQuickPickValues = (
   }
 
   return formattedFields
+}
+
+const verifyFilesHaveSingleField = (files: PlotConfigDataAxis) => {
+  for (const [file, fields] of Object.entries(files)) {
+    if (fields.length > 1) {
+      void Toast.showError(
+        `${file} cannot have more than one metric selected. ${multipleXMetricsExample}`
+      )
+      return
+    }
+  }
+
+  return files
+}
+
+const verifyXFields = (xValues: QuickPickFieldValues | undefined) => {
+  const x = formatFieldQuickPickValues(xValues)
+
+  if (!x) {
+    return
+  }
+
+  const doFilesHaveOneField = verifyFilesHaveSingleField(x)
+
+  if (!doFilesHaveOneField) {
+    return
+  }
+
+  return x
+}
+
+const verifyYFieldsWithMultiXFields = (
+  y: PlotConfigDataAxis,
+  yValues: QuickPickFieldValues,
+  xFieldsLength: number
+) => {
+  if (yValues.length !== xFieldsLength) {
+    void Toast.showError(
+      `Found ${xFieldsLength} x metrics and ${yValues.length} y metric(s). When there are multiple x metrics selected there must be an equal number of y metrics. ${multipleXMetricsExample}`
+    )
+    return
+  }
+
+  const doFilesHaveOneField = verifyFilesHaveSingleField(y)
+
+  if (!doFilesHaveOneField) {
+    return
+  }
+
+  return y
+}
+
+const verifyYFields = (
+  yValues: QuickPickFieldValues | undefined,
+  xFieldsLength = 0
+) => {
+  const y = formatFieldQuickPickValues(yValues)
+
+  if (!y) {
+    return
+  }
+
+  if (xFieldsLength > 1) {
+    return verifyYFieldsWithMultiXFields(
+      y,
+      yValues as QuickPickFieldValues,
+      xFieldsLength
+    )
+  }
+
+  return y
 }
 
 const pickFields = async (
@@ -74,32 +153,32 @@ const pickFields = async (
 
   const xValues = (await quickPickUserOrderedValues(items, {
     title: Title.SELECT_PLOT_X_METRIC
-  })) as { file: string; field: string }[] | undefined
+  })) as QuickPickFieldValues | undefined
 
-  if (!xValues || xValues.length === 0) {
+  const x = verifyXFields(xValues)
+  if (!x) {
     return
   }
 
   const yValues = (await quickPickUserOrderedValues(
     items.filter(
-      item => item.value === undefined || !xValues.includes(item.value)
+      item => item.value === undefined || !xValues?.includes(item.value)
     ),
     {
       title: Title.SELECT_PLOT_Y_METRIC
     }
   )) as { file: string; field: string }[] | undefined
 
-  if (!yValues || yValues.length === 0) {
+  const y = verifyYFields(yValues, xValues?.length)
+
+  if (!y) {
     return
   }
 
   return {
-    fields: {
-      x: formatFieldQuickPickValues(xValues),
-      y: formatFieldQuickPickValues(yValues)
-    },
-    firstXKey: xValues[0].field,
-    firstYKey: yValues[0].field
+    fields: { x, y },
+    firstXKey: (xValues as QuickPickFieldValues)[0].field,
+    firstYKey: (yValues as QuickPickFieldValues)[0].field
   }
 }
 
