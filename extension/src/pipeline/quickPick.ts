@@ -129,7 +129,7 @@ const pickYFields = async (
 ) => {
   const yValues = (await quickPickUserOrderedValues(yItems, {
     title: Title.SELECT_PLOT_Y_METRIC
-  })) as { file: string; field: string }[] | undefined
+  })) as QuickPickFieldValues | undefined
 
   const y = formatFieldQuickPickValues(yValues)
 
