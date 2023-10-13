@@ -467,12 +467,10 @@ export class Setup
   }
 
   private async findWorkspaceDvcRoots() {
-    let dvcRoots: Set<string> = new Set()
+    const dvcRoots: Set<string> = await findDvcRootPaths()
 
     for (const workspaceFolder of getWorkspaceFolders()) {
-      const workspaceFolderRoots = await findDvcRootPaths(workspaceFolder)
-      if (definedAndNonEmpty(workspaceFolderRoots)) {
-        dvcRoots = new Set([...dvcRoots, ...workspaceFolderRoots])
+      if ([...dvcRoots].filter(root => root.includes(workspaceFolder))) {
         continue
       }
 
