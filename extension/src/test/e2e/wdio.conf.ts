@@ -17,8 +17,8 @@ const dvcDemoPath = resolve(extensionPath, '..', 'demo')
 
 export const config: Options.Testrunner = {
   after: async function () {
-    await browser.switchToFrame(null)
-    await browser.switchToFrame(null)
+    await browser.switchToParentFrame()
+    await browser.switchToParentFrame()
   },
   afterTest: async (test, __, { passed }) => {
     if (passed) {

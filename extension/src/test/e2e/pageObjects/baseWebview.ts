@@ -34,7 +34,7 @@ export class BaseWebview extends BasePage<
   }
 
   public async unfocus() {
-    await browser.switchToFrame(null)
-    await browser.switchToFrame(null)
+    await browser.switchToParentFrame()
+    await browser.switchToParentFrame()
   }
 }
