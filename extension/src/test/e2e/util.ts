@@ -85,7 +85,8 @@ const runDeleteCommand = async (
 
 export const waitForDvcToFinish = async (timeout = 60000): Promise<void> => {
   await browser.waitUntil(async () => !(await dvcIsWorking()), {
-    timeout
+    timeout,
+    timeoutMsg: `DVC is still working after ${timeout}ms`
   })
 }
 

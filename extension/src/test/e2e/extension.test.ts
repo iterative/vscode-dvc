@@ -91,6 +91,7 @@ describe('Experiments Table Webview', function () {
 
   it('should update with new data for each DVCLive step when an experiment is running', async function () {
     this.timeout(210000)
+    await browser.setTimeout({ implicit: 21000, script: 21000 })
     await runModifiedExperiment()
     await webview.focus()
 
@@ -101,7 +102,11 @@ describe('Experiments Table Webview', function () {
 
         return currentRows.length >= initialRows + experimentRow
       },
-      { interval: 5000, timeout: 210000 }
+      {
+        interval: 5000,
+        timeout: 210000,
+        timeoutMsg: 'the first wait for timed out'
+      }
     )
 
     const currentRows = await webview.row$$
@@ -120,7 +125,11 @@ describe('Experiments Table Webview', function () {
 
         return step === epochs - 1
       },
-      { interval: 5000, timeout: 210000 }
+      {
+        interval: 5000,
+        timeout: 210000,
+        timeoutMsg: 'the second wait for timed out'
+      }
     )
 
     const finalRows = await webview.row$$
