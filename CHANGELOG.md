@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.7] - 2023-10-13
+
+### 🚀 New Features and Enhancements
+
+- Add Multiple X Field Selection to Plot Wizard [#4797](https://github.com/iterative/vscode-dvc/pull/4797) by [@julieg18](https://github.com/julieg18)
+- Deeply nested repo [#4810](https://github.com/iterative/vscode-dvc/pull/4810) by [@sroy3](https://github.com/sroy3)
+
+### 🔨 Maintenance
+
+- Ignore every WebdriverIO dependency in Renovate [#4819](https://github.com/iterative/vscode-dvc/pull/4819) by [@sroy3](https://github.com/sroy3)
+- Ignore new .turbo directory [#4823](https://github.com/iterative/vscode-dvc/pull/4823) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.1.6] - 2023-10-12
 
 ### 🚀 New Features and Enhancements
