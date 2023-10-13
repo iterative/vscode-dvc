@@ -6,7 +6,8 @@ import {
   relative,
   resolve,
   sep,
-  format
+  format,
+  dirname
 } from 'path'
 import {
   appendFileSync,
@@ -66,32 +67,17 @@ export const findSubRootPaths = async (
     .map(child => standardizePath(join(cwd, child)))
 }
 
-export const findDvcRootPaths = async (cwd: string): Promise<string[]> => {
+export const findDvcRootPaths = async (): Promise<Set<string>> => {
   const dvcRoots = []
 
-  if (isDirectory(join(cwd, DOT_DVC))) {
-    dvcRoots.push(standardizePath(cwd))
+  const nested = await findFiles(FULLY_NESTED_DVC)
+  if (definedAndNonEmpty(nested)) {
+    dvcRoots.push(
+      ...nested.map(nestedRoot => standardizePath(dirname(dirname(nestedRoot))))
+    )
   }
 
-  const subRoots = await findSubRootPaths(cwd, DOT_DVC)
-
-  if (definedAndNonEmpty(subRoots)) {
-    dvcRoots.push(...subRoots)
-  } else {
-    const nested = await findFiles(FULLY_NESTED_DVC)
-    if (definedAndNonEmpty(nested)) {
-      dvcRoots.push(
-        ...nested.map(nestedRoot =>
-          parse(nestedRoot)
-            .dir.split(sep)
-            .filter(part => part !== DOT_DVC)
-            .join(sep)
-        )
-      )
-    }
-  }
-
-  return sortCollectedArray(dvcRoots)
+  return new Set(sortCollectedArray(dvcRoots))
 }
 
 export const findAbsoluteDvcRootPath = async (

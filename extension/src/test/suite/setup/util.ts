@@ -80,7 +80,7 @@ export const buildSetup = ({
   const mockInitializeGit = stub(gitExecutor, 'gitInit')
 
   stub(FileSystem, 'findDvcRootPaths').resolves(
-    [mockDvcRoot].filter(Boolean) as string[]
+    new Set([mockDvcRoot].filter(Boolean) as string[])
   )
 
   const mockAutoInstallDvc = stub(AutoInstall, 'autoInstallDvc')

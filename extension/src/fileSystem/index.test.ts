@@ -1,9 +1,7 @@
 import { join, relative, resolve } from 'path'
 import {
   appendFileSync,
-  ensureDirSync,
   ensureFileSync,
-  remove,
   readFileSync,
   writeFileSync
 } from 'fs-extra'
@@ -277,71 +275,67 @@ describe('writeTsv', () => {
 })
 
 describe('findDvcRootPaths', () => {
-  it('should find the dvc root if it exists in the given folder', async () => {
-    mockedFindFiles.mockResolvedValue([])
-    const dvcRoots = await findDvcRootPaths(dvcDemoPath)
+  const convertAsFindDvcConfigFile = (rootPath: string) => ({
+    fsPath: join(rootPath, DOT_DVC, 'config')
+  })
 
-    expect(dvcRoots).toStrictEqual([dvcDemoPath])
+  it('should find the dvc root if it exists in the given folder', async () => {
+    mockedFindFiles.mockResolvedValue([convertAsFindDvcConfigFile(dvcDemoPath)])
+    const dvcRoots = await findDvcRootPaths()
+
+    expect(dvcRoots).toStrictEqual(new Set([dvcDemoPath]))
   })
 
   it('should find multiple roots if available one directory below the given folder', async () => {
     const parentDir = resolve(dvcDemoPath, '..')
     const mockDvcRoot = join(parentDir, 'mockDvc')
-    ensureDirSync(join(mockDvcRoot, DOT_DVC))
+    mockedFindFiles.mockResolvedValue([
+      convertAsFindDvcConfigFile(dvcDemoPath),
+      convertAsFindDvcConfigFile(mockDvcRoot)
+    ])
 
-    const dvcRoots = await findDvcRootPaths(parentDir)
+    const dvcRoots = await findDvcRootPaths()
 
-    void remove(mockDvcRoot)
-
-    expect([...dvcRoots]).toStrictEqual([dvcDemoPath, mockDvcRoot])
+    expect(dvcRoots).toStrictEqual(new Set([dvcDemoPath, mockDvcRoot]))
   })
 
   it('should find a mono-repo root as well as sub-roots if available one directory below the given folder', async () => {
-    const parentDir = dvcDemoPath
-    const mockFirstDvcRoot = join(parentDir, 'mockFirstDvc')
-    const mockSecondDvcRoot = join(parentDir, 'mockSecondDvc')
-    ensureDirSync(join(mockFirstDvcRoot, DOT_DVC))
-    ensureDirSync(join(mockSecondDvcRoot, DOT_DVC))
-
-    const dvcRoots = await findDvcRootPaths(parentDir)
-
-    await remove(mockFirstDvcRoot)
-    await remove(mockSecondDvcRoot)
-
-    expect([...dvcRoots]).toStrictEqual([
-      dvcDemoPath,
-      mockFirstDvcRoot,
-      mockSecondDvcRoot
+    const mockFirstDvcRoot = join(dvcDemoPath, 'mockFirstDvc')
+    const mockSecondDvcRoot = join(dvcDemoPath, 'mockSecondDvc')
+    mockedFindFiles.mockResolvedValue([
+      convertAsFindDvcConfigFile(dvcDemoPath),
+      convertAsFindDvcConfigFile(mockFirstDvcRoot),
+      convertAsFindDvcConfigFile(mockSecondDvcRoot)
     ])
+
+    const dvcRoots = await findDvcRootPaths()
+
+    expect(dvcRoots).toStrictEqual(
+      new Set([dvcDemoPath, mockFirstDvcRoot, mockSecondDvcRoot])
+    )
   })
 
   it('should find deeply nested roots if available', async () => {
-    const parentDir = dvcDemoPath
-    const mockFirstDvcRootPath = join(
-      parentDir,
+    const mockFirstDvcRoot = join(
+      dvcDemoPath,
       'deep',
       'deeper',
       'really_deep',
       'one'
     )
-    const mockSecondDvcRootPath = join(parentDir, 'one_deep', 'two')
+    const mockSecondDvcRoot = join(dvcDemoPath, 'one_deep', 'two')
 
-    const mockFirstDvcRoot = {
-      fsPath: join(mockFirstDvcRootPath, DOT_DVC, 'config')
-    }
-    const mockSecondDvcRoot = {
-      fsPath: join(mockSecondDvcRootPath, DOT_DVC, 'config')
-    }
-
-    mockedFindFiles.mockResolvedValue([mockFirstDvcRoot, mockSecondDvcRoot])
-
-    const dvcRoots = await findDvcRootPaths(parentDir)
-
-    expect([...dvcRoots]).toStrictEqual([
-      dvcDemoPath,
-      mockFirstDvcRootPath,
-      mockSecondDvcRootPath
+    mockedFindFiles.mockResolvedValue([
+      convertAsFindDvcConfigFile(dvcDemoPath),
+      convertAsFindDvcConfigFile(mockFirstDvcRoot),
+      convertAsFindDvcConfigFile(mockSecondDvcRoot)
     ])
+
+    const dvcRoots = await findDvcRootPaths()
+
+    expect(dvcRoots).toStrictEqual(
+      new Set([dvcDemoPath, mockFirstDvcRoot, mockSecondDvcRoot])
+    )
   })
 })
 
