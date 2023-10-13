@@ -655,7 +655,7 @@ describe('pickPlotConfiguration', () => {
     expect(result).toStrictEqual(undefined)
     expect(mockedShowError).toHaveBeenCalledTimes(1)
     expect(mockedShowError).toHaveBeenCalledWith(
-      'The amount of y metrics needs to match the amount of x metrics. See [an example](https://dvc.org/doc/user-guide/project-structure/dvcyaml-files#available-configuration-fields) of a plot with multiple x metrics.'
+      'Found 2 x metrics and 1 y metric(s). When there are multiple x metrics selected there must be an equal number of y metrics. See [an example](https://dvc.org/doc/user-guide/project-structure/dvcyaml-files#available-configuration-fields) of a plot with multiple x metrics.'
     )
   })
 

@@ -28,12 +28,21 @@ type UnknownValue = Value | ValueTree
 type FileFields = { file: string; fields: string[] }[]
 type QuickPickFieldValues = { file: string; field: string }[]
 
+const multipleXMetricsExample =
+  'See [an example](https://dvc.org/doc/user-guide/project-structure/dvcyaml-files#available-configuration-fields) of a plot with multiple x metrics.'
+
 const pickDataFiles = (): Promise<string[] | undefined> =>
   pickFiles(Title.SELECT_PLOT_DATA, {
     'Data Formats': ['json', 'csv', 'tsv', 'yaml']
   })
 
-const formatFieldQuickPickValues = (values: QuickPickFieldValues) => {
+const formatFieldQuickPickValues = (
+  values: QuickPickFieldValues | undefined
+) => {
+  if (!values || values.length === 0) {
+    return
+  }
+
   const formattedFields: PlotConfigDataAxis = {}
 
   for (const { file, field } of values) {
@@ -48,11 +57,11 @@ const formatFieldQuickPickValues = (values: QuickPickFieldValues) => {
   return formattedFields
 }
 
-const verifyFilesHavingSingleField = (files: PlotConfigDataAxis) => {
+const verifyFilesHaveSingleField = (files: PlotConfigDataAxis) => {
   for (const [file, fields] of Object.entries(files)) {
     if (fields.length > 1) {
       void Toast.showError(
-        `${file} cannot have more than one metric selected. See [an example](https://dvc.org/doc/user-guide/project-structure/dvcyaml-files#available-configuration-fields) of a plot with multiple x metrics.`
+        `${file} cannot have more than one metric selected. ${multipleXMetricsExample}`
       )
       return
     }
@@ -62,49 +71,61 @@ const verifyFilesHavingSingleField = (files: PlotConfigDataAxis) => {
 }
 
 const verifyXFields = (xValues: QuickPickFieldValues | undefined) => {
-  if (!xValues || xValues.length === 0) {
+  const x = formatFieldQuickPickValues(xValues)
+
+  if (!x) {
     return
   }
 
-  const x = formatFieldQuickPickValues(xValues)
-
-  const doFilesHaveOneField = verifyFilesHavingSingleField(x)
+  const doFilesHaveOneField = verifyFilesHaveSingleField(x)
 
   if (!doFilesHaveOneField) {
     return
   }
 
-  return { firstXKey: xValues[0].field, x }
+  return x
 }
 
-const verifyYFields = (
-  yValues: QuickPickFieldValues | undefined,
+const verifyYFieldsWithMultiXFields = (
+  y: PlotConfigDataAxis,
+  yValues: QuickPickFieldValues,
   xFieldsLength: number
 ) => {
-  if (!yValues || yValues.length === 0) {
-    return
-  }
-
-  const y = formatFieldQuickPickValues(yValues)
-
-  if (xFieldsLength === 1) {
-    return { firstYKey: yValues[0].field, y }
-  }
-
   if (yValues.length !== xFieldsLength) {
     void Toast.showError(
-      'The amount of y metrics needs to match the amount of x metrics. See [an example](https://dvc.org/doc/user-guide/project-structure/dvcyaml-files#available-configuration-fields) of a plot with multiple x metrics.'
+      `Found ${xFieldsLength} x metrics and ${yValues.length} y metric(s). When there are multiple x metrics selected there must be an equal number of y metrics. ${multipleXMetricsExample}`
     )
     return
   }
 
-  const doFilesHaveOneField = verifyFilesHavingSingleField(y)
+  const doFilesHaveOneField = verifyFilesHaveSingleField(y)
 
   if (!doFilesHaveOneField) {
     return
   }
 
-  return { firstYKey: yValues[0].field, y }
+  return y
+}
+
+const verifyYFields = (
+  yValues: QuickPickFieldValues | undefined,
+  xFieldsLength = 0
+) => {
+  const y = formatFieldQuickPickValues(yValues)
+
+  if (!y) {
+    return
+  }
+
+  if (xFieldsLength > 1) {
+    return verifyYFieldsWithMultiXFields(
+      y,
+      yValues as QuickPickFieldValues,
+      xFieldsLength
+    )
+  }
+
+  return y
 }
 
 const pickFields = async (
@@ -134,12 +155,11 @@ const pickFields = async (
     title: Title.SELECT_PLOT_X_METRIC
   })) as QuickPickFieldValues | undefined
 
-  const xFieldInfo = verifyXFields(xValues)
-  if (!xFieldInfo) {
+  const x = verifyXFields(xValues)
+  if (!x) {
     return
   }
 
-  const { x, firstXKey } = xFieldInfo
   const yValues = (await quickPickUserOrderedValues(
     items.filter(
       item => item.value === undefined || !xValues?.includes(item.value)
@@ -149,18 +169,16 @@ const pickFields = async (
     }
   )) as { file: string; field: string }[] | undefined
 
-  const yFieldInfo = verifyYFields(yValues, xValues?.length || 0)
+  const y = verifyYFields(yValues, xValues?.length)
 
-  if (!yFieldInfo) {
+  if (!y) {
     return
   }
 
-  const { y, firstYKey } = yFieldInfo
-
   return {
     fields: { x, y },
-    firstXKey,
-    firstYKey
+    firstXKey: (xValues as QuickPickFieldValues)[0].field,
+    firstYKey: (yValues as QuickPickFieldValues)[0].field
   }
 }
 
