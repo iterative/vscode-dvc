@@ -91,7 +91,6 @@ describe('Experiments Table Webview', function () {
 
   it('should update with new data for each DVCLive step when an experiment is running', async function () {
     this.timeout(210000)
-    await browser.setTimeout({ implicit: 21000, script: 21000 })
     await runModifiedExperiment()
     await webview.focus()
 
@@ -99,6 +98,8 @@ describe('Experiments Table Webview', function () {
       async () => {
         await webview.expandAllRows()
         const currentRows = await webview.row$$
+        // eslint-disable-next-line no-console
+        console.error('still waiting')
 
         return currentRows.length >= initialRows + experimentRow
       },
@@ -122,6 +123,9 @@ describe('Experiments Table Webview', function () {
         await webview.expandAllRows()
 
         const step = await webview.getExperimentStep(newRow, experimentName)
+
+        // eslint-disable-next-line no-console
+        console.error(`step is ${step}`)
 
         return step === epochs - 1
       },
