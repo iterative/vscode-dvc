@@ -312,8 +312,8 @@ suite('Pipeline Test Suite', () => {
     const mockPlotConfig: PipelineQuickPick.PlotConfigData = {
       template: 'simple',
       title: 'Great Plot Name',
-      x: { 'results.json': 'step' },
-      y: { 'results.json': 'acc' }
+      x: { 'results.json': ['step'] },
+      y: { 'results.json': ['acc'] }
     }
 
     mockPickPlotConfiguration.onSecondCall().resolves(mockPlotConfig)
