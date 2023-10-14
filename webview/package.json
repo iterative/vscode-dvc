@@ -81,7 +81,7 @@
     "style-loader": "3.3.3",
     "stylelint": "15.10.3",
     "stylelint-config-standard-scss": "11.0.0",
-    "ts-loader": "9.4.4",
+    "ts-loader": "9.5.0",
     "webpack": "5.88.2",
     "webpack-cli": "5.1.4",
     "webpack-dev-server": "4.15.1"
