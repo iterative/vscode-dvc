@@ -580,7 +580,7 @@ describe('App', () => {
     expect(screen.getByText('No Data to Plot')).toBeInTheDocument()
   })
 
-  it('should render template with "No Plots to Display" message and "Add Plot" button if there is no template data and no unselected plots', () => {
+  it('should render template with "No Plots or Data to Display" message and "Add Plot" button if there is no template data and no unselected plots', () => {
     renderAppWithOptionalData({
       comparison: comparisonTableFixture,
       custom: customPlotsFixture,
@@ -589,7 +589,7 @@ describe('App', () => {
     })
 
     expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
-    expect(screen.getByText('No Plots to Display')).toBeInTheDocument()
+    expect(screen.getByText('No Plots or Data to Display')).toBeInTheDocument()
 
     const templateSection = screen.getByTestId('template-plots-section-details')
 
@@ -606,7 +606,7 @@ describe('App', () => {
     })
   })
 
-  it('should render template with "No Plots to Display" message and action buttons ("Select Plots" and "Add Plot") if there is no template data and unselected plots', () => {
+  it('should render template with "No Plots or Data to Display" message and action buttons ("Select Plots" and "Add Plot") if there is no template data and unselected plots', () => {
     renderAppWithOptionalData({
       comparison: comparisonTableFixture,
       custom: customPlotsFixture,
@@ -615,7 +615,7 @@ describe('App', () => {
     })
 
     expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
-    expect(screen.getByText('No Plots to Display')).toBeInTheDocument()
+    expect(screen.getByText('No Plots or Data to Display')).toBeInTheDocument()
 
     const templateSection = screen.getByTestId('template-plots-section-details')
     const selectPlotsButton = within(templateSection).getByText('Select Plots')
