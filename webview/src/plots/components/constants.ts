@@ -1,8 +1,9 @@
 import { Config } from 'vega-lite'
+import { ThemeProperty } from '../../util/styles'
 
-const foregroundColor = 'var(--vscode-editor-foreground)'
+const foregroundColor = `var(${ThemeProperty.FOREGROUND_COLOR})`
 const backgroundColor = 'transparent'
-const font = 'var(--vscode-editor-font-family)'
+const font = `var(${ThemeProperty.FONT})`
 const fontWeight = 'normal' as const
 
 const title = {

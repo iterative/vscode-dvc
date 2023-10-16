@@ -16,7 +16,8 @@ export enum ThemeProperty {
   BACKGROUND_COLOR = '--vscode-editor-background',
   FOREGROUND_COLOR = '--vscode-editor-foreground',
   MENU_BACKGROUND = '--vscode-menu-background',
-  ACCENT_COLOR = '--button-primary-background'
+  ACCENT_COLOR = '--button-primary-background',
+  FONT = '--vscode-editor-font-family'
 }
 
 export const getThemeValue = (property: ThemeProperty) =>

@@ -7,11 +7,13 @@ import {
   makePlotZoomOnWheel,
   reverseOfLegendSuppressionUpdate
 } from 'dvc/src/plots/vega/util'
+import { View } from 'react-vega'
 import { TemplateVegaLite } from './templatePlots/TemplateVegaLite'
 import styles from './styles.module.scss'
 import { ZoomablePlotWrapper } from './ZoomablePlotWrapper'
 import { getThemeValue, ThemeProperty } from '../../util/styles'
 import {
+  exportPlotAsSvg,
   exportPlotDataAsCsv,
   exportPlotDataAsJson,
   exportPlotDataAsTsv
@@ -61,13 +63,26 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
     }
   }, [])
 
-  const onNewView = () => {
+  const onNewView = (view: View) => {
     const actions: HTMLDivElement | null | undefined =
       zoomedInPlotRef.current?.querySelector('.vega-actions')
     if (!actions) {
       return
     }
 
+    appendActionToVega('SVG', actions, () => {
+      void view.toSVG().then(svg => {
+        const themedSvg = svg.replace(
+          /></,
+          `><style>:root{${ThemeProperty.FOREGROUND_COLOR}:${getThemeValue(
+            ThemeProperty.FOREGROUND_COLOR
+          )};${ThemeProperty.FONT}:${getThemeValue(
+            ThemeProperty.FONT
+          )}}</style><`
+        )
+        exportPlotAsSvg(themedSvg)
+      })
+    })
     appendActionToVega('JSON', actions, () => exportPlotDataAsJson(id))
     appendActionToVega('CSV', actions, () => exportPlotDataAsCsv(id))
     appendActionToVega('TSV', actions, () => exportPlotDataAsTsv(id))
@@ -92,7 +107,7 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
     actions: {
       compiled: false,
       editor: false,
-      export: true,
+      export: false,
       source: false
     },
     config: {

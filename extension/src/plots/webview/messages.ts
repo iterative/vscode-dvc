@@ -24,13 +24,15 @@ import { BaseWebview } from '../../webview'
 import {
   getModifiedTime,
   openImageFileInEditor,
-  showSaveDialog
+  showSaveDialog,
+  writeFile
 } from '../../fileSystem'
 import { reorderObjectList } from '../../util/array'
 import { CustomPlotsOrderValue } from '../model/custom'
 import { getCustomPlotId } from '../model/collect'
 import { RegisteredCommands } from '../../commands/external'
 import { ErrorsModel } from '../errors/model'
+import { openUrl } from '../../vscode/external'
 
 export class WebviewMessages {
   private readonly dvcRoot: string
@@ -80,6 +82,8 @@ export class WebviewMessages {
         return this.exportPlotDataAsCsv(message.payload)
       case MessageFromWebviewType.EXPORT_PLOT_DATA_AS_TSV:
         return this.exportPlotDataAsTsv(message.payload)
+      case MessageFromWebviewType.EXPORT_PLOT_AS_SVG:
+        return this.exportPlotAsSvg(message.payload)
       case MessageFromWebviewType.EXPORT_PLOT_DATA_AS_JSON:
         return this.exportPlotDataAsJson(message.payload)
       case MessageFromWebviewType.RESIZE_PLOTS:
@@ -431,6 +435,15 @@ export class WebviewMessages {
     sendTelemetryEvent(event, undefined, undefined)
 
     writeFile(file.path, plotId)
+  }
+
+  private async exportPlotAsSvg(svg: string) {
+    const file = await showSaveDialog('visualization.svg', 'svg')
+    if (!file) {
+      return
+    }
+    writeFile(file.path, svg)
+    return openUrl(file.path)
   }
 
   private exportPlotDataAsJson(plotId: string) {

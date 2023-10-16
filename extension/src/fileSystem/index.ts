@@ -297,6 +297,11 @@ export const addPlotToDvcYamlFile = (cwd: string, plotObj: PlotConfigData) => {
   return writeFileSync(dvcYamlFile, dvcYamlLines.join('\n'))
 }
 
+export const writeFile = (path: string, contents: string): void => {
+  ensureFileSync(path)
+  return writeFileSync(path, contents)
+}
+
 export const getFileExtension = (filePath: string) => parse(filePath).ext
 
 export const relativeWithUri = (dvcRoot: string, uri: Uri) =>
