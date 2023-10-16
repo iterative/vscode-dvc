@@ -35,6 +35,7 @@ const appendActionToVega = (
   rawDataAction.textContent = `Save as ${type}`
   rawDataAction.addEventListener('click', () => {
     onClick()
+    ;(vegaActions.parentNode as HTMLElement).removeAttribute('open')
   })
   rawDataAction.classList.add(styles.vegaCustomAction)
   vegaActions.append(rawDataAction)
