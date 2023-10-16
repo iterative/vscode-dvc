@@ -38,7 +38,7 @@ export const Connect: React.FC = () => {
         <Button
           appearance="secondary"
           isNested={true}
-          text="Save"
+          text="Save Token"
           onClick={saveStudioToken}
         />
         <p>
