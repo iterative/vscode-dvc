@@ -42,7 +42,7 @@ export enum Title {
   SELECT_SORT_DIRECTION = 'Select Sort Direction',
   SELECT_SORTS_TO_REMOVE = 'Select Sort(s) to Remove',
   SELECT_TRAINING_SCRIPT = 'Select your Training Script',
-  SELECT_PLOT_X_METRIC = 'Select a Metric for X',
+  SELECT_PLOT_X_METRIC = 'Select Metric(s) for X',
   SELECT_PLOT_Y_METRIC = 'Select a Metric for Y',
   SELECT_PLOT_DATA = 'Select Data to Plot',
   SELECT_PLOT_TYPE = 'Select Plot Type',

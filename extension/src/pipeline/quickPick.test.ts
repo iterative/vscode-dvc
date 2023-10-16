@@ -514,8 +514,9 @@ describe('pickPlotConfiguration', () => {
         { label: 'prob', value: { field: 'prob', file: 'file2.json' } }
       ],
       {
-        title: Title.SELECT_PLOT_Y_METRIC
-      }
+        title: 'Select 2 Metrics for Y'
+      },
+      2
     )
     expect(result).toStrictEqual({
       template: 'simple',
