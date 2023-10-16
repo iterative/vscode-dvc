@@ -667,7 +667,7 @@ describe('App', () => {
       renderApp()
 
       mockPostMessage.mockClear()
-      const button = screen.getByText('Save')
+      const button = screen.getByText('Save Token')
       fireEvent.click(button)
       expect(mockPostMessage).toHaveBeenCalledTimes(1)
       expect(mockPostMessage).toHaveBeenCalledWith({
