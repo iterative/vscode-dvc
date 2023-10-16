@@ -2637,6 +2637,78 @@ describe('App', () => {
       expect(clickEvent.stopPropagation).toHaveBeenCalledTimes(1)
     })
 
+    it('should have a tooltip on the plot if the title is cut', () => {
+      const title = 'Plot with a long title'
+      renderAppWithOptionalData({
+        template: {
+          ...templatePlotsFixture,
+          plots: [
+            {
+              entries: [
+                {
+                  ...templatePlotsFixture.plots[0].entries[0],
+                  content: {
+                    ...templatePlotsFixture.plots[0].entries[0].content,
+                    title: '… with a long title'
+                  } as unknown as VisualizationSpec,
+                  id: title
+                }
+              ],
+              group: TemplatePlotGroup.SINGLE_VIEW
+            }
+          ]
+        }
+      })
+
+      expect(screen.queryByText(title)).not.toBeInTheDocument()
+
+      const plot = within(screen.getByTestId(`plot_${title}`)).getAllByRole(
+        'button'
+      )[0]
+      fireEvent.mouseEnter(plot, {
+        bubbles: true,
+        cancelable: true
+      })
+
+      expect(screen.getByText(title)).toBeInTheDocument()
+    })
+
+    it('should not have a tooltip on the plot if the title is not cut', () => {
+      const title = 'Short title'
+      renderAppWithOptionalData({
+        template: {
+          ...templatePlotsFixture,
+          plots: [
+            {
+              entries: [
+                {
+                  ...templatePlotsFixture.plots[0].entries[0],
+                  content: {
+                    ...templatePlotsFixture.plots[0].entries[0].content,
+                    title
+                  } as unknown as VisualizationSpec,
+                  id: title
+                }
+              ],
+              group: TemplatePlotGroup.SINGLE_VIEW
+            }
+          ]
+        }
+      })
+
+      expect(screen.queryByText(title)).not.toBeInTheDocument()
+
+      const plot = within(screen.getByTestId(`plot_${title}`)).getAllByRole(
+        'button'
+      )[0]
+      fireEvent.mouseEnter(plot, {
+        bubbles: true,
+        cancelable: true
+      })
+
+      expect(screen.queryByText(title)).not.toBeInTheDocument()
+    })
+
     describe('Smooth Plots', () => {
       const waitSetValuePostMessage = (value: number) =>
         waitFor(
