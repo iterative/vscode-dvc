@@ -12,7 +12,7 @@ export const ErrorState: React.FC<{
 }> = ({ cliError, hasCustomPlots, modal }) => (
   <EmptyState hasCustomPlots={hasCustomPlots} modal={modal}>
     <ErrorIcon error={cliError} size={96} />
-    <p>No Plots to Display</p>
+    <p>No Plots or Data to Display</p>
     <div>
       <StartButton onClick={selectRevisions} text="Add Experiments" />
       {!hasCustomPlots && (
