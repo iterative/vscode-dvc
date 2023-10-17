@@ -4,6 +4,7 @@ import React, { useEffect, useRef } from 'react'
 import { useDispatch } from 'react-redux'
 import { VisualizationSpec } from 'react-vega'
 import VegaLite, { VegaLiteProps } from 'react-vega/lib/VegaLite'
+import { ZoomablePlotWrapper } from './ZoomablePlotWrapper'
 import { TemplateVegaLite } from './templatePlots/TemplateVegaLite'
 import { setZoomedInPlot } from './webviewSlice'
 import styles from './styles.module.scss'
@@ -77,39 +78,41 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
   }
 
   return (
-    <button
-      className={styles.zoomablePlot}
-      onClick={() => handleOnClick()}
-      aria-label="Open Plot in Popup"
-    >
-      <GripIcon className={styles.plotGripIcon} />
-      <span
-        className={styles.plotActions}
-        onClick={event => {
-          event.stopPropagation()
-          handleOnClick(true)
-        }}
-        onKeyDown={event => {
-          if (event.key === 'Enter') {
-            handleOnClick(true)
-          }
-        }}
-        role="button"
-        tabIndex={0}
-        aria-label="See Plot Export Options"
+    <ZoomablePlotWrapper id={id} title={plotProps.spec.title?.toString()}>
+      <button
+        className={styles.zoomablePlot}
+        onClick={() => handleOnClick()}
+        aria-label="Open Plot in Popup"
       >
-        <Ellipsis />
-      </span>
-      {currentPlotProps.current &&
-        (isTemplatePlot ? (
-          <TemplateVegaLite
-            vegaLiteProps={plotProps}
-            id={id}
-            onNewView={onNewView}
-          />
-        ) : (
-          <VegaLite {...plotProps} onNewView={onNewView} />
-        ))}
-    </button>
+        <GripIcon className={styles.plotGripIcon} />
+        <span
+          className={styles.plotActions}
+          onClick={event => {
+            event.stopPropagation()
+            handleOnClick(true)
+          }}
+          onKeyDown={event => {
+            if (event.key === 'Enter') {
+              handleOnClick(true)
+            }
+          }}
+          role="button"
+          tabIndex={0}
+          aria-label="See Plot Export Options"
+        >
+          <Ellipsis />
+        </span>
+        {currentPlotProps.current &&
+          (isTemplatePlot ? (
+            <TemplateVegaLite
+              vegaLiteProps={plotProps}
+              id={id}
+              onNewView={onNewView}
+            />
+          ) : (
+            <VegaLite {...plotProps} onNewView={onNewView} />
+          ))}
+      </button>
+    </ZoomablePlotWrapper>
   )
 }
