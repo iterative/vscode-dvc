@@ -37,6 +37,26 @@ export const replaceThemeValuesForExport = (
   return themedSvg
 }
 
+const replaceFirstTwoInstances = (
+  svg: string,
+  heightOrWidth: 'height' | 'width'
+): string => {
+  let counter = 0
+  return svg.replace(new RegExp(`${heightOrWidth}="\\d+"`, 'g'), match => {
+    counter = counter + 1
+    return counter <= 2 ? `${heightOrWidth}="100%"` : match
+  })
+}
+
+export const preventSvgTruncation = (svg: string): string => {
+  const heightTruncationRemoved = replaceFirstTwoInstances(svg, 'height')
+  const widthTruncationRemoved = replaceFirstTwoInstances(
+    heightTruncationRemoved,
+    'width'
+  )
+  return widthTruncationRemoved.replace(/viewBox=".*?"/, '')
+}
+
 export const alphaToHex = (color: string, alpha: number): string => {
   const fullColor: string = color.length === 4 ? color + color.slice(-3) : color
   return `${fullColor}${(Math.round(alpha * 255) + 0x10000)

@@ -1,3 +1,4 @@
+import { join } from 'path'
 import { commands } from 'vscode'
 import isEmpty from 'lodash.isempty'
 import {
@@ -438,7 +439,10 @@ export class WebviewMessages {
   }
 
   private async exportPlotAsSvg(svg: string) {
-    const file = await showSaveDialog('visualization.svg', 'svg')
+    const file = await showSaveDialog(
+      join(this.dvcRoot, 'visualization.svg'),
+      'svg'
+    )
     if (!file) {
       return
     }

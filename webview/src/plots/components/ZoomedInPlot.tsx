@@ -13,6 +13,7 @@ import styles from './styles.module.scss'
 import { ZoomablePlotWrapper } from './ZoomablePlotWrapper'
 import {
   getThemeValue,
+  preventSvgTruncation,
   replaceThemeValuesForExport,
   ThemeProperty
 } from '../../util/styles'
@@ -82,7 +83,9 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
           ThemeProperty.FONT
         ])
 
-        exportPlotAsSvg(themedSvg)
+        const fullThemedSvg = preventSvgTruncation(themedSvg)
+
+        exportPlotAsSvg(fullThemedSvg)
       })
     })
     appendActionToVega('JSON', actions, () => exportPlotDataAsJson(id))
