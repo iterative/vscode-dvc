@@ -87,6 +87,7 @@ export const EventName = Object.assign(
       'views.plots.comparisonRowsReordered',
     VIEWS_PLOTS_CREATED: 'views.plots.created',
     VIEWS_PLOTS_EXPERIMENT_TOGGLE: 'views.plots.toggleExperimentStatus',
+    VIEWS_PLOTS_EXPORT_PLOT_AS_SVG: 'views.plots.exportPlotAsSvg',
     VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_CSV: 'views.plots.exportPlotDataAsCsv',
     VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_JSON: 'views.plots.exportPlotDataAsJson',
     VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_TSV: 'views.plots.exportPlotDataAsTsv',
@@ -300,6 +301,7 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_PLOTS_SELECT_EXPERIMENTS]: undefined
   [EventName.VIEWS_PLOTS_SELECT_PLOTS]: undefined
   [EventName.VIEWS_PLOTS_EXPERIMENT_TOGGLE]: undefined
+  [EventName.VIEWS_PLOTS_EXPORT_PLOT_AS_SVG]: undefined
   [EventName.VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_CSV]: undefined
   [EventName.VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_JSON]: undefined
   [EventName.VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_TSV]: undefined

@@ -442,8 +442,15 @@ export class WebviewMessages {
     if (!file) {
       return
     }
+
     writeFile(file.path, svg)
-    return openUrl(file.path)
+    void openUrl(file.path)
+
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_EXPORT_PLOT_AS_SVG,
+      undefined,
+      undefined
+    )
   }
 
   private exportPlotDataAsJson(plotId: string) {

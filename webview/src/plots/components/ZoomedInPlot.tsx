@@ -11,7 +11,11 @@ import { View } from 'react-vega'
 import { TemplateVegaLite } from './templatePlots/TemplateVegaLite'
 import styles from './styles.module.scss'
 import { ZoomablePlotWrapper } from './ZoomablePlotWrapper'
-import { getThemeValue, ThemeProperty } from '../../util/styles'
+import {
+  getThemeValue,
+  replaceThemeValuesForExport,
+  ThemeProperty
+} from '../../util/styles'
 import {
   exportPlotAsSvg,
   exportPlotDataAsCsv,
@@ -73,14 +77,11 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
 
     appendActionToVega('SVG', actions, () => {
       void view.toSVG().then(svg => {
-        const themedSvg = svg.replace(
-          /></,
-          `><style>:root{${ThemeProperty.FOREGROUND_COLOR}:${getThemeValue(
-            ThemeProperty.FOREGROUND_COLOR
-          )};${ThemeProperty.FONT}:${getThemeValue(
-            ThemeProperty.FONT
-          )}}</style><`
-        )
+        const themedSvg = replaceThemeValuesForExport(svg, [
+          ThemeProperty.FOREGROUND_COLOR,
+          ThemeProperty.FONT
+        ])
+
         exportPlotAsSvg(themedSvg)
       })
     })

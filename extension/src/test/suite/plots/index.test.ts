@@ -54,6 +54,7 @@ import { COMMITS_SEPARATOR } from '../../../cli/git/constants'
 import { BaseWebview } from '../../../webview'
 import * as PlotsCollectUtils from '../../../plots/model/collect'
 import { Operator } from '../../../experiments/model/filterBy'
+import * as External from '../../../vscode/external'
 
 suite('Plots Test Suite', () => {
   const disposable = Disposable.fn()
@@ -598,6 +599,47 @@ suite('Plots Test Suite', () => {
       expect(mockSendTelemetryEvent).to.be.calledOnce
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
         EventName.VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_JSON,
+        undefined,
+        undefined
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle an export plot as svg message from the webview', async () => {
+      const { mockMessageReceived } = await buildPlotsWebview({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
+
+      const mockSvg = '<svg></svg>'
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockShowSaveDialog = stub(window, 'showSaveDialog')
+      const mockWriteFile = stub(FileSystem, 'writeFile')
+      const mockOpenUrl = stub(External, 'openUrl')
+      const exportFile = Uri.file('visualization.svg')
+
+      mockShowSaveDialog.resolves(exportFile)
+
+      const openUrlEvent = new Promise(resolve =>
+        mockOpenUrl.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(true)
+        })
+      )
+
+      mockMessageReceived.fire({
+        payload: mockSvg,
+        type: MessageFromWebviewType.EXPORT_PLOT_AS_SVG
+      })
+
+      await openUrlEvent
+
+      expect(mockWriteFile).to.be.calledOnce
+      expect(mockWriteFile).to.be.calledWithExactly(exportFile.path, mockSvg)
+      expect(mockOpenUrl).to.calledWithExactly(exportFile.path)
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_PLOTS_EXPORT_PLOT_AS_SVG,
         undefined,
         undefined
       )

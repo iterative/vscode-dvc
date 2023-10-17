@@ -1,44 +1,44 @@
 import { Config } from 'vega-lite'
 import { ThemeProperty } from '../../util/styles'
 
-const foregroundColor = `var(${ThemeProperty.FOREGROUND_COLOR})`
-const backgroundColor = 'transparent'
-const font = `var(${ThemeProperty.FONT})`
-const fontWeight = 'normal' as const
+export const PlOT_FOREGROUND_COLOR = `var(${ThemeProperty.FOREGROUND_COLOR})`
+const PLOT_BACKGROUND_COLOR = 'transparent'
+export const PLOT_FONT = `var(${ThemeProperty.FONT})`
+const PLOT_FONT_WEIGHT = 'normal' as const
 
 const title = {
-  fill: foregroundColor,
-  font,
+  fill: PlOT_FOREGROUND_COLOR,
+  font: PLOT_FONT,
   fontSize: 12,
-  fontWeight
+  fontWeight: PLOT_FONT_WEIGHT
 }
 
 export const config: Config = {
   axis: {
     domain: false,
-    gridColor: foregroundColor,
+    gridColor: PlOT_FOREGROUND_COLOR,
     gridOpacity: 0.25,
-    tickColor: foregroundColor,
-    titleColor: foregroundColor,
+    tickColor: PlOT_FOREGROUND_COLOR,
+    titleColor: PlOT_FOREGROUND_COLOR,
     titlePadding: 15
   },
-  background: backgroundColor,
+  background: PLOT_BACKGROUND_COLOR,
 
   padding: 20,
   style: {
     cell: {
-      stroke: foregroundColor
+      stroke: PlOT_FOREGROUND_COLOR
     },
     'group-title': title,
     'guide-label': {
-      fill: foregroundColor,
-      font,
-      fontWeight
+      fill: PlOT_FOREGROUND_COLOR,
+      font: PLOT_FONT,
+      fontWeight: PLOT_FONT_WEIGHT
     },
     'guide-title': title
   },
   title: {
-    color: foregroundColor,
-    subtitleColor: foregroundColor
+    color: PlOT_FOREGROUND_COLOR,
+    subtitleColor: PlOT_FOREGROUND_COLOR
   }
 }

@@ -23,6 +23,20 @@ export enum ThemeProperty {
 export const getThemeValue = (property: ThemeProperty) =>
   getComputedStyle(document.documentElement).getPropertyValue(property).trim()
 
+export const replaceThemeValuesForExport = (
+  svg: string,
+  properties: ThemeProperty[]
+): string => {
+  let themedSvg = svg
+  for (const property of properties) {
+    themedSvg = themedSvg.replace(
+      new RegExp(`var\\(${property}\\)`, 'g'),
+      getThemeValue(property)
+    )
+  }
+  return themedSvg
+}
+
 export const alphaToHex = (color: string, alpha: number): string => {
   const fullColor: string = color.length === 4 ? color + color.slice(-3) : color
   return `${fullColor}${(Math.round(alpha * 255) + 0x10000)
