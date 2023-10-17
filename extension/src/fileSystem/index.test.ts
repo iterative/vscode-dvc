@@ -1,9 +1,7 @@
 import { join, relative, resolve } from 'path'
 import {
   appendFileSync,
-  ensureDirSync,
   ensureFileSync,
-  remove,
   readFileSync,
   writeFileSync
 } from 'fs-extra'
@@ -55,8 +53,10 @@ const mockedWorkspace = jest.mocked(workspace)
 const mockedWindow = jest.mocked(window)
 const mockedOpenTextDocument = jest.fn()
 const mockedShowTextDocument = jest.fn()
+const mockedFindFiles = jest.fn()
 
 mockedWorkspace.openTextDocument = mockedOpenTextDocument
+mockedWorkspace.findFiles = mockedFindFiles
 mockedWindow.showTextDocument = mockedShowTextDocument
 
 beforeEach(() => {
@@ -275,41 +275,67 @@ describe('writeTsv', () => {
 })
 
 describe('findDvcRootPaths', () => {
-  it('should find the dvc root if it exists in the given folder', async () => {
-    const dvcRoots = await findDvcRootPaths(dvcDemoPath)
+  const convertAsFindDvcConfigFile = (rootPath: string) => ({
+    fsPath: join(rootPath, DOT_DVC, 'config')
+  })
 
-    expect(dvcRoots).toStrictEqual([dvcDemoPath])
+  it('should find the dvc root if it exists in the given folder', async () => {
+    mockedFindFiles.mockResolvedValue([convertAsFindDvcConfigFile(dvcDemoPath)])
+    const dvcRoots = await findDvcRootPaths()
+
+    expect(dvcRoots).toStrictEqual(new Set([dvcDemoPath]))
   })
 
   it('should find multiple roots if available one directory below the given folder', async () => {
     const parentDir = resolve(dvcDemoPath, '..')
     const mockDvcRoot = join(parentDir, 'mockDvc')
-    ensureDirSync(join(mockDvcRoot, DOT_DVC))
+    mockedFindFiles.mockResolvedValue([
+      convertAsFindDvcConfigFile(dvcDemoPath),
+      convertAsFindDvcConfigFile(mockDvcRoot)
+    ])
 
-    const dvcRoots = await findDvcRootPaths(parentDir)
+    const dvcRoots = await findDvcRootPaths()
 
-    void remove(mockDvcRoot)
-
-    expect([...dvcRoots]).toStrictEqual([dvcDemoPath, mockDvcRoot])
+    expect(dvcRoots).toStrictEqual(new Set([dvcDemoPath, mockDvcRoot]))
   })
 
   it('should find a mono-repo root as well as sub-roots if available one directory below the given folder', async () => {
-    const parentDir = dvcDemoPath
-    const mockFirstDvcRoot = join(parentDir, 'mockFirstDvc')
-    const mockSecondDvcRoot = join(parentDir, 'mockSecondDvc')
-    ensureDirSync(join(mockFirstDvcRoot, DOT_DVC))
-    ensureDirSync(join(mockSecondDvcRoot, DOT_DVC))
-
-    const dvcRoots = await findDvcRootPaths(parentDir)
-
-    void remove(mockFirstDvcRoot)
-    void remove(mockSecondDvcRoot)
-
-    expect([...dvcRoots]).toStrictEqual([
-      dvcDemoPath,
-      mockFirstDvcRoot,
-      mockSecondDvcRoot
+    const mockFirstDvcRoot = join(dvcDemoPath, 'mockFirstDvc')
+    const mockSecondDvcRoot = join(dvcDemoPath, 'mockSecondDvc')
+    mockedFindFiles.mockResolvedValue([
+      convertAsFindDvcConfigFile(dvcDemoPath),
+      convertAsFindDvcConfigFile(mockFirstDvcRoot),
+      convertAsFindDvcConfigFile(mockSecondDvcRoot)
     ])
+
+    const dvcRoots = await findDvcRootPaths()
+
+    expect(dvcRoots).toStrictEqual(
+      new Set([dvcDemoPath, mockFirstDvcRoot, mockSecondDvcRoot])
+    )
+  })
+
+  it('should find deeply nested roots if available', async () => {
+    const mockFirstDvcRoot = join(
+      dvcDemoPath,
+      'deep',
+      'deeper',
+      'really_deep',
+      'one'
+    )
+    const mockSecondDvcRoot = join(dvcDemoPath, 'one_deep', 'two')
+
+    mockedFindFiles.mockResolvedValue([
+      convertAsFindDvcConfigFile(dvcDemoPath),
+      convertAsFindDvcConfigFile(mockFirstDvcRoot),
+      convertAsFindDvcConfigFile(mockSecondDvcRoot)
+    ])
+
+    const dvcRoots = await findDvcRootPaths()
+
+    expect(dvcRoots).toStrictEqual(
+      new Set([dvcDemoPath, mockFirstDvcRoot, mockSecondDvcRoot])
+    )
   })
 })
 
@@ -608,7 +634,7 @@ describe('addPlotToDvcYamlFile', () => {
     '        eval/prc/test.json: precision'
   ]
   const mockNewPlotLines = [
-    '  - simple_plot:',
+    '  - Simple Plot:',
     '      template: simple',
     '      x: epochs',
     '      y:',
@@ -624,8 +650,9 @@ describe('addPlotToDvcYamlFile', () => {
 
     addPlotToDvcYamlFile('/', {
       template: 'simple',
-      x: { file: 'data.json', key: 'epochs' },
-      y: { file: 'data.json', key: 'accuracy' }
+      title: 'Simple Plot',
+      x: { 'data.json': ['epochs'] },
+      y: { 'data.json': ['accuracy'] }
     })
 
     expect(mockedWriteFileSync).toHaveBeenCalledWith(
@@ -652,8 +679,39 @@ describe('addPlotToDvcYamlFile', () => {
 
     addPlotToDvcYamlFile('/', {
       template: 'simple',
-      x: { file: 'data.json', key: 'epochs' },
-      y: { file: 'acc.json', key: 'accuracy' }
+      title: 'simple_plot',
+      x: { 'data.json': ['epochs'] },
+      y: { 'acc.json': ['accuracy'] }
+    })
+
+    expect(mockedWriteFileSync).toHaveBeenCalledWith(
+      '//dvc.yaml',
+      mockDvcYamlContent + mockPlotYamlContent
+    )
+  })
+
+  it('should add the new plot with an axis having multiple fields', () => {
+    const mockDvcYamlContent = mockStagesLines.join('\n')
+    const mockPlotYamlContent = [
+      '',
+      'plots:',
+      '  - simple_plot:',
+      '      template: simple',
+      '      x: epochs',
+      '      y:',
+      '        data.json:',
+      '          - accuracy',
+      '          - epochs',
+      ''
+    ].join('\n')
+    mockedReadFileSync.mockReturnValueOnce(mockDvcYamlContent)
+    mockedReadFileSync.mockReturnValueOnce(mockDvcYamlContent)
+
+    addPlotToDvcYamlFile('/', {
+      template: 'simple',
+      title: 'simple_plot',
+      x: { 'data.json': ['epochs'] },
+      y: { 'data.json': ['accuracy', 'epochs'] }
     })
 
     expect(mockedWriteFileSync).toHaveBeenCalledWith(
@@ -670,8 +728,9 @@ describe('addPlotToDvcYamlFile', () => {
 
     addPlotToDvcYamlFile('/', {
       template: 'simple',
-      x: { file: 'data.json', key: 'epochs' },
-      y: { file: 'data.json', key: 'accuracy' }
+      title: 'Simple Plot',
+      x: { 'data.json': ['epochs'] },
+      y: { 'data.json': ['accuracy'] }
     })
 
     mockDvcYamlContent.splice(7, 0, ...mockPlotYamlContent)
@@ -692,8 +751,9 @@ describe('addPlotToDvcYamlFile', () => {
 
     addPlotToDvcYamlFile('/', {
       template: 'simple',
-      x: { file: 'data.json', key: 'epochs' },
-      y: { file: 'data.json', key: 'accuracy' }
+      title: 'Simple Plot',
+      x: { 'data.json': ['epochs'] },
+      y: { 'data.json': ['accuracy'] }
     })
 
     expect(mockedWriteFileSync).toHaveBeenCalledWith(
@@ -729,8 +789,9 @@ describe('addPlotToDvcYamlFile', () => {
 
     addPlotToDvcYamlFile('/', {
       template: 'simple',
-      x: { file: 'data.json', key: 'epochs' },
-      y: { file: 'data.json', key: 'accuracy' }
+      title: 'simple_plot',
+      x: { 'data.json': ['epochs'] },
+      y: { 'data.json': ['accuracy'] }
     })
 
     expect(mockedWriteFileSync).toHaveBeenCalledWith(

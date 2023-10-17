@@ -6,7 +6,8 @@ import {
   relative,
   resolve,
   sep,
-  format
+  format,
+  dirname
 } from 'path'
 import {
   appendFileSync,
@@ -22,15 +23,16 @@ import { Uri, workspace, window, commands, ViewColumn } from 'vscode'
 import { csv2json, json2csv } from 'json-2-csv'
 import yaml from 'yaml'
 import { standardizePath } from './path'
+import { findFiles } from './workspace'
 import { definedAndNonEmpty, sortCollectedArray } from '../util/array'
 import { Logger } from '../common/logger'
 import { gitPath } from '../cli/git/constants'
 import { createValidInteger } from '../util/number'
 import { processExists } from '../process/execution'
 import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
-import { DOT_DVC } from '../cli/dvc/constants'
+import { DOT_DVC, FULLY_NESTED_DVC } from '../cli/dvc/constants'
 import { delay } from '../util/time'
-import { PlotConfigData } from '../pipeline/quickPick'
+import { PlotConfigData, PlotConfigDataAxis } from '../pipeline/quickPick'
 
 export const exists = (path: string): boolean => existsSync(path)
 
@@ -65,20 +67,17 @@ export const findSubRootPaths = async (
     .map(child => standardizePath(join(cwd, child)))
 }
 
-export const findDvcRootPaths = async (cwd: string): Promise<string[]> => {
+export const findDvcRootPaths = async (): Promise<Set<string>> => {
   const dvcRoots = []
 
-  if (isDirectory(join(cwd, DOT_DVC))) {
-    dvcRoots.push(standardizePath(cwd))
+  const nested = await findFiles(FULLY_NESTED_DVC)
+  if (definedAndNonEmpty(nested)) {
+    dvcRoots.push(
+      ...nested.map(nestedRoot => standardizePath(dirname(dirname(nestedRoot))))
+    )
   }
 
-  const subRoots = await findSubRootPaths(cwd, DOT_DVC)
-
-  if (definedAndNonEmpty(subRoots)) {
-    dvcRoots.push(...subRoots)
-  }
-
-  return sortCollectedArray(dvcRoots)
+  return new Set(sortCollectedArray(dvcRoots))
 }
 
 export const findAbsoluteDvcRootPath = async (
@@ -214,14 +213,35 @@ const loadYamlAsDoc = (
   }
 }
 
+const formatPlotYamlObjAxis = (axis: PlotConfigDataAxis) => {
+  const formattedAxis: { [file: string]: string | string[] } = {}
+
+  for (const [file, fields] of Object.entries(axis)) {
+    if (fields.length === 1) {
+      formattedAxis[file] = fields[0]
+      continue
+    }
+
+    formattedAxis[file] = fields
+  }
+
+  return formattedAxis
+}
+
 const getPlotYamlObj = (plot: PlotConfigData) => {
-  const { x, y, template } = plot
-  const plotName = `${template}_plot`
+  const { x, y, template, title } = plot
+
+  const yFiles = Object.keys(y)
+  const xFiles = Object.keys(x)
+  const firstXFile = xFiles[0]
+  const oneFileUsed =
+    yFiles.length === 1 && xFiles.length === 1 && yFiles[0] === firstXFile
+
   return {
-    [plotName]: {
+    [title]: {
       template,
-      x: x.file === y.file ? x.key : { [x.file]: x.key },
-      y: { [y.file]: y.key }
+      x: oneFileUsed ? x[firstXFile][0] : formatPlotYamlObjAxis(x),
+      y: formatPlotYamlObjAxis(y)
     }
   }
 }

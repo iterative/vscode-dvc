@@ -8,35 +8,148 @@ import {
   isValueTree
 } from '../cli/dvc/contract'
 import { getFileExtension, loadDataFiles } from '../fileSystem'
-import { quickPickOne, quickPickValue } from '../vscode/quickPick'
+import {
+  QuickPickItemWithValue,
+  quickPickOne,
+  quickPickUserOrderedValues
+} from '../vscode/quickPick'
 import { pickFiles } from '../vscode/resourcePicker'
 import { Title } from '../vscode/title'
 import { Toast } from '../vscode/toast'
+import { getInput } from '../vscode/inputBox'
+
+export type PlotConfigDataAxis = { [file: string]: string[] }
 
 export type PlotConfigData = {
-  x: { file: string; key: string }
+  x: PlotConfigDataAxis
   template: string
-  y: { file: string; key: string }
+  title: string
+  y: PlotConfigDataAxis
 }
 
 type UnknownValue = Value | ValueTree
 
 type FileFields = { file: string; fields: string[] }[]
+type QuickPickFieldValues = { file: string; field: string }[]
+
+const multipleXMetricsExample =
+  'See [an example](https://dvc.org/doc/user-guide/project-structure/dvcyaml-files#available-configuration-fields) of a plot with multiple x metrics.'
 
 const pickDataFiles = (): Promise<string[] | undefined> =>
   pickFiles(Title.SELECT_PLOT_DATA, {
     'Data Formats': ['json', 'csv', 'tsv', 'yaml']
   })
 
-const pickTemplateAndFields = async (
-  fileFields: FileFields
-): Promise<PlotConfigData | undefined> => {
-  const template = await quickPickOne(PLOT_TEMPLATES, 'Pick a Plot Template')
-
-  if (!template) {
+const formatFieldQuickPickValues = (
+  values: QuickPickFieldValues | undefined
+) => {
+  if (!values || values.length === 0) {
     return
   }
 
+  const formattedFields: PlotConfigDataAxis = {}
+
+  for (const { file, field } of values) {
+    if (!formattedFields[file]) {
+      formattedFields[file] = [field]
+      continue
+    }
+
+    formattedFields[file].push(field)
+  }
+
+  return formattedFields
+}
+
+const verifyFilesHaveSingleField = (files: PlotConfigDataAxis) => {
+  for (const [file, fields] of Object.entries(files)) {
+    if (fields.length > 1) {
+      void Toast.showError(
+        `${file} cannot have more than one metric selected. ${multipleXMetricsExample}`
+      )
+      return
+    }
+  }
+
+  return files
+}
+
+const verifyXFields = (xValues: QuickPickFieldValues | undefined) => {
+  const x = formatFieldQuickPickValues(xValues)
+
+  if (!x) {
+    return
+  }
+
+  const doFilesHaveOneField = verifyFilesHaveSingleField(x)
+
+  if (!doFilesHaveOneField) {
+    return
+  }
+
+  return x
+}
+
+const pickYFieldsWithMultiXFields = async (
+  yItems: QuickPickItemWithValue<{ file: string; field: string } | undefined>[],
+  xFieldsLength: number
+) => {
+  const yValues = (await quickPickUserOrderedValues(
+    yItems,
+    {
+      title: `Select ${xFieldsLength} Metrics for Y` as Title
+    },
+    xFieldsLength
+  )) as QuickPickFieldValues | undefined
+
+  const y = formatFieldQuickPickValues(yValues)
+
+  if (!y) {
+    return
+  }
+
+  if (yValues?.length !== xFieldsLength) {
+    void Toast.showError(
+      `Found ${xFieldsLength} x metrics and ${yValues?.length} y metric(s). When there are multiple x metrics selected there must be an equal number of y metrics. ${multipleXMetricsExample}`
+    )
+    return
+  }
+
+  const doFilesHaveOneField = verifyFilesHaveSingleField(y)
+
+  if (!doFilesHaveOneField) {
+    return
+  }
+
+  return y
+}
+
+const pickYFields = async (
+  yItems: QuickPickItemWithValue<{ file: string; field: string } | undefined>[]
+) => {
+  const yValues = (await quickPickUserOrderedValues(yItems, {
+    title: Title.SELECT_PLOT_Y_METRIC
+  })) as QuickPickFieldValues | undefined
+
+  const y = formatFieldQuickPickValues(yValues)
+
+  if (!y) {
+    return
+  }
+
+  return y
+}
+
+const pickFields = async (
+  fileFields: FileFields
+): Promise<
+  | {
+      fields: Omit<PlotConfigData, 'title' | 'template'>
+      firstXField: string
+      firstYField: string
+    }
+  | undefined
+> => {
   const items = []
 
   for (const { file, fields } of fileFields) {
@@ -46,26 +159,69 @@ const pickTemplateAndFields = async (
         label: file,
         value: undefined
       },
-      ...fields.map(key => ({ label: key, value: { file, key } }))
+      ...fields.map(field => ({ label: field, value: { field, file } }))
     )
   }
 
-  const x = await quickPickValue(items, { title: Title.SELECT_PLOT_X_METRIC })
+  const xValues = (await quickPickUserOrderedValues(items, {
+    title: Title.SELECT_PLOT_X_METRIC
+  })) as QuickPickFieldValues | undefined
 
+  const x = verifyXFields(xValues)
   if (!x) {
     return
   }
 
-  const y = await quickPickValue(
-    items.filter(item => !isEqual(item.value, x)),
-    { title: Title.SELECT_PLOT_Y_METRIC }
+  const xValuesLength = xValues?.length || 0
+
+  const yItems = items.filter(
+    item => item.value === undefined || !xValues?.includes(item.value)
   )
+  const y =
+    xValuesLength > 1
+      ? await pickYFieldsWithMultiXFields(yItems, xValuesLength)
+      : await pickYFields(yItems)
 
   if (!y) {
     return
   }
 
-  return { template, x, y }
+  const [firstXField] = Object.values(x)[0]
+  const [firstYField] = Object.values(y)[0]
+
+  return {
+    fields: { x, y },
+    firstXField,
+    firstYField
+  }
+}
+const pickPlotConfigData = async (
+  fileFields: FileFields
+): Promise<PlotConfigData | undefined> => {
+  const template = await quickPickOne(PLOT_TEMPLATES, 'Pick a Plot Template')
+
+  if (!template) {
+    return
+  }
+
+  const fieldsInfo = await pickFields(fileFields)
+
+  if (!fieldsInfo) {
+    return
+  }
+
+  const { fields, firstYField, firstXField } = fieldsInfo
+
+  const title = await getInput(
+    Title.ENTER_PLOT_TITLE,
+    `${firstXField} vs ${firstYField}`
+  )
+
+  if (!title) {
+    return
+  }
+
+  return { template, title, ...fields }
 }
 
 const joinList = (items: string[]) => {
@@ -157,7 +313,7 @@ const validateMultiFilesData = (
   filesData: { data: UnknownValue; file: string }[]
 ) => {
   const filesArrLength: Set<number> = new Set()
-  const keys: FileFields = []
+  const fileFields: FileFields = []
 
   for (const { file, data } of filesData) {
     const metricInfo = getMetricInfoFromValue(data)
@@ -167,7 +323,7 @@ const validateMultiFilesData = (
     }
 
     const { arrLength, fields } = metricInfo
-    keys.push({ fields, file })
+    fileFields.push({ fields, file })
     filesArrLength.add(arrLength)
   }
 
@@ -179,7 +335,7 @@ const validateMultiFilesData = (
     return
   }
 
-  return keys
+  return fileFields
 }
 
 const validateFilesData = async (cwd: string, files: string[]) => {
@@ -222,11 +378,5 @@ export const pickPlotConfiguration = async (
     return
   }
 
-  const templateAndFields = await pickTemplateAndFields(validFileFields)
-
-  if (!templateAndFields) {
-    return
-  }
-
-  return { ...templateAndFields }
+  return pickPlotConfigData(validFileFields)
 }

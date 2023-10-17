@@ -219,6 +219,69 @@ export const quickPickLimitedValues = <T>(
     quickPick.show()
   })
 
+const addNewUserOrderedItems = <T>(
+  orderedSelection: T[],
+  newSelection: readonly QuickPickItemWithValue<T>[]
+) => {
+  const itemValues: T[] = []
+  for (const item of newSelection) {
+    if (!orderedSelection.includes(item.value)) {
+      orderedSelection.push(item.value)
+    }
+    itemValues.push(item.value)
+  }
+
+  return itemValues
+}
+
+const removeMissingUserOrderedItems = <T>(
+  orderedSelection: T[],
+  newSelection: T[]
+) => orderedSelection.filter(item => newSelection.includes(item))
+
+export const quickPickUserOrderedValues = <T>(
+  items: QuickPickItemWithValue<T>[],
+  options: QuickPickOptions & { title: Title },
+  maxSelectedItems?: number
+): Promise<T[] | undefined> =>
+  new Promise(resolve => {
+    const quickPick = createQuickPick(items, [], {
+      ...DEFAULT_OPTIONS,
+      canSelectMany: true,
+      ...options
+    })
+
+    let orderedSelection: T[] = []
+
+    quickPick.onDidChangeSelection(selectedItems => {
+      const selectedItemValues = addNewUserOrderedItems(
+        orderedSelection,
+        selectedItems
+      )
+
+      orderedSelection = removeMissingUserOrderedItems(
+        orderedSelection,
+        selectedItemValues
+      )
+    })
+
+    if (maxSelectedItems) {
+      limitSelected<T>(quickPick, maxSelectedItems)
+    }
+
+    quickPick.onDidAccept(() => {
+      resolve(orderedSelection)
+      quickPick.dispose()
+    })
+
+    quickPick.onDidHide(() => {
+      resolve(undefined)
+      quickPick.dispose()
+    })
+
+    quickPick.show()
+  })
+
 export const quickPickYesOrNo = (
   descriptionYes: string,
   descriptionNo: string,

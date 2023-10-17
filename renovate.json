@@ -1,5 +1,15 @@
 {
-  "ignoreDeps": ["@types/node", "@types/vscode", "execa", "process-exists"],
+  "ignoreDeps": [
+    "@types/node",
+    "@types/vscode",
+    "@wdio/cli",
+    "@wdio/local-runner",
+    "@wdio/mocha-framework",
+    "@wdio/spec-reporter",
+    "execa",
+    "process-exists",
+    "webdriverio"
+  ],
   "extends": ["config:base"],
   "packageRules": [
     {

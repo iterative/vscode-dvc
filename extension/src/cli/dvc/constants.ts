@@ -3,6 +3,9 @@ import { join } from 'path'
 export const UNEXPECTED_ERROR_CODE = 255
 export const DOT_DVC = '.dvc'
 
+const NESTED_DVC = join(DOT_DVC, 'config')
+export const FULLY_NESTED_DVC = join('**', NESTED_DVC)
+
 export const TEMP_DAG_FILE = join(DOT_DVC, 'tmp', 'dag.md')
 
 export const TEMP_PLOTS_DIR = join(DOT_DVC, 'tmp', 'plots')

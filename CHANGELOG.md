@@ -2,6 +2,54 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.7] - 2023-10-13
+
+### 🚀 New Features and Enhancements
+
+- Add Multiple X Field Selection to Plot Wizard [#4797](https://github.com/iterative/vscode-dvc/pull/4797) by [@julieg18](https://github.com/julieg18)
+- Deeply nested repo [#4810](https://github.com/iterative/vscode-dvc/pull/4810) by [@sroy3](https://github.com/sroy3)
+
+### 🔨 Maintenance
+
+- Ignore every WebdriverIO dependency in Renovate [#4819](https://github.com/iterative/vscode-dvc/pull/4819) by [@sroy3](https://github.com/sroy3)
+- Ignore new .turbo directory [#4823](https://github.com/iterative/vscode-dvc/pull/4823) by [@mattseddon](https://github.com/mattseddon)
+
+## [1.1.6] - 2023-10-12
+
+### 🚀 New Features and Enhancements
+
+- Add Multiple Y Field Selection to Plot Wizard [#4787](https://github.com/iterative/vscode-dvc/pull/4787) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Fix error when user chooses no Y fields in the Plot Wizard [#4808](https://github.com/iterative/vscode-dvc/pull/4808) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Added webdriverio-monorepo to ignored dependencies for Renovate [#4806](https://github.com/iterative/vscode-dvc/pull/4806) by [@sroy3](https://github.com/sroy3)
+
+## [1.1.5] - 2023-10-10
+
+### 🚀 New Features and Enhancements
+
+- Add title option to plot wizard [#4786](https://github.com/iterative/vscode-dvc/pull/4786) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Add subscribe to YouTube message to README [#4794](https://github.com/iterative/vscode-dvc/pull/4794) by [@mattseddon](https://github.com/mattseddon)
+- Remove banner from README [#4795](https://github.com/iterative/vscode-dvc/pull/4795) by [@mattseddon](https://github.com/mattseddon)
+
+## [1.1.4] - 2023-10-09
+
+### 🐛 Bug Fixes
+
+- Transfer selection/starred status to renamed experiment [#4783](https://github.com/iterative/vscode-dvc/pull/4783) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Watch deps and outs files for experiment updates [#4784](https://github.com/iterative/vscode-dvc/pull/4784) by [@mattseddon](https://github.com/mattseddon)
+- Update demo project and latest tested CLI version (3.25.0) [#4788](https://github.com/iterative/vscode-dvc/pull/4788) by [@julieg18](https://github.com/julieg18)
+
 ## [1.1.3] - 2023-10-09
 
 ### 🚀 New Features and Enhancements
