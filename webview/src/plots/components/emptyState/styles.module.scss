@@ -1,3 +1,5 @@
+@import '../../../shared/variables';
+
 .emptyStateWrapper {
   display: flex;
   flex-direction: column;
@@ -6,5 +8,15 @@
 
   > *:first-child {
     flex-grow: 1;
+  }
+}
+
+.infoText {
+  font-size: 0.8rem;
+
+  svg {
+    fill: $accent-color;
+    vertical-align: text-bottom;
+    margin-right: 4px;
   }
 }

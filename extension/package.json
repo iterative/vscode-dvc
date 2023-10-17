@@ -1558,7 +1558,7 @@
       },
       {
         "view": "dvc.views.plotsPathsTree",
-        "contents": "No Plots to Display."
+        "contents": "No Plots or Data to Display."
       },
       {
         "view": "dvc.views.experimentsSortByTree",
