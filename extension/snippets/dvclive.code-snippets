@@ -100,9 +100,17 @@
     "body": [
       "from dvclive.xgb import DVCLiveCallback",
       "",
-      "xgboost.train(",
-      "    ${1:param}, ${2:dtrain}, num_round=${3:5}, evals=[${4:(dval, \"eval_data\")}]",
-      "    callbacks=[DVCLiveCallback(${5:\"eval_data\"}, save_dvc_exp=True)],",
+      "model = xgb.XGBClassifier(",
+      "    n_estimators=${1:100},",
+      "    early_stopping_rounds=${2:5},",
+      "    eval_metric=[${3:\"merror\", \"mlogloss\"}],",
+      "    callbacks=[DVCLiveCallback()]",
+      ")",
+      "",
+      "model.fit(",
+      "    X_train,",
+      "    y_train,",
+      "    eval_set=[(X_test, y_test)]",
       ")"
     ],
     "description": "DVCLive XGBoost callback"
