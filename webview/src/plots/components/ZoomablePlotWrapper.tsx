@@ -12,7 +12,7 @@ export const ZoomablePlotWrapper: React.FC<
   const isTitleCut = title?.indexOf('…') === 0
 
   return isTitleCut ? (
-    <Tooltip content={id} placement="top" interactive>
+    <Tooltip content={id} placement="top" interactive appendTo={document.body}>
       {children as ReactElement}
     </Tooltip>
   ) : (

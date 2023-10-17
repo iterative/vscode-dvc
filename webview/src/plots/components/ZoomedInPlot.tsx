@@ -9,6 +9,7 @@ import {
 } from 'dvc/src/plots/vega/util'
 import { TemplateVegaLite } from './templatePlots/TemplateVegaLite'
 import styles from './styles.module.scss'
+import { ZoomablePlotWrapper } from './ZoomablePlotWrapper'
 import { getThemeValue, ThemeProperty } from '../../util/styles'
 import {
   exportPlotDataAsCsv,
@@ -101,20 +102,22 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
   }
 
   return (
-    <div
-      className={styles.zoomedInPlot}
-      data-testid="zoomed-in-plot"
-      ref={zoomedInPlotRef}
-    >
-      {isTemplatePlot ? (
-        <TemplateVegaLite
-          id={id}
-          vegaLiteProps={vegaLiteProps}
-          onNewView={onNewView}
-        />
-      ) : (
-        <VegaLite {...vegaLiteProps} onNewView={onNewView} />
-      )}
-    </div>
+    <ZoomablePlotWrapper title={props.spec.title?.toString()} id={id}>
+      <div
+        className={styles.zoomedInPlot}
+        data-testid="zoomed-in-plot"
+        ref={zoomedInPlotRef}
+      >
+        {isTemplatePlot ? (
+          <TemplateVegaLite
+            id={id}
+            vegaLiteProps={vegaLiteProps}
+            onNewView={onNewView}
+          />
+        ) : (
+          <VegaLite {...vegaLiteProps} onNewView={onNewView} />
+        )}
+      </div>
+    </ZoomablePlotWrapper>
   )
 }
