@@ -130,10 +130,7 @@ export class WebviewMessages {
           { dvcRoot: this.dvcRoot, id: message.payload }
         )
       case MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT:
-        return commands.executeCommand(
-          RegisteredCliCommands.EXPERIMENT_VIEW_BRANCH,
-          { dvcRoot: this.dvcRoot, id: message.payload }
-        )
+        return this.createBranchFromExperiment(message.payload)
       case MessageFromWebviewType.RENAME_EXPERIMENT:
         return commands.executeCommand(
           RegisteredCliCommands.EXPERIMENT_VIEW_RENAME,
@@ -246,6 +243,29 @@ export class WebviewMessages {
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
     }
+  }
+
+  private async createBranchFromExperiment(expId: string) {
+    const branchName = await commands.executeCommand(
+      RegisteredCliCommands.EXPERIMENT_VIEW_BRANCH,
+      { dvcRoot: this.dvcRoot, id: expId }
+    )
+
+    if (!branchName) {
+      return
+    }
+
+    await this.update()
+
+    const selectedBranches = this.experiments.getSelectedBranches()
+    const branchesWithNewBranch = this.experiments
+      .getAvailableBranchesToSelect()
+      .filter(
+        branch => selectedBranches.includes(branch) || branch === branchName
+      )
+
+    this.experiments.setSelectedBranches(branchesWithNewBranch)
+    await this.update()
   }
 
   private async addAndRemoveBranches() {
