@@ -7,11 +7,19 @@ import {
   makePlotZoomOnWheel,
   reverseOfLegendSuppressionUpdate
 } from 'dvc/src/plots/vega/util'
+import { View } from 'react-vega'
 import { TemplateVegaLite } from './templatePlots/TemplateVegaLite'
 import styles from './styles.module.scss'
 import { ZoomablePlotWrapper } from './ZoomablePlotWrapper'
 import { getThemeValue, ThemeProperty } from '../../util/styles'
 import {
+  getThemeValue,
+  preventSvgTruncation,
+  replaceThemeValuesForExport,
+  ThemeProperty
+} from '../../util/styles'
+import {
+  exportPlotAsSvg,
   exportPlotDataAsCsv,
   exportPlotDataAsJson,
   exportPlotDataAsTsv
@@ -33,6 +41,7 @@ const appendActionToVega = (
   rawDataAction.textContent = `Save as ${type}`
   rawDataAction.addEventListener('click', () => {
     onClick()
+    ;(vegaActions.parentNode as HTMLElement).removeAttribute('open')
   })
   rawDataAction.classList.add(styles.vegaCustomAction)
   vegaActions.append(rawDataAction)
@@ -61,13 +70,25 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
     }
   }, [])
 
-  const onNewView = () => {
+  const onNewView = (view: View) => {
     const actions: HTMLDivElement | null | undefined =
       zoomedInPlotRef.current?.querySelector('.vega-actions')
     if (!actions) {
       return
     }
 
+    appendActionToVega('SVG', actions, () => {
+      void view.toSVG().then(svg => {
+        const themedSvg = replaceThemeValuesForExport(svg, [
+          ThemeProperty.FOREGROUND_COLOR,
+          ThemeProperty.FONT
+        ])
+
+        const fullThemedSvg = preventSvgTruncation(themedSvg)
+
+        exportPlotAsSvg(fullThemedSvg)
+      })
+    })
     appendActionToVega('JSON', actions, () => exportPlotDataAsJson(id))
     appendActionToVega('CSV', actions, () => exportPlotDataAsCsv(id))
     appendActionToVega('TSV', actions, () => exportPlotDataAsTsv(id))
@@ -92,7 +113,7 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
     actions: {
       compiled: false,
       editor: false,
-      export: true,
+      export: false,
       source: false
     },
     config: {

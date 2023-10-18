@@ -16,7 +16,7 @@ export const TemplateVegaLite = ({
   vegaLiteProps
 }: {
   id: string
-  onNewView: () => void
+  onNewView: (view: View) => void
   vegaLiteProps: VegaLiteProps
 }) => {
   const vegaView = useRef<View>()
@@ -65,7 +65,7 @@ export const TemplateVegaLite = ({
       <VegaLite
         {...vegaLiteProps}
         onNewView={view => {
-          onNewView()
+          onNewView(view)
           vegaView.current = view
           const defaultValue = smoothPlotValues[id]
           const state = view.getState() as VegaState

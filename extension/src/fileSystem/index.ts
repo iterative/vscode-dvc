@@ -297,6 +297,11 @@ export const addPlotToDvcYamlFile = (cwd: string, plotObj: PlotConfigData) => {
   return writeFileSync(dvcYamlFile, dvcYamlLines.join('\n'))
 }
 
+export const writeFile = (path: string, contents: string): void => {
+  ensureFileSync(path)
+  return writeFileSync(path, contents)
+}
+
 export const getFileExtension = (filePath: string) => parse(filePath).ext
 
 export const relativeWithUri = (dvcRoot: string, uri: Uri) =>
@@ -373,27 +378,24 @@ export const writeJson = <
   obj: T,
   format = false
 ): void => {
-  ensureFileSync(path)
   const json = format ? JSON.stringify(obj, null, 4) : JSON.stringify(obj)
-  return writeFileSync(path, json)
+  return writeFile(path, json)
 }
 
 export const writeCsv = async (
   path: string,
   arr: Array<Record<string, unknown>>
 ) => {
-  ensureFileSync(path)
   const csv = await json2csv(arr)
-  return writeFileSync(path, csv)
+  return writeFile(path, csv)
 }
 
 export const writeTsv = async (
   path: string,
   arr: Array<Record<string, unknown>>
 ) => {
-  ensureFileSync(path)
   const csv = await json2csv(arr, { delimiter: { field: '\t' } })
-  return writeFileSync(path, csv)
+  return writeFile(path, csv)
 }
 
 const getPid = (contents: string): number | undefined => {
