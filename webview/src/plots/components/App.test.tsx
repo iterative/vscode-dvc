@@ -1653,6 +1653,46 @@ describe('App', () => {
     expect(screen.getByTestId('modal')).toBeInTheDocument()
   })
 
+  it('should add a "save as svg" action to zoomed in plot modal', async () => {
+    renderAppWithOptionalData({
+      template: complexTemplatePlotsFixture
+    })
+
+    expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
+
+    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByLabelText(
+      'Open Plot in Popup'
+    )
+
+    fireEvent.click(plot)
+
+    const modal = screen.getByTestId('modal')
+
+    const customAction = await within(modal).findByText('Save as SVG')
+
+    expect(customAction).toBeInTheDocument()
+
+    fireEvent.click(customAction)
+
+    const svgString = expect.stringMatching('^<svg .*?</svg>$')
+    await waitFor(
+      () =>
+        expect(mockPostMessage).toHaveBeenCalledWith({
+          payload: svgString,
+          type: MessageFromWebviewType.EXPORT_PLOT_AS_SVG
+        }),
+      { timeout: 1000 }
+    )
+
+    const stringContainingUnresolvedCssVars = expect.stringMatching(
+      '^<svg .*?var\\(.*?\\).*?</svg>$'
+    )
+    expect(mockPostMessage).not.toHaveBeenCalledWith({
+      payload: stringContainingUnresolvedCssVars,
+      type: MessageFromWebviewType.EXPORT_PLOT_AS_SVG
+    })
+  })
+
   it('should add a "save as json" action to zoomed in plot modal', async () => {
     renderAppWithOptionalData({
       template: complexTemplatePlotsFixture

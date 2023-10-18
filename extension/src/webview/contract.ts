@@ -20,6 +20,7 @@ export enum MessageFromWebviewType {
   CREATE_BRANCH_FROM_EXPERIMENT = 'create-branch-from-experiment',
   COPY_TO_CLIPBOARD = 'copy-to-clipboard',
   COPY_STUDIO_LINK = 'copy-studio-link',
+  EXPORT_PLOT_AS_SVG = 'export-plot-as-svg',
   EXPORT_PLOT_DATA_AS_JSON = 'export-plot-data-as-json',
   EXPORT_PLOT_DATA_AS_CSV = 'export-plot-data-as-csv',
   EXPORT_PLOT_DATA_AS_TSV = 'export-plot-data-as-tsv',
@@ -118,6 +119,10 @@ export type MessageFromWebview =
   | {
       type: MessageFromWebviewType.COPY_STUDIO_LINK
       payload: { id: string; type: StudioLinkType }
+    }
+  | {
+      type: MessageFromWebviewType.EXPORT_PLOT_AS_SVG
+      payload: string
     }
   | {
       type: MessageFromWebviewType.EXPORT_PLOT_DATA_AS_JSON
