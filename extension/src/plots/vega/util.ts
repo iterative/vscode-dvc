@@ -277,7 +277,7 @@ const truncateTitles = (
   spec: TopLevelSpec,
   width: number,
   height: number,
-  axis: 'x' | 'y' | 'main' = 'main',
+  axis: 'x' | 'y' | 'main',
   titles: SpecTitles
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
@@ -291,12 +291,10 @@ const truncateTitles = (
       }
 
       const valueType = typeof value
-      if (key === 'y') {
-        axis = 'y'
+      if (key === 'y' || key === 'x') {
+        axis = key
       }
-      if (key === 'x') {
-        axis = 'x'
-      }
+
       if (key === 'title') {
         const title = value as unknown as Title
         const truncatedTitle =

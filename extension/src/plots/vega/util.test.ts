@@ -150,6 +150,7 @@ describe('extendVegaSpec', () => {
   it('should truncate all titles from the left to 50 characters for large plots', () => {
     const spec = withLongTemplatePlotTitle()
     const updatedSpec = extendVegaSpec(spec, 1, DEFAULT_PLOT_HEIGHT)
+    delete updatedSpec.titles
 
     const truncatedTitle = '…-many-many-characters-at-least-seventy-characters'
     const truncatedHorizontalTitle =
@@ -180,6 +181,7 @@ describe('extendVegaSpec', () => {
       DEFAULT_NB_ITEMS_PER_ROW,
       DEFAULT_PLOT_HEIGHT
     )
+    delete updatedSpec.titles
 
     const truncatedTitle = '…-many-many-characters-at-least-seventy-characters'
     const truncatedHorizontalTitle =
@@ -206,6 +208,7 @@ describe('extendVegaSpec', () => {
   it('should truncate all titles from the left to 30 characters for small plots', () => {
     const spec = withLongTemplatePlotTitle()
     const updatedSpec = extendVegaSpec(spec, 3, DEFAULT_PLOT_HEIGHT)
+    delete updatedSpec.titles
 
     const truncatedTitle = '…s-at-least-seventy-characters'
     const truncatedHorizontalTitle = '…at-least-seventy-characters-x'
@@ -236,6 +239,7 @@ describe('extendVegaSpec', () => {
     })
 
     const updatedSpec = extendVegaSpec(spec, 3, DEFAULT_PLOT_HEIGHT)
+    delete updatedSpec.titles
 
     const truncatedTitle = '…ghijklmnopqrstuvwyz1234567890'
 
@@ -274,6 +278,7 @@ describe('extendVegaSpec', () => {
     })
 
     const updatedSpec = extendVegaSpec(spec, 3, DEFAULT_PLOT_HEIGHT)
+    delete updatedSpec.titles
 
     const truncatedTitle = '…ghijklmnopqrstuvwyz1234567890'
 

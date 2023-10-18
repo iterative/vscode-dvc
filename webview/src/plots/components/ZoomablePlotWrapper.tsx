@@ -16,25 +16,17 @@ type SpecWithTitles = VisualizationSpec & {
 const isTitleCut = (title?: string) => title?.indexOf('…') === 0
 
 const getLine = (axis: string, title: string) => {
-  if (axis === 'x') {
+  if (axis === 'x' || axis === 'y') {
     return {
       children: (
         <>
-          <span className={styles.plotTooltipLabel}>X-axis:</span> {title}
+          <span className={styles.plotTooltipLabel}>
+            {axis.toUpperCase()}-axis:
+          </span>{' '}
+          {title}
         </>
       ),
-      key: 'x'
-    }
-  }
-
-  if (axis === 'y') {
-    return {
-      children: (
-        <>
-          <span className={styles.plotTooltipLabel}>Y-axis:</span> {title}
-        </>
-      ),
-      key: 'y'
+      key: axis
     }
   }
 
