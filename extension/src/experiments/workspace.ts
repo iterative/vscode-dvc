@@ -250,7 +250,8 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     if (!input) {
       return
     }
-    return runCommand(...args, input)
+    await runCommand(...args, input)
+    return input
   }
 
   public async getCwdIntegerInputAndRun(

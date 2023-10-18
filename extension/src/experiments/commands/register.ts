@@ -17,7 +17,6 @@ import { CliCompatible, isVersionCompatible } from '../../cli/dvc/version'
 import { Toast } from '../../vscode/toast'
 import { Response } from '../../vscode/response'
 import { SetupSection } from '../../setup/webview/contract'
-import { getInput } from '../../vscode/inputBox'
 
 type ExperimentDetails = { dvcRoot: string; id: string }
 
@@ -172,18 +171,14 @@ const registerExperimentInputCommands = (
 
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_VIEW_BRANCH,
-    async ({ dvcRoot, id }: ExperimentDetails) => {
-      // maybe move all or part to experiments method
-      const branchExpCommand = getBranchExperimentCommand(experiments)
-      const branchName = await getInput(Title.ENTER_BRANCH_NAME, `${id}-branch`)
-
-      if (!branchName) {
-        return
-      }
-
-      await branchExpCommand(dvcRoot, id, branchName)
-      return branchName
-    }
+    ({ dvcRoot, id }: ExperimentDetails) =>
+      experiments.getInputAndRun(
+        getBranchExperimentCommand(experiments),
+        Title.ENTER_BRANCH_NAME,
+        `${id}-branch`,
+        dvcRoot,
+        id
+      )
   )
 }
 
