@@ -534,31 +534,74 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to create a branch from an experiment', async () => {
-      const { mockMessageReceived } =
-        await stubWorkspaceGettersWebview(disposable)
+      const {
+        experimentsModel,
+        mockMessageReceived,
+        mockUpdateExperimentsData
+      } = await buildExperimentsWebview({
+        disposer: disposable
+      })
 
-      const mockBranch = 'mock-branch-input'
-      const inputEvent = getInputBoxEvent(mockBranch)
-
+      const mockExperimentId = 'exp-e7a67'
+      const mockInput = stub(window, 'showInputBox')
       const mockExperimentBranch = stub(
         DvcExecutor.prototype,
         'expBranch'
       ).resolves('undefined')
-
-      const mockExperimentId = 'exp-e7a67'
+      const mockSetSelectedBranches = stub(
+        experimentsModel,
+        'setSelectedBranches'
+      )
+      const undefinedInputEvent = new Promise(resolve =>
+        mockInput.onFirstCall().callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(undefined)
+        })
+      )
 
       mockMessageReceived.fire({
         payload: mockExperimentId,
         type: MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT
       })
 
-      await inputEvent
+      await undefinedInputEvent
+
+      expect(mockExperimentBranch).not.to.be.called
+      expect(mockSetSelectedBranches).not.to.be.called
+      expect(mockUpdateExperimentsData).not.to.be.called
+
+      const mockBranch = 'mock-branch-input'
+      mockInput.onSecondCall().resolves(mockBranch)
+      const selectedBranches = ['main', 'other']
+      const availableBranches = ['main', 'other', 'test-branch', mockBranch]
+      stub(experimentsModel, 'getSelectedBranches')
+        .onFirstCall()
+        .returns(selectedBranches)
+      stub(experimentsModel, 'getAvailableBranchesToSelect')
+        .onFirstCall()
+        .returns(availableBranches)
+      const waitForBranchesToBeSelected = new Promise(resolve =>
+        mockSetSelectedBranches.callsFake(() => resolve(undefined))
+      )
+
+      mockMessageReceived.fire({
+        payload: mockExperimentId,
+        type: MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT
+      })
+
+      await waitForBranchesToBeSelected
+
       expect(mockExperimentBranch).to.be.calledOnce
       expect(mockExperimentBranch).to.be.calledWithExactly(
         dvcDemoPath,
         mockExperimentId,
         mockBranch
       )
+      expect(mockSetSelectedBranches).to.be.calledWithExactly([
+        ...selectedBranches,
+        mockBranch
+      ])
+      expect(mockUpdateExperimentsData).to.be.calledTwice
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to rename an experiment', async () => {

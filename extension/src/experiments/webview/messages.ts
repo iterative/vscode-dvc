@@ -130,7 +130,7 @@ export class WebviewMessages {
           { dvcRoot: this.dvcRoot, id: message.payload }
         )
       case MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT:
-        return this.createBranchFromExperiment(message.payload)
+        return this.createAndSelectBranchFromExperiment(message.payload)
       case MessageFromWebviewType.RENAME_EXPERIMENT:
         return commands.executeCommand(
           RegisteredCliCommands.EXPERIMENT_VIEW_RENAME,
@@ -245,7 +245,7 @@ export class WebviewMessages {
     }
   }
 
-  private async createBranchFromExperiment(expId: string) {
+  private async createAndSelectBranchFromExperiment(expId: string) {
     const branchName = await commands.executeCommand(
       RegisteredCliCommands.EXPERIMENT_VIEW_BRANCH,
       { dvcRoot: this.dvcRoot, id: expId }
