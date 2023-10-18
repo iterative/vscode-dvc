@@ -427,7 +427,7 @@ export class WebviewMessages {
       | typeof EventName.VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_TSV,
     writeFile: (filePath: string, plotId: string) => void
   ) {
-    const file = await showSaveDialog(`data.${extName}`, extName)
+    const file = await this.showSaveDialog('data', extName)
 
     if (!file) {
       return
@@ -439,10 +439,7 @@ export class WebviewMessages {
   }
 
   private async exportPlotAsSvg(svg: string) {
-    const file = await showSaveDialog(
-      join(this.dvcRoot, 'visualization.svg'),
-      'svg'
-    )
+    const file = await this.showSaveDialog('visualization', 'svg')
     if (!file) {
       return
     }
@@ -485,5 +482,10 @@ export class WebviewMessages {
       (filePath: string, plotId: string) =>
         this.plots.savePlotDataAsTsv(filePath, plotId)
     )
+  }
+
+  private showSaveDialog(filename: string, extName: string) {
+    const defaultPath = join(this.dvcRoot, [filename, extName].join('.'))
+    return showSaveDialog(defaultPath, extName)
   }
 }
