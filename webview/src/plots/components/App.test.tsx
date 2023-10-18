@@ -1,4 +1,5 @@
 import { join } from 'dvc/src/test/util/path'
+import { Title } from 'dvc/src/vscode/title'
 import { configureStore } from '@reduxjs/toolkit'
 import React from 'react'
 import { Provider } from 'react-redux'
@@ -1995,6 +1996,11 @@ describe('App', () => {
             encoding: {},
             height: 100,
             layer: [],
+            titles: {
+              main: { normal: '' as unknown as Title, truncated: '' },
+              x: { normal: '' as unknown as Title, truncated: '' },
+              y: { normal: '' as unknown as Title, truncated: '' }
+            },
             transform: [],
             width: 100
           },
@@ -2005,7 +2011,7 @@ describe('App', () => {
         ...customPlotsFixture,
         plots,
         selectedMetrics: plots.map(plot => plot.id)
-      } as CustomPlotsData
+      } as unknown as CustomPlotsData
     }
 
     const resizeScreen = (width: number, store: typeof plotsStore) => {

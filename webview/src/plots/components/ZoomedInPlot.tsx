@@ -102,7 +102,7 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
   }
 
   return (
-    <ZoomablePlotWrapper title={props.spec.title?.toString()} id={id}>
+    <ZoomablePlotWrapper spec={props.spec}>
       <div
         className={styles.zoomedInPlot}
         data-testid="zoomed-in-plot"

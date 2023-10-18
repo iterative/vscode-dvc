@@ -262,11 +262,23 @@ export const truncateVerticalTitle = (
 const isEndValue = (valueType: string) =>
   ['string', 'number', 'boolean'].includes(valueType)
 
+type SpecTitle = {
+  normal: Title | undefined
+  truncated: string | string[] | Title | undefined
+}
+
+export interface SpecTitles {
+  x: SpecTitle
+  y: SpecTitle
+  main: SpecTitle
+}
+
 const truncateTitles = (
   spec: TopLevelSpec,
   width: number,
   height: number,
-  vertical?: boolean
+  axis: 'x' | 'y' | 'main' = 'main',
+  titles: SpecTitles
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
   if (spec && typeof spec === 'object') {
@@ -280,23 +292,30 @@ const truncateTitles = (
 
       const valueType = typeof value
       if (key === 'y') {
-        vertical = true
+        axis = 'y'
+      }
+      if (key === 'x') {
+        axis = 'x'
       }
       if (key === 'title') {
         const title = value as unknown as Title
-        specCopy[key] = vertical
-          ? truncateVerticalTitle(title, width, height)
-          : truncateTitle(title, width > DEFAULT_NB_ITEMS_PER_ROW ? 30 : 50)
+        const truncatedTitle =
+          axis === 'y'
+            ? truncateVerticalTitle(title, width, height)
+            : truncateTitle(title, width > DEFAULT_NB_ITEMS_PER_ROW ? 30 : 50)
+        titles[axis].normal = title
+        titles[axis].truncated = truncatedTitle
+        specCopy[key] = truncatedTitle
       } else if (isEndValue(valueType)) {
         specCopy[key] = value
       } else if (Array.isArray(value)) {
         specCopy[key] = value.map(val =>
           isEndValue(typeof val)
             ? val
-            : truncateTitles(val, width, height, vertical)
+            : truncateTitles(val, width, height, axis, titles)
         )
       } else if (typeof value === 'object') {
-        specCopy[key] = truncateTitles(value, width, height, vertical)
+        specCopy[key] = truncateTitles(value, width, height, axis, titles)
       }
     }
     return specCopy
@@ -314,11 +333,21 @@ export const extendVegaSpec = (
     shape?: ShapeEncoding
   }
 ) => {
+  const emptyTitle = { normal: undefined, truncated: undefined }
+  const titles = {
+    main: { ...emptyTitle },
+    x: { ...emptyTitle },
+    y: { ...emptyTitle }
+  }
   const updatedSpec = truncateTitles(
     spec,
     width,
-    height
+    height,
+    'main',
+    titles
   ) as unknown as TopLevelSpec
+
+  ;(updatedSpec as any).titles = titles
 
   if (isMultiViewByCommitPlot(spec) || !encoding) {
     return updatedSpec

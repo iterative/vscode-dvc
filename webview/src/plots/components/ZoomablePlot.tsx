@@ -78,7 +78,7 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
   }
 
   return (
-    <ZoomablePlotWrapper id={id} title={plotProps.spec.title?.toString()}>
+    <ZoomablePlotWrapper spec={plotProps.spec}>
       <button
         className={styles.zoomablePlot}
         onClick={() => handleOnClick()}

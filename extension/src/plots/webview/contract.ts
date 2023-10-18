@@ -1,5 +1,6 @@
 import { VisualizationSpec } from 'react-vega'
 import { Color } from '../../experiments/model/status/colors'
+import { SpecTitles } from '../vega/util'
 
 export const DEFAULT_NB_ITEMS_PER_ROW = 2
 
@@ -94,7 +95,7 @@ export type CustomPlot = {
 }
 
 export type CustomPlotData = CustomPlot & {
-  spec: VisualizationSpec
+  spec: VisualizationSpec & { titles: SpecTitles }
 }
 
 export type CustomPlotsData = {

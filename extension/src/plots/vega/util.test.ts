@@ -253,6 +253,7 @@ describe('extendVegaSpec', () => {
     const spec = withLongTemplatePlotTitle([repeatedTitle, repeatedTitle])
 
     const updatedSpec = extendVegaSpec(spec, 3, DEFAULT_PLOT_HEIGHT)
+    delete updatedSpec.titles
 
     const truncatedTitle = '…ghijklmnopqrstuvwyz1234567890'
 
@@ -305,6 +306,7 @@ describe('extendVegaSpec', () => {
     const updatedSpecCopy = cloneDeep(updatedSpec)
     delete updatedSpecCopy.layer[1].layer[0].encoding.shape
     delete updatedSpecCopy.encoding
+    delete updatedSpecCopy.titles
 
     expect(updatedSpecCopy).toStrictEqual(multiSourceTemplate)
   })

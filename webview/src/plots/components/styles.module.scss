@@ -210,6 +210,25 @@ $gap: 20px;
   display: flex;
 }
 
+.plotTooltip {
+  word-break: break-all;
+}
+
+.plotTooltipLine {
+  margin-bottom: 10px;
+  display: flex;
+
+  &:last-child {
+    margin: 0;
+  }
+}
+
+.plotTooltipLabel {
+  font-weight: bold;
+  min-width: 50px;
+  color: $accent-color;
+}
+
 /* stylelint-disable selector-class-pattern -- 3rd party selectors */
 
 :global(.vega-bindings):not(:empty) {
