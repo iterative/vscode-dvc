@@ -17,8 +17,10 @@ menu.
 [`dvc plots diff`]: https://dvc.org/doc/command-reference/plots/diff
 
 💡 To add [DVC plots] to the project, start writing data series into JSON, YAML,
-CSV, or TSV files; or save your own plot images (`.png`, etc.). If you're using
-Python, the [DVCLive] helper library can save plots data for you!
+CSV, or TSV files; or save your own plot images (`.png`, etc.). Use
+[`DVC: Add Plot`](command:workbench.action.quickOpen?%22>DVC:%20Add%20Plot%22)
+to define plots in a `dvc.yaml` file. If you're using Python, the [DVCLive]
+helper library can save plots data for you!
 
 ```python
 points = metrics.precision_recall_curve(labels, predictions)
