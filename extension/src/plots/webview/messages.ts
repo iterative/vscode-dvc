@@ -1,3 +1,4 @@
+import { join } from 'path'
 import { commands } from 'vscode'
 import isEmpty from 'lodash.isempty'
 import {
@@ -24,13 +25,15 @@ import { BaseWebview } from '../../webview'
 import {
   getModifiedTime,
   openImageFileInEditor,
-  showSaveDialog
+  showSaveDialog,
+  writeFile
 } from '../../fileSystem'
 import { reorderObjectList } from '../../util/array'
 import { CustomPlotsOrderValue } from '../model/custom'
 import { getCustomPlotId } from '../model/collect'
 import { RegisteredCommands } from '../../commands/external'
 import { ErrorsModel } from '../errors/model'
+import { openUrl } from '../../vscode/external'
 
 export class WebviewMessages {
   private readonly dvcRoot: string
@@ -80,6 +83,8 @@ export class WebviewMessages {
         return this.exportPlotDataAsCsv(message.payload)
       case MessageFromWebviewType.EXPORT_PLOT_DATA_AS_TSV:
         return this.exportPlotDataAsTsv(message.payload)
+      case MessageFromWebviewType.EXPORT_PLOT_AS_SVG:
+        return this.exportPlotAsSvg(message.payload)
       case MessageFromWebviewType.EXPORT_PLOT_DATA_AS_JSON:
         return this.exportPlotDataAsJson(message.payload)
       case MessageFromWebviewType.RESIZE_PLOTS:
@@ -422,7 +427,7 @@ export class WebviewMessages {
       | typeof EventName.VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_TSV,
     writeFile: (filePath: string, plotId: string) => void
   ) {
-    const file = await showSaveDialog(`data.${extName}`, extName)
+    const file = await this.showSaveDialog('data', extName)
 
     if (!file) {
       return
@@ -431,6 +436,22 @@ export class WebviewMessages {
     sendTelemetryEvent(event, undefined, undefined)
 
     writeFile(file.path, plotId)
+  }
+
+  private async exportPlotAsSvg(svg: string) {
+    const file = await this.showSaveDialog('visualization', 'svg')
+    if (!file) {
+      return
+    }
+
+    writeFile(file.path, svg)
+    void openUrl(file.path)
+
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_EXPORT_PLOT_AS_SVG,
+      undefined,
+      undefined
+    )
   }
 
   private exportPlotDataAsJson(plotId: string) {
@@ -461,5 +482,10 @@ export class WebviewMessages {
       (filePath: string, plotId: string) =>
         this.plots.savePlotDataAsTsv(filePath, plotId)
     )
+  }
+
+  private showSaveDialog(filename: string, extName: string) {
+    const defaultPath = join(this.dvcRoot, [filename, extName].join('.'))
+    return showSaveDialog(defaultPath, extName)
   }
 }

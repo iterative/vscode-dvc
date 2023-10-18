@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.8] - 2023-10-18
+
+### 🚀 New Features and Enhancements
+
+- Improve validation of Plot Wizard Y metrics quick pick [#4827](https://github.com/iterative/vscode-dvc/pull/4827) by [@julieg18](https://github.com/julieg18)
+- Rename "Save" to "Save Token" in studio settings [#4837](https://github.com/iterative/vscode-dvc/pull/4837) by [@julieg18](https://github.com/julieg18)
+- Update "No Plots" section  message [#4793](https://github.com/iterative/vscode-dvc/pull/4793) by [@julieg18](https://github.com/julieg18)
+- Add a tooltip to plots with long titles that are cut by Vega [#4840](https://github.com/iterative/vscode-dvc/pull/4840) by [@sroy3](https://github.com/sroy3)
+- Update DVCLive XGBoost snippet [#4847](https://github.com/iterative/vscode-dvc/pull/4847) by [@mattseddon](https://github.com/mattseddon)
+- Add `Add Plot` command to walkthrough [#4845](https://github.com/iterative/vscode-dvc/pull/4845) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Fix exporting plots to SVG [#4835](https://github.com/iterative/vscode-dvc/pull/4835) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Update demo project [#4826](https://github.com/iterative/vscode-dvc/pull/4826) by [@sroy3](https://github.com/sroy3)
+- Update demo project and latest tested CLI version (3.26.0) [#4829](https://github.com/iterative/vscode-dvc/pull/4829) by [@mattseddon](https://github.com/mattseddon)
+- Update default export path for plots data [#4849](https://github.com/iterative/vscode-dvc/pull/4849) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.1.7] - 2023-10-13
 
 ### 🚀 New Features and Enhancements
