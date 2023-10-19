@@ -23,7 +23,7 @@ import {
   extendVegaSpec,
   isMultiViewPlot,
   SpecWithTitles,
-  truncateVerticalTitle
+  truncateVegaSpecTitles
 } from '../vega/util'
 import { definedAndNonEmpty } from '../../util/array'
 import {
@@ -139,10 +139,8 @@ const getCustomPlotData = (
   const completeColorScale = fillColorScale(experiments, colorScale, valueIds)
 
   const [{ param: paramVal, metric: metricVal }] = values
-  const yTitle = truncateVerticalTitle(metric, nbItemsPerRow, height) as string
 
   const spec = createSpec(
-    yTitle,
     metric,
     param,
     typeof metricVal,
@@ -150,11 +148,13 @@ const getCustomPlotData = (
     completeColorScale
   )
 
+  const updatedSpec = truncateVegaSpecTitles(spec, nbItemsPerRow, height)
+
   return {
     id: getCustomPlotId(metric, param),
     metric,
     param,
-    spec,
+    spec: updatedSpec,
     values
   } as CustomPlotData
 }

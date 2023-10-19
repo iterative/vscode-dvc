@@ -319,15 +319,10 @@ const truncateTitles = (
   return spec
 }
 
-export const extendVegaSpec = (
+export const truncateVegaSpecTitles = (
   spec: TopLevelSpec,
   width: number,
-  height: number,
-  encoding?: {
-    color?: ColorScale
-    strokeDash?: StrokeDashEncoding
-    shape?: ShapeEncoding
-  }
+  height: number
 ) => {
   const emptyTitle = { normal: undefined, truncated: undefined }
   const titles = {
@@ -344,6 +339,21 @@ export const extendVegaSpec = (
   ) as unknown as TopLevelSpec
 
   ;(updatedSpec as any).titles = titles
+
+  return updatedSpec
+}
+
+export const extendVegaSpec = (
+  spec: TopLevelSpec,
+  width: number,
+  height: number,
+  encoding?: {
+    color?: ColorScale
+    strokeDash?: StrokeDashEncoding
+    shape?: ShapeEncoding
+  }
+) => {
+  const updatedSpec = truncateVegaSpecTitles(spec, width, height)
 
   if (isMultiViewByCommitPlot(spec) || !encoding) {
     return updatedSpec

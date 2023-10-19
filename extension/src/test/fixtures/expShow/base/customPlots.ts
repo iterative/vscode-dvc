@@ -178,9 +178,18 @@ const data: CustomPlotsData = {
         ],
         width: 'container',
         titles: {
-          main: { normal: '' as unknown as Title, truncated: '' },
-          x: { normal: '' as unknown as Title, truncated: '' },
-          y: { normal: '' as unknown as Title, truncated: '' }
+          main: {
+            normal: 'params.yaml:log_file' as unknown as Title,
+            truncated: 'params.yaml:log_file'
+          },
+          x: {
+            normal: 'params.yaml:log_file' as unknown as Title,
+            truncated: 'params.yaml:log_file'
+          },
+          y: {
+            normal: 'summary.json:loss' as unknown as Title,
+            truncated: 'summary.json:loss'
+          }
         }
       },
       values: [
@@ -315,9 +324,18 @@ const data: CustomPlotsData = {
         ],
         width: 'container',
         titles: {
-          main: { normal: '' as unknown as Title, truncated: '' },
-          x: { normal: '' as unknown as Title, truncated: '' },
-          y: { normal: '' as unknown as Title, truncated: '' }
+          main: {
+            normal: 'params.yaml:epochs' as unknown as Title,
+            truncated: 'params.yaml:epochs'
+          },
+          x: {
+            normal: 'params.yaml:epochs' as unknown as Title,
+            truncated: 'params.yaml:epochs'
+          },
+          y: {
+            normal: 'summary.json:accuracy' as unknown as Title,
+            truncated: 'summary.json:accuracy'
+          }
         }
       }
     }
