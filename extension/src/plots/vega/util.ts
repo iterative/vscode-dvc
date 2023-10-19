@@ -30,10 +30,23 @@ import { ColorScale, DEFAULT_NB_ITEMS_PER_ROW } from '../webview/contract'
 import { ShapeEncoding, StrokeDashEncoding } from '../multiSource/constants'
 import { Color } from '../../experiments/model/status/colors'
 
+type SpecTitle = {
+  normal: Title | undefined
+  truncated: string | string[] | Title | undefined
+}
+
+interface SpecTitles {
+  x: SpecTitle
+  y: SpecTitle
+  main: SpecTitle
+}
+
+export type SpecWithTitles = VisualizationSpec & { titles: SpecTitles }
+
 const COMMIT_FIELD = 'rev'
 
 const getFacetField = (
-  template: TopLevelSpec | VisualizationSpec
+  template: TopLevelSpec | SpecWithTitles
 ): string | null => {
   const facetSpec = template as TopLevelFacetSpec
   if (facetSpec.facet) {
@@ -56,23 +69,19 @@ const getFacetField = (
   return null
 }
 
-const isVegaFacetPlot = (template: TopLevelSpec | VisualizationSpec): boolean =>
+const isVegaFacetPlot = (template: TopLevelSpec | SpecWithTitles): boolean =>
   !!getFacetField(template)
 
 type ConcatSpec = TopLevel<GenericConcatSpec<NonNormalizedSpec>>
 type VerticalConcatSpec = TopLevel<GenericVConcatSpec<NonNormalizedSpec>>
 type HorizontalConcatSpec = TopLevel<GenericHConcatSpec<NonNormalizedSpec>>
 
-const isVegaConcatPlot = (
-  template: TopLevelSpec | VisualizationSpec
-): boolean =>
+const isVegaConcatPlot = (template: TopLevelSpec | SpecWithTitles): boolean =>
   (template as ConcatSpec).concat?.length > 0 ||
   (template as VerticalConcatSpec).vconcat?.length > 0 ||
   (template as HorizontalConcatSpec).hconcat?.length > 0
 
-const isVegaRepeatPlot = (
-  template: TopLevelSpec | VisualizationSpec
-): boolean => {
+const isVegaRepeatPlot = (template: TopLevelSpec | SpecWithTitles): boolean => {
   const repeatSpec = template as TopLevel<NonLayerRepeatSpec>
   return (
     !!repeatSpec.repeat &&
@@ -83,7 +92,7 @@ const isVegaRepeatPlot = (
 }
 
 export const isMultiViewPlot = (
-  template?: TopLevelSpec | VisualizationSpec
+  template?: TopLevelSpec | SpecWithTitles
 ): boolean =>
   !template ||
   isVegaFacetPlot(template) ||
@@ -91,7 +100,7 @@ export const isMultiViewPlot = (
   isVegaRepeatPlot(template)
 
 export const isMultiViewByCommitPlot = (
-  template?: TopLevelSpec | VisualizationSpec
+  template?: TopLevelSpec | SpecWithTitles
 ): boolean => !template || getFacetField(template) === COMMIT_FIELD
 
 export const getColorScale = (
@@ -261,17 +270,6 @@ export const truncateVerticalTitle = (
 
 const isEndValue = (valueType: string) =>
   ['string', 'number', 'boolean'].includes(valueType)
-
-type SpecTitle = {
-  normal: Title | undefined
-  truncated: string | string[] | Title | undefined
-}
-
-export interface SpecTitles {
-  x: SpecTitle
-  y: SpecTitle
-  main: SpecTitle
-}
 
 const truncateTitles = (
   spec: TopLevelSpec,

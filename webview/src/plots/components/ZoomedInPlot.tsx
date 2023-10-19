@@ -4,6 +4,7 @@ import { Config } from 'vega-lite'
 import merge from 'lodash.merge'
 import cloneDeep from 'lodash.clonedeep'
 import {
+  SpecWithTitles,
   makePlotZoomOnWheel,
   reverseOfLegendSuppressionUpdate
 } from 'dvc/src/plots/vega/util'
@@ -11,7 +12,6 @@ import { View } from 'react-vega'
 import { TemplateVegaLite } from './templatePlots/TemplateVegaLite'
 import styles from './styles.module.scss'
 import { ZoomablePlotWrapper } from './ZoomablePlotWrapper'
-import { getThemeValue, ThemeProperty } from '../../util/styles'
 import {
   getThemeValue,
   preventSvgTruncation,
@@ -123,7 +123,7 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
   }
 
   return (
-    <ZoomablePlotWrapper spec={props.spec}>
+    <ZoomablePlotWrapper spec={props.spec as SpecWithTitles}>
       <div
         className={styles.zoomedInPlot}
         data-testid="zoomed-in-plot"

@@ -1,9 +1,11 @@
 import { TopLevelSpec } from 'vega-lite'
-import { VisualizationSpec } from 'react-vega'
-import { extendVegaSpec, isMultiViewPlot } from '../../../plots/vega/util'
+import {
+  SpecWithTitles,
+  extendVegaSpec,
+  isMultiViewPlot
+} from '../../../plots/vega/util'
 import { EXPERIMENT_WORKSPACE_ID, PlotsOutput } from '../../../cli/dvc/contract'
 import {
-  ComparisonPlots,
   ComparisonRevisionData,
   TemplatePlotSection,
   PlotsType,
@@ -20,6 +22,7 @@ import {
 import { join } from '../../util/path'
 import { copyOriginalColors } from '../../../experiments/model/status/colors'
 import { ColumnType } from '../../../experiments/webview/contract'
+import { Title } from 'vega'
 
 const basicVega = {
   [join('logs', 'loss.tsv')]: [
@@ -342,8 +345,13 @@ const basicVega = {
               }
             ]
           }
-        ]
-      } as VisualizationSpec,
+        ],
+        titles: {
+          main: { normal: '' as unknown as Title, truncated: '' },
+          x: { normal: '' as unknown as Title, truncated: '' },
+          y: { normal: '' as unknown as Title, truncated: '' }
+        }
+      } as SpecWithTitles,
       multiView: false
     }
   ]
@@ -543,7 +551,7 @@ const extendedSpecs = (plotsOutput: TemplatePlots): TemplatePlotSection[] => {
               range: copyOriginalColors().slice(0, 5)
             }
           }
-        ) as VisualizationSpec,
+        ) as SpecWithTitles,
         id: path,
         multiView: isMultiViewPlot(originalPlot.content as TopLevelSpec),
         revisions: REVISIONS,

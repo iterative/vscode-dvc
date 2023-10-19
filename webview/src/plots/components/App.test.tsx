@@ -1,5 +1,6 @@
 import { join } from 'dvc/src/test/util/path'
 import { Title } from 'dvc/src/vscode/title'
+import { SpecWithTitles } from 'dvc/src/plots/vega/util'
 import { configureStore } from '@reduxjs/toolkit'
 import React from 'react'
 import { Provider } from 'react-redux'
@@ -36,7 +37,6 @@ import {
 } from 'dvc/src/webview/contract'
 import { act } from 'react-dom/test-utils'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
-import { VisualizationSpec } from 'react-vega'
 import { App } from './App'
 import { NewSectionBlock } from './templatePlots/TemplatePlots'
 import {
@@ -2606,7 +2606,7 @@ describe('App', () => {
             {
               content: {
                 ...smoothTemplatePlotContent
-              } as unknown as VisualizationSpec,
+              } as unknown as SpecWithTitles,
               datapoints: {
                 [EXPERIMENT_WORKSPACE_ID]:
                   smoothTemplatePlotContent.data.values.slice(0, 10)
@@ -2685,6 +2685,8 @@ describe('App', () => {
 
     it('should have a tooltip on the plot if the title is cut', () => {
       const title = 'Plot with a long title'
+      const truncatedTitle = '… with a long title'
+
       renderAppWithOptionalData({
         template: {
           ...templatePlotsFixture,
@@ -2695,8 +2697,96 @@ describe('App', () => {
                   ...templatePlotsFixture.plots[0].entries[0],
                   content: {
                     ...templatePlotsFixture.plots[0].entries[0].content,
-                    title: '… with a long title'
-                  } as unknown as VisualizationSpec,
+                    titles: {
+                      main: { normal: title, truncated: truncatedTitle },
+                      x: { normal: '' as Title, truncated: '' },
+                      y: { normal: '' as Title, truncated: '' }
+                    }
+                  } as unknown as SpecWithTitles,
+                  id: title
+                }
+              ],
+              group: TemplatePlotGroup.SINGLE_VIEW
+            }
+          ]
+        }
+      })
+
+      expect(screen.queryByText(title)).not.toBeInTheDocument()
+
+      const plot = within(screen.getByTestId(`plot_${title}`)).getAllByRole(
+        'button'
+      )[0]
+      fireEvent.mouseEnter(plot, {
+        bubbles: true,
+        cancelable: true
+      })
+
+      expect(screen.getByText(title)).toBeInTheDocument()
+    })
+
+    it('should have a tooltip on the plot if the x axis label is cut', () => {
+      const title = 'Plot with a long title'
+      const truncatedTitle = '… with a long title'
+
+      renderAppWithOptionalData({
+        template: {
+          ...templatePlotsFixture,
+          plots: [
+            {
+              entries: [
+                {
+                  ...templatePlotsFixture.plots[0].entries[0],
+                  content: {
+                    ...templatePlotsFixture.plots[0].entries[0].content,
+                    titles: {
+                      main: { normal: title, truncated: truncatedTitle },
+                      x: { normal: '' as Title, truncated: '' },
+                      y: { normal: '' as Title, truncated: '' }
+                    }
+                  } as unknown as SpecWithTitles,
+                  id: title
+                }
+              ],
+              group: TemplatePlotGroup.SINGLE_VIEW
+            }
+          ]
+        }
+      })
+
+      expect(screen.queryByText(title)).not.toBeInTheDocument()
+
+      const plot = within(screen.getByTestId(`plot_${title}`)).getAllByRole(
+        'button'
+      )[0]
+      fireEvent.mouseEnter(plot, {
+        bubbles: true,
+        cancelable: true
+      })
+
+      expect(screen.getByText(title)).toBeInTheDocument()
+    })
+
+    it('should have a tooltip on the plot if the y axis label is cut', () => {
+      const title = 'Plot with a long title'
+      const truncatedTitle = '… with a long title'
+
+      renderAppWithOptionalData({
+        template: {
+          ...templatePlotsFixture,
+          plots: [
+            {
+              entries: [
+                {
+                  ...templatePlotsFixture.plots[0].entries[0],
+                  content: {
+                    ...templatePlotsFixture.plots[0].entries[0].content,
+                    titles: {
+                      main: { normal: title, truncated: truncatedTitle },
+                      x: { normal: '' as Title, truncated: '' },
+                      y: { normal: '' as Title, truncated: '' }
+                    }
+                  } as unknown as SpecWithTitles,
                   id: title
                 }
               ],
@@ -2731,8 +2821,12 @@ describe('App', () => {
                   ...templatePlotsFixture.plots[0].entries[0],
                   content: {
                     ...templatePlotsFixture.plots[0].entries[0].content,
-                    title
-                  } as unknown as VisualizationSpec,
+                    titles: {
+                      main: { normal: title, truncated: title },
+                      x: { normal: title, truncated: title },
+                      y: { normal: title, truncated: title }
+                    }
+                  } as unknown as SpecWithTitles,
                   id: title
                 }
               ],

@@ -1,8 +1,8 @@
-import { VisualizationSpec } from 'react-vega'
 import { getCustomPlotId } from './collect'
 import { Column, ColumnType } from '../../experiments/webview/contract'
 import { FILE_SEPARATOR } from '../../experiments/columns/paths'
 import { ColorScale } from '../webview/contract'
+import { SpecWithTitles } from '../vega/util'
 
 export type CustomPlotsOrderValue = {
   metric: string
@@ -120,4 +120,4 @@ export const createSpec = (
       }
     ],
     width: 'container'
-  }) as VisualizationSpec
+  }) as SpecWithTitles

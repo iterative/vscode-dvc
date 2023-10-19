@@ -1,6 +1,5 @@
 import get from 'lodash.get'
 import { TopLevelSpec } from 'vega-lite'
-import { VisualizationSpec } from 'react-vega'
 import { createSpec, CustomPlotsOrderValue, getFullValuePath } from './custom'
 import {
   ColorScale,
@@ -23,6 +22,7 @@ import { TemplateOrder } from '../paths/collect'
 import {
   extendVegaSpec,
   isMultiViewPlot,
+  SpecWithTitles,
   truncateVerticalTitle
 } from '../vega/util'
 import { definedAndNonEmpty } from '../../util/array'
@@ -522,7 +522,7 @@ const collectTemplatePlot = (
   multiSourceEncoding: MultiSourceEncoding
 ) => {
   const isMultiView = isMultiViewPlot(
-    JSON.parse(template) as TopLevelSpec | VisualizationSpec
+    JSON.parse(template) as TopLevelSpec | SpecWithTitles
   )
   const multiSourceEncodingUpdate = multiSourceEncoding[path] || {}
   const { datapoints, revisions } = transformRevisionData(
@@ -545,7 +545,7 @@ const collectTemplatePlot = (
       ...multiSourceEncodingUpdate,
       color: revisionColors
     }
-  ) as VisualizationSpec
+  ) as SpecWithTitles
 
   acc.push({
     content,
@@ -638,7 +638,7 @@ export const collectSelectedTemplatePlotRawData = ({
   multiSourceEncodingUpdate: { strokeDash: StrokeDashEncoding }
 }) => {
   const isMultiView = isMultiViewPlot(
-    JSON.parse(template) as TopLevelSpec | VisualizationSpec
+    JSON.parse(template) as TopLevelSpec | SpecWithTitles
   )
   const { datapoints } = transformRevisionData(
     path,

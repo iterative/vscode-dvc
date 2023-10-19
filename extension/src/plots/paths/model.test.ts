@@ -7,6 +7,7 @@ import { PlotsType, TemplatePlotGroup } from '../webview/contract'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 import { ErrorsModel } from '../errors/model'
 import { REVISIONS } from '../../test/fixtures/plotsDiff'
+import { SpecWithTitles } from '../vega/util'
 
 describe('PathsModel', () => {
   const mockDvcRoot = 'test'
@@ -107,7 +108,7 @@ describe('PathsModel', () => {
     data: {
       [previousPlotPath]: [
         {
-          content: {},
+          content: {} as SpecWithTitles,
           datapoints: {
             [commitBeforePlots]: [
               {

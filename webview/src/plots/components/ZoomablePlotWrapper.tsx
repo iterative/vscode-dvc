@@ -1,16 +1,11 @@
 import React, { ReactElement, PropsWithChildren } from 'react'
-import { VisualizationSpec } from 'react-vega'
-import { SpecTitles } from 'dvc/src/plots/vega/util'
+import { SpecWithTitles } from 'dvc/src/plots/vega/util'
 import styles from './styles.module.scss'
 import Tooltip from '../../shared/components/tooltip/Tooltip'
 
 interface ZoomablePlotWrapperProps {
   title?: string
-  spec: VisualizationSpec
-}
-
-type SpecWithTitles = VisualizationSpec & {
-  titles: SpecTitles
+  spec: SpecWithTitles
 }
 
 const isTitleCut = (title?: string) => title?.indexOf('…') === 0
@@ -44,9 +39,7 @@ export const ZoomablePlotWrapper: React.FC<
   PropsWithChildren<ZoomablePlotWrapperProps>
 > = ({ children, spec }) => {
   const tooltipContentLines = []
-  for (const [titleKey, title] of Object.entries(
-    (spec as SpecWithTitles).titles
-  )) {
+  for (const [titleKey, title] of Object.entries(spec.titles)) {
     if (isTitleCut(title.truncated)) {
       tooltipContentLines.push(getLine(titleKey, title.normal))
     }
