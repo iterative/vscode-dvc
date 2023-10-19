@@ -262,7 +262,7 @@ const truncateTitle = (
   return titleCopy
 }
 
-export const truncateVerticalTitle = (
+const truncateVerticalTitle = (
   title: Text | Title,
   width: number,
   height: number
