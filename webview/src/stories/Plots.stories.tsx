@@ -8,7 +8,6 @@ import {
   DEFAULT_SECTION_COLLAPSED,
   TemplatePlotGroup,
   TemplatePlotSection,
-  DEFAULT_PLOT_HEIGHT,
   DEFAULT_NB_ITEMS_PER_ROW
 } from 'dvc/src/plots/webview/contract'
 import { MessageToWebviewType } from 'dvc/src/webview/contract'
@@ -18,7 +17,6 @@ import manyTemplatePlots from 'dvc/src/test/fixtures/plotsDiff/template/virtuali
 import comparisonPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
 import smoothTemplatePlotContent from 'dvc/src/test/fixtures/plotsDiff/template/smoothTemplatePlot'
-import { truncateVerticalTitle } from 'dvc/src/plots/vega/util'
 import {
   CHROMATIC_VIEWPORTS_WITH_DELAY,
   DISABLE_CHROMATIC_SNAPSHOTS
@@ -39,11 +37,7 @@ const manyCustomPlots = (length: number) =>
     return {
       ...plot,
       id,
-      yTitle: truncateVerticalTitle(
-        id,
-        DEFAULT_NB_ITEMS_PER_ROW,
-        DEFAULT_PLOT_HEIGHT
-      ) as string
+      yTitle: id
     }
   })
 

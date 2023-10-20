@@ -1,8 +1,8 @@
 import { AnyAction } from '@reduxjs/toolkit'
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
+import { SpecWithTitles } from 'dvc/src/plots/vega/util'
 import React, { useEffect, useRef } from 'react'
 import { useDispatch } from 'react-redux'
-import { VisualizationSpec } from 'react-vega'
 import VegaLite, { VegaLiteProps } from 'react-vega/lib/VegaLite'
 import { ZoomablePlotWrapper } from './ZoomablePlotWrapper'
 import { TemplateVegaLite } from './templatePlots/TemplateVegaLite'
@@ -15,7 +15,7 @@ import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
 import { Ellipsis } from '../../shared/components/icons'
 
 interface ZoomablePlotProps {
-  spec?: VisualizationSpec
+  spec?: SpecWithTitles
   id: string
   onViewReady?: () => void
   changeDisabledDragIds: (ids: string[]) => AnyAction
@@ -78,7 +78,7 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
   }
 
   return (
-    <ZoomablePlotWrapper id={id} title={plotProps.spec.title?.toString()}>
+    <ZoomablePlotWrapper spec={plotProps.spec as SpecWithTitles}>
       <button
         className={styles.zoomablePlot}
         onClick={() => handleOnClick()}

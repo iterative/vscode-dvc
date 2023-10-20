@@ -1,3 +1,4 @@
+import { Title } from 'vega'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../cli/dvc/contract'
 import { join } from '../../util/path'
 
@@ -322,7 +323,12 @@ const data = {
               }
             ]
           }
-        ]
+        ],
+        titles: {
+          main: { normal: '' as unknown as Title, truncated: '' },
+          x: { normal: '' as unknown as Title, truncated: '' },
+          y: { normal: '' as unknown as Title, truncated: '' }
+        }
       }
     }
   ],
@@ -50427,6 +50433,11 @@ const data = {
               }
             }
           ]
+        },
+        titles: {
+          main: { normal: '' as unknown as Title, truncated: '' },
+          x: { normal: '' as unknown as Title, truncated: '' },
+          y: { normal: '' as unknown as Title, truncated: '' }
         }
       }
     }

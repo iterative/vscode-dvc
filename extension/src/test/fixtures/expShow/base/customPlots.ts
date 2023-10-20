@@ -5,6 +5,7 @@ import {
   DEFAULT_PLOT_HEIGHT
 } from '../../../../plots/webview/contract'
 import { Experiment } from '../../../../experiments/webview/contract'
+import { Title } from 'vega'
 
 export const customPlotsOrderFixture: CustomPlotsOrderValue[] = [
   {
@@ -175,7 +176,21 @@ const data: CustomPlotsData = {
             }
           }
         ],
-        width: 'container'
+        width: 'container',
+        titles: {
+          main: {
+            normal: 'params.yaml:log_file' as unknown as Title,
+            truncated: 'params.yaml:log_file'
+          },
+          x: {
+            normal: 'params.yaml:log_file' as unknown as Title,
+            truncated: 'params.yaml:log_file'
+          },
+          y: {
+            normal: 'summary.json:loss' as unknown as Title,
+            truncated: 'summary.json:loss'
+          }
+        }
       },
       values: [
         { id: '7df876c', metric: 2.048856019973755, param: 'logs.csv' },
@@ -307,7 +322,21 @@ const data: CustomPlotsData = {
             }
           }
         ],
-        width: 'container'
+        width: 'container',
+        titles: {
+          main: {
+            normal: 'params.yaml:epochs' as unknown as Title,
+            truncated: 'params.yaml:epochs'
+          },
+          x: {
+            normal: 'params.yaml:epochs' as unknown as Title,
+            truncated: 'params.yaml:epochs'
+          },
+          y: {
+            normal: 'summary.json:accuracy' as unknown as Title,
+            truncated: 'summary.json:accuracy'
+          }
+        }
       }
     }
   ],

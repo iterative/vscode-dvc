@@ -1,6 +1,5 @@
 import get from 'lodash.get'
 import { TopLevelSpec } from 'vega-lite'
-import { VisualizationSpec } from 'react-vega'
 import { createSpec, CustomPlotsOrderValue, getFullValuePath } from './custom'
 import {
   ColorScale,
@@ -23,7 +22,8 @@ import { TemplateOrder } from '../paths/collect'
 import {
   extendVegaSpec,
   isMultiViewPlot,
-  truncateVerticalTitle
+  SpecWithTitles,
+  truncateVegaSpecTitles
 } from '../vega/util'
 import { definedAndNonEmpty } from '../../util/array'
 import {
@@ -139,10 +139,8 @@ const getCustomPlotData = (
   const completeColorScale = fillColorScale(experiments, colorScale, valueIds)
 
   const [{ param: paramVal, metric: metricVal }] = values
-  const yTitle = truncateVerticalTitle(metric, nbItemsPerRow, height) as string
 
   const spec = createSpec(
-    yTitle,
     metric,
     param,
     typeof metricVal,
@@ -150,11 +148,13 @@ const getCustomPlotData = (
     completeColorScale
   )
 
+  const updatedSpec = truncateVegaSpecTitles(spec, nbItemsPerRow, height)
+
   return {
     id: getCustomPlotId(metric, param),
     metric,
     param,
-    spec,
+    spec: updatedSpec,
     values
   } as CustomPlotData
 }
@@ -522,7 +522,7 @@ const collectTemplatePlot = (
   multiSourceEncoding: MultiSourceEncoding
 ) => {
   const isMultiView = isMultiViewPlot(
-    JSON.parse(template) as TopLevelSpec | VisualizationSpec
+    JSON.parse(template) as TopLevelSpec | SpecWithTitles
   )
   const multiSourceEncodingUpdate = multiSourceEncoding[path] || {}
   const { datapoints, revisions } = transformRevisionData(
@@ -545,7 +545,7 @@ const collectTemplatePlot = (
       ...multiSourceEncodingUpdate,
       color: revisionColors
     }
-  ) as VisualizationSpec
+  ) as SpecWithTitles
 
   acc.push({
     content,
@@ -638,7 +638,7 @@ export const collectSelectedTemplatePlotRawData = ({
   multiSourceEncodingUpdate: { strokeDash: StrokeDashEncoding }
 }) => {
   const isMultiView = isMultiViewPlot(
-    JSON.parse(template) as TopLevelSpec | VisualizationSpec
+    JSON.parse(template) as TopLevelSpec | SpecWithTitles
   )
   const { datapoints } = transformRevisionData(
     path,

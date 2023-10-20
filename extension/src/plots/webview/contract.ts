@@ -1,5 +1,5 @@
-import { VisualizationSpec } from 'react-vega'
 import { Color } from '../../experiments/model/status/colors'
+import { SpecWithTitles } from '../vega/util'
 
 export const DEFAULT_NB_ITEMS_PER_ROW = 2
 
@@ -94,7 +94,7 @@ export type CustomPlot = {
 }
 
 export type CustomPlotData = CustomPlot & {
-  spec: VisualizationSpec
+  spec: SpecWithTitles
 }
 
 export type CustomPlotsData = {
@@ -114,7 +114,7 @@ export const isVegaPlot = (plot: Plot): plot is TemplatePlot =>
   plot.type === PlotsType.VEGA
 
 export type TemplatePlot = {
-  content: VisualizationSpec
+  content: SpecWithTitles
   datapoints?: { [revision: string]: Record<string, unknown>[] }
   revisions?: string[]
   type: PlotsType
