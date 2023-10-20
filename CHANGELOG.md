@@ -76,6 +76,7 @@ All notable changes to this project will be documented in this file.
 ### 🚀 New Features and Enhancements
 
 - Improve Plot Wizard Error Handling [#4770](https://github.com/iterative/vscode-dvc/pull/4770) by [@julieg18](https://github.com/julieg18)
+- exp rename: Add exp rename to experiments table [#4616](https://github.com/iterative/vscode-dvc/pull/4616) by [@BradyJ27](https://github.com/BradyJ27)
 
 ## [1.1.2] - 2023-10-05
 
