@@ -6,6 +6,8 @@ import { Pipeline } from '../../../pipeline'
 import { PipelineData } from '../../../pipeline/data'
 import { dvcDemoPath } from '../../util'
 import { buildDependencies } from '../util'
+import { Response } from '../../../vscode/response'
+import { Modal } from '../../../vscode/modal'
 
 export const buildExperimentsPipeline = ({
   disposer,
@@ -56,9 +58,15 @@ export const buildPipeline = ({
     dvcYamls,
     internalCommands
   })
+
+  const mockShowInformation = stub(Modal, 'showInformation').resolves(
+    Response.YES
+  )
+
   return {
     dvcReader,
     internalCommands,
+    mockShowInformation,
     pipeline,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     pipelineData: (pipeline as any).data as PipelineData

@@ -1523,14 +1523,14 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a message to add a configuration', async () => {
-      const { mockMessageReceived, mockCheckOrAddPipeline } =
+      const { mockMessageReceived, mockAddPipeline } =
         await buildExperimentsWebview({ disposer: disposable })
 
       mockMessageReceived.fire({
         type: MessageFromWebviewType.ADD_CONFIGURATION
       })
 
-      expect(mockCheckOrAddPipeline).to.be.calledOnce
+      expect(mockAddPipeline).to.be.calledOnce
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a message to show more commits', async () => {
