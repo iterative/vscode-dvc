@@ -86,6 +86,7 @@ export const buildExperiments = ({
     internalCommands
   })
   const mockCheckOrAddPipeline = stub(pipeline, 'checkOrAddPipeline')
+  const mockAddPipeline = stub(pipeline, 'addPipeline')
   const mockSelectBranches = stub().resolves(['main', 'other'])
   const mockMemento = buildMockMemento({
     [`${PersistenceKey.EXPERIMENTS_BRANCHES}${dvcRoot}`]: ['main'],
@@ -130,6 +131,7 @@ export const buildExperiments = ({
     experimentsModel: (experiments as any).experiments as ExperimentsModel,
     gitReader,
     internalCommands,
+    mockAddPipeline,
     mockCheckOrAddPipeline,
     mockCheckSignalFile,
     mockExpShow,
