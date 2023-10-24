@@ -1,5 +1,6 @@
 import { DragEvent } from 'react'
 import { getEventCurrentTargetDistances } from './currentTarget'
+import { getIDWithoutIndex } from '../../../util/ids'
 
 export enum DragEnterDirection {
   RIGHT = 'RIGHT',
@@ -8,6 +9,11 @@ export enum DragEnterDirection {
   TOP = 'TOP',
   BOTTOM = 'BOTTOM'
 }
+
+const AFTER_DIRECTIONS = new Set([
+  DragEnterDirection.RIGHT,
+  DragEnterDirection.BOTTOM
+])
 
 export const getDragEnterDirection = (
   e: DragEvent<HTMLElement>,
@@ -40,3 +46,15 @@ export const getDragEnterDirection = (
     ? DragEnterDirection.TOP
     : DragEnterDirection.BOTTOM
 }
+
+export const isEnteringAfter = (direction: DragEnterDirection) =>
+  AFTER_DIRECTIONS.has(direction)
+
+export const isExactGroup = (
+  group1?: string,
+  group1Alt?: string,
+  group2?: string
+) => group1 === group2 || group1Alt === group2
+
+export const isSameGroup = (group1?: string, group2?: string) =>
+  getIDWithoutIndex(group1) === getIDWithoutIndex(group2)
