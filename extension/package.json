@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "1.1.8",
+  "version": "1.1.9",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -1729,12 +1729,12 @@
     "uuid": "9.0.1",
     "vega-util": "1.17.2",
     "vscode-languageclient": "9.0.1",
-    "yaml": "2.3.2"
+    "yaml": "2.3.3"
   },
   "devDependencies": {
-    "@swc/core": "1.3.92",
+    "@swc/core": "1.3.93",
     "@swc/jest": "0.2.29",
-    "@types/chai": "4.3.7",
+    "@types/chai": "4.3.8",
     "@types/chai-as-promised": "7.1.6",
     "@types/copy-webpack-plugin": "10.1.0",
     "@types/fs-extra": "11.0.2",
@@ -1776,7 +1776,7 @@
     "vscode-uri": "3.0.8",
     "wdio-vscode-service": "5.2.1",
     "webdriverio": "8.16.7",
-    "webpack": "5.88.2",
+    "webpack": "5.89.0",
     "webpack-cli": "5.1.4"
   },
   "peerDependencies": {

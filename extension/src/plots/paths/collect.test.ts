@@ -1,5 +1,4 @@
 import { join, sep } from 'path'
-import { VisualizationSpec } from 'react-vega'
 import isEqual from 'lodash.isequal'
 import {
   collectEncodingElements,
@@ -16,6 +15,7 @@ import { Shape, StrokeDash } from '../multiSource/constants'
 import { EXPERIMENT_WORKSPACE_ID, PlotsOutput } from '../../cli/dvc/contract'
 import { REVISIONS } from '../../test/fixtures/plotsDiff'
 import { FIELD_SEPARATOR } from '../../cli/dvc/constants'
+import { SpecWithTitles } from '../vega/util'
 
 const plotsDiffFixturePaths: PlotPath[] = [
   {
@@ -112,7 +112,7 @@ describe('collectPaths', () => {
         data: {
           [remainingPath]: [
             {
-              content: {},
+              content: {} as SpecWithTitles,
               datapoints: {
                 [fetchedRevs[0]]: [
                   {
@@ -212,7 +212,7 @@ describe('collectPaths', () => {
       data: {
         [join('logs', 'scalars', 'acc.tsv')]: [
           {
-            content: {},
+            content: {} as SpecWithTitles,
             datapoints: { [EXPERIMENT_WORKSPACE_ID]: [{}] },
             revisions,
             type: PlotsType.VEGA
@@ -220,7 +220,7 @@ describe('collectPaths', () => {
         ],
         [join('logs', 'scalars', 'loss.tsv')]: [
           {
-            content: {},
+            content: {} as SpecWithTitles,
             datapoints: { [EXPERIMENT_WORKSPACE_ID]: [{}] },
             revisions,
             type: PlotsType.VEGA
@@ -237,7 +237,7 @@ describe('collectPaths', () => {
           {
             content: {
               facet: { field: 'rev', type: 'nominal' }
-            } as VisualizationSpec,
+            } as SpecWithTitles,
             datapoints: { [EXPERIMENT_WORKSPACE_ID]: [{}] },
             revisions,
             type: PlotsType.VEGA
@@ -245,7 +245,7 @@ describe('collectPaths', () => {
         ],
         [join(`dvc.yaml${FIELD_SEPARATOR}logs`, 'acc.tsv')]: [
           {
-            content: {},
+            content: {} as SpecWithTitles,
             datapoints: { [EXPERIMENT_WORKSPACE_ID]: [{}] },
             revisions,
             type: PlotsType.VEGA
@@ -258,7 +258,7 @@ describe('collectPaths', () => {
           'acc.tsv'
         )]: [
           {
-            content: {},
+            content: {} as SpecWithTitles,
             datapoints: { [EXPERIMENT_WORKSPACE_ID]: [{}] },
             revisions,
             type: PlotsType.VEGA

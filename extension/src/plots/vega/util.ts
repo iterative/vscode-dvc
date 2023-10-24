@@ -30,10 +30,23 @@ import { ColorScale, DEFAULT_NB_ITEMS_PER_ROW } from '../webview/contract'
 import { ShapeEncoding, StrokeDashEncoding } from '../multiSource/constants'
 import { Color } from '../../experiments/model/status/colors'
 
+type SpecTitle = {
+  normal: Title | undefined
+  truncated: string | string[] | Title | undefined
+}
+
+interface SpecTitles {
+  x: SpecTitle
+  y: SpecTitle
+  main: SpecTitle
+}
+
+export type SpecWithTitles = VisualizationSpec & { titles: SpecTitles }
+
 const COMMIT_FIELD = 'rev'
 
 const getFacetField = (
-  template: TopLevelSpec | VisualizationSpec
+  template: TopLevelSpec | SpecWithTitles
 ): string | null => {
   const facetSpec = template as TopLevelFacetSpec
   if (facetSpec.facet) {
@@ -56,23 +69,19 @@ const getFacetField = (
   return null
 }
 
-const isVegaFacetPlot = (template: TopLevelSpec | VisualizationSpec): boolean =>
+const isVegaFacetPlot = (template: TopLevelSpec | SpecWithTitles): boolean =>
   !!getFacetField(template)
 
 type ConcatSpec = TopLevel<GenericConcatSpec<NonNormalizedSpec>>
 type VerticalConcatSpec = TopLevel<GenericVConcatSpec<NonNormalizedSpec>>
 type HorizontalConcatSpec = TopLevel<GenericHConcatSpec<NonNormalizedSpec>>
 
-const isVegaConcatPlot = (
-  template: TopLevelSpec | VisualizationSpec
-): boolean =>
+const isVegaConcatPlot = (template: TopLevelSpec | SpecWithTitles): boolean =>
   (template as ConcatSpec).concat?.length > 0 ||
   (template as VerticalConcatSpec).vconcat?.length > 0 ||
   (template as HorizontalConcatSpec).hconcat?.length > 0
 
-const isVegaRepeatPlot = (
-  template: TopLevelSpec | VisualizationSpec
-): boolean => {
+const isVegaRepeatPlot = (template: TopLevelSpec | SpecWithTitles): boolean => {
   const repeatSpec = template as TopLevel<NonLayerRepeatSpec>
   return (
     !!repeatSpec.repeat &&
@@ -83,7 +92,7 @@ const isVegaRepeatPlot = (
 }
 
 export const isMultiViewPlot = (
-  template?: TopLevelSpec | VisualizationSpec
+  template?: TopLevelSpec | SpecWithTitles
 ): boolean =>
   !template ||
   isVegaFacetPlot(template) ||
@@ -91,7 +100,7 @@ export const isMultiViewPlot = (
   isVegaRepeatPlot(template)
 
 export const isMultiViewByCommitPlot = (
-  template?: TopLevelSpec | VisualizationSpec
+  template?: TopLevelSpec | SpecWithTitles
 ): boolean => !template || getFacetField(template) === COMMIT_FIELD
 
 export const getColorScale = (
@@ -253,7 +262,7 @@ const truncateTitle = (
   return titleCopy
 }
 
-export const truncateVerticalTitle = (
+const truncateVerticalTitle = (
   title: Text | Title,
   width: number,
   height: number
@@ -266,7 +275,8 @@ const truncateTitles = (
   spec: TopLevelSpec,
   width: number,
   height: number,
-  vertical?: boolean
+  axis: 'x' | 'y' | 'main',
+  titles: SpecTitles
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
   if (spec && typeof spec === 'object') {
@@ -279,29 +289,58 @@ const truncateTitles = (
       }
 
       const valueType = typeof value
-      if (key === 'y') {
-        vertical = true
+      if (key === 'y' || key === 'x') {
+        axis = key
       }
+
       if (key === 'title') {
         const title = value as unknown as Title
-        specCopy[key] = vertical
-          ? truncateVerticalTitle(title, width, height)
-          : truncateTitle(title, width > DEFAULT_NB_ITEMS_PER_ROW ? 30 : 50)
+        const truncatedTitle =
+          axis === 'y'
+            ? truncateVerticalTitle(title, width, height)
+            : truncateTitle(title, width > DEFAULT_NB_ITEMS_PER_ROW ? 30 : 50)
+        titles[axis].normal = title
+        titles[axis].truncated = truncatedTitle
+        specCopy[key] = truncatedTitle
       } else if (isEndValue(valueType)) {
         specCopy[key] = value
       } else if (Array.isArray(value)) {
         specCopy[key] = value.map(val =>
           isEndValue(typeof val)
             ? val
-            : truncateTitles(val, width, height, vertical)
+            : truncateTitles(val, width, height, axis, titles)
         )
       } else if (typeof value === 'object') {
-        specCopy[key] = truncateTitles(value, width, height, vertical)
+        specCopy[key] = truncateTitles(value, width, height, axis, titles)
       }
     }
     return specCopy
   }
   return spec
+}
+
+export const truncateVegaSpecTitles = (
+  spec: TopLevelSpec,
+  width: number,
+  height: number
+) => {
+  const emptyTitle = { normal: undefined, truncated: undefined }
+  const titles = {
+    main: { ...emptyTitle },
+    x: { ...emptyTitle },
+    y: { ...emptyTitle }
+  }
+  const updatedSpec = truncateTitles(
+    spec,
+    width,
+    height,
+    'main',
+    titles
+  ) as unknown as TopLevelSpec
+
+  ;(updatedSpec as any).titles = titles
+
+  return updatedSpec
 }
 
 export const extendVegaSpec = (
@@ -314,11 +353,7 @@ export const extendVegaSpec = (
     shape?: ShapeEncoding
   }
 ) => {
-  const updatedSpec = truncateTitles(
-    spec,
-    width,
-    height
-  ) as unknown as TopLevelSpec
+  const updatedSpec = truncateVegaSpecTitles(spec, width, height)
 
   if (isMultiViewByCommitPlot(spec) || !encoding) {
     return updatedSpec

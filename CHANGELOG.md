@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.9] - 2023-10-20
+
+### 🔨 Maintenance
+
+- Fix DVCLive snippet in walkthrough [#4853](https://github.com/iterative/vscode-dvc/pull/4853) by [@mattseddon](https://github.com/mattseddon)
+- Amend changelog with missing entry [#4852](https://github.com/iterative/vscode-dvc/pull/4852) by [@mattseddon](https://github.com/mattseddon)
+- Update demo project and latest tested CLI version (3.27.0) [#4860](https://github.com/iterative/vscode-dvc/pull/4860) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.1.8] - 2023-10-18
 
 ### 🚀 New Features and Enhancements
@@ -76,6 +84,7 @@ All notable changes to this project will be documented in this file.
 ### 🚀 New Features and Enhancements
 
 - Improve Plot Wizard Error Handling [#4770](https://github.com/iterative/vscode-dvc/pull/4770) by [@julieg18](https://github.com/julieg18)
+- exp rename: Add exp rename to experiments table [#4616](https://github.com/iterative/vscode-dvc/pull/4616) by [@BradyJ27](https://github.com/BradyJ27)
 
 ## [1.1.2] - 2023-10-05
 

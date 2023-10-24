@@ -1,3 +1,4 @@
+import { Title } from 'vega'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
 
 const smoothTemplatePlotContent = {
@@ -270,6 +271,11 @@ const smoothTemplatePlotContent = {
         range: ['#945dd6', '#13adc7']
       }
     }
+  },
+  titles: {
+    main: { normal: '' as unknown as Title, truncated: '' },
+    x: { normal: '' as unknown as Title, truncated: '' },
+    y: { normal: '' as unknown as Title, truncated: '' }
   }
 }
 

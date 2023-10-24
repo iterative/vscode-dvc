@@ -1,4 +1,4 @@
-import { VisualizationSpec } from 'react-vega'
+import { TopLevelSpec } from 'vega-lite'
 import { getCustomPlotId } from './collect'
 import { Column, ColumnType } from '../../experiments/webview/contract'
 import { FILE_SEPARATOR } from '../../experiments/columns/paths'
@@ -56,7 +56,6 @@ const getSpecDataType = (type: string) =>
   type === 'number' ? 'quantitative' : 'nominal'
 
 export const createSpec = (
-  title: string,
   metric: string,
   param: string,
   metricType: string,
@@ -89,7 +88,7 @@ export const createSpec = (
         scale: {
           zero: false
         },
-        title,
+        title: metric,
         type: getSpecDataType(metricType)
       }
     },
@@ -120,4 +119,4 @@ export const createSpec = (
       }
     ],
     width: 'container'
-  }) as VisualizationSpec
+  }) as TopLevelSpec
