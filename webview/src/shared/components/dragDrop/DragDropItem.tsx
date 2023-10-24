@@ -29,7 +29,7 @@ export const DragDropItem: React.FC<DragDropItemProps> = ({
   draggedId,
   isDiv
 }) => {
-  const Type = isDiv ? 'div' : draggable.type
+  const Type = isDiv ? 'div' : draggable?.type
   return (
     draggable && (
       <Type
