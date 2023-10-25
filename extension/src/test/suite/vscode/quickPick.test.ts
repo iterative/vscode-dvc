@@ -209,6 +209,7 @@ suite('Quick Pick Test Suite', () => {
         maxSelectedItems
       )
 
+      // this is failing with an error
       await selectMultipleQuickPickItems([5, 2, 1], items.length, false)
 
       expect(
