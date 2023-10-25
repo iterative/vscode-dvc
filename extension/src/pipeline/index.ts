@@ -84,7 +84,7 @@ export class Pipeline extends DeferredDisposable {
 
   public async getCwd() {
     await this.checkOrAddPipeline()
-    return this.getPipelineCwd()
+    return this.findPipelineCwd()
   }
 
   public async checkOrAddPipeline() {
@@ -138,7 +138,7 @@ export class Pipeline extends DeferredDisposable {
   }
 
   public async addDataSeriesPlot() {
-    const cwd = (await this.getPipelineCwd()) || this.dvcRoot
+    const cwd = (await this.findPipelineCwd()) || this.dvcRoot
 
     const plotConfiguration = await pickPlotConfiguration(cwd)
 
@@ -153,7 +153,7 @@ export class Pipeline extends DeferredDisposable {
     return appendFileSync(join(this.dvcRoot, TEMP_DAG_FILE), '\n')
   }
 
-  private getPipelineCwd() {
+  private findPipelineCwd() {
     const focusedPipeline = this.getFocusedPipeline()
     if (focusedPipeline) {
       return focusedPipeline
