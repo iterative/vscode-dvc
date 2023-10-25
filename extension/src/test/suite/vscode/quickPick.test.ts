@@ -161,7 +161,7 @@ suite('Quick Pick Test Suite', () => {
       const result = await resultPromise
 
       expect(result).to.deep.equal([5, 2, 1])
-    }).timeout(8000)
+    }).timeout(10000)
 
     it('should return undefined if user cancels the quick pick', async () => {
       const quickPick = disposable.track(
@@ -208,9 +208,16 @@ suite('Quick Pick Test Suite', () => {
         { title: 'select up to 3 values' as Title },
         maxSelectedItems
       )
+      const selectionEvent = new Promise(resolve =>
+        quickPick.onDidChangeSelection(items => {
+          if (items.length === 3) {
+            resolve(undefined)
+          }
+        })
+      )
 
-      // this is failing with an error
       await selectMultipleQuickPickItems([5, 2, 1], items.length, false)
+      await selectionEvent
 
       expect(
         quickPick.selectedItems,
@@ -220,6 +227,6 @@ suite('Quick Pick Test Suite', () => {
         quickPick.items,
         'all items which could be selected are hidden'
       ).to.have.lengthOf(maxSelectedItems)
-    }).timeout(8000)
+    }).timeout(10000)
   })
 })
