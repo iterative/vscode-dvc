@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.10] - 2023-10-25
+
+### 🚀 New Features and Enhancements
+
+- Add created branch (from `dvc exp branch`) to the experiments table [#4857](https://github.com/iterative/vscode-dvc/pull/4857) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Warn user before trying to add a stage to their pipeline [#4869](https://github.com/iterative/vscode-dvc/pull/4869) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Update demo project dvclive 3.1.0 [#4874](https://github.com/iterative/vscode-dvc/pull/4874) by [@sroy3](https://github.com/sroy3)
+- Fix `quickPickUserOrderedValues` windows test timing out [#4879](https://github.com/iterative/vscode-dvc/pull/4879) by [@julieg18](https://github.com/julieg18)
+- Remove @types/react-measure [#4898](https://github.com/iterative/vscode-dvc/pull/4898) by [@sroy3](https://github.com/sroy3)
+
 ## [1.1.9] - 2023-10-20
 
 ### 🔨 Maintenance
