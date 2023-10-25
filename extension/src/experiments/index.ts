@@ -7,7 +7,12 @@ import {
   workspace
 } from 'vscode'
 import omit from 'lodash.omit'
-import { ColumnLike, addStarredToColumns } from './columns/like'
+import {
+  ColumnLike,
+  addToColumns,
+  starredColumnLike,
+  tagsColumnLike
+} from './columns/like'
 import { setContextForEditorTitleIcons } from './context'
 import { ExperimentsModel } from './model'
 import { collectRemoteExpShas } from './model/collect'
@@ -291,7 +296,7 @@ export class Experiments extends BaseRepository<TableData> {
 
   public async addSort() {
     const columns = this.columns.getTerminalNodes()
-    const columnLikes = addStarredToColumns(columns)
+    const columnLikes = addToColumns(columns, starredColumnLike)
 
     const sortToAdd = await pickSortToAdd(columnLikes)
     if (!sortToAdd) {
@@ -773,7 +778,7 @@ export class Experiments extends BaseRepository<TableData> {
       return overrideColumn
     }
     const columns = this.columns.getTerminalNodes()
-    const columnLikes = addStarredToColumns(columns)
+    const columnLikes = addToColumns(columns, starredColumnLike, tagsColumnLike)
     return pickColumnToFilter(columnLikes)
   }
 
