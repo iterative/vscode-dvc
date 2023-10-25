@@ -613,6 +613,11 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getAvailableBranchesToSelect()
   }
 
+  public addBranch(branch: string) {
+    this.experiments.addBranch(branch)
+    return this.refresh()
+  }
+
   public refresh() {
     return this.data.update()
   }
