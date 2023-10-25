@@ -14,8 +14,21 @@ import { RegisteredCommands } from '../../commands/external'
 
 export const getBranchExperimentCommand =
   (experiments: WorkspaceExperiments) =>
-  (cwd: string, name: string, input: string) =>
-    experiments.runCommand(AvailableCommands.EXP_BRANCH, cwd, name, input)
+  async (cwd: string, name: string, input: string) => {
+    const output = await experiments.runCommand(
+      AvailableCommands.EXP_BRANCH,
+      cwd,
+      name,
+      input
+    )
+
+    if (!output) {
+      return
+    }
+
+    const repository = experiments.getRepository(cwd)
+    return repository.addBranch(input)
+  }
 
 export const getRenameExperimentCommand =
   (experiments: WorkspaceExperiments) =>

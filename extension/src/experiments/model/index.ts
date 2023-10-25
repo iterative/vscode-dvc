@@ -585,6 +585,13 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.availableBranchesToSelect
   }
 
+  public addBranch(branch: string) {
+    const selectedBranches: string[] = this.getSelectedBranches()
+    const branchesWithNewBranch = [...selectedBranches, branch].sort()
+
+    this.setSelectedBranches(branchesWithNewBranch)
+  }
+
   public setStudioData(
     live: { baselineSha: string; name: string }[],
     pushed: string[]

@@ -17,6 +17,8 @@ import { getInput, getValidInput } from '../vscode/inputBox'
 import { Title } from '../vscode/title'
 import { quickPickOne, quickPickOneOrInput } from '../vscode/quickPick'
 import { pickFile } from '../vscode/resourcePicker'
+import { Response } from '../vscode/response'
+import { Modal } from '../vscode/modal'
 
 export enum ScriptCommand {
   JUPYTER = 'jupyter nbconvert --to notebook --inplace --execute',
@@ -105,11 +107,54 @@ export class Pipeline extends DeferredDisposable {
     )
   }
 
-  public checkOrAddPipeline() {
+  public async checkOrAddPipeline() {
     if (this.model.hasPipeline()) {
       return
     }
+
+    const response = await Modal.showInformation(
+      'To continue you must add some configuration. Would you like to add a stage now?',
+      Response.YES
+    )
+
+    if (response !== Response.YES) {
+      return
+    }
+
     return this.addPipeline()
+  }
+
+  public async addPipeline() {
+    const stageName = await this.askForStageName()
+    if (!stageName) {
+      return
+    }
+
+    const { trainingScript, command, enteredManually } =
+      await this.askForTrainingScript()
+    if (!trainingScript) {
+      return
+    }
+
+    const dataUpdated = new Promise(resolve => {
+      const listener = this.dispose.track(
+        this.data.onDidUpdate(() => {
+          resolve(undefined)
+          this.dispose.untrack(listener)
+          listener.dispose()
+        })
+      )
+    })
+
+    void findOrCreateDvcYamlFile(
+      this.dvcRoot,
+      trainingScript,
+      stageName,
+      command,
+      !enteredManually
+    )
+    void this.data.managedUpdate()
+    return dataUpdated
   }
 
   public async addDataSeriesPlot() {
@@ -147,39 +192,6 @@ export class Pipeline extends DeferredDisposable {
 
     await this.data.isReady()
     return this.deferred.resolve()
-  }
-
-  private async addPipeline() {
-    const stageName = await this.askForStageName()
-    if (!stageName) {
-      return
-    }
-
-    const { trainingScript, command, enteredManually } =
-      await this.askForTrainingScript()
-    if (!trainingScript) {
-      return
-    }
-
-    const dataUpdated = new Promise(resolve => {
-      const listener = this.dispose.track(
-        this.data.onDidUpdate(() => {
-          resolve(undefined)
-          this.dispose.untrack(listener)
-          listener.dispose()
-        })
-      )
-    })
-
-    void findOrCreateDvcYamlFile(
-      this.dvcRoot,
-      trainingScript,
-      stageName,
-      command,
-      !enteredManually
-    )
-    void this.data.managedUpdate()
-    return dataUpdated
   }
 
   private async askForStageName() {

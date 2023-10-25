@@ -30,16 +30,50 @@ suite('Pipeline Test Suite', () => {
   })
 
   describe('Pipeline', () => {
+    it('should not show a modal when addPipeline is called', async () => {
+      const mockInputBox = stub(window, 'showInputBox').resolves(undefined)
+      const { mockShowInformation, pipeline } = buildPipeline({
+        disposer: disposable,
+        dvcYamls: []
+      })
+      await pipeline.isReady()
+      await pipeline.addPipeline()
+      expect(mockShowInformation).not.to.have.been.calledOnce
+      expect(mockInputBox).to.have.been.calledOnce
+    })
+
     it('should ask to create a stage and not return a cwd if there is no pipeline', async () => {
       const mockInputBox = stub(window, 'showInputBox').resolves(undefined)
-      const { pipeline } = buildPipeline({
+      const { mockShowInformation, pipeline } = buildPipeline({
         disposer: disposable,
         dvcYamls: []
       })
       await pipeline.isReady()
       const cwd = await pipeline.getCwd()
-      expect(mockInputBox, 'the user should be prompted to add a pipeline').to
+      expect(
+        mockShowInformation,
+        'the user should be asked whether or not they want to add a stage'
+      ).to.have.been.calledOnce
+      expect(mockInputBox, 'the user should be prompted for a stage name').to
         .have.been.calledOnce
+      expect(cwd, 'no cwd is returned').to.be.undefined
+    })
+
+    it('should not create a stage if the user does not want to add one', async () => {
+      const mockInputBox = stub(window, 'showInputBox').resolves(undefined)
+      const { mockShowInformation, pipeline } = buildPipeline({
+        disposer: disposable,
+        dvcYamls: []
+      })
+      mockShowInformation.resetBehavior()
+      mockShowInformation.resolves(undefined)
+      await pipeline.isReady()
+      const cwd = await pipeline.getCwd()
+      expect(
+        mockShowInformation,
+        'the user should be asked whether or not they want to add a stage'
+      ).to
+      expect(mockInputBox).not.to.have.been.called
       expect(cwd, 'no cwd is returned').to.be.undefined
     })
 
