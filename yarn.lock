@@ -6147,10 +6147,10 @@
   resolved "https://registry.yarnpkg.com/@types/mocha/-/mocha-10.0.1.tgz#2f4f65bb08bc368ac39c96da7b2f09140b26851b"
   integrity sha512-/fvYntiO1GeICvqbQ3doGDIP97vWmvFt83GKguJ6prmQM2iXZfFcq6YE8KteFyRtX2/h5Hf91BYvPodJKFYv5Q==
 
-"@types/mock-require@2.0.1":
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/@types/mock-require/-/mock-require-2.0.1.tgz#1546819af1d8d5b124f5f70aff130cc77c53573e"
-  integrity sha512-O7U5DVGboY/Crueb5/huUCIRjKtRVRaLmRDbZJBlDQgJn966z3aiFDN+6AtYviu2ExwMkl34LjT/IiC0OPtKuQ==
+"@types/mock-require@2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@types/mock-require/-/mock-require-2.0.2.tgz#004a20eddcfbdc0ee051868ab40bcf585a0c7354"
+  integrity sha512-+gdhqQrG7NLVr3TZMzDa6ovD8drpMdXDlA0f4wDODWjl/PLCInPRWtrk9iPvscM48J44Cosed1cqCXR3u8ttMg==
   dependencies:
     "@types/node" "*"
 
