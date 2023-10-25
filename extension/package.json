@@ -1744,7 +1744,7 @@
     "@types/lodash.isempty": "4.4.8",
     "@types/lodash.isequal": "4.5.7",
     "@types/lodash.merge": "4.6.8",
-    "@types/lodash.omit": "4.5.7",
+    "@types/lodash.omit": "4.5.8",
     "@types/mocha": "10.0.2",
     "@types/mock-require": "2.0.1",
     "@types/node": "16.x",
