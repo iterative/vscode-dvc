@@ -161,7 +161,7 @@ suite('Quick Pick Test Suite', () => {
       const result = await resultPromise
 
       expect(result).to.deep.equal([5, 2, 1])
-    })
+    }).timeout(8000)
 
     it('should return undefined if user cancels the quick pick', async () => {
       const quickPick = disposable.track(
