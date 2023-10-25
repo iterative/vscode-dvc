@@ -144,6 +144,10 @@ suite('Quick Pick Test Suite', () => {
 
   describe('quickPickUserOrderedValues', () => {
     it('should return selected values in the order that the user selected', async () => {
+      const quickPick = disposable.track(
+        window.createQuickPick<QuickPickItemWithValue<number>>()
+      )
+      stub(window, 'createQuickPick').returns(quickPick)
       const items = [
         { label: 'J', value: 1 },
         { label: 'K', value: 2 },
@@ -156,7 +160,7 @@ suite('Quick Pick Test Suite', () => {
         title: 'Select some values' as Title
       })
 
-      await selectMultipleQuickPickItems([5, 2, 1], items.length)
+      await selectMultipleQuickPickItems([5, 2, 1], items.length, quickPick)
 
       const result = await resultPromise
 
@@ -208,16 +212,13 @@ suite('Quick Pick Test Suite', () => {
         { title: 'select up to 3 values' as Title },
         maxSelectedItems
       )
-      const selectionEvent = new Promise(resolve =>
-        quickPick.onDidChangeSelection(items => {
-          if (items.length === 3) {
-            resolve(undefined)
-          }
-        })
-      )
 
-      await selectMultipleQuickPickItems([5, 2, 1], items.length, false)
-      await selectionEvent
+      await selectMultipleQuickPickItems(
+        [5, 2, 1],
+        items.length,
+        quickPick,
+        false
+      )
 
       expect(
         quickPick.selectedItems,
