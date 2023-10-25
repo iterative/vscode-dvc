@@ -1,23 +1,17 @@
 import React, { PropsWithChildren } from 'react'
 import styles from './styles.module.scss'
-import { DragDropItem, DragDropItemProps } from './DragDropItem'
 
-interface DragDropItemWithTargetProps extends DragDropItemProps {
+interface DragDropItemWithTargetProps {
   dropTarget: JSX.Element | null
+  draggable: JSX.Element
   isAfter?: boolean
+  shouldShowOnDrag?: boolean
 }
 
 export const DragDropItemWithTarget: React.FC<
   PropsWithChildren<DragDropItemWithTargetProps>
-> = ({ dropTarget, isAfter, children, ...props }) => {
-  const { shouldShowOnDrag, draggable } = props
-
-  const itemWithTag = shouldShowOnDrag ? (
-    <DragDropItem key={draggable.key} {...props} isDiv={shouldShowOnDrag} />
-  ) : (
-    children
-  )
-  const block = isAfter ? [itemWithTag, dropTarget] : [dropTarget, itemWithTag]
+> = ({ dropTarget, isAfter, shouldShowOnDrag, draggable, children }) => {
+  const block = isAfter ? [children, dropTarget] : [dropTarget, children]
 
   return shouldShowOnDrag ? (
     <draggable.type className={styles.newBlockWhenShowingOnDrag}>

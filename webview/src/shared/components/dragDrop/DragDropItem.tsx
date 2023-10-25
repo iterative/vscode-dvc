@@ -1,6 +1,6 @@
 import React, { DragEvent } from 'react'
 
-export interface DragDropItemProps {
+interface DragDropItemProps {
   id: string
   draggable: JSX.Element
   onDragStart: (e: DragEvent<HTMLElement>) => void
@@ -29,7 +29,7 @@ export const DragDropItem: React.FC<DragDropItemProps> = ({
   draggedId,
   isDiv
 }) => {
-  const Type = isDiv ? 'div' : draggable?.type
+  const Type = isDiv ? 'div' : draggable.type
   return (
     <Type
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

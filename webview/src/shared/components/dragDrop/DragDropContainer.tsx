@@ -291,23 +291,28 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   const wrappedItems = items
     .map(draggable => {
       const id = draggable.props.id
-      const itemProps = {
-        cleanup,
-        disabledDropIds,
-        draggable,
-        draggedId,
-        id,
-        onDragEnter: handleDragEnter,
-        onDragLeave: handleDragLeave,
-        onDragOver: handleDragOver,
-        onDragStart: handleDragStart,
-        onDrop: handleOnDrop,
-        shouldShowOnDrag
-      }
+      const isDraggedOver =
+        id === draggedOverId && (hoveringSomething || !parentDraggedOver)
 
-      const item = <DragDropItem key={draggable.key} {...itemProps} />
+      const item = (
+        <DragDropItem
+          key={draggable.key}
+          cleanup={cleanup}
+          disabledDropIds={disabledDropIds}
+          draggable={draggable}
+          id={id}
+          onDragEnter={handleDragEnter}
+          onDragLeave={handleDragLeave}
+          onDragOver={handleDragOver}
+          onDragStart={handleDragStart}
+          onDrop={handleOnDrop}
+          draggedId={draggedId}
+          shouldShowOnDrag={shouldShowOnDrag}
+          isDiv={isDraggedOver && shouldShowOnDrag}
+        />
+      )
 
-      if (id === draggedOverId && (hoveringSomething || !parentDraggedOver)) {
+      if (isDraggedOver) {
         const isAfter = isEnteringAfter(direction)
         const target = isExactGroup(draggedOverGroup, draggedRef?.group, group)
           ? getTarget(
@@ -319,10 +324,11 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
 
         return (
           <DragDropItemWithTarget
-            {...itemProps}
             key={draggable.key}
             isAfter={isAfter}
             dropTarget={target}
+            shouldShowOnDrag={shouldShowOnDrag}
+            draggable={draggable}
           >
             {item}
           </DragDropItemWithTarget>
