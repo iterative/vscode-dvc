@@ -6074,10 +6074,10 @@
   dependencies:
     "@types/lodash" "*"
 
-"@types/lodash.isempty@4.4.7":
-  version "4.4.7"
-  resolved "https://registry.yarnpkg.com/@types/lodash.isempty/-/lodash.isempty-4.4.7.tgz#b1015d1adba560daf560ad04f294848939e75317"
-  integrity sha512-YOzlpoIn9jrfHzjIukKnu9Le3tmi+0PhUdOt2rMpJW/4J6jX7s0HeBatXdh9QckLga8qt4EKBxVIEqtEq6pzLg==
+"@types/lodash.isempty@4.4.8":
+  version "4.4.8"
+  resolved "https://registry.yarnpkg.com/@types/lodash.isempty/-/lodash.isempty-4.4.8.tgz#f609eb59175b263d4e66d55667daeb5520533cbc"
+  integrity sha512-cfBlgq2xgy5Hg3SWKGQeTnJdHeZ4ZZ6FBCn9F6OZVW2codhsZVysluDu01iHvSS/hneAhcjkF8Td8hFMzBrUUQ==
   dependencies:
     "@types/lodash" "*"
 
