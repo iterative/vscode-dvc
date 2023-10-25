@@ -6250,10 +6250,10 @@
   dependencies:
     react-vega "*"
 
-"@types/react-virtualized@9.21.24":
-  version "9.21.24"
-  resolved "https://registry.yarnpkg.com/@types/react-virtualized/-/react-virtualized-9.21.24.tgz#cb8cb94cc6ac3ddfec96b171f0ac116e0aeb17e1"
-  integrity sha512-IIVofOOE/LcGcppDDOBAN6Q5XfmVByIHo2CV2ymEuozN/Q6bvFEHGr5dttYKrl7fa3tJoGhmtb9S/Z7gxN1oBw==
+"@types/react-virtualized@9.21.25":
+  version "9.21.25"
+  resolved "https://registry.yarnpkg.com/@types/react-virtualized/-/react-virtualized-9.21.25.tgz#ba693758b349bae941d6338bed7fa02ba3041d46"
+  integrity sha512-DVPEzSHB6qzujW6G4VxMwzLybFG3dB79A+mNYk2/qCBK6ayqDDFlzBKgKZmdaKqzBhydpSlUq4I7/yeojp8pQQ==
   dependencies:
     "@types/prop-types" "*"
     "@types/react" "*"
