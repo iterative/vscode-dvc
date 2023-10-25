@@ -6236,13 +6236,6 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react-measure@2.0.10":
-  version "2.0.10"
-  resolved "https://registry.yarnpkg.com/@types/react-measure/-/react-measure-2.0.10.tgz#431fd5677464b3d91ceea93dc56120c8b3f7a9a9"
-  integrity sha512-LO7xwv+1fI+i9LjyKmj5hWiwPJkJzhq7Yh9C3GpDfpxly3+cMNlTyMhil2Bg+VoXdTEfGxmYpZyoStD8MohROw==
-  dependencies:
-    "@types/react" "*"
-
 "@types/react-syntax-highlighter@11.0.5":
   version "11.0.5"
   resolved "https://registry.yarnpkg.com/@types/react-syntax-highlighter/-/react-syntax-highlighter-11.0.5.tgz#0d546261b4021e1f9d85b50401c0a42acb106087"
