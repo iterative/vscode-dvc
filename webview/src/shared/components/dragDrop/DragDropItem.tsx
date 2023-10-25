@@ -31,23 +31,21 @@ export const DragDropItem: React.FC<DragDropItemProps> = ({
 }) => {
   const Type = isDiv ? 'div' : draggable?.type
   return (
-    draggable && (
-      <Type
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ref={(draggable as any).ref}
-        {...draggable.props}
-        onDragStart={onDragStart}
-        onDragEnd={cleanup}
-        onDragOver={onDragOver}
-        onDragEnter={onDragEnter}
-        onDrop={onDrop}
-        onDragLeave={onDragLeave}
-        draggable={!disabledDropIds.includes(id)}
-        style={
-          (!shouldShowOnDrag && id === draggedId && { display: 'none' }) ||
-          draggable.props.style
-        }
-      />
-    )
+    <Type
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ref={(draggable as any).ref}
+      {...draggable.props}
+      onDragStart={onDragStart}
+      onDragEnd={cleanup}
+      onDragOver={onDragOver}
+      onDragEnter={onDragEnter}
+      onDrop={onDrop}
+      onDragLeave={onDragLeave}
+      draggable={!disabledDropIds.includes(id)}
+      style={
+        (!shouldShowOnDrag && id === draggedId && { display: 'none' }) ||
+        draggable.props.style
+      }
+    />
   )
 }

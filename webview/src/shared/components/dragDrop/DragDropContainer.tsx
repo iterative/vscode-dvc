@@ -289,11 +289,8 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   )
 
   const wrappedItems = items
-    .flatMap(draggable => {
-      const id = draggable?.props?.id
-      if (!id) {
-        return
-      }
+    .map(draggable => {
+      const id = draggable.props.id
       const itemProps = {
         cleanup,
         disabledDropIds,
@@ -307,6 +304,8 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
         onDrop: handleOnDrop,
         shouldShowOnDrag
       }
+
+      const item = <DragDropItem key={draggable.key} {...itemProps} />
 
       if (id === draggedOverId && (hoveringSomething || !parentDraggedOver)) {
         const isAfter = isEnteringAfter(direction)
@@ -324,11 +323,13 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
             key={draggable.key}
             isAfter={isAfter}
             dropTarget={target}
-          />
+          >
+            {item}
+          </DragDropItemWithTarget>
         )
       }
 
-      return <DragDropItem key={draggable.key} {...itemProps} />
+      return item
     })
     .filter(Boolean) as JSX.Element[]
 
@@ -337,7 +338,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     !hoveringSomething &&
     parentDraggedOver
   ) {
-    const lastItem = wrappedItems[wrappedItems.length - 1]
+    const lastItem = items[items.length - 1]
     wrappedItems.push(getTarget(lastItem.props.id, false, <lastItem.type />))
   }
 
