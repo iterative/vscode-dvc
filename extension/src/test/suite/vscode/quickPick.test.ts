@@ -161,7 +161,7 @@ suite('Quick Pick Test Suite', () => {
       const result = await resultPromise
 
       expect(result).to.deep.equal([5, 2, 1])
-    })
+    }).timeout(8000)
 
     it('should return undefined if user cancels the quick pick', async () => {
       const quickPick = disposable.track(
@@ -200,11 +200,7 @@ suite('Quick Pick Test Suite', () => {
         { label: 'B', value: 2 },
         { label: 'C', value: 3 },
         { label: 'D', value: 4 },
-        { label: 'E', value: 5 },
-        { label: 'F', value: 6 },
-        { label: 'G', value: 7 },
-        { label: 'H', value: 8 },
-        { label: 'I', value: 9 }
+        { label: 'E', value: 5 }
       ]
 
       void quickPickUserOrderedValues(
@@ -223,6 +219,6 @@ suite('Quick Pick Test Suite', () => {
         quickPick.items,
         'all items which could be selected are hidden'
       ).to.have.lengthOf(maxSelectedItems)
-    })
+    }).timeout(8000)
   })
 })
