@@ -640,12 +640,34 @@ describe('addPlotToDvcYamlFile', () => {
     '      y:',
     '        data.json: accuracy'
   ]
+
+  it('should add a plots list with the new plot if the dvc.yaml file does not exist', () => {
+    const mockPlotYamlContent = ['', 'plots:', ...mockNewPlotLines, ''].join(
+      '\n'
+    )
+    mockedReadFileSync.mockReturnValueOnce('')
+    mockedReadFileSync.mockReturnValueOnce('')
+
+    addPlotToDvcYamlFile('/', {
+      template: 'simple',
+      title: 'Simple Plot',
+      x: { 'data.json': ['epochs'] },
+      y: { 'data.json': ['accuracy'] }
+    })
+
+    expect(mockedOpenTextDocument).toHaveBeenCalledTimes(1)
+    expect(mockedWriteFileSync).toHaveBeenCalledWith(
+      '//dvc.yaml',
+      mockPlotYamlContent
+    )
+  })
+
   it('should add a plots list with the new plot if the dvc.yaml file has no plots', () => {
     const mockDvcYamlContent = mockStagesLines.join('\n')
     const mockPlotYamlContent = ['', 'plots:', ...mockNewPlotLines, ''].join(
       '\n'
     )
-    mockedReadFileSync.mockReturnValueOnce(mockDvcYamlContent)
+    mockedReadFileSync.mockReturnValueOnce('')
     mockedReadFileSync.mockReturnValueOnce(mockDvcYamlContent)
 
     addPlotToDvcYamlFile('/', {
@@ -655,6 +677,7 @@ describe('addPlotToDvcYamlFile', () => {
       y: { 'data.json': ['accuracy'] }
     })
 
+    expect(mockedOpenTextDocument).toHaveBeenCalledTimes(1)
     expect(mockedWriteFileSync).toHaveBeenCalledWith(
       '//dvc.yaml',
       mockDvcYamlContent + mockPlotYamlContent
@@ -684,6 +707,7 @@ describe('addPlotToDvcYamlFile', () => {
       y: { 'acc.json': ['accuracy'] }
     })
 
+    expect(mockedOpenTextDocument).toHaveBeenCalledTimes(1)
     expect(mockedWriteFileSync).toHaveBeenCalledWith(
       '//dvc.yaml',
       mockDvcYamlContent + mockPlotYamlContent
@@ -714,6 +738,7 @@ describe('addPlotToDvcYamlFile', () => {
       y: { 'data.json': ['accuracy', 'epochs'] }
     })
 
+    expect(mockedOpenTextDocument).toHaveBeenCalledTimes(1)
     expect(mockedWriteFileSync).toHaveBeenCalledWith(
       '//dvc.yaml',
       mockDvcYamlContent + mockPlotYamlContent
@@ -735,6 +760,7 @@ describe('addPlotToDvcYamlFile', () => {
 
     mockDvcYamlContent.splice(7, 0, ...mockPlotYamlContent)
 
+    expect(mockedOpenTextDocument).toHaveBeenCalledTimes(1)
     expect(mockedWriteFileSync).toHaveBeenCalledWith(
       '//dvc.yaml',
       mockDvcYamlContent.join('\n')
@@ -756,6 +782,7 @@ describe('addPlotToDvcYamlFile', () => {
       y: { 'data.json': ['accuracy'] }
     })
 
+    expect(mockedOpenTextDocument).toHaveBeenCalledTimes(1)
     expect(mockedWriteFileSync).toHaveBeenCalledWith(
       '//dvc.yaml',
       mockDvcYamlContent + mockPlotYamlContent
@@ -794,6 +821,7 @@ describe('addPlotToDvcYamlFile', () => {
       y: { 'data.json': ['accuracy'] }
     })
 
+    expect(mockedOpenTextDocument).toHaveBeenCalledTimes(1)
     expect(mockedWriteFileSync).toHaveBeenCalledWith(
       '//dvc.yaml',
       mockDvcYamlContent + mockPlotYamlContent
