@@ -45,6 +45,7 @@ import {
   ValueTree,
   FileDataOrError
 } from '../../../../../cli/dvc/contract'
+import { tagsColumnLike } from '../../../../../experiments/columns/like'
 
 suite('Experiments Filter By Tree Test Suite', () => {
   const disposable = Disposable.fn()
@@ -361,6 +362,36 @@ suite('Experiments Filter By Tree Test Suite', () => {
         columnOrder: columnsOrderFixture,
         columns: columnsFixture,
         filters: ['starred'],
+        rows: filteredRows
+      }
+
+      await messageSent
+      expect(messageSpy).to.be.calledWithMatch(filteredTableData)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should be able to filter to tagged commits', async () => {
+      const { experiments, messageSpy } =
+        await stubWorkspaceGettersWebview(disposable)
+
+      const messageSent = waitForSpyCall(messageSpy, messageSpy.callCount)
+      await addFilterViaQuickInput(experiments, {
+        operator: Operator.CONTAINS,
+        path: tagsColumnLike.path,
+        value: '9.3'
+      })
+
+      const [workspace, main] = rowsFixture
+
+      const mainNoSubRows = { ...main }
+      delete mainNoSubRows.subRows
+
+      const filteredRows = [workspace, mainNoSubRows]
+
+      const filteredTableData: Partial<TableData> = {
+        changes: workspaceChangesFixture,
+        columnOrder: columnsOrderFixture,
+        columns: columnsFixture,
+        filters: ['Git Tag'],
         rows: filteredRows
       }
 
