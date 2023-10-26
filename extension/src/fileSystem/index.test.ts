@@ -655,6 +655,7 @@ describe('addPlotToDvcYamlFile', () => {
       y: { 'data.json': ['accuracy'] }
     })
 
+    expect(mockedEnsureFileSync).toHaveBeenCalledWith('//dvc.yaml')
     expect(mockedOpenTextDocument).toHaveBeenCalledTimes(1)
     expect(mockedWriteFileSync).toHaveBeenCalledWith(
       '//dvc.yaml',
