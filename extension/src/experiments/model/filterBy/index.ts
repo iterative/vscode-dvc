@@ -3,6 +3,7 @@ import { Experiment } from '../../webview/contract'
 import { definedAndNonEmpty } from '../../../util/array'
 import { splitColumnPath } from '../../columns/paths'
 import { getValue } from '../../columns/util'
+import { tagsColumnLike } from '../../columns/like'
 
 export enum Operator {
   EQUAL = '=',
@@ -33,7 +34,7 @@ export const isDateOperator = (operator: Operator): boolean =>
 export interface FilterDefinition {
   path: string
   operator: Operator
-  value: string | number | undefined
+  value: string | number | undefined | string[]
 }
 
 const stringContains = (
@@ -60,6 +61,7 @@ const evaluate = <T extends string | number | boolean>(
   if (valueToEvaluate === undefined) {
     return operator !== Operator.NOT_MISSING
   }
+
   switch (operator) {
     case Operator.NOT_MISSING:
       return true
@@ -105,12 +107,31 @@ const evaluate = <T extends string | number | boolean>(
   }
 }
 
+const evaluateTagsFilter = (
+  experiment: Experiment,
+  filter: FilterDefinition
+) => {
+  const values = experiment.commit?.tags
+  if (!values || values.length === 0) {
+    return true
+  }
+  if (Array.isArray(values)) {
+    return !values.some(value =>
+      evaluate<typeof value>(value, filter.operator, filter.value as string)
+    )
+  }
+}
+
 const buildFilter =
   (
     filterDefinitions: FilterDefinition[]
   ): ((experiment: Experiment) => boolean) =>
   experiment => {
     const firstFailure = filterDefinitions.find(filter => {
+      if (filter.path === tagsColumnLike.path) {
+        return evaluateTagsFilter(experiment, filter)
+      }
+
       const pathArray = splitColumnPath(filter.path)
       const value = getValue(experiment, pathArray)
 

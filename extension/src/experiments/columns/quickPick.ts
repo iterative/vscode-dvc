@@ -1,4 +1,4 @@
-import { ColumnLike } from './like'
+import { ColumnLike, starredColumnLike, tagsColumnLike } from './like'
 import { definedAndNonEmpty } from '../../util/array'
 import {
   QuickPickOptionsWithTitle,
@@ -16,9 +16,11 @@ export const pickFromColumnLikes = (
 
   const items = []
   for (const columnLike of columnLikes) {
-    if (columnLike.path === 'starred') {
+    if (
+      [starredColumnLike.path, tagsColumnLike.path].includes(columnLike.path)
+    ) {
       items.push({
-        description: columnLike.path,
+        description: columnLike.description,
         label: columnLike.label,
         value: columnLike
       })
