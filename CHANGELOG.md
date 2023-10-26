@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.11] - 2023-10-25
+
+### 🚀 New Features and Enhancements
+
+- Add tags filters to experiments table [#4882](https://github.com/iterative/vscode-dvc/pull/4882) by [@mattseddon](https://github.com/mattseddon)
+- Watch Git tags for experiment table updates [#4911](https://github.com/iterative/vscode-dvc/pull/4911) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.1.10] - 2023-10-25
 
 ### 🚀 New Features and Enhancements

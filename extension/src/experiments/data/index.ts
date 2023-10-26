@@ -234,7 +234,8 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
       gitPath.DOT_GIT_HEAD,
       EXPERIMENTS_GIT_REFS,
       EXPERIMENTS_GIT_LOGS_REFS,
-      gitPath.HEADS_GIT_REFS
+      gitPath.HEADS_GIT_REFS,
+      gitPath.GIT_TAGS_REFS
     ]
 
     return createFileSystemWatcher(

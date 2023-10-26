@@ -5,16 +5,22 @@ import { FilterDefinition } from '../../../../../experiments/model/filterBy'
 import { experimentsUpdatedEvent } from '../../../util'
 import { Experiments } from '../../../../../experiments'
 import { RegisteredCommands } from '../../../../../commands/external'
-import { addStarredToColumns } from '../../../../../experiments/columns/like'
+import {
+  addToColumns,
+  starredColumnLike,
+  tagsColumnLike
+} from '../../../../../experiments/columns/like'
 
 export const mockQuickInputFilter = (
   fixtureFilter: FilterDefinition,
   mockShowQuickPick = stub(window, 'showQuickPick'),
   mockShowInputBox = stub(window, 'showInputBox')
 ) => {
-  const column = addStarredToColumns(columnsFixture)?.find(
-    column => column.path === fixtureFilter.path
-  )
+  const column = addToColumns(
+    columnsFixture,
+    starredColumnLike,
+    tagsColumnLike
+  )?.find(column => column.path === fixtureFilter.path)
   mockShowQuickPick
     .onFirstCall()
     .resolves({ value: column } as unknown as QuickPickItem)
