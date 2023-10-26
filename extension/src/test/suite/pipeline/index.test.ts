@@ -360,7 +360,7 @@ suite('Pipeline Test Suite', () => {
     )
   })
 
-  it('should add a data series plot when a dvc.yaml file does not exist', async () => {
+  it('should add a data series plot without trying to add a missing dvc.yaml file or stage', async () => {
     const { pipeline } = buildPipeline({
       disposer: disposable,
       dvcYamls: []
