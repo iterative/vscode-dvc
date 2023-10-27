@@ -3,6 +3,7 @@ import { FilterDefinition, filterExperiment, Operator } from '.'
 import rowsFixture from '../../../test/fixtures/expShow/base/rows'
 import { buildDepPath, buildMetricOrParamPath } from '../../columns/paths'
 import { Experiment, ColumnType } from '../../webview/contract'
+import { tagsColumnLike } from '../../columns/like'
 
 describe('filterExperiment', () => {
   const paramsFile = 'params.yaml'
@@ -289,6 +290,72 @@ describe('filterExperiment', () => {
       filterExperiment(
         [{ operator: Operator.NOT_EQUAL, path: depPath, value }],
         experiment
+      )
+    ).toBeUndefined()
+  })
+
+  it('should correctly filter by tags using the equal operator', () => {
+    const main = { ...rowsFixture[1] }
+    ;(main.commit as { tags: string[] }).tags = ['0.9.3', 'model@v1']
+    const tagFilter = [
+      {
+        operator: Operator.EQUAL,
+        path: tagsColumnLike.path,
+        value: '0.9.3'
+      }
+    ]
+    const unfiltered = filterExperiment(tagFilter, main)
+    expect(unfiltered).toStrictEqual(main)
+
+    expect((main?.subRows || []).length > 0).toBe(true)
+
+    for (const experiment of main.subRows || []) {
+      expect(filterExperiment(tagFilter, experiment)).toBeUndefined()
+    }
+
+    expect(
+      filterExperiment(
+        [
+          {
+            operator: Operator.EQUAL,
+            path: tagsColumnLike.path,
+            value: '0.9'
+          }
+        ],
+        main
+      )
+    ).toBeUndefined()
+  })
+
+  it('should correctly filter by tags using the contains operator', () => {
+    const main = { ...rowsFixture[1] }
+    ;(main.commit as { tags: string[] }).tags = ['0.9.3', 'model@v1', 'a-tag']
+    const tagFilter = [
+      {
+        operator: Operator.CONTAINS,
+        path: tagsColumnLike.path,
+        value: '0.9'
+      }
+    ]
+    const unfiltered = filterExperiment(tagFilter, main)
+    expect(unfiltered).toStrictEqual(main)
+
+    expect((main?.subRows || []).length > 0).toBe(true)
+
+    for (const experiment of main.subRows || []) {
+      expect(filterExperiment(tagFilter, experiment)).toBeUndefined()
+    }
+
+    expect(
+      filterExperiment(
+        [
+          {
+            operator: Operator.CONTAINS,
+            path: tagsColumnLike.path,
+            value: '0.9.4'
+          }
+        ],
+        main
       )
     ).toBeUndefined()
   })

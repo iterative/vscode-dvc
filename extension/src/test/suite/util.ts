@@ -5,6 +5,7 @@ import {
   commands,
   ConfigurationChangeEvent,
   EventEmitter,
+  QuickPick,
   TextEditor,
   Uri,
   window,
@@ -38,6 +39,7 @@ import { Toast } from '../../vscode/toast'
 import { GitExecutor } from '../../cli/git/executor'
 import { DvcConfig } from '../../cli/dvc/config'
 import { ExpShowOutput, PlotsOutput } from '../../cli/dvc/contract'
+import { QuickPickItemWithValue } from '../../vscode/quickPick'
 
 export const mockDisposable = {
   dispose: stub()
@@ -85,12 +87,34 @@ export const selectQuickPickItem = async (number: number) => {
   return commands.executeCommand('workbench.action.acceptSelectedQuickOpenItem')
 }
 
-const toggleQuickPickItem = async (number: number, itemsLength: number) => {
+type NumberQuickPick = QuickPick<QuickPickItemWithValue<number>>
+
+const getQuickPickSelectionEvent = (
+  quickPick: NumberQuickPick,
+  numberInd: number
+) =>
+  new Promise(resolve =>
+    quickPick.onDidChangeSelection(items => {
+      const isItemSelected = items[numberInd]
+      if (isItemSelected) {
+        resolve(undefined)
+      }
+    })
+  )
+
+const toggleQuickPickItem = async (
+  number: number,
+  numberInd: number,
+  itemsLength: number,
+  quickPick: NumberQuickPick
+) => {
   for (let itemInd = 1; itemInd <= itemsLength; itemInd++) {
     await commands.executeCommand('workbench.action.quickOpenSelectNext')
 
     if (itemInd === number) {
+      const selectionEvent = getQuickPickSelectionEvent(quickPick, numberInd)
       await commands.executeCommand('workbench.action.quickPickManyToggle')
+      await selectionEvent
     }
   }
 }
@@ -98,10 +122,11 @@ const toggleQuickPickItem = async (number: number, itemsLength: number) => {
 export const selectMultipleQuickPickItems = async (
   numbers: number[],
   itemsLength: number,
+  quickPick: NumberQuickPick,
   acceptItems = true
 ) => {
-  for (const number of numbers) {
-    await toggleQuickPickItem(number, itemsLength)
+  for (const [ind, num] of numbers.entries()) {
+    await toggleQuickPickItem(num, ind, itemsLength, quickPick)
   }
   if (acceptItems) {
     return commands.executeCommand(

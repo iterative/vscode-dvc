@@ -144,6 +144,10 @@ suite('Quick Pick Test Suite', () => {
 
   describe('quickPickUserOrderedValues', () => {
     it('should return selected values in the order that the user selected', async () => {
+      const quickPick = disposable.track(
+        window.createQuickPick<QuickPickItemWithValue<number>>()
+      )
+      stub(window, 'createQuickPick').returns(quickPick)
       const items = [
         { label: 'J', value: 1 },
         { label: 'K', value: 2 },
@@ -156,12 +160,12 @@ suite('Quick Pick Test Suite', () => {
         title: 'Select some values' as Title
       })
 
-      await selectMultipleQuickPickItems([5, 2, 1], items.length)
+      await selectMultipleQuickPickItems([5, 2, 1], items.length, quickPick)
 
       const result = await resultPromise
 
       expect(result).to.deep.equal([5, 2, 1])
-    }).timeout(8000)
+    }).timeout(10000)
 
     it('should return undefined if user cancels the quick pick', async () => {
       const quickPick = disposable.track(
@@ -209,7 +213,12 @@ suite('Quick Pick Test Suite', () => {
         maxSelectedItems
       )
 
-      await selectMultipleQuickPickItems([5, 2, 1], items.length, false)
+      await selectMultipleQuickPickItems(
+        [5, 2, 1],
+        items.length,
+        quickPick,
+        false
+      )
 
       expect(
         quickPick.selectedItems,
@@ -219,6 +228,6 @@ suite('Quick Pick Test Suite', () => {
         quickPick.items,
         'all items which could be selected are hidden'
       ).to.have.lengthOf(maxSelectedItems)
-    }).timeout(8000)
+    }).timeout(10000)
   })
 })

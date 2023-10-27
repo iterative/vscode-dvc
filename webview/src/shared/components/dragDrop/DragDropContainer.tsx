@@ -9,35 +9,32 @@ import React, {
   useLayoutEffect
 } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { DragEnterDirection, getDragEnterDirection } from './util'
+import {
+  DragEnterDirection,
+  getDragEnterDirection,
+  isEnteringAfter,
+  isExactGroup,
+  isSameGroup
+} from './util'
 import { changeRef, setDraggedOverGroup } from './dragDropSlice'
 import styles from './styles.module.scss'
 import { DropTarget } from './DropTarget'
-import { getIDIndex, getIDWithoutIndex } from '../../../util/ids'
+import { DragDropItemWithTarget } from './DragDropItemWithTarget'
+import { DragDropItem } from './DragDropItem'
+import { getIDIndex } from '../../../util/ids'
 import { Any } from '../../../util/objects'
 import { PlotsState } from '../../../plots/store'
 import { getStyleProperty } from '../../../util/styles'
 import { idToNode } from '../../../util/helpers'
 import { useDeferedDragLeave } from '../../hooks/useDeferedDragLeave'
 
-const AFTER_DIRECTIONS = new Set([
-  DragEnterDirection.RIGHT,
-  DragEnterDirection.BOTTOM
-])
-
 const orderIdxTune = (direction: DragEnterDirection, isAfter: boolean) => {
-  if (AFTER_DIRECTIONS.has(direction)) {
+  if (isEnteringAfter(direction)) {
     return isAfter ? 0 : 1
   }
 
   return isAfter ? -1 : 0
 }
-
-export const isSameGroup = (group1?: string, group2?: string) =>
-  getIDWithoutIndex(group1) === getIDWithoutIndex(group2)
-
-const isExactGroup = (group1?: string, group1Alt?: string, group2?: string) =>
-  group1 === group2 || group1Alt === group2
 
 const setStyle = (elem: HTMLElement, style: CSSProperties, reset?: boolean) => {
   for (const [rule, value] of Object.entries(style)) {
@@ -199,7 +196,6 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     const dragged = newOrder[draggedIndex]
     newOrder.splice(draggedIndex, 1)
     newOrder.splice(droppedIndex, 0, dragged)
-
     setOrder(newOrder)
     dispatch(changeRef(undefined))
 
@@ -266,26 +262,6 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     deferedDragLeave()
   }
 
-  const buildItem = (id: string, draggable: JSX.Element) => (
-    <draggable.type
-      key={draggable.key}
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ref={(draggable as any).ref}
-      {...draggable.props}
-      onDragStart={handleDragStart}
-      onDragEnd={cleanup}
-      onDragOver={handleDragOver}
-      onDragEnter={handleDragEnter}
-      onDrop={handleOnDrop}
-      onDragLeave={handleDragLeave}
-      draggable={!disabledDropIds.includes(id)}
-      style={
-        (!shouldShowOnDrag && id === draggedId && { display: 'none' }) ||
-        draggable.props.style
-      }
-    />
-  )
-
   const getDropTargetClassNames = (isEnteringRight: boolean) =>
     shouldShowOnDrag
       ? cx(styles.dropTargetWhenShowingOnDrag, {
@@ -300,7 +276,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     wrapper: JSX.Element
   ) => (
     <DropTarget
-      key="drop-target"
+      key={`drop-target-${id}`}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleOnDrop}
@@ -312,50 +288,63 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     </DropTarget>
   )
 
-  const createItemWithDropTarget = (id: string, item: JSX.Element) => {
-    const isEnteringAfter = AFTER_DIRECTIONS.has(direction)
-    const target = isExactGroup(draggedOverGroup, draggedRef?.group, group)
-      ? getTarget(
-          id,
-          isEnteringAfter,
-          shouldShowOnDrag ? <div /> : <item.type />
+  const wrappedItems = items
+    .map(draggable => {
+      const id = draggable.props.id
+      const isDraggedOver =
+        id === draggedOverId && (hoveringSomething || !parentDraggedOver)
+
+      const item = (
+        <DragDropItem
+          key={draggable.key}
+          cleanup={cleanup}
+          disabledDropIds={disabledDropIds}
+          draggable={draggable}
+          id={id}
+          onDragEnter={handleDragEnter}
+          onDragLeave={handleDragLeave}
+          onDragOver={handleDragOver}
+          onDragStart={handleDragStart}
+          onDrop={handleOnDrop}
+          draggedId={draggedId}
+          shouldShowOnDrag={shouldShowOnDrag}
+          isDiv={isDraggedOver && shouldShowOnDrag}
+        />
+      )
+
+      if (isDraggedOver) {
+        const isAfter = isEnteringAfter(direction)
+        const target = isExactGroup(draggedOverGroup, draggedRef?.group, group)
+          ? getTarget(
+              id,
+              isAfter,
+              shouldShowOnDrag ? <div /> : <draggable.type />
+            )
+          : null
+
+        return (
+          <DragDropItemWithTarget
+            key={draggable.key}
+            isAfter={isAfter}
+            dropTarget={target}
+            shouldShowOnDrag={shouldShowOnDrag}
+            draggable={draggable}
+          >
+            {item}
+          </DragDropItemWithTarget>
         )
-      : null
+      }
 
-    const itemWithTag = shouldShowOnDrag ? (
-      <div key="item" {...item.props} />
-    ) : (
-      item
-    )
-    const block = isEnteringAfter
-      ? [itemWithTag, target]
-      : [target, itemWithTag]
-
-    return shouldShowOnDrag ? (
-      <item.type key={item.key} className={styles.newBlockWhenShowingOnDrag}>
-        {block}
-      </item.type>
-    ) : (
-      block
-    )
-  }
-
-  const wrappedItems = items.flatMap(draggable => {
-    const id = draggable?.props?.id
-    const item = id && buildItem(id, draggable)
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return id === draggedOverId && (hoveringSomething || !parentDraggedOver)
-      ? createItemWithDropTarget(id, item)
-      : item
-  })
+      return item
+    })
+    .filter(Boolean) as JSX.Element[]
 
   if (
     isSameGroup(draggedRef?.group, group) &&
     !hoveringSomething &&
     parentDraggedOver
   ) {
-    const lastItem = wrappedItems[wrappedItems.length - 1]
+    const lastItem = items[items.length - 1]
     wrappedItems.push(getTarget(lastItem.props.id, false, <lastItem.type />))
   }
 

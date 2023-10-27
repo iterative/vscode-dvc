@@ -109,7 +109,8 @@ export const dragAndDrop = (
   direction: DragEnterDirection = DragEnterDirection.LEFT,
   spyableModule?: SpyableEventCurrentTargetDistances
 ) => {
-  // When showing element on drag, the dragged over element is being recreated to be wrapped in another element, thus the endingNode does not exist as is in the document
+  // When showing element on drag, the dragged over element is being recreated to be wrapped in another element,
+  // thus the endingNode does not exist as is in the document
   const endingNodeId = endingNode.id
   dragEnter(startingNode, endingNodeId, direction, spyableModule)
 

@@ -92,6 +92,18 @@ export const OPERATORS = [
     label: Operator.ON_DATE,
     types: [ColumnType.TIMESTAMP],
     value: Operator.ON_DATE
+  },
+  {
+    description: 'Git Tag Equal',
+    label: '=',
+    types: ['tags'],
+    value: Operator.EQUAL
+  },
+  {
+    description: 'Git Tag Contains',
+    label: Operator.CONTAINS,
+    types: ['tags'],
+    value: Operator.CONTAINS
   }
 ]
 
