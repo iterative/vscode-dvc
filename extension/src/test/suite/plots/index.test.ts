@@ -1195,7 +1195,7 @@ suite('Plots Test Suite', () => {
         templatePlot.id,
         0.5
       )
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle an update comparison multi plot value message from the webview', async () => {
       const { mockMessageReceived, plotsModel } = await buildPlotsWebview({
