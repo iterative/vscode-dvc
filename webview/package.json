@@ -60,7 +60,7 @@
     "@types/node": "16.x",
     "@types/react": "18.2.30",
     "@types/react-dom": "18.2.14",
-    "@types/react-virtualized": "9.21.25",
+    "@types/react-virtualized": "9.21.26",
     "@types/webpack": "5.28.4",
     "@welldone-software/why-did-you-render": "7.0.1",
     "clean-webpack-plugin": "4.0.0",
