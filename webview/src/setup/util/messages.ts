@@ -45,11 +45,8 @@ export const showExperiments = () => {
   sendMessage({ type: MessageFromWebviewType.OPEN_EXPERIMENTS_WEBVIEW })
 }
 
-export const openStudio = () =>
-  sendMessage({ type: MessageFromWebviewType.OPEN_STUDIO })
-
-export const openStudioProfile = () =>
-  sendMessage({ type: MessageFromWebviewType.OPEN_STUDIO_PROFILE })
+export const openStudioAuthLink = () =>
+  sendMessage({ type: MessageFromWebviewType.OPEN_STUDIO_AUTH_LINK })
 
 export const saveStudioToken = () =>
   sendMessage({ type: MessageFromWebviewType.SAVE_STUDIO_TOKEN })
@@ -62,6 +59,9 @@ export const setStudioShareExperimentsLive = (shouldShareLive: boolean) =>
 
 export const removeStudioToken = () =>
   sendMessage({ type: MessageFromWebviewType.REMOVE_STUDIO_TOKEN })
+
+export const requestStudioAuth = () =>
+  sendMessage({ type: MessageFromWebviewType.REQUEST_STUDIO_AUTH })
 
 export const addRemote = () =>
   sendMessage({ type: MessageFromWebviewType.REMOTE_ADD })

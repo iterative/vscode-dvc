@@ -41,7 +41,8 @@ const DEFAULT_DATA = {
   pythonBinPath: undefined,
   remoteList: undefined,
   sectionCollapsed: undefined,
-  shareLiveToStudio: false
+  shareLiveToStudio: false,
+  studioUserCode: null
 }
 
 const renderApp = (overrideData: Partial<SetupData> = {}) => {

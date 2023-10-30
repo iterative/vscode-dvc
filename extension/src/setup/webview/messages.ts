@@ -21,19 +21,25 @@ export class WebviewMessages {
   private readonly updateStudioOffline: (offline: boolean) => Promise<void>
   private readonly isPythonExtensionUsed: () => Promise<boolean>
   private readonly updatePythonEnv: () => Promise<void>
+  private readonly requestStudioAuth: () => Promise<void>
+  private readonly openStudioAuthLink: () => void
 
   constructor(
     getWebview: () => BaseWebview<TSetupData> | undefined,
     initializeGit: () => void,
     updateStudioOffline: (shareLive: boolean) => Promise<void>,
     isPythonExtensionUsed: () => Promise<boolean>,
-    updatePythonEnv: () => Promise<void>
+    updatePythonEnv: () => Promise<void>,
+    requestStudioAuth: () => Promise<void>,
+    openStudioAuthLink: () => void
   ) {
     this.getWebview = getWebview
     this.initializeGit = initializeGit
     this.updateStudioOffline = updateStudioOffline
     this.isPythonExtensionUsed = isPythonExtensionUsed
     this.updatePythonEnv = updatePythonEnv
+    this.requestStudioAuth = requestStudioAuth
+    this.openStudioAuthLink = openStudioAuthLink
   }
 
   public sendWebviewMessage(data: SetupData) {
@@ -68,6 +74,8 @@ export class WebviewMessages {
         return this.openStudio()
       case MessageFromWebviewType.OPEN_STUDIO_PROFILE:
         return this.openStudioProfile()
+      case MessageFromWebviewType.OPEN_STUDIO_AUTH_LINK:
+        return this.openStudioAuthLink()
       case MessageFromWebviewType.SAVE_STUDIO_TOKEN:
         return commands.executeCommand(
           RegisteredCommands.ADD_STUDIO_ACCESS_TOKEN
@@ -78,6 +86,8 @@ export class WebviewMessages {
         )
       case MessageFromWebviewType.SET_STUDIO_SHARE_EXPERIMENTS_LIVE:
         return this.updateStudioOffline(message.payload)
+      case MessageFromWebviewType.REQUEST_STUDIO_AUTH:
+        return this.requestStudioAuth()
       case MessageFromWebviewType.OPEN_EXPERIMENTS_WEBVIEW:
         return commands.executeCommand(RegisteredCommands.EXPERIMENT_SHOW)
       case MessageFromWebviewType.REMOTE_ADD:

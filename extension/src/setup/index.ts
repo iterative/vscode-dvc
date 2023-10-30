@@ -4,6 +4,7 @@ import { Disposable, Disposer } from '@hediet/std/disposable'
 import isEmpty from 'lodash.isempty'
 import {
   DvcCliDetails,
+  STUDIO_URL,
   SetupSection,
   SetupData as TSetupData
 } from './webview/contract'
@@ -16,7 +17,7 @@ import { WebviewMessages } from './webview/messages'
 import { validateTokenInput } from './inputBox'
 import { findPythonBinForInstall } from './autoInstall'
 import { run, runWithRecheck, runWorkspace } from './runner'
-import { isStudioAccessToken } from './token'
+import { isStudioAccessToken, pollForStudioToken } from './token'
 import {
   PYTHON_EXTENSION_ACTION,
   pickFocusedProjects,
@@ -69,6 +70,7 @@ import {
   isActivePythonEnvGlobal,
   selectPythonInterpreter
 } from '../extensions/python'
+import { openUrl } from '../vscode/external'
 
 export class Setup
   extends BaseRepository<TSetupData>
@@ -118,7 +120,9 @@ export class Setup
   private dotFolderWatcher?: Disposer
 
   private studioAccessToken: string | undefined = undefined
+  private studioAuthLink: string | undefined = undefined
   private studioIsConnected = false
+  private studioUserCode: string | null = null
   private shareLiveToStudio: boolean | undefined = undefined
 
   private focusedSection: SetupSection | undefined = undefined
@@ -357,8 +361,7 @@ export class Setup
       return
     }
 
-    await this.accessConfig(cwd, Flag.GLOBAL, ConfigKey.STUDIO_TOKEN, token)
-    return this.updateStudioAndSend()
+    return this.saveStudioAccessTokenInConfig(cwd, token)
   }
 
   public getStudioAccessToken() {
@@ -367,6 +370,11 @@ export class Setup
 
   public sendInitialWebviewData() {
     return this.sendDataToWebview()
+  }
+
+  private async saveStudioAccessTokenInConfig(cwd: string, token: string) {
+    await this.accessConfig(cwd, Flag.GLOBAL, ConfigKey.STUDIO_TOKEN, token)
+    return this.updateStudioAndSend()
   }
 
   private async getDvcCliDetails(): Promise<DvcCliDetails> {
@@ -445,7 +453,8 @@ export class Setup
       pythonBinPath: getBinDisplayText(pythonBinPath),
       remoteList,
       sectionCollapsed: collectSectionCollapsed(this.focusedSection),
-      shareLiveToStudio: !!this.shareLiveToStudio
+      shareLiveToStudio: !!this.shareLiveToStudio,
+      studioUserCode: this.getStudioUserCode()
     })
     this.focusedSection = undefined
   }
@@ -456,8 +465,11 @@ export class Setup
       () => this.initializeGit(),
       (offline: boolean) => this.updateStudioOffline(offline),
       () => this.isPythonExtensionUsed(),
-      () => this.updatePythonEnvironment()
+      () => this.updatePythonEnvironment(),
+      () => this.requestStudioAuth(),
+      () => this.openStudioAuthLink()
     )
+    // add both new actions to above
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message =>
         webviewMessages.handleMessageFromWebview(message)
@@ -803,6 +815,68 @@ export class Setup
       ConfigKey.STUDIO_OFFLINE,
       String(offline)
     )
+  }
+
+  private getStudioUserCode() {
+    return this.studioUserCode
+  }
+
+  private async requestStudioAuth() {
+    const response = await fetch(`${STUDIO_URL}/api/device-login`, {
+      body: JSON.stringify({
+        client_name: 'vscode'
+      }),
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      method: 'POST'
+    })
+
+    const {
+      token_uri: tokenUri,
+      verification_uri: verificationUri,
+      user_code: userCode,
+      device_code: deviceCode
+    } = (await response.json()) as {
+      token_uri: string
+      verification_uri: string
+      user_code: string
+      device_code: string
+    }
+    this.studioAuthLink = verificationUri
+    this.studioUserCode = userCode
+
+    await this.sendDataToWebview()
+    void this.requestStudioToken(deviceCode, tokenUri)
+  }
+
+  private async requestStudioToken(
+    studioDeviceCode: string,
+    studioTokenRequestUri: string
+  ) {
+    const token = await pollForStudioToken(
+      studioTokenRequestUri,
+      studioDeviceCode
+    )
+
+    this.studioAccessToken = token
+    this.studioUserCode = null
+    this.studioAuthLink = undefined
+
+    const cwd = this.getCwd()
+
+    if (!cwd) {
+      return
+    }
+
+    return this.saveStudioAccessTokenInConfig(cwd, token)
+  }
+
+  private openStudioAuthLink() {
+    if (!this.studioAuthLink) {
+      return
+    }
+    void openUrl(this.studioAuthLink)
   }
 
   private getCwd() {

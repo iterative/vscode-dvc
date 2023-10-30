@@ -32,7 +32,8 @@ const DEFAULT_DATA: SetupData = {
     [SetupSection.REMOTES]: false,
     [SetupSection.STUDIO]: true
   },
-  shareLiveToStudio: false
+  shareLiveToStudio: false,
+  studioUserCode: null
 }
 
 const getUpdatedArgs = (data: Partial<SetupData>): { data: SetupData } => ({

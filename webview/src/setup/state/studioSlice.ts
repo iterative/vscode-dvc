@@ -3,12 +3,13 @@ import { SetupData } from 'dvc/src/setup/webview/contract'
 
 export type StudioState = Pick<
   SetupData,
-  'shareLiveToStudio' | 'isStudioConnected'
+  'shareLiveToStudio' | 'isStudioConnected' | 'studioUserCode'
 >
 
 export const studioInitialState: StudioState = {
   isStudioConnected: false,
-  shareLiveToStudio: false
+  shareLiveToStudio: false,
+  studioUserCode: null
 }
 
 export const studioSlice = createSlice({
@@ -20,11 +21,17 @@ export const studioSlice = createSlice({
     },
     updateShareLiveToStudio: (state, action: PayloadAction<boolean>) => {
       state.shareLiveToStudio = action.payload
+    },
+    updateStudioUserCode: (state, action: PayloadAction<string | null>) => {
+      state.studioUserCode = action.payload
     }
   }
 })
 
-export const { updateIsStudioConnected, updateShareLiveToStudio } =
-  studioSlice.actions
+export const {
+  updateIsStudioConnected,
+  updateShareLiveToStudio,
+  updateStudioUserCode
+} = studioSlice.actions
 
 export default studioSlice.reducer
