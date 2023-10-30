@@ -262,6 +262,7 @@ const getPlotsYaml = (plotObj: PlotConfigData, indentSearchLines: string[]) => {
 
 export const addPlotToDvcYamlFile = (cwd: string, plotObj: PlotConfigData) => {
   const dvcYamlFile = `${cwd}/dvc.yaml`
+  ensureFileSync(dvcYamlFile)
   const dvcYamlDoc = loadYamlAsDoc(dvcYamlFile)
 
   if (!dvcYamlDoc) {
@@ -276,8 +277,9 @@ export const addPlotToDvcYamlFile = (cwd: string, plotObj: PlotConfigData) => {
   if (!plots?.range) {
     const plotYaml = getPlotsYaml(plotObj, dvcYamlLines)
     dvcYamlLines.push(...plotYaml)
-    writeFileSync(dvcYamlFile, dvcYamlLines.join('\n'))
-    return
+
+    void openFileInEditor(dvcYamlFile)
+    return writeFileSync(dvcYamlFile, dvcYamlLines.join('\n'))
   }
 
   const plotsEndPos = lineCounter.linePos(plots.range[2]).line

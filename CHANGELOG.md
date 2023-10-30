@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.12] - 2023-10-27
+
+### 🚀 New Features and Enhancements
+
+- Remove check for stages in plot wizard [#4904](https://github.com/iterative/vscode-dvc/pull/4904) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Fix unstable `quickPickUserOrderedValues` test in windows [#4900](https://github.com/iterative/vscode-dvc/pull/4900) by [@julieg18](https://github.com/julieg18)
+- Split drag and drop container into different files [#4880](https://github.com/iterative/vscode-dvc/pull/4880) by [@sroy3](https://github.com/sroy3)
+
 ## [1.1.11] - 2023-10-25
 
 ### 🚀 New Features and Enhancements

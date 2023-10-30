@@ -83,28 +83,8 @@ export class Pipeline extends DeferredDisposable {
   }
 
   public async getCwd() {
-    const focusedPipeline = this.getFocusedPipeline()
-    if (focusedPipeline) {
-      return focusedPipeline
-    }
-
     await this.checkOrAddPipeline()
-
-    const pipelines = this.model.getPipelines()
-    if (!pipelines?.size) {
-      return
-    }
-    if (pipelines.has(this.dvcRoot)) {
-      return this.dvcRoot
-    }
-    if (pipelines.size === 1) {
-      return [...pipelines][0]
-    }
-
-    return quickPickOne(
-      [...pipelines],
-      'Select a Pipeline to Run Command Against'
-    )
+    return this.findPipelineCwd()
   }
 
   public async checkOrAddPipeline() {
@@ -158,11 +138,7 @@ export class Pipeline extends DeferredDisposable {
   }
 
   public async addDataSeriesPlot() {
-    const cwd = await this.getCwd()
-
-    if (!cwd) {
-      return
-    }
+    const cwd = (await this.findPipelineCwd()) || this.dvcRoot
 
     const plotConfiguration = await pickPlotConfiguration(cwd)
 
@@ -175,6 +151,29 @@ export class Pipeline extends DeferredDisposable {
 
   public forceRerender() {
     return appendFileSync(join(this.dvcRoot, TEMP_DAG_FILE), '\n')
+  }
+
+  private findPipelineCwd() {
+    const focusedPipeline = this.getFocusedPipeline()
+    if (focusedPipeline) {
+      return focusedPipeline
+    }
+
+    const pipelines = this.model.getPipelines()
+    if (!pipelines?.size) {
+      return
+    }
+    if (pipelines.has(this.dvcRoot)) {
+      return this.dvcRoot
+    }
+    if (pipelines.size === 1) {
+      return [...pipelines][0]
+    }
+
+    return quickPickOne(
+      [...pipelines],
+      'Select a Pipeline to Run Command Against'
+    )
   }
 
   private async initialize() {
