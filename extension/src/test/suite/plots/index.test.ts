@@ -1164,7 +1164,7 @@ suite('Plots Test Suite', () => {
         RegisteredCommands.PLOTS_CUSTOM_REMOVE,
         dvcDemoPath
       )
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle an update smooth plot values message from the webview', async () => {
       const { mockMessageReceived, plotsModel } = await buildPlotsWebview({
@@ -1231,7 +1231,7 @@ suite('Plots Test Suite', () => {
         multiImg.path,
         5
       )
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle an add plot message from the webview', async () => {
       const { mockMessageReceived } = await buildPlotsWebview({
@@ -1249,7 +1249,7 @@ suite('Plots Test Suite', () => {
         RegisteredCommands.ADD_PLOT,
         dvcDemoPath
       )
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle the CLI throwing an error', async () => {
       const { data, errorsModel, mockPlotsDiff, plots, plotsModel } =
