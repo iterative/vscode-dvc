@@ -3,7 +3,8 @@ import React, {
   useEffect,
   DetailedHTMLProps,
   HTMLAttributes,
-  useCallback
+  useCallback,
+  MouseEvent
 } from 'react'
 import { AnyAction } from '@reduxjs/toolkit'
 import { useDispatch, useSelector } from 'react-redux'
@@ -16,6 +17,8 @@ import { Slider } from '../../shared/components/slider/Slider'
 import { PlotsState } from '../store'
 import { SectionContainer } from '../../shared/components/sectionContainer/SectionContainer'
 import { resizePlots, togglePlotsSection } from '../util/messages'
+import { toggleDragAndDropMode as toggleTemplateDragAndDrop } from './templatePlots/templatePlotsSlice'
+import { toggleDragAndDropMode as toggleCustomDragAndDrop } from './customPlots/customPlotsSlice'
 
 interface PlotsContainerProps {
   sectionCollapsed: boolean
@@ -33,6 +36,7 @@ interface PlotsContainerProps {
   children: React.ReactNode
   hasItems?: boolean
   noHeight?: boolean
+  isDragAndDropMode?: boolean
 }
 
 export const PlotsContainer: React.FC<PlotsContainerProps> = ({
@@ -47,7 +51,8 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   removePlotsButton,
   changeSize,
   hasItems,
-  noHeight
+  noHeight,
+  isDragAndDropMode
 }) => {
   const open = !sectionCollapsed
   const dispatch = useDispatch()
@@ -55,7 +60,6 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
     (state: PlotsState) => state.webview.maxNbPlotsPerRow
   )
   const ribbonHeight = useSelector((state: PlotsState) => state.ribbon.height)
-
   useEffect(() => {
     window.dispatchEvent(new Event('resize'))
   }, [nbItemsPerRowOrWidth, height])
@@ -106,6 +110,20 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
     value => typeof value !== 'string'
   ) as number[]
 
+  const changeMode = (e: MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation()
+    switch (sectionKey) {
+      case PlotsSection.TEMPLATE_PLOTS:
+        return dispatch(toggleTemplateDragAndDrop(!isDragAndDropMode))
+
+      case PlotsSection.CUSTOM_PLOTS:
+        return dispatch(toggleCustomDragAndDrop(!isDragAndDropMode))
+
+      default:
+        return
+    }
+  }
+
   return (
     <SectionContainer
       menuItems={menuItems}
@@ -127,6 +145,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
         hasItems &&
         maxNbPlotsPerRow > 1 && (
           <div className={styles.sizeSliders} data-testid="size-sliders">
+            <button onClick={changeMode}>Toggle</button>
             <div className={styles.sizeSlider}>
               <Slider
                 maximum={-1}

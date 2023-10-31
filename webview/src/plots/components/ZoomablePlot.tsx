@@ -1,4 +1,3 @@
-import { AnyAction } from '@reduxjs/toolkit'
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import { SpecWithTitles } from 'dvc/src/plots/vega/util'
 import React, { useEffect, useRef } from 'react'
@@ -11,14 +10,12 @@ import styles from './styles.module.scss'
 import { config } from './constants'
 import { zoomPlot } from '../util/messages'
 import { useGetPlot } from '../hooks/useGetPlot'
-import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
 import { Ellipsis } from '../../shared/components/icons'
 
 interface ZoomablePlotProps {
   spec?: SpecWithTitles
   id: string
   onViewReady?: () => void
-  changeDisabledDragIds: (ids: string[]) => AnyAction
   currentSnapPoint: number
   section: PlotsSection
   shouldNotResize?: boolean
@@ -84,7 +81,6 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
         onClick={() => handleOnClick()}
         aria-label="Open Plot in Popup"
       >
-        <GripIcon className={styles.plotGripIcon} />
         <span
           className={styles.plotActions}
           onClick={event => {
@@ -116,3 +112,4 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
     </ZoomablePlotWrapper>
   )
 }
+;(ZoomablePlot as any).whyDidYouRender = true
