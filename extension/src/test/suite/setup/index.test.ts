@@ -850,48 +850,6 @@ suite('Setup Test Suite', () => {
       ).to.be.calledWithExactly('setContext', 'dvc.cli.incompatible', false)
     })
 
-    it('should handle a message from the webview to open Studio', async () => {
-      const { mockOpenExternal, setup, urlOpenedEvent } = buildSetup({
-        disposer: disposable
-      })
-
-      const webview = await setup.showWebview()
-      await webview.isReady()
-
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
-
-      mockMessageReceived.fire({
-        type: MessageFromWebviewType.OPEN_STUDIO
-      })
-
-      await urlOpenedEvent
-      expect(mockOpenExternal).to.be.calledWith(
-        Uri.parse('https://studio.iterative.ai')
-      )
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
-
-    it("should handle a message from the webview to open the user's Studio profile", async () => {
-      const { setup, mockOpenExternal, urlOpenedEvent } = buildSetup({
-        disposer: disposable
-      })
-
-      const webview = await setup.showWebview()
-      await webview.isReady()
-
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
-
-      mockMessageReceived.fire({
-        type: MessageFromWebviewType.OPEN_STUDIO_PROFILE
-      })
-
-      await urlOpenedEvent
-      expect(mockOpenExternal).to.be.calledWith(
-        Uri.parse(
-          'https://studio.iterative.ai/user/_/profile?section=accessToken'
-        )
-      )
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
-
     it("should handle a message from the webview to save the user's Studio access token", async () => {
       const mockToken = 'isat_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
 

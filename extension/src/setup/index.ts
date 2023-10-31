@@ -469,7 +469,6 @@ export class Setup
       () => this.requestStudioAuth(),
       () => this.openStudioAuthLink()
     )
-    // add both new actions to above
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message =>
         webviewMessages.handleMessageFromWebview(message)

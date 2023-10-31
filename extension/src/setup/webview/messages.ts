@@ -1,5 +1,5 @@
 import { commands } from 'vscode'
-import { STUDIO_URL, SetupData, SetupData as TSetupData } from './contract'
+import { SetupData, SetupData as TSetupData } from './contract'
 import { Logger } from '../../common/logger'
 import {
   MessageFromWebview,
@@ -12,7 +12,6 @@ import {
   RegisteredCliCommands,
   RegisteredCommands
 } from '../../commands/external'
-import { openUrl } from '../../vscode/external'
 import { autoInstallDvc, autoUpgradeDvc } from '../autoInstall'
 
 export class WebviewMessages {
@@ -70,10 +69,6 @@ export class WebviewMessages {
         return commands.executeCommand(
           RegisteredCommands.EXTENSION_SETUP_WORKSPACE
         )
-      case MessageFromWebviewType.OPEN_STUDIO:
-        return this.openStudio()
-      case MessageFromWebviewType.OPEN_STUDIO_PROFILE:
-        return this.openStudioProfile()
       case MessageFromWebviewType.OPEN_STUDIO_AUTH_LINK:
         return this.openStudioAuthLink()
       case MessageFromWebviewType.SAVE_STUDIO_TOKEN:
@@ -139,13 +134,5 @@ export class WebviewMessages {
     const isPythonExtensionUsed = await this.isPythonExtensionUsed()
 
     return autoInstallDvc(isPythonExtensionUsed)
-  }
-
-  private openStudio() {
-    return openUrl(STUDIO_URL)
-  }
-
-  private openStudioProfile() {
-    return openUrl(`${STUDIO_URL}/user/_/profile?section=accessToken`)
   }
 }
