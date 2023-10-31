@@ -61,7 +61,7 @@ export const removeStudioToken = () =>
   sendMessage({ type: MessageFromWebviewType.REMOVE_STUDIO_TOKEN })
 
 export const requestStudioAuth = () =>
-  sendMessage({ type: MessageFromWebviewType.REQUEST_STUDIO_AUTH })
+  sendMessage({ type: MessageFromWebviewType.REQUEST_STUDIO_TOKEN })
 
 export const addRemote = () =>
   sendMessage({ type: MessageFromWebviewType.REMOTE_ADD })

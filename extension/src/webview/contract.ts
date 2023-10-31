@@ -48,7 +48,7 @@ export enum MessageFromWebviewType {
   RESET_COMMITS = 'reset-commits',
   RESIZE_COLUMN = 'resize-column',
   RESIZE_PLOTS = 'resize-plots',
-  REQUEST_STUDIO_AUTH = 'request-studio-authentication',
+  REQUEST_STUDIO_TOKEN = 'request-studio-authentication',
   SAVE_STUDIO_TOKEN = 'save-studio-token',
   SET_COMPARISON_MULTI_PLOT_VALUE = 'update-comparison-multi-plot-value',
   SET_SMOOTH_PLOT_VALUE = 'update-smooth-plot-value',
@@ -296,7 +296,7 @@ export type MessageFromWebview =
   | { type: MessageFromWebviewType.OPEN_STUDIO_PROFILE }
   | { type: MessageFromWebviewType.OPEN_STUDIO_AUTH_LINK }
   | { type: MessageFromWebviewType.SAVE_STUDIO_TOKEN }
-  | { type: MessageFromWebviewType.REQUEST_STUDIO_AUTH }
+  | { type: MessageFromWebviewType.REQUEST_STUDIO_TOKEN }
   | { type: MessageFromWebviewType.ADD_CONFIGURATION }
   | { type: MessageFromWebviewType.ZOOM_PLOT; payload?: string }
   | { type: MessageFromWebviewType.OPEN_EXPERIMENTS_WEBVIEW }

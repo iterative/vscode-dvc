@@ -632,47 +632,48 @@ describe('App', () => {
   })
 
   describe('Studio not connected', () => {
-    it('should show three buttons which walk the user through saving a token', async () => {
+    it('should show a button which requests a token from Studio', () => {
       renderApp()
-      const buttons = await within(
-        await screen.findByTestId('setup-studio-content')
-      ).findAllByRole('button')
-      expect(buttons).toHaveLength(3)
-    })
-
-    it('should show a button which opens Studio', () => {
-      renderApp()
-
       mockPostMessage.mockClear()
-      const button = screen.getByText('Sign In')
-      fireEvent.click(button)
-      expect(mockPostMessage).toHaveBeenCalledTimes(1)
-      expect(mockPostMessage).toHaveBeenCalledWith({
-        type: MessageFromWebviewType.OPEN_STUDIO
-      })
-    })
 
-    it("should show a button which opens the user's Studio profile", () => {
-      renderApp()
-
-      mockPostMessage.mockClear()
       const button = screen.getByText('Get Token')
       fireEvent.click(button)
       expect(mockPostMessage).toHaveBeenCalledTimes(1)
       expect(mockPostMessage).toHaveBeenCalledWith({
-        type: MessageFromWebviewType.OPEN_STUDIO_PROFILE
+        type: MessageFromWebviewType.REQUEST_STUDIO_TOKEN
       })
     })
 
-    it("should show a button which allows the user's to save their Studio access token", () => {
+    it('should show a button-like link which lets the user save a token manually', () => {
       renderApp()
 
       mockPostMessage.mockClear()
-      const button = screen.getByText('Save Token')
+      const button = screen.getByText('add an already created token')
       fireEvent.click(button)
       expect(mockPostMessage).toHaveBeenCalledTimes(1)
       expect(mockPostMessage).toHaveBeenCalledWith({
         type: MessageFromWebviewType.SAVE_STUDIO_TOKEN
+      })
+    })
+
+    it('should instruct the user to verify their identity if a user code exists', () => {
+      const userCode = '45JFHQ56'
+      renderApp({
+        studioAuthUserCode: userCode
+      })
+
+      mockPostMessage.mockClear()
+      const code = screen.getByText(userCode)
+      const copyButton = screen.getByTitle('Copy Code')
+
+      expect(code).toBeInTheDocument()
+      expect(copyButton).toBeInTheDocument()
+
+      const verifyButton = screen.getByText('Verify Identity')
+      fireEvent.click(verifyButton)
+      expect(mockPostMessage).toHaveBeenCalledTimes(1)
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.OPEN_STUDIO_AUTH_LINK
       })
     })
 

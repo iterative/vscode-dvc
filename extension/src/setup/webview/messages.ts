@@ -86,7 +86,7 @@ export class WebviewMessages {
         )
       case MessageFromWebviewType.SET_STUDIO_SHARE_EXPERIMENTS_LIVE:
         return this.updateStudioOffline(message.payload)
-      case MessageFromWebviewType.REQUEST_STUDIO_AUTH:
+      case MessageFromWebviewType.REQUEST_STUDIO_TOKEN:
         return this.requestStudioAuth()
       case MessageFromWebviewType.OPEN_EXPERIMENTS_WEBVIEW:
         return commands.executeCommand(RegisteredCommands.EXPERIMENT_SHOW)
