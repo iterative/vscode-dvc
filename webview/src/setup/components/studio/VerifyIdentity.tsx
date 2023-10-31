@@ -4,8 +4,8 @@ import { openStudioAuthLink } from '../../util/messages'
 import { Button } from '../../../shared/components/button/Button'
 import { CopyButton } from '../../../shared/components/copyButton/CopyButton'
 
-export const VerifyIdentity: React.FC<{ studioAuthUserCode: string }> = ({
-  studioAuthUserCode
+export const VerifyIdentity: React.FC<{ studioVerifyUserCode: string }> = ({
+  studioVerifyUserCode
 }) => {
   return (
     <>
@@ -14,11 +14,11 @@ export const VerifyIdentity: React.FC<{ studioAuthUserCode: string }> = ({
         your identity.
       </p>
       <p className={styles.userAuthCode}>
-        {studioAuthUserCode}
+        {studioVerifyUserCode}
         <CopyButton
           className={styles.copyButton}
           tooltip="Copy Code"
-          value={studioAuthUserCode}
+          value={studioVerifyUserCode}
         />
       </p>
       <Button text="Verify Identity" onClick={openStudioAuthLink} />

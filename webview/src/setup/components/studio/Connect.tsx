@@ -7,7 +7,7 @@ import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { SetupState } from '../../store'
 
 export const Connect: React.FC = () => {
-  const { studioAuthUserCode } = useSelector(
+  const { studioVerifyUserCode } = useSelector(
     (state: SetupState) => state.studio
   )
   return (
@@ -16,8 +16,8 @@ export const Connect: React.FC = () => {
         <h1>
           Connect to <a href={STUDIO_URL}>Studio</a>
         </h1>
-        {studioAuthUserCode ? (
-          <VerifyIdentity studioAuthUserCode={studioAuthUserCode} />
+        {studioVerifyUserCode ? (
+          <VerifyIdentity studioVerifyUserCode={studioVerifyUserCode} />
         ) : (
           <GetToken />
         )}

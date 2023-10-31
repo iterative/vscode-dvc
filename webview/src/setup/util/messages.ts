@@ -46,7 +46,7 @@ export const showExperiments = () => {
 }
 
 export const openStudioAuthLink = () =>
-  sendMessage({ type: MessageFromWebviewType.OPEN_STUDIO_AUTH_LINK })
+  sendMessage({ type: MessageFromWebviewType.OPEN_STUDIO_VERIFY_USER_LINK })
 
 export const saveStudioToken = () =>
   sendMessage({ type: MessageFromWebviewType.SAVE_STUDIO_TOKEN })

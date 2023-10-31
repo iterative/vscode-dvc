@@ -69,7 +69,7 @@ export class WebviewMessages {
         return commands.executeCommand(
           RegisteredCommands.EXTENSION_SETUP_WORKSPACE
         )
-      case MessageFromWebviewType.OPEN_STUDIO_AUTH_LINK:
+      case MessageFromWebviewType.OPEN_STUDIO_VERIFY_USER_LINK:
         return this.openStudioAuthLink()
       case MessageFromWebviewType.SAVE_STUDIO_TOKEN:
         return commands.executeCommand(

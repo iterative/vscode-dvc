@@ -33,7 +33,7 @@ const DEFAULT_DATA: SetupData = {
     [SetupSection.STUDIO]: true
   },
   shareLiveToStudio: false,
-  studioAuthUserCode: null
+  studioVerifyUserCode: null
 }
 
 const getUpdatedArgs = (data: Partial<SetupData>): { data: SetupData } => ({
@@ -95,7 +95,7 @@ NoDataUserAuthRequired.parameters = {}
 NoDataUserAuthRequired.args = getUpdatedArgs({
   isStudioConnected: false,
   sectionCollapsed: undefined,
-  studioAuthUserCode: '45JFHQ56'
+  studioVerifyUserCode: '45JFHQ56'
 })
 
 export const CompletedConnected = Template.bind({})

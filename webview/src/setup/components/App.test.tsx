@@ -42,7 +42,7 @@ const DEFAULT_DATA = {
   remoteList: undefined,
   sectionCollapsed: undefined,
   shareLiveToStudio: false,
-  studioAuthUserCode: null
+  studioVerifyUserCode: null
 }
 
 const renderApp = (overrideData: Partial<SetupData> = {}) => {
@@ -659,7 +659,7 @@ describe('App', () => {
     it('should instruct the user to verify their identity if a user code exists', () => {
       const userCode = '45JFHQ56'
       renderApp({
-        studioAuthUserCode: userCode
+        studioVerifyUserCode: userCode
       })
 
       mockPostMessage.mockClear()
@@ -673,7 +673,7 @@ describe('App', () => {
       fireEvent.click(verifyButton)
       expect(mockPostMessage).toHaveBeenCalledTimes(1)
       expect(mockPostMessage).toHaveBeenCalledWith({
-        type: MessageFromWebviewType.OPEN_STUDIO_AUTH_LINK
+        type: MessageFromWebviewType.OPEN_STUDIO_VERIFY_USER_LINK
       })
     })
 

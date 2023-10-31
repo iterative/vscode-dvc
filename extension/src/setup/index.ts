@@ -120,9 +120,9 @@ export class Setup
   private dotFolderWatcher?: Disposer
 
   private studioAccessToken: string | undefined = undefined
-  private studioAuthLink: string | undefined = undefined
   private studioIsConnected = false
-  private studioAuthUserCode: string | null = null
+  private studioVerifyUserUrl: string | undefined = undefined
+  private studioVerifyUserCode: string | null = null
   private shareLiveToStudio: boolean | undefined = undefined
 
   private focusedSection: SetupSection | undefined = undefined
@@ -454,7 +454,7 @@ export class Setup
       remoteList,
       sectionCollapsed: collectSectionCollapsed(this.focusedSection),
       shareLiveToStudio: !!this.shareLiveToStudio,
-      studioAuthUserCode: this.getStudioUserCode()
+      studioVerifyUserCode: this.getStudioVerifyUserCode()
     })
     this.focusedSection = undefined
   }
@@ -466,8 +466,8 @@ export class Setup
       (offline: boolean) => this.updateStudioOffline(offline),
       () => this.isPythonExtensionUsed(),
       () => this.updatePythonEnvironment(),
-      () => this.requestStudioAuth(),
-      () => this.openStudioAuthLink()
+      () => this.requestStudioAuthentication(),
+      () => this.openStudioVerifyUserUrl()
     )
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message =>
@@ -816,11 +816,15 @@ export class Setup
     )
   }
 
-  private getStudioUserCode() {
-    return this.studioAuthUserCode
+  private getStudioVerifyUserCode() {
+    return this.studioVerifyUserCode
   }
 
-  private async requestStudioAuth() {
+  private getStudioVerifyUserUrl() {
+    return this.studioVerifyUserUrl
+  }
+
+  private async requestStudioAuthentication() {
     const response = await fetch(`${STUDIO_URL}/api/device-login`, {
       body: JSON.stringify({
         client_name: 'vscode'
@@ -842,8 +846,7 @@ export class Setup
       user_code: string
       device_code: string
     }
-    this.studioAuthLink = verificationUri
-    this.studioAuthUserCode = userCode
+    this.updateStudioUserVerifyDetails(userCode, verificationUri)
 
     await this.sendDataToWebview()
     void this.requestStudioToken(deviceCode, tokenUri)
@@ -858,9 +861,7 @@ export class Setup
       studioDeviceCode
     )
 
-    this.studioAccessToken = token
-    this.studioAuthUserCode = null
-    this.studioAuthLink = undefined
+    this.updateStudioUserVerifyDetails(null, undefined)
 
     const cwd = this.getCwd()
 
@@ -871,11 +872,20 @@ export class Setup
     return this.saveStudioAccessTokenInConfig(cwd, token)
   }
 
-  private openStudioAuthLink() {
-    if (!this.studioAuthLink) {
+  private openStudioVerifyUserUrl() {
+    const url = this.getStudioVerifyUserUrl()
+    if (!url) {
       return
     }
-    void openUrl(this.studioAuthLink)
+    void openUrl(url)
+  }
+
+  private updateStudioUserVerifyDetails(
+    userCode: string | null,
+    verifyUrl: string | undefined
+  ) {
+    this.studioVerifyUserCode = userCode
+    this.studioVerifyUserUrl = verifyUrl
   }
 
   private getCwd() {

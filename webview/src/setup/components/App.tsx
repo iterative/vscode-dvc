@@ -120,8 +120,8 @@ export const feedStore = (
       case 'shareLiveToStudio':
         dispatch(updateShareLiveToStudio(data.data.shareLiveToStudio))
         continue
-      case 'studioAuthUserCode':
-        dispatch(updateStudioUserCode(data.data.studioAuthUserCode))
+      case 'studioVerifyUserCode':
+        dispatch(updateStudioUserCode(data.data.studioVerifyUserCode))
         continue
       case 'remoteList':
         dispatch(updateRemoteList(data.data.remoteList))
