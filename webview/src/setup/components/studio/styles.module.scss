@@ -1,6 +1,26 @@
 @import '../../../shared/variables';
 @import '../../../shared/mixins';
 
+.buttonAsLink {
+  @extend %buttonAsLink;
+}
+
+.userAuthCode {
+  color: $fg-color;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .copyButton {
+    display: flex;
+    margin: 0 0 2px 2px;
+    max-width: 16px;
+    max-height: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
 .studioSettings {
   display: 'flex';
   margin-top: -20px;
@@ -18,8 +38,4 @@
 .checkboxDescription {
   font-size: 0.8rem;
   margin-top: -10px;
-}
-
-.buttonAsLink {
-  @extend %buttonAsLink;
 }

@@ -1,57 +1,25 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { STUDIO_URL } from 'dvc/src/setup/webview/contract'
-import styles from './styles.module.scss'
-import {
-  requestStudioAuth,
-  openStudioAuthLink,
-  saveStudioToken
-} from '../../util/messages'
+import { GetToken } from './GetToken'
+import { VerifyIdentity } from './VerifyIdentity'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
-import { Button } from '../../../shared/components/button/Button'
 import { SetupState } from '../../store'
 
 export const Connect: React.FC = () => {
-  const { studioUserCode } = useSelector((state: SetupState) => state.studio)
+  const { studioAuthUserCode } = useSelector(
+    (state: SetupState) => state.studio
+  )
   return (
     <EmptyState isFullScreen={false}>
       <div data-testid="setup-studio-content">
         <h1>
           Connect to <a href={STUDIO_URL}>Studio</a>
         </h1>
-        {studioUserCode ? (
-          <>
-            <p>
-              We sent a token request to Studio. Enter the code shown below to
-              verify your identity.
-            </p>
-            <p>{studioUserCode}</p>
-            <Button
-              appearance="secondary"
-              text="Verify Identity"
-              onClick={openStudioAuthLink}
-            />
-          </>
+        {studioAuthUserCode ? (
+          <VerifyIdentity studioAuthUserCode={studioAuthUserCode} />
         ) : (
-          <>
-            <p>
-              Share experiments and plots with collaborators directly from your
-              IDE. Start sending data with an{' '}
-              <a href="https://dvc.org/doc/studio/user-guide/projects-and-experiments/live-metrics-and-plots#set-up-an-access-token">
-                access token
-              </a>{' '}
-              generated from your Studio profile page. Request a token below or
-              <button className={styles.buttonAsLink} onClick={saveStudioToken}>
-                add an already created token
-              </button>
-              .
-            </p>
-            <Button
-              appearance="secondary"
-              text="Get Token"
-              onClick={requestStudioAuth}
-            />
-          </>
+          <GetToken />
         )}
         <p>
           Don&apos;t Have an account? <a href={STUDIO_URL}>Get Started</a>

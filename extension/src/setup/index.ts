@@ -122,7 +122,7 @@ export class Setup
   private studioAccessToken: string | undefined = undefined
   private studioAuthLink: string | undefined = undefined
   private studioIsConnected = false
-  private studioUserCode: string | null = null
+  private studioAuthUserCode: string | null = null
   private shareLiveToStudio: boolean | undefined = undefined
 
   private focusedSection: SetupSection | undefined = undefined
@@ -454,7 +454,7 @@ export class Setup
       remoteList,
       sectionCollapsed: collectSectionCollapsed(this.focusedSection),
       shareLiveToStudio: !!this.shareLiveToStudio,
-      studioUserCode: this.getStudioUserCode()
+      studioAuthUserCode: this.getStudioUserCode()
     })
     this.focusedSection = undefined
   }
@@ -818,7 +818,7 @@ export class Setup
   }
 
   private getStudioUserCode() {
-    return this.studioUserCode
+    return this.studioAuthUserCode
   }
 
   private async requestStudioAuth() {
@@ -844,7 +844,7 @@ export class Setup
       device_code: string
     }
     this.studioAuthLink = verificationUri
-    this.studioUserCode = userCode
+    this.studioAuthUserCode = userCode
 
     await this.sendDataToWebview()
     void this.requestStudioToken(deviceCode, tokenUri)
@@ -860,7 +860,7 @@ export class Setup
     )
 
     this.studioAccessToken = token
-    this.studioUserCode = null
+    this.studioAuthUserCode = null
     this.studioAuthLink = undefined
 
     const cwd = this.getCwd()

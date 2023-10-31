@@ -42,7 +42,7 @@ const DEFAULT_DATA = {
   remoteList: undefined,
   sectionCollapsed: undefined,
   shareLiveToStudio: false,
-  studioUserCode: null
+  studioAuthUserCode: null
 }
 
 const renderApp = (overrideData: Partial<SetupData> = {}) => {
