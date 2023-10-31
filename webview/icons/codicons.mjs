@@ -23,6 +23,7 @@ export const codicons = [
   'info',
   'list-filter',
   'link',
+  'move',
   'pass-filled',
   'pinned',
   'refresh',

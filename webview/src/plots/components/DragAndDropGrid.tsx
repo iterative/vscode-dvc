@@ -42,7 +42,7 @@ export const DragAndDropGrid: React.FC<DragAndDropGridProps> = ({
         plotDataStore[PlotsSection.TEMPLATE_PLOTS][plot].revisions?.length) ||
       1
 
-    const plotClassName = cx(styles.plot, {
+    const plotClassName = cx(styles.plot, styles.dragAndDropPlot, {
       [styles.multiViewPlot]: multiView
     })
 

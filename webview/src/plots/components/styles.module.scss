@@ -36,6 +36,12 @@ $gap: 20px;
   }
 }
 
+.dragAndDropPlot {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .plotGripIcon {
   position: absolute;
   z-index: 2;
@@ -46,15 +52,11 @@ $gap: 20px;
   width: 100%;
   border-top-left-radius: 5px;
   border-bottom-left-radius: 5px;
-  opacity: 0;
+  opacity: 0.5;
 
   path {
     transform: rotate(90deg);
     transform-origin: center;
-  }
-
-  .plot:hover & {
-    opacity: 0.5;
   }
 }
 
@@ -199,11 +201,10 @@ $gap: 20px;
   gap: 10px;
   right: 0;
   top: 0;
+  justify-self: flex-end;
   display: flex;
   justify-content: end;
   background-color: $bg-color;
-  z-index: 3;
-  justify-self: flex-end;
 }
 
 .sizeSlider {

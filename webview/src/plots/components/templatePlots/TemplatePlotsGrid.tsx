@@ -54,7 +54,6 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
 
   const setEntriesOrder = (order: string[]) => {
     setSectionEntries(groupIndex, order)
-    dispatch(toggleDragAndDropMode(false))
   }
 
   return (
