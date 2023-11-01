@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import cx from 'classnames'
 import { NoPlotsAdded } from './NoPlotsAdded'
-import { changeDisabledDragIds } from './customPlotsSlice'
 import styles from '../styles.module.scss'
 import { shouldUseVirtualizedGrid } from '../util'
 import { Grid } from '../Grid'
@@ -25,7 +24,6 @@ export const CustomPlots: React.FC<CustomPlotsProps> = ({ plotsIds }) => {
     hasData,
     hasItems,
     hasAddedPlots,
-    disabledDragPlotIds,
     hasUnfilteredExperiments
   } = useSelector((state: PlotsState) => state.custom)
   const [onSection, setOnSection] = useState(false)
@@ -93,10 +91,6 @@ export const CustomPlots: React.FC<CustomPlotsProps> = ({ plotsIds }) => {
         order={order}
         groupId="custom-plots"
         parentDraggedOver={onSection}
-        disabledDragPlotIds={disabledDragPlotIds}
-        changeDisabledDragIds={(disabled: string[]) =>
-          dispatch(changeDisabledDragIds(disabled))
-        }
         sectionKey={PlotsSection.CUSTOM_PLOTS}
       />
     </div>

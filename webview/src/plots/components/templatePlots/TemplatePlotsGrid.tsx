@@ -1,7 +1,6 @@
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { changeDisabledDragIds } from './templatePlotsSlice'
+import { useSelector } from 'react-redux'
 import { OnDrop } from '../../../shared/components/dragDrop/DragDropContainer'
 import { PlotsState } from '../../store'
 import { Grid } from '../Grid'
@@ -27,13 +26,8 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   nbItemsPerRow,
   parentDraggedOver
 }) => {
-  const dispatch = useDispatch()
   const entries = useSelector(
     (state: PlotsState) => state.template.sections[groupIndex].entries
-  )
-
-  const disabledDragPlotIds = useSelector(
-    (state: PlotsState) => state.template.disabledDragPlotIds
   )
 
   const setEntriesOrder = (order: string[]) => {
@@ -49,11 +43,7 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
       groupId={groupId}
       onDrop={onDropInSection}
       parentDraggedOver={parentDraggedOver}
-      disabledDragPlotIds={disabledDragPlotIds}
       multiView={multiView}
-      changeDisabledDragIds={(disabled: string[]) =>
-        dispatch(changeDisabledDragIds(disabled))
-      }
       sectionKey={PlotsSection.TEMPLATE_PLOTS}
     />
   )

@@ -15,12 +15,10 @@ export interface CustomPlotsState extends Omit<CustomPlotsData, 'plots'> {
   hasItems: boolean
   plotsIds: string[]
   plotsSnapshots: { [key: string]: string }
-  disabledDragPlotIds: string[]
   isInDragAndDropMode: boolean
 }
 
 export const customPlotsInitialState: CustomPlotsState = {
-  disabledDragPlotIds: [],
   hasAddedPlots: false,
   hasData: false,
   hasItems: false,
@@ -38,9 +36,6 @@ export const customPlotsSlice = createSlice({
   initialState: customPlotsInitialState,
   name: 'custom',
   reducers: {
-    changeDisabledDragIds: (state, action: PayloadAction<string[]>) => {
-      state.disabledDragPlotIds = action.payload
-    },
     changeSize: (
       state,
       action: PayloadAction<{
@@ -80,12 +75,7 @@ export const customPlotsSlice = createSlice({
   }
 })
 
-export const {
-  update,
-  setCollapsed,
-  changeSize,
-  changeDisabledDragIds,
-  toggleDragAndDropMode
-} = customPlotsSlice.actions
+export const { update, setCollapsed, changeSize, toggleDragAndDropMode } =
+  customPlotsSlice.actions
 
 export default customPlotsSlice.reducer

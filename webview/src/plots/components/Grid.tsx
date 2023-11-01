@@ -12,7 +12,6 @@ interface GridProps extends NormalGridProps {
   groupId: string
   onDrop?: OnDrop
   parentDraggedOver?: boolean
-  disabledDragPlotIds: string[]
 }
 
 export const Grid: React.FC<GridProps> = ({
@@ -23,9 +22,7 @@ export const Grid: React.FC<GridProps> = ({
   groupId,
   onDrop,
   parentDraggedOver,
-  disabledDragPlotIds,
   multiView,
-  changeDisabledDragIds,
   sectionKey
 }) => {
   const isInDragAndDropMode = useSelector((state: PlotsState) =>
@@ -41,7 +38,6 @@ export const Grid: React.FC<GridProps> = ({
       groupId={groupId}
       onDrop={onDrop}
       parentDraggedOver={parentDraggedOver}
-      disabledDragPlotIds={disabledDragPlotIds}
     />
   ) : (
     <NormalGrid
@@ -49,7 +45,6 @@ export const Grid: React.FC<GridProps> = ({
       nbItemsPerRow={nbItemsPerRow}
       order={order}
       multiView={multiView}
-      changeDisabledDragIds={changeDisabledDragIds}
       sectionKey={sectionKey}
     />
   )

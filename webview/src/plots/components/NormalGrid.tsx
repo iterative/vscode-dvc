@@ -13,7 +13,6 @@ export interface NormalGridProps {
   order: string[]
   multiView?: boolean
   sectionKey: PlotsSection
-  changeDisabledDragIds: (disabled: string[]) => void
 }
 
 export const NormalGrid: React.FC<NormalGridProps> = ({
@@ -21,22 +20,8 @@ export const NormalGrid: React.FC<NormalGridProps> = ({
   nbItemsPerRow,
   order,
   multiView,
-  sectionKey,
-  changeDisabledDragIds
+  sectionKey
 }) => {
-  const addDisabled = useCallback(
-    (e: Event) => {
-      const disabledId = (e.currentTarget as HTMLFormElement).closest('.plot')
-        ?.id
-      changeDisabledDragIds([disabledId].filter(Boolean) as string[])
-    },
-    [changeDisabledDragIds]
-  )
-
-  const removeDisabled = useCallback(() => {
-    changeDisabledDragIds([])
-  }, [changeDisabledDragIds])
-
   const disableClick = useCallback((e: Event) => {
     e.stopPropagation()
   }, [])
@@ -44,11 +29,9 @@ export const NormalGrid: React.FC<NormalGridProps> = ({
   const addEventsOnViewReady = useCallback(() => {
     const panels = document.querySelectorAll('.vega-bindings')
     for (const panel of Object.values(panels)) {
-      panel.addEventListener('mouseenter', addDisabled)
-      panel.addEventListener('mouseleave', removeDisabled)
       panel.addEventListener('click', disableClick)
     }
-  }, [addDisabled, removeDisabled, disableClick])
+  }, [disableClick])
 
   const plots = order.map((plot: string) => {
     const colSpan =

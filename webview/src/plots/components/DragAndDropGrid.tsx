@@ -21,7 +21,6 @@ interface DragAndDropGridProps {
   nbItemsPerRow: number
   useVirtualizedGrid?: boolean
   parentDraggedOver?: boolean
-  disabledDragPlotIds?: string[]
   multiView?: boolean
 }
 
@@ -33,7 +32,6 @@ export const DragAndDropGrid: React.FC<DragAndDropGridProps> = ({
   nbItemsPerRow,
   useVirtualizedGrid,
   parentDraggedOver,
-  disabledDragPlotIds,
   multiView
 }) => {
   const items = order.map((plot: string) => {
@@ -78,7 +76,7 @@ export const DragAndDropGrid: React.FC<DragAndDropGridProps> = ({
           : undefined
       }
       parentDraggedOver={parentDraggedOver}
-      disabledDropIds={disabledDragPlotIds}
+      disabledDropIds={[]}
     />
   )
 }

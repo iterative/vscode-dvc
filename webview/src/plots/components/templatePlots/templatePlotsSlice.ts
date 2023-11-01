@@ -17,12 +17,10 @@ export interface TemplatePlotsState extends Omit<TemplatePlotsData, 'plots'> {
   hasItems: boolean
   plotsSnapshots: { [key: string]: string }
   sections: PlotGroup[]
-  disabledDragPlotIds: string[]
   isInDragAndDropMode: boolean
 }
 
 export const templatePlotsInitialState: TemplatePlotsState = {
-  disabledDragPlotIds: [],
   hasData: false,
   hasItems: false,
   height: DEFAULT_HEIGHT[PlotsSection.TEMPLATE_PLOTS],
@@ -39,9 +37,6 @@ export const templatePlotsSlice = createSlice({
   initialState: templatePlotsInitialState,
   name: 'template',
   reducers: {
-    changeDisabledDragIds: (state, action: PayloadAction<string[]>) => {
-      state.disabledDragPlotIds = action.payload
-    },
     changeSize: (
       state,
       action: PayloadAction<{
@@ -102,7 +97,6 @@ export const {
   update,
   setCollapsed,
   changeSize,
-  changeDisabledDragIds,
   toggleDragAndDropMode,
   updateSections
 } = templatePlotsSlice.actions

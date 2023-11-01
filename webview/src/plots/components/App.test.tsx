@@ -1545,7 +1545,7 @@ describe('App', () => {
 
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
 
-    const plot = within(screen.getAllByTestId(/^plot-/)[0]).getByLabelText(
+    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByLabelText(
       'Open Plot in Popup'
     )
 
@@ -1562,7 +1562,7 @@ describe('App', () => {
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
 
     const plotActionsButton = within(
-      screen.getAllByTestId(/^plot-/)[0]
+      screen.getAllByTestId(/^plot_/)[0]
     ).getByLabelText('See Plot Export Options')
 
     fireEvent.click(plotActionsButton)
@@ -1586,7 +1586,7 @@ describe('App', () => {
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
 
     const plotActionsButton = within(
-      screen.getAllByTestId(/^plot-/)[0]
+      screen.getAllByTestId(/^plot_/)[0]
     ).getByLabelText('See Plot Export Options')
 
     fireEvent.keyDown(plotActionsButton, { key: 'Enter' })
@@ -2031,7 +2031,7 @@ describe('App', () => {
           id,
           metric: '',
           param: '',
-          spec: {
+          content: {
             $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
             encoding: {},
             height: 100,
@@ -2147,14 +2147,14 @@ describe('App', () => {
             PlotsSection.CUSTOM_PLOTS
           )
 
-          let plots = screen.getAllByTestId(/^plot-/)
+          let plots = screen.getAllByTestId(/^plot_/)
 
           expect(plots[4].id).toBe('plot-4')
           expect(plots.length).toBe(OVERSCAN_ROW_COUNT + 1)
 
           resizeScreen(5453, store)
 
-          plots = screen.getAllByTestId(/^plot-/)
+          plots = screen.getAllByTestId(/^plot_/)
 
           expect(plots[3].id).toBe('plot-3')
           expect(plots.length).toBe(OVERSCAN_ROW_COUNT + 1)
@@ -2169,7 +2169,7 @@ describe('App', () => {
 
           resizeScreen(1849, store)
 
-          const plots = screen.getAllByTestId(/^plot-/)
+          const plots = screen.getAllByTestId(/^plot_/)
 
           expect(plots[12].id).toBe('plot-12')
           expect(plots.length).toBe(OVERSCAN_ROW_COUNT + 1)
@@ -2184,7 +2184,7 @@ describe('App', () => {
 
           resizeScreen(936, store)
 
-          const plots = screen.getAllByTestId(/^plot-/)
+          const plots = screen.getAllByTestId(/^plot_/)
 
           expect(plots[14].id).toBe('plot-14')
           expect(plots.length).toBe(1 + OVERSCAN_ROW_COUNT) // Only the first and the next lines defined by the overscan row count will be rendered
@@ -2199,7 +2199,7 @@ describe('App', () => {
 
           resizeScreen(563, store)
 
-          const plots = screen.getAllByTestId(/^plot-/)
+          const plots = screen.getAllByTestId(/^plot_/)
 
           expect(plots[4].id).toBe('plot-4')
         })
@@ -2259,14 +2259,14 @@ describe('App', () => {
 
           resizeScreen(3200, store)
 
-          let plots = screen.getAllByTestId(/^plot-/)
+          let plots = screen.getAllByTestId(/^plot_/)
 
           expect(plots[20].id).toBe('plot-20')
           expect(plots.length).toBe(custom.plots.length)
 
           resizeScreen(6453, store)
 
-          plots = screen.getAllByTestId(/^plot-/)
+          plots = screen.getAllByTestId(/^plot_/)
 
           expect(plots[19].id).toBe('plot-19')
           expect(plots.length).toBe(custom.plots.length)
@@ -2281,7 +2281,7 @@ describe('App', () => {
 
           resizeScreen(1889, store)
 
-          const plots = screen.getAllByTestId(/^plot-/)
+          const plots = screen.getAllByTestId(/^plot_/)
 
           expect(plots[7].id).toBe('plot-7')
           expect(plots.length).toBe(custom.plots.length)
@@ -2296,7 +2296,7 @@ describe('App', () => {
 
           resizeScreen(938, store)
 
-          const plots = screen.getAllByTestId(/^plot-/)
+          const plots = screen.getAllByTestId(/^plot_/)
 
           expect(plots[7].id).toBe('plot-7')
           expect(plots.length).toBe(custom.plots.length)
@@ -2311,7 +2311,7 @@ describe('App', () => {
 
           resizeScreen(562, store)
 
-          const plots = screen.getAllByTestId(/^plot-/)
+          const plots = screen.getAllByTestId(/^plot_/)
 
           expect(plots[4].id).toBe('plot-4')
         })
@@ -2371,14 +2371,14 @@ describe('App', () => {
 
           resizeScreen(3004, store)
 
-          let plots = screen.getAllByTestId(/^plot-/)
+          let plots = screen.getAllByTestId(/^plot_/)
 
           expect(plots[7].id).toBe('plot-7')
           expect(plots.length).toBe(custom.plots.length)
 
           resizeScreen(5473, store)
 
-          plots = screen.getAllByTestId(/^plot-/)
+          plots = screen.getAllByTestId(/^plot_/)
 
           expect(plots[9].id).toBe('plot-9')
           expect(plots.length).toBe(custom.plots.length)
@@ -2393,7 +2393,7 @@ describe('App', () => {
 
           resizeScreen(1839, store)
 
-          const plots = screen.getAllByTestId(/^plot-/)
+          const plots = screen.getAllByTestId(/^plot_/)
 
           expect(plots[24].id).toBe('plot-24')
           expect(plots.length).toBe(custom.plots.length)
@@ -2408,7 +2408,7 @@ describe('App', () => {
 
           resizeScreen(956, store)
 
-          const plots = screen.getAllByTestId(/^plot-/)
+          const plots = screen.getAllByTestId(/^plot_/)
 
           expect(plots[9].id).toBe('plot-9')
           expect(plots.length).toBe(custom.plots.length)
@@ -2423,7 +2423,7 @@ describe('App', () => {
 
           resizeScreen(663, store)
 
-          const plots = screen.getAllByTestId(/^plot-/)
+          const plots = screen.getAllByTestId(/^plot_/)
 
           expect(plots[9].id).toBe('plot-9')
           expect(plots.length).toBe(custom.plots.length)
@@ -2438,7 +2438,9 @@ describe('App', () => {
 
           resizeScreen(569, store)
 
-          const plots = screen.getAllByTestId(/^plot-/)
+          screen.debug(undefined, Infinity)
+
+          const plots = screen.getAllByTestId(/^plot_/)
 
           expect(plots[4].id).toBe('plot-4')
         })
@@ -2627,45 +2629,6 @@ describe('App', () => {
           expect(plot.querySelectorAll('.marks')[0]).toBeInTheDocument(),
         { timeout: 5000 }
       )
-
-    const getPanel = async (smoothPlot: HTMLElement) => {
-      await waitFor(() =>
-        // eslint-disable-next-line testing-library/no-node-access
-        expect(smoothPlot.querySelector('.vega-bindings')).toBeInTheDocument()
-      )
-      // eslint-disable-next-line testing-library/no-node-access
-      return smoothPlot.querySelector('.vega-bindings')
-    }
-
-    it('should disable a template plot from drag and drop when hovering a vega panel', async () => {
-      renderAppWithOptionalData({ template: withVegaPanels })
-
-      const smoothPlot = screen.getByTestId(`plot_${smoothId}`)
-
-      await waitForVega(smoothPlot)
-
-      const panel = await getPanel(smoothPlot)
-
-      expect(smoothPlot.draggable).toBe(true)
-
-      panel && fireEvent.mouseEnter(panel)
-
-      expect(smoothPlot.draggable).toBe(false)
-    })
-
-    it('should re-enable a template plot for drag and drop when the mouse leaves a vega panel', async () => {
-      renderAppWithOptionalData({ template: withVegaPanels })
-
-      const smoothPlot = screen.getByTestId(`plot_${smoothId}`)
-
-      await waitForVega(smoothPlot)
-
-      const panel = await getPanel(smoothPlot)
-
-      panel && fireEvent.mouseEnter(panel)
-      panel && fireEvent.mouseLeave(panel)
-      expect(smoothPlot.draggable).toBe(true)
-    })
 
     it('should disable zooming the template plot when clicking inside the vega panel', async () => {
       renderAppWithOptionalData({ template: withVegaPanels })
