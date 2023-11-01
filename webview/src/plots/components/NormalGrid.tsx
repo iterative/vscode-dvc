@@ -1,11 +1,11 @@
 import React, { useCallback } from 'react'
 import cx from 'classnames'
-import { VirtualizedGrid } from '../../shared/components/virtualizedGrid/VirtualizedGrid'
-import { plotDataStore } from './plotDataStore'
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
-import styles from './styles.module.scss'
-import { withScale } from '../../util/styles'
 import { ZoomablePlot } from './ZoomablePlot'
+import { plotDataStore } from './plotDataStore'
+import styles from './styles.module.scss'
+import { VirtualizedGrid } from '../../shared/components/virtualizedGrid/VirtualizedGrid'
+import { withScale } from '../../util/styles'
 
 export interface NormalGridProps {
   useVirtualizedGrid?: boolean
@@ -26,10 +26,9 @@ export const NormalGrid: React.FC<NormalGridProps> = ({
 }) => {
   const addDisabled = useCallback(
     (e: Event) => {
-      const disabledId = (e.currentTarget as HTMLFormElement).closest(
-        `.${styles.plot as string}`
-      )?.id
-      changeDisabledDragIds(disabledId ? [disabledId] : [])
+      const disabledId = (e.currentTarget as HTMLFormElement).closest('.plot')
+        ?.id
+      changeDisabledDragIds([disabledId].filter(Boolean) as string[])
     },
     [changeDisabledDragIds]
   )
@@ -57,15 +56,13 @@ export const NormalGrid: React.FC<NormalGridProps> = ({
         plotDataStore[PlotsSection.TEMPLATE_PLOTS][plot].revisions?.length) ||
       1
 
-    const plotClassName = cx(styles.plot, {
-      [styles.multiViewPlot]: multiView
-    })
-
     return (
       <div
         key={plot}
         id={plot}
-        className={plotClassName}
+        className={cx(styles.plot, {
+          [styles.multiViewPlot]: multiView
+        })}
         data-testid={`plot_${plot}`}
         style={withScale(colSpan)}
       >

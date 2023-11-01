@@ -1,27 +1,24 @@
 import React, { DragEvent, useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import cx from 'classnames'
-import { CustomPlot } from './CustomPlot'
 import { NoPlotsAdded } from './NoPlotsAdded'
+import { changeDisabledDragIds } from './customPlotsSlice'
 import styles from '../styles.module.scss'
-import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
-import {
-  DragDropContainer,
-  WrapperProps
-} from '../../../shared/components/dragDrop/DragDropContainer'
-import { DropTarget } from '../DropTarget'
-import { VirtualizedGrid } from '../../../shared/components/virtualizedGrid/VirtualizedGrid'
 import { shouldUseVirtualizedGrid } from '../util'
+import { Grid } from '../Grid'
+import { LoadingSection, sectionIsLoading } from '../LoadingSection'
 import { PlotsState } from '../../store'
 import { changeOrderWithDraggedInfo } from '../../../util/array'
-import { LoadingSection, sectionIsLoading } from '../LoadingSection'
 import { reorderCustomPlots } from '../../util/messages'
+import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 
 interface CustomPlotsProps {
   plotsIds: string[]
 }
 
 export const CustomPlots: React.FC<CustomPlotsProps> = ({ plotsIds }) => {
+  const dispatch = useDispatch()
   const [order, setOrder] = useState(plotsIds)
   const {
     nbItemsPerRow,
@@ -64,14 +61,8 @@ export const CustomPlots: React.FC<CustomPlotsProps> = ({ plotsIds }) => {
     return <EmptyState isFullScreen={false}>No Data to Plot</EmptyState>
   }
 
-  const items = order.map(plot => (
-    <div key={plot} id={plot}>
-      <CustomPlot id={plot} />
-    </div>
-  ))
-
   const useVirtualizedGrid = shouldUseVirtualizedGrid(
-    items.length,
+    order.length,
     nbItemsPerRow
   )
 
@@ -95,22 +86,18 @@ export const CustomPlots: React.FC<CustomPlotsProps> = ({ plotsIds }) => {
       onDragOver={handleDragOver}
       onDrop={handleDropAtTheEnd}
     >
-      <DragDropContainer
-        order={order}
+      <Grid
         setOrder={setPlotsIdsOrder}
-        disabledDropIds={disabledDragPlotIds}
-        items={items}
-        group="custom-plots"
-        dropTarget={<DropTarget />}
-        wrapperComponent={
-          useVirtualizedGrid
-            ? {
-                component: VirtualizedGrid as React.FC<WrapperProps>,
-                props: { nbItemsPerRow }
-              }
-            : undefined
-        }
+        nbItemsPerRow={nbItemsPerRow}
+        useVirtualizedGrid={useVirtualizedGrid}
+        order={order}
+        groupId="custom-plots"
         parentDraggedOver={onSection}
+        disabledDragPlotIds={disabledDragPlotIds}
+        changeDisabledDragIds={(disabled: string[]) =>
+          dispatch(changeDisabledDragIds(disabled))
+        }
+        sectionKey={PlotsSection.CUSTOM_PLOTS}
       />
     </div>
   )

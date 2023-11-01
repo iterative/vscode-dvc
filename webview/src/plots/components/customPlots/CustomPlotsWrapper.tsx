@@ -2,7 +2,6 @@ import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { CustomPlots } from './CustomPlots'
-import { changeSize } from './customPlotsSlice'
 import { PlotsContainer } from '../PlotsContainer'
 import { PlotsState } from '../../store'
 import { removeCustomPlots } from '../../util/messages'
@@ -26,7 +25,6 @@ export const CustomPlotsWrapper: React.FC = () => {
       removePlotsButton={
         hasAddedPlots ? { onClick: removeCustomPlots } : undefined
       }
-      changeSize={changeSize}
       hasItems={hasItems}
       height={height}
     >

@@ -27,12 +27,12 @@ export const templatePlotsInitialState: TemplatePlotsState = {
   hasItems: false,
   height: DEFAULT_HEIGHT[PlotsSection.TEMPLATE_PLOTS],
   isCollapsed: DEFAULT_SECTION_COLLAPSED[PlotsSection.TEMPLATE_PLOTS],
+  isInDragAndDropMode: false,
   nbItemsPerRow:
     DEFAULT_SECTION_NB_ITEMS_PER_ROW_OR_WIDTH[PlotsSection.TEMPLATE_PLOTS],
   plotsSnapshots: {},
   sections: [],
-  smoothPlotValues: {},
-  isInDragAndDropMode: false
+  smoothPlotValues: {}
 }
 
 export const templatePlotsSlice = createSlice({

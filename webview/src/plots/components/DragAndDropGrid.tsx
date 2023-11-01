@@ -1,23 +1,23 @@
+import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import React from 'react'
 import cx from 'classnames'
+import { DropTarget } from './DropTarget'
+import { plotDataStore } from './plotDataStore'
+import styles from './styles.module.scss'
+import { withScale } from '../../util/styles'
+import { VirtualizedGrid } from '../../shared/components/virtualizedGrid/VirtualizedGrid'
+import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
 import {
   DragDropContainer,
   OnDrop,
   WrapperProps
 } from '../../shared/components/dragDrop/DragDropContainer'
-import { VirtualizedGrid } from '../../shared/components/virtualizedGrid/VirtualizedGrid'
-import { DropTarget } from './DropTarget'
-import { plotDataStore } from './plotDataStore'
-import { PlotsSection } from 'dvc/src/plots/webview/contract'
-import styles from './styles.module.scss'
-import { withScale } from '../../util/styles'
-import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
 
 interface DragAndDropGridProps {
   order: string[]
   setOrder: (order: string[]) => void
   groupId: string
-  onDrop: OnDrop
+  onDrop?: OnDrop
   nbItemsPerRow: number
   useVirtualizedGrid?: boolean
   parentDraggedOver?: boolean

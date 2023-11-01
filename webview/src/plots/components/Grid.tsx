@@ -1,16 +1,18 @@
 import React from 'react'
-import { OnDrop } from '../../shared/components/dragDrop/DragDropContainer'
+import { useSelector } from 'react-redux'
 import { NormalGrid, NormalGridProps } from './NormalGrid'
 import { DragAndDropGrid } from './DragAndDropGrid'
+import { isDragAndDropModeSelector } from './util'
+import { PlotsState } from '../store'
+import { OnDrop } from '../../shared/components/dragDrop/DragDropContainer'
 
 interface GridProps extends NormalGridProps {
   setOrder: (order: string[]) => void
   order: string[]
   groupId: string
-  onDrop: OnDrop
+  onDrop?: OnDrop
   parentDraggedOver?: boolean
   disabledDragPlotIds: string[]
-  isInDragAndDropMode?: boolean
 }
 
 export const Grid: React.FC<GridProps> = ({
@@ -22,11 +24,13 @@ export const Grid: React.FC<GridProps> = ({
   onDrop,
   parentDraggedOver,
   disabledDragPlotIds,
-  isInDragAndDropMode,
   multiView,
   changeDisabledDragIds,
   sectionKey
 }) => {
+  const isInDragAndDropMode = useSelector((state: PlotsState) =>
+    isDragAndDropModeSelector(state, sectionKey)
+  )
   return isInDragAndDropMode ? (
     <DragAndDropGrid
       order={order}

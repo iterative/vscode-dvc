@@ -13,7 +13,6 @@ import { useGetPlot } from '../hooks/useGetPlot'
 import { Ellipsis } from '../../shared/components/icons'
 
 interface ZoomablePlotProps {
-  spec?: SpecWithTitles
   id: string
   onViewReady?: () => void
   currentSnapPoint: number
@@ -22,16 +21,11 @@ interface ZoomablePlotProps {
 }
 
 export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
-  spec: createdSpec,
   id,
   onViewReady,
   section
 }) => {
-  const {
-    data,
-    content: spec,
-    isTemplatePlot
-  } = useGetPlot(section, id, createdSpec)
+  const { data, spec, isTemplatePlot } = useGetPlot(section, id)
   const dispatch = useDispatch()
   const currentPlotProps = useRef<VegaLiteProps>()
 
@@ -112,4 +106,3 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
     </ZoomablePlotWrapper>
   )
 }
-;(ZoomablePlot as any).whyDidYouRender = true

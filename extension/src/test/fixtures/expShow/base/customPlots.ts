@@ -99,7 +99,7 @@ const data: CustomPlotsData = {
       id: 'custom-summary.json:loss-params.yaml:log_file',
       metric: 'summary.json:loss',
       param: 'params.yaml:log_file',
-      spec: {
+      content: {
         $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
         data: { name: 'values' },
         encoding: {
@@ -245,7 +245,7 @@ const data: CustomPlotsData = {
           param: 5
         }
       ],
-      spec: {
+      content: {
         $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
         data: { name: 'values' },
         encoding: {
