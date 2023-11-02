@@ -45,6 +45,8 @@ import {
   TemplatePlotsById
 } from './plotDataStore'
 import { setMaxNbPlotsPerRow } from './webviewSlice'
+import { toggleDragAndDropMode as toggleTemplatePlotsDragAndDropMode } from './templatePlots/templatePlotsSlice'
+import { toggleDragAndDropMode as toggleCustomPlotsDragAndDropMode } from './customPlots/customPlotsSlice'
 import { plotsReducers, plotsStore } from '../store'
 import { vsCodeApi } from '../../shared/api'
 import {
@@ -108,6 +110,21 @@ describe('App', () => {
     data && sendSetDataMessage(data)
 
     return store
+  }
+
+  const renderAppWithOptionalDataInDragAndDropMode = (
+    data?: PlotsData,
+    forCustomPlots?: boolean
+  ) => {
+    const store = renderAppWithOptionalData(data)
+
+    act(() => {
+      store.dispatch(
+        forCustomPlots
+          ? toggleCustomPlotsDragAndDropMode(true)
+          : toggleTemplatePlotsDragAndDropMode(true)
+      )
+    })
   }
 
   const setWrapperSize = (store: typeof plotsStore, size = 2000) =>
@@ -940,10 +957,12 @@ describe('App', () => {
   })
 
   it('should display the custom plots in the order stored', () => {
-    renderAppWithOptionalData({
-      comparison: comparisonTableFixture,
-      custom: customPlotsFixture
-    })
+    renderAppWithOptionalDataInDragAndDropMode(
+      {
+        custom: customPlotsFixture
+      },
+      true
+    )
 
     let plots = screen.getAllByTestId(/summary\.json/)
 
@@ -963,9 +982,12 @@ describe('App', () => {
   })
 
   it('should send a message to the extension when the custom plots are reordered', () => {
-    renderAppWithOptionalData({
-      custom: customPlotsFixture
-    })
+    renderAppWithOptionalDataInDragAndDropMode(
+      {
+        custom: customPlotsFixture
+      },
+      true
+    )
 
     const plots = screen.getAllByTestId(/summary\.json/)
     expect(plots.map(plot => plot.id)).toStrictEqual([
@@ -1041,7 +1063,7 @@ describe('App', () => {
   })
 
   it('should not be possible to drag a plot from a section to another', () => {
-    renderAppWithOptionalData({
+    renderAppWithOptionalDataInDragAndDropMode({
       custom: customPlotsFixture,
       template: templatePlotsFixture
     })
@@ -1058,7 +1080,7 @@ describe('App', () => {
   })
 
   it('should reorder template plots and send a message to the extension on drop', () => {
-    renderAppWithOptionalData({
+    renderAppWithOptionalDataInDragAndDropMode({
       template: complexTemplatePlotsFixture
     })
 
@@ -1110,7 +1132,7 @@ describe('App', () => {
   })
 
   it('should create a new section above the others if the template plot type is different than the first section', () => {
-    renderAppWithOptionalData({
+    renderAppWithOptionalDataInDragAndDropMode({
       template: complexTemplatePlotsFixture
     })
 
@@ -1129,7 +1151,7 @@ describe('App', () => {
   })
 
   it('should not create a new section above the others by dragging a template plot from the same type as the first section above it', () => {
-    renderAppWithOptionalData({
+    renderAppWithOptionalDataInDragAndDropMode({
       template: complexTemplatePlotsFixture
     })
 
@@ -1146,7 +1168,7 @@ describe('App', () => {
   })
 
   it('should create a new section below the others if the template plot type is different than the last section', () => {
-    renderAppWithOptionalData({
+    renderAppWithOptionalDataInDragAndDropMode({
       template: complexTemplatePlotsFixture
     })
 
@@ -1164,7 +1186,7 @@ describe('App', () => {
   })
 
   it('should not create a new section below the others by dragging a template plot from the same type as the last section below it', () => {
-    renderAppWithOptionalData({
+    renderAppWithOptionalDataInDragAndDropMode({
       template: complexTemplatePlotsFixture
     })
 
@@ -1183,7 +1205,7 @@ describe('App', () => {
   })
 
   it('should move a template plot from one type in another section of the same type and show two drop targets', async () => {
-    renderAppWithOptionalData({
+    renderAppWithOptionalDataInDragAndDropMode({
       template: complexTemplatePlotsFixture
     })
 
@@ -1218,7 +1240,7 @@ describe('App', () => {
   })
 
   it('should show a drop target at the end of the section when moving a plot from one section to another but not over any other plot', async () => {
-    renderAppWithOptionalData({
+    renderAppWithOptionalDataInDragAndDropMode({
       template: complexTemplatePlotsFixture
     })
 
@@ -1242,7 +1264,7 @@ describe('App', () => {
   })
 
   it('should show a drop target at the end of the template plots section when moving a plot inside of one section but not over any other plot', () => {
-    renderAppWithOptionalData({
+    renderAppWithOptionalDataInDragAndDropMode({
       template: complexTemplatePlotsFixture
     })
 
@@ -1254,7 +1276,7 @@ describe('App', () => {
   })
 
   it('should drop a plot at the end of the template plots section when moving a plot inside of one section but not over any other plot', () => {
-    renderAppWithOptionalData({
+    renderAppWithOptionalDataInDragAndDropMode({
       template: complexTemplatePlotsFixture
     })
 
@@ -1271,10 +1293,13 @@ describe('App', () => {
   })
 
   it('should show a drop target at the end of the custom plots when moving a plot inside the section but not over any other plot', () => {
-    renderAppWithOptionalData({
-      custom: customPlotsFixture,
-      template: templatePlotsFixture
-    })
+    renderAppWithOptionalDataInDragAndDropMode(
+      {
+        custom: customPlotsFixture,
+        template: templatePlotsFixture
+      },
+      true
+    )
 
     const plots = screen.getAllByTestId(/summary\.json/)
 
@@ -1284,10 +1309,13 @@ describe('App', () => {
   })
 
   it('should show a drop a plot at the end of the custom plots when moving a plot inside the section but not over any other plot', () => {
-    renderAppWithOptionalData({
-      custom: customPlotsFixture,
-      template: templatePlotsFixture
-    })
+    renderAppWithOptionalDataInDragAndDropMode(
+      {
+        custom: customPlotsFixture,
+        template: templatePlotsFixture
+      },
+      true
+    )
 
     const plots = screen.getAllByTestId(/summary\.json/)
 
@@ -1304,7 +1332,7 @@ describe('App', () => {
   })
 
   it('should show a drop zone when hovering a new section', () => {
-    renderAppWithOptionalData({
+    renderAppWithOptionalDataInDragAndDropMode({
       template: complexTemplatePlotsFixture
     })
 
@@ -1324,7 +1352,7 @@ describe('App', () => {
   })
 
   it('should remove the drop zone when hovering out a new section', () => {
-    renderAppWithOptionalData({
+    renderAppWithOptionalDataInDragAndDropMode({
       template: complexTemplatePlotsFixture
     })
 
@@ -1347,7 +1375,7 @@ describe('App', () => {
   })
 
   it('should not show a drop target when moving an element from a whole different section (comparison to template)', () => {
-    renderAppWithOptionalData({
+    renderAppWithOptionalDataInDragAndDropMode({
       comparison: comparisonTableFixture,
       selectedRevisions: plotsRevisionsFixture,
       template: complexTemplatePlotsFixture
@@ -1366,7 +1394,7 @@ describe('App', () => {
   })
 
   it('should prevent default behaviour when dragging over a new section', () => {
-    renderAppWithOptionalData({
+    renderAppWithOptionalDataInDragAndDropMode({
       template: complexTemplatePlotsFixture
     })
 
@@ -1383,7 +1411,7 @@ describe('App', () => {
   })
 
   it('should show a drop target before a plot on drag enter from the left', () => {
-    renderAppWithOptionalData({
+    renderAppWithOptionalDataInDragAndDropMode({
       template: complexTemplatePlotsFixture
     })
 
@@ -1401,7 +1429,7 @@ describe('App', () => {
   })
 
   it('should show a drop target after a plot on drag enter from the right', () => {
-    renderAppWithOptionalData({
+    renderAppWithOptionalDataInDragAndDropMode({
       template: complexTemplatePlotsFixture
     })
 
@@ -1425,7 +1453,7 @@ describe('App', () => {
   })
 
   it('should hide the plot being dragged from the list', () => {
-    renderAppWithOptionalData({
+    renderAppWithOptionalDataInDragAndDropMode({
       template: complexTemplatePlotsFixture
     })
 
@@ -1438,7 +1466,7 @@ describe('App', () => {
   })
 
   it('should remove the drop target after exiting a section after dragging in and out of it', () => {
-    renderAppWithOptionalData({
+    renderAppWithOptionalDataInDragAndDropMode({
       template: complexTemplatePlotsFixture
     })
 
@@ -2028,9 +2056,6 @@ describe('App', () => {
       for (let i = 0; i < nbOfPlots; i++) {
         const id = `plot-${i}`
         plots.push({
-          id,
-          metric: '',
-          param: '',
           content: {
             $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
             encoding: {},
@@ -2044,6 +2069,9 @@ describe('App', () => {
             transform: [],
             width: 100
           },
+          id,
+          metric: '',
+          param: '',
           values: []
         })
       }
@@ -2437,8 +2465,6 @@ describe('App', () => {
           )
 
           resizeScreen(569, store)
-
-          screen.debug(undefined, Infinity)
 
           const plots = screen.getAllByTestId(/^plot_/)
 
