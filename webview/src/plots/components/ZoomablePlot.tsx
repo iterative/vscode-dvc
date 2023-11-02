@@ -6,6 +6,7 @@ import { VisualizationSpec } from 'react-vega'
 import { ExtendedVegaLite } from './vegaLite/ExtendedVegaLite'
 import { setZoomedInPlot } from './webviewSlice'
 import styles from './styles.module.scss'
+import { ZoomablePlotWrapper } from './ZoomablePlotWrapper'
 import { zoomPlot } from '../util/messages'
 import { useGetPlot } from '../hooks/useGetPlot'
 import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
@@ -25,7 +26,7 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
   onViewReady,
   section
 }) => {
-  const spec = useGetPlot(section, id)
+  const [spec, titles] = useGetPlot(section, id)
   const dispatch = useDispatch()
   const currentPlotProps = useRef<VisualizationSpec>()
 
@@ -48,37 +49,39 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
   }
 
   return (
-    <button
-      className={styles.zoomablePlot}
-      onClick={() => handleOnClick()}
-      aria-label="Open Plot in Popup"
-    >
-      <GripIcon className={styles.plotGripIcon} />
-      <span
-        className={styles.plotActions}
-        onClick={event => {
-          event.stopPropagation()
-          handleOnClick(true)
-        }}
-        onKeyDown={event => {
-          if (event.key === 'Enter') {
-            handleOnClick(true)
-          }
-        }}
-        role="button"
-        tabIndex={0}
-        aria-label="See Plot Export Options"
+    <ZoomablePlotWrapper titles={titles}>
+      <button
+        className={styles.zoomablePlot}
+        onClick={() => handleOnClick()}
+        aria-label="Open Plot in Popup"
       >
-        <Ellipsis />
-      </span>
-      {currentPlotProps.current && (
-        <ExtendedVegaLite
-          id={id}
-          onNewView={onNewView}
-          spec={spec}
-          actions={false}
-        />
-      )}
-    </button>
+        <GripIcon className={styles.plotGripIcon} />
+        <span
+          className={styles.plotActions}
+          onClick={event => {
+            event.stopPropagation()
+            handleOnClick(true)
+          }}
+          onKeyDown={event => {
+            if (event.key === 'Enter') {
+              handleOnClick(true)
+            }
+          }}
+          role="button"
+          tabIndex={0}
+          aria-label="See Plot Export Options"
+        >
+          <Ellipsis />
+        </span>
+        {currentPlotProps.current && (
+          <ExtendedVegaLite
+            id={id}
+            onNewView={onNewView}
+            spec={spec}
+            actions={false}
+          />
+        )}
+      </button>
+    </ZoomablePlotWrapper>
   )
 }

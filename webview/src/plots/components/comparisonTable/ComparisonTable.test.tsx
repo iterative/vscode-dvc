@@ -28,7 +28,7 @@ import { webviewInitialState } from '../webviewSlice'
 import { getThemeValue, hexToRGB, ThemeProperty } from '../../../util/styles'
 import * as EventCurrentTargetDistances from '../../../shared/components/dragDrop/currentTarget'
 
-const getHeaders = () => screen.getAllByRole('columnheader')
+const getHeaders = (): HTMLElement[] => screen.getAllByRole('columnheader')
 
 jest.mock('../../../shared/api')
 jest.mock('../../../shared/components/dragDrop/currentTarget', () => {
@@ -489,7 +489,7 @@ describe('ComparisonTable', () => {
 
       const [, draggedHeader] = getHeaders()
 
-      expect(draggedHeader.isSameNode(startingNode)).toBe(true)
+      expect(draggedHeader.isEqualNode(startingNode)).toBe(true)
     })
 
     it('should wrap the drop target with the header we are dragging over', () => {
@@ -503,26 +503,25 @@ describe('ComparisonTable', () => {
 
       // eslint-disable-next-line testing-library/no-node-access
       expect(headerWrapper.childElementCount).toBe(2)
-      expect(headerWrapper.contains(endingNode)).toBe(true)
+      expect(
+        // eslint-disable-next-line testing-library/no-node-access
+        Object.values(headerWrapper.children)
+          .map(child => child.id)
+          .includes(endingNode.id)
+      ).toBe(true)
     })
 
     it('should not change the order when dropping a header in its own spot', () => {
       renderTable()
 
-      const [startingAndEndingNode, secondEndingNode] = getHeaders()
+      const [startingNode] = getHeaders()
 
-      dragAndDrop(
-        startingAndEndingNode,
-        startingAndEndingNode,
-        DragEnterDirection.RIGHT
-      )
+      dragAndDrop(startingNode, startingNode, DragEnterDirection.RIGHT)
       expect(mockPostMessage).not.toHaveBeenCalled()
 
-      dragAndDrop(
-        startingAndEndingNode,
-        secondEndingNode,
-        DragEnterDirection.RIGHT
-      )
+      const [start, end] = getHeaders()
+
+      dragAndDrop(start, end, DragEnterDirection.RIGHT)
       expect(mockPostMessage).toHaveBeenCalled()
     })
 

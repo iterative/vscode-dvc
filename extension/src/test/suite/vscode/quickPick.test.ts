@@ -144,6 +144,10 @@ suite('Quick Pick Test Suite', () => {
 
   describe('quickPickUserOrderedValues', () => {
     it('should return selected values in the order that the user selected', async () => {
+      const quickPick = disposable.track(
+        window.createQuickPick<QuickPickItemWithValue<number>>()
+      )
+      stub(window, 'createQuickPick').returns(quickPick)
       const items = [
         { label: 'J', value: 1 },
         { label: 'K', value: 2 },
@@ -156,12 +160,12 @@ suite('Quick Pick Test Suite', () => {
         title: 'Select some values' as Title
       })
 
-      await selectMultipleQuickPickItems([5, 2, 1], items.length)
+      await selectMultipleQuickPickItems([5, 2, 1], items.length, quickPick)
 
       const result = await resultPromise
 
       expect(result).to.deep.equal([5, 2, 1])
-    })
+    }).timeout(10000)
 
     it('should return undefined if user cancels the quick pick', async () => {
       const quickPick = disposable.track(
@@ -186,5 +190,44 @@ suite('Quick Pick Test Suite', () => {
 
       expect(result).to.deep.equal(undefined)
     })
+
+    it('should limit the number of values that can be selected to the max selected items', async () => {
+      const quickPick = disposable.track(
+        window.createQuickPick<QuickPickItemWithValue<number>>()
+      )
+      stub(window, 'createQuickPick').returns(quickPick)
+
+      const maxSelectedItems = 3
+
+      const items = [
+        { label: 'A', value: 1 },
+        { label: 'B', value: 2 },
+        { label: 'C', value: 3 },
+        { label: 'D', value: 4 },
+        { label: 'E', value: 5 }
+      ]
+
+      void quickPickUserOrderedValues(
+        items,
+        { title: 'select up to 3 values' as Title },
+        maxSelectedItems
+      )
+
+      await selectMultipleQuickPickItems(
+        [5, 2, 1],
+        items.length,
+        quickPick,
+        false
+      )
+
+      expect(
+        quickPick.selectedItems,
+        'the max number of items are selected'
+      ).to.have.lengthOf(maxSelectedItems)
+      expect(
+        quickPick.items,
+        'all items which could be selected are hidden'
+      ).to.have.lengthOf(maxSelectedItems)
+    }).timeout(10000)
   })
 })

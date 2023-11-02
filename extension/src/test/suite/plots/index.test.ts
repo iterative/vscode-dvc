@@ -54,6 +54,7 @@ import { COMMITS_SEPARATOR } from '../../../cli/git/constants'
 import { BaseWebview } from '../../../webview'
 import * as PlotsCollectUtils from '../../../plots/model/collect'
 import { Operator } from '../../../experiments/model/filterBy'
+import * as External from '../../../vscode/external'
 
 suite('Plots Test Suite', () => {
   const disposable = Disposable.fn()
@@ -609,6 +610,47 @@ suite('Plots Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
+    it('should handle an export plot as svg message from the webview', async () => {
+      const { mockMessageReceived } = await buildPlotsWebview({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
+
+      const mockSvg = '<svg></svg>'
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockShowSaveDialog = stub(window, 'showSaveDialog')
+      const mockWriteFile = stub(FileSystem, 'writeFile')
+      const mockOpenUrl = stub(External, 'openUrl')
+      const exportFile = Uri.file('visualization.svg')
+
+      mockShowSaveDialog.resolves(exportFile)
+
+      const openUrlEvent = new Promise(resolve =>
+        mockOpenUrl.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(true)
+        })
+      )
+
+      mockMessageReceived.fire({
+        payload: mockSvg,
+        type: MessageFromWebviewType.EXPORT_PLOT_AS_SVG
+      })
+
+      await openUrlEvent
+
+      expect(mockWriteFile).to.be.calledOnce
+      expect(mockWriteFile).to.be.calledWithExactly(exportFile.path, mockSvg)
+      expect(mockOpenUrl).to.calledWithExactly(exportFile.path)
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_PLOTS_EXPORT_PLOT_AS_SVG,
+        undefined,
+        undefined
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
     it('should handle an export plot data as csv message from the webview', async () => {
       const { mockMessageReceived } = await buildPlotsWebview({
         disposer: disposable,
@@ -1143,7 +1185,7 @@ suite('Plots Test Suite', () => {
         RegisteredCommands.PLOTS_CUSTOM_REMOVE,
         dvcDemoPath
       )
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle an update smooth plot values message from the webview', async () => {
       const { mockMessageReceived, plotsModel } = await buildPlotsWebview({
@@ -1174,7 +1216,7 @@ suite('Plots Test Suite', () => {
         templatePlot.id,
         0.5
       )
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle an update comparison multi plot value message from the webview', async () => {
       const { mockMessageReceived, plotsModel } = await buildPlotsWebview({
@@ -1210,7 +1252,7 @@ suite('Plots Test Suite', () => {
         multiImg.path,
         5
       )
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle an add plot message from the webview', async () => {
       const { mockMessageReceived } = await buildPlotsWebview({
@@ -1228,7 +1270,7 @@ suite('Plots Test Suite', () => {
         RegisteredCommands.ADD_PLOT,
         dvcDemoPath
       )
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle the CLI throwing an error', async () => {
       const { data, errorsModel, mockPlotsDiff, plots, plotsModel } =

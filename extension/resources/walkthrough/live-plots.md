@@ -27,7 +27,7 @@ for epoch in range(NUM_EPOCHS):
     for metric_name, value in metrics.items():
         live.log(metric_name, value)
 
- live.next_step()
+    live.next_step()
 ```
 
 `DVCLive` is _optional_, and you can just append or modify plot files using any

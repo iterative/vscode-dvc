@@ -305,24 +305,31 @@ const basicVega = {
             timestamp: '1642041350855',
             rev: 'exp-e7a67'
           }
-        ])
+        ]),
+        '<DVC_METRIC_TITLE>': '',
+        '<DVC_METRIC_X_LABEL>': 'step',
+        '<DVC_METRIC_Y_LABEL>': 'loss'
       },
       content: JSON.stringify({
         $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
         data: {
           values: '<DVC_METRIC_DATA>'
         },
-        title: '',
+        title: '<DVC_METRIC_TITLE>',
         width: 300,
         height: 300,
         layer: [
           {
             encoding: {
-              x: { field: 'step', type: 'quantitative', title: 'step' },
+              x: {
+                field: 'step',
+                type: 'quantitative',
+                title: '<DVC_METRIC_X_LABEL>'
+              },
               y: {
                 field: 'loss',
                 type: 'quantitative',
-                title: 'loss',
+                title: '<DVC_METRIC_Y_LABEL>',
                 scale: { zero: false }
               },
               color: { field: 'rev', type: 'nominal' }

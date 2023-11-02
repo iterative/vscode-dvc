@@ -5,6 +5,7 @@ import {
   DEFAULT_PLOT_HEIGHT
 } from '../../../../plots/webview/contract'
 import { Experiment } from '../../../../experiments/webview/contract'
+import { Title } from 'vega'
 
 export const customPlotsOrderFixture: CustomPlotsOrderValue[] = [
   {

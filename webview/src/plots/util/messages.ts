@@ -8,6 +8,13 @@ export const addPlot = () =>
     type: MessageFromWebviewType.ADD_PLOT
   })
 
+export const exportPlotAsSvg = (svg: string) => {
+  sendMessage({
+    payload: svg,
+    type: MessageFromWebviewType.EXPORT_PLOT_AS_SVG
+  })
+}
+
 export const exportPlotDataAsCsv = (id: string) => {
   sendMessage({
     payload: id,

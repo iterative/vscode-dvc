@@ -1,4 +1,3 @@
-import { VisualizationSpec } from 'react-vega'
 import { TopLevelSpec } from 'vega-lite'
 import {
   GenericHConcatSpec,
@@ -18,11 +17,7 @@ import { ColorScale } from '../webview/contract'
 import { ShapeEncoding, StrokeDashEncoding } from '../multiSource/constants'
 import { Color } from '../../experiments/model/status/colors'
 
-const COMMIT_FIELD = 'rev'
-
-const getFacetField = (
-  template: TopLevelSpec | VisualizationSpec
-): string | null => {
+const getFacetField = (template: TopLevelSpec): string | null => {
   const facetSpec = template as TopLevelFacetSpec
   if (facetSpec.facet) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
@@ -50,23 +45,19 @@ const getFacetField = (
   return null
 }
 
-const isVegaFacetPlot = (template: TopLevelSpec | VisualizationSpec): boolean =>
+const isVegaFacetPlot = (template: TopLevelSpec): boolean =>
   !!getFacetField(template)
 
 type ConcatSpec = TopLevel<GenericConcatSpec<NonNormalizedSpec>>
 type VerticalConcatSpec = TopLevel<GenericVConcatSpec<NonNormalizedSpec>>
 type HorizontalConcatSpec = TopLevel<GenericHConcatSpec<NonNormalizedSpec>>
 
-const isVegaConcatPlot = (
-  template: TopLevelSpec | VisualizationSpec
-): boolean =>
+const isVegaConcatPlot = (template: TopLevelSpec): boolean =>
   (template as ConcatSpec).concat?.length > 0 ||
   (template as VerticalConcatSpec).vconcat?.length > 0 ||
   (template as HorizontalConcatSpec).hconcat?.length > 0
 
-const isVegaRepeatPlot = (
-  template: TopLevelSpec | VisualizationSpec
-): boolean => {
+const isVegaRepeatPlot = (template: TopLevelSpec): boolean => {
   const repeatSpec = template as TopLevel<NonLayerRepeatSpec>
   return (
     !!repeatSpec.repeat &&
@@ -76,17 +67,11 @@ const isVegaRepeatPlot = (
   )
 }
 
-export const isMultiViewPlot = (
-  template?: TopLevelSpec | VisualizationSpec
-): boolean =>
+export const isMultiViewPlot = (template?: TopLevelSpec): boolean =>
   !template ||
   isVegaFacetPlot(template) ||
   isVegaConcatPlot(template) ||
   isVegaRepeatPlot(template)
-
-export const isMultiViewByCommitPlot = (
-  template?: TopLevelSpec | VisualizationSpec
-): boolean => !template || getFacetField(template) === COMMIT_FIELD
 
 export const getColorScale = (
   revisions: { displayColor: Color; id: string }[]

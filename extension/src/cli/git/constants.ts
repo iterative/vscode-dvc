@@ -6,6 +6,7 @@ export const gitPath = {
   DOT_GIT_INDEX: 'index',
   GIT_LOGS_REFS: join('logs', 'ref'),
   GIT_REFS: 'refs',
+  GIT_TAGS_REFS: join('refs', 'tags'),
   HEADS_GIT_REFS: 'heads'
 } as const
 

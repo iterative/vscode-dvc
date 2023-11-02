@@ -17,6 +17,8 @@ import { getInput, getValidInput } from '../vscode/inputBox'
 import { Title } from '../vscode/title'
 import { quickPickOne, quickPickOneOrInput } from '../vscode/quickPick'
 import { pickFile } from '../vscode/resourcePicker'
+import { Response } from '../vscode/response'
+import { Modal } from '../vscode/modal'
 
 export enum ScriptCommand {
   JUPYTER = 'jupyter nbconvert --to notebook --inplace --execute',
@@ -81,75 +83,28 @@ export class Pipeline extends DeferredDisposable {
   }
 
   public async getCwd() {
-    const focusedPipeline = this.getFocusedPipeline()
-    if (focusedPipeline) {
-      return focusedPipeline
-    }
-
     await this.checkOrAddPipeline()
-
-    const pipelines = this.model.getPipelines()
-    if (!pipelines?.size) {
-      return
-    }
-    if (pipelines.has(this.dvcRoot)) {
-      return this.dvcRoot
-    }
-    if (pipelines.size === 1) {
-      return [...pipelines][0]
-    }
-
-    return quickPickOne(
-      [...pipelines],
-      'Select a Pipeline to Run Command Against'
-    )
+    return this.findPipelineCwd()
   }
 
-  public checkOrAddPipeline() {
+  public async checkOrAddPipeline() {
     if (this.model.hasPipeline()) {
       return
     }
+
+    const response = await Modal.showInformation(
+      'To continue you must add some configuration. Would you like to add a stage now?',
+      Response.YES
+    )
+
+    if (response !== Response.YES) {
+      return
+    }
+
     return this.addPipeline()
   }
 
-  public async addDataSeriesPlot() {
-    const cwd = await this.getCwd()
-
-    if (!cwd) {
-      return
-    }
-
-    const plotConfiguration = await pickPlotConfiguration(cwd)
-
-    if (!plotConfiguration) {
-      return
-    }
-
-    addPlotToDvcYamlFile(cwd, plotConfiguration)
-  }
-
-  public forceRerender() {
-    return appendFileSync(join(this.dvcRoot, TEMP_DAG_FILE), '\n')
-  }
-
-  private async initialize() {
-    this.dispose.track(
-      this.data.onDidUpdate(({ dag, stages }) => {
-        this.writeDag(dag)
-        const hasPipeline = this.model.hasPipeline()
-        this.model.transformAndSet(stages)
-        if (hasPipeline !== this.model.hasPipeline()) {
-          this.updated.fire()
-        }
-      })
-    )
-    void this.data.managedUpdate()
-
-    await this.data.isReady()
-    return this.deferred.resolve()
-  }
-
-  private async addPipeline() {
+  public async addPipeline() {
     const stageName = await this.askForStageName()
     if (!stageName) {
       return
@@ -180,6 +135,62 @@ export class Pipeline extends DeferredDisposable {
     )
     void this.data.managedUpdate()
     return dataUpdated
+  }
+
+  public async addDataSeriesPlot() {
+    const cwd = (await this.findPipelineCwd()) || this.dvcRoot
+
+    const plotConfiguration = await pickPlotConfiguration(cwd)
+
+    if (!plotConfiguration) {
+      return
+    }
+
+    addPlotToDvcYamlFile(cwd, plotConfiguration)
+  }
+
+  public forceRerender() {
+    return appendFileSync(join(this.dvcRoot, TEMP_DAG_FILE), '\n')
+  }
+
+  private findPipelineCwd() {
+    const focusedPipeline = this.getFocusedPipeline()
+    if (focusedPipeline) {
+      return focusedPipeline
+    }
+
+    const pipelines = this.model.getPipelines()
+    if (!pipelines?.size) {
+      return
+    }
+    if (pipelines.has(this.dvcRoot)) {
+      return this.dvcRoot
+    }
+    if (pipelines.size === 1) {
+      return [...pipelines][0]
+    }
+
+    return quickPickOne(
+      [...pipelines],
+      'Select a Pipeline to Run Command Against'
+    )
+  }
+
+  private async initialize() {
+    this.dispose.track(
+      this.data.onDidUpdate(({ dag, stages }) => {
+        this.writeDag(dag)
+        const hasPipeline = this.model.hasPipeline()
+        this.model.transformAndSet(stages)
+        if (hasPipeline !== this.model.hasPipeline()) {
+          this.updated.fire()
+        }
+      })
+    )
+    void this.data.managedUpdate()
+
+    await this.data.isReady()
+    return this.deferred.resolve()
   }
 
   private async askForStageName() {

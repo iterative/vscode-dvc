@@ -2,6 +2,69 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.12] - 2023-10-27
+
+### 🚀 New Features and Enhancements
+
+- Remove check for stages in plot wizard [#4904](https://github.com/iterative/vscode-dvc/pull/4904) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Fix unstable `quickPickUserOrderedValues` test in windows [#4900](https://github.com/iterative/vscode-dvc/pull/4900) by [@julieg18](https://github.com/julieg18)
+- Split drag and drop container into different files [#4880](https://github.com/iterative/vscode-dvc/pull/4880) by [@sroy3](https://github.com/sroy3)
+
+## [1.1.11] - 2023-10-25
+
+### 🚀 New Features and Enhancements
+
+- Add tags filters to experiments table [#4882](https://github.com/iterative/vscode-dvc/pull/4882) by [@mattseddon](https://github.com/mattseddon)
+- Watch Git tags for experiment table updates [#4911](https://github.com/iterative/vscode-dvc/pull/4911) by [@mattseddon](https://github.com/mattseddon)
+
+## [1.1.10] - 2023-10-25
+
+### 🚀 New Features and Enhancements
+
+- Add created branch (from `dvc exp branch`) to the experiments table [#4857](https://github.com/iterative/vscode-dvc/pull/4857) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Warn user before trying to add a stage to their pipeline [#4869](https://github.com/iterative/vscode-dvc/pull/4869) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Update demo project dvclive 3.1.0 [#4874](https://github.com/iterative/vscode-dvc/pull/4874) by [@sroy3](https://github.com/sroy3)
+- Fix `quickPickUserOrderedValues` windows test timing out [#4879](https://github.com/iterative/vscode-dvc/pull/4879) by [@julieg18](https://github.com/julieg18)
+- Remove @types/react-measure [#4898](https://github.com/iterative/vscode-dvc/pull/4898) by [@sroy3](https://github.com/sroy3)
+
+## [1.1.9] - 2023-10-20
+
+### 🔨 Maintenance
+
+- Fix DVCLive snippet in walkthrough [#4853](https://github.com/iterative/vscode-dvc/pull/4853) by [@mattseddon](https://github.com/mattseddon)
+- Amend changelog with missing entry [#4852](https://github.com/iterative/vscode-dvc/pull/4852) by [@mattseddon](https://github.com/mattseddon)
+- Update demo project and latest tested CLI version (3.27.0) [#4860](https://github.com/iterative/vscode-dvc/pull/4860) by [@mattseddon](https://github.com/mattseddon)
+
+## [1.1.8] - 2023-10-18
+
+### 🚀 New Features and Enhancements
+
+- Improve validation of Plot Wizard Y metrics quick pick [#4827](https://github.com/iterative/vscode-dvc/pull/4827) by [@julieg18](https://github.com/julieg18)
+- Rename "Save" to "Save Token" in studio settings [#4837](https://github.com/iterative/vscode-dvc/pull/4837) by [@julieg18](https://github.com/julieg18)
+- Update "No Plots" section  message [#4793](https://github.com/iterative/vscode-dvc/pull/4793) by [@julieg18](https://github.com/julieg18)
+- Add a tooltip to plots with long titles that are cut by Vega [#4840](https://github.com/iterative/vscode-dvc/pull/4840) by [@sroy3](https://github.com/sroy3)
+- Update DVCLive XGBoost snippet [#4847](https://github.com/iterative/vscode-dvc/pull/4847) by [@mattseddon](https://github.com/mattseddon)
+- Add `Add Plot` command to walkthrough [#4845](https://github.com/iterative/vscode-dvc/pull/4845) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Fix exporting plots to SVG [#4835](https://github.com/iterative/vscode-dvc/pull/4835) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Update demo project [#4826](https://github.com/iterative/vscode-dvc/pull/4826) by [@sroy3](https://github.com/sroy3)
+- Update demo project and latest tested CLI version (3.26.0) [#4829](https://github.com/iterative/vscode-dvc/pull/4829) by [@mattseddon](https://github.com/mattseddon)
+- Update default export path for plots data [#4849](https://github.com/iterative/vscode-dvc/pull/4849) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.1.7] - 2023-10-13
 
 ### 🚀 New Features and Enhancements
@@ -55,6 +118,7 @@ All notable changes to this project will be documented in this file.
 ### 🚀 New Features and Enhancements
 
 - Improve Plot Wizard Error Handling [#4770](https://github.com/iterative/vscode-dvc/pull/4770) by [@julieg18](https://github.com/julieg18)
+- exp rename: Add exp rename to experiments table [#4616](https://github.com/iterative/vscode-dvc/pull/4616) by [@BradyJ27](https://github.com/BradyJ27)
 
 ## [1.1.2] - 2023-10-05
 

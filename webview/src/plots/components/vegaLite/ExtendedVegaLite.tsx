@@ -22,11 +22,11 @@ export const ExtendedVegaLite = ({
     | {
         compiled: false
         editor: false
-        export: true
+        export: false
         source: false
       }
   id: string
-  onNewView: () => void
+  onNewView: (view: View) => void
   spec: VisualizationSpec
 }) => {
   const vegaLiteProps: VegaLiteProps = {
@@ -83,7 +83,7 @@ export const ExtendedVegaLite = ({
       <VegaLite
         {...vegaLiteProps}
         onNewView={view => {
-          onNewView()
+          onNewView(view)
           vegaView.current = view
           const defaultValue = smoothPlotValues[id]
           const state = view.getState() as VegaState

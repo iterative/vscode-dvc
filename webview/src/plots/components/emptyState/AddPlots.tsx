@@ -1,4 +1,5 @@
 import React from 'react'
+import { WaitForPlotsInfo } from './WaitForPlotsInfo'
 import { addPlot, selectPlots, selectRevisions } from '../../util/messages'
 import { StartButton } from '../../../shared/components/button/StartButton'
 
@@ -10,7 +11,8 @@ export const AddPlots: React.FC<AddPlotsProps> = ({
   hasUnselectedPlots
 }: AddPlotsProps) => (
   <div>
-    <p>No Plots to Display</p>
+    <p>No Plots or Data to Display</p>
+    <WaitForPlotsInfo />
     <div>
       <StartButton onClick={selectRevisions} text="Add Experiments" />
       {hasUnselectedPlots && (

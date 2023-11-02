@@ -4,6 +4,7 @@ import { StartButton } from '../../../shared/components/button/StartButton'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { addPlot, selectPlots } from '../../util/messages'
 import { PlotsState } from '../../store'
+import { WaitForPlotsInfo } from '../emptyState/WaitForPlotsInfo'
 
 export const NoPlotsToDisplay: React.FC = () => {
   const { hasUnselectedPlots } = useSelector(
@@ -11,7 +12,8 @@ export const NoPlotsToDisplay: React.FC = () => {
   )
   return (
     <EmptyState isFullScreen={false}>
-      <p>No Plots to Display</p>
+      <p>No Plots or Data to Display</p>
+      <WaitForPlotsInfo />
       {hasUnselectedPlots ? (
         <div>
           <StartButton

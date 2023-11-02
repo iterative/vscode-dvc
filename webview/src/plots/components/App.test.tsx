@@ -1,4 +1,5 @@
 import { join } from 'dvc/src/test/util/path'
+import { Title } from 'dvc/src/vscode/title'
 import { configureStore } from '@reduxjs/toolkit'
 import React from 'react'
 import { Provider } from 'react-redux'
@@ -579,7 +580,7 @@ describe('App', () => {
     expect(screen.getByText('No Data to Plot')).toBeInTheDocument()
   })
 
-  it('should render template with "No Plots to Display" message and "Add Plot" button if there is no template data and no unselected plots', () => {
+  it('should render template with "No Plots or Data to Display" message and "Add Plot" button if there is no template data and no unselected plots', () => {
     renderAppWithOptionalData({
       comparison: comparisonTableFixture,
       custom: customPlotsFixture,
@@ -588,7 +589,7 @@ describe('App', () => {
     })
 
     expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
-    expect(screen.getByText('No Plots to Display')).toBeInTheDocument()
+    expect(screen.getByText('No Plots or Data to Display')).toBeInTheDocument()
 
     const templateSection = screen.getByTestId('template-plots-section-details')
 
@@ -605,7 +606,7 @@ describe('App', () => {
     })
   })
 
-  it('should render template with "No Plots to Display" message and action buttons ("Select Plots" and "Add Plot") if there is no template data and unselected plots', () => {
+  it('should render template with "No Plots or Data to Display" message and action buttons ("Select Plots" and "Add Plot") if there is no template data and unselected plots', () => {
     renderAppWithOptionalData({
       comparison: comparisonTableFixture,
       custom: customPlotsFixture,
@@ -614,7 +615,7 @@ describe('App', () => {
     })
 
     expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
-    expect(screen.getByText('No Plots to Display')).toBeInTheDocument()
+    expect(screen.getByText('No Plots or Data to Display')).toBeInTheDocument()
 
     const templateSection = screen.getByTestId('template-plots-section-details')
     const selectPlotsButton = within(templateSection).getByText('Select Plots')
@@ -1652,6 +1653,46 @@ describe('App', () => {
     expect(screen.getByTestId('modal')).toBeInTheDocument()
   })
 
+  it('should add a "save as svg" action to zoomed in plot modal', async () => {
+    renderAppWithOptionalData({
+      template: complexTemplatePlotsFixture
+    })
+
+    expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
+
+    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByLabelText(
+      'See Plot Export Options'
+    )
+
+    fireEvent.click(plot)
+
+    const modal = screen.getByTestId('modal')
+
+    const customAction = await within(modal).findByText('Save as SVG')
+
+    expect(customAction).toBeInTheDocument()
+
+    fireEvent.click(customAction)
+
+    const svgString = expect.stringMatching('^<svg .*?</svg>$')
+    await waitFor(
+      () =>
+        expect(mockPostMessage).toHaveBeenCalledWith({
+          payload: svgString,
+          type: MessageFromWebviewType.EXPORT_PLOT_AS_SVG
+        }),
+      { timeout: 1000 }
+    )
+
+    const stringContainingUnresolvedCssVars = expect.stringMatching(
+      '^<svg .*?var\\(.*?\\).*?</svg>$'
+    )
+    expect(mockPostMessage).not.toHaveBeenCalledWith({
+      payload: stringContainingUnresolvedCssVars,
+      type: MessageFromWebviewType.EXPORT_PLOT_AS_SVG
+    })
+  })
+
   it('should add a "save as json" action to zoomed in plot modal', async () => {
     renderAppWithOptionalData({
       template: complexTemplatePlotsFixture
@@ -1992,6 +2033,11 @@ describe('App', () => {
             encoding: {},
             height: 100,
             layer: [],
+            titles: {
+              main: { normal: '' as unknown as Title, truncated: '' },
+              x: { normal: '' as unknown as Title, truncated: '' },
+              y: { normal: '' as unknown as Title, truncated: '' }
+            },
             transform: [],
             width: 100
           }),
@@ -2004,7 +2050,7 @@ describe('App', () => {
         ...customPlotsFixture,
         plots,
         selectedMetrics: plots.map(plot => plot.id)
-      } as CustomPlotsData
+      } as unknown as CustomPlotsData
     }
 
     const resizeScreen = (width: number, store: typeof plotsStore) => {
@@ -2634,6 +2680,142 @@ describe('App', () => {
       clickEvent.stopPropagation = jest.fn()
       fireEvent(panel, clickEvent)
       expect(clickEvent.stopPropagation).toHaveBeenCalledTimes(1)
+    })
+
+    it('should have a tooltip on the plot if the title is cut', () => {
+      const title =
+        'Plot with a long title that is definitely longer than the max 50 characters'
+      const plotEntry = {
+        ...templatePlotsFixture.plots[0].entries[0],
+        id: title
+      }
+      plotEntry.anchor_definitions['<DVC_METRIC_TITLE>'] = title
+
+      renderAppWithOptionalData({
+        template: {
+          ...templatePlotsFixture,
+          plots: [
+            {
+              entries: [plotEntry],
+              group: TemplatePlotGroup.SINGLE_VIEW
+            }
+          ]
+        }
+      })
+
+      expect(screen.queryByText(title)).not.toBeInTheDocument()
+
+      const plot = within(screen.getByTestId(`plot_${title}`)).getAllByRole(
+        'button'
+      )[0]
+      fireEvent.mouseEnter(plot, {
+        bubbles: true,
+        cancelable: true
+      })
+
+      expect(screen.getByText(title)).toBeInTheDocument()
+    })
+
+    it('should have a tooltip on the plot if the x axis label is cut', () => {
+      const xLabel =
+        'Plot with a long x axis label that is definitely longer than the max 50 characters'
+      const plotEntry = {
+        ...templatePlotsFixture.plots[0].entries[0],
+        id: xLabel
+      }
+      plotEntry.anchor_definitions['<DVC_METRIC_X_LABEL>'] = xLabel
+
+      renderAppWithOptionalData({
+        template: {
+          ...templatePlotsFixture,
+          plots: [
+            {
+              entries: [plotEntry],
+              group: TemplatePlotGroup.SINGLE_VIEW
+            }
+          ]
+        }
+      })
+
+      expect(screen.queryByText(xLabel)).not.toBeInTheDocument()
+
+      const plot = within(screen.getByTestId(`plot_${xLabel}`)).getAllByRole(
+        'button'
+      )[0]
+      fireEvent.mouseEnter(plot, {
+        bubbles: true,
+        cancelable: true
+      })
+
+      expect(screen.getByText(xLabel)).toBeInTheDocument()
+    })
+
+    it('should have a tooltip on the plot if the y axis label is cut', () => {
+      const yLabel =
+        'Plot with a very long y axis title that is definitely longer than the max 30 characters'
+      const plotEntry = {
+        ...templatePlotsFixture.plots[0].entries[0],
+        id: yLabel
+      }
+      plotEntry.anchor_definitions['<DVC_METRIC_Y_LABEL>'] = yLabel
+
+      renderAppWithOptionalData({
+        template: {
+          ...templatePlotsFixture,
+          plots: [
+            {
+              entries: [plotEntry],
+              group: TemplatePlotGroup.SINGLE_VIEW
+            }
+          ]
+        }
+      })
+
+      expect(screen.queryByText(yLabel)).not.toBeInTheDocument()
+
+      const plot = within(screen.getByTestId(`plot_${yLabel}`)).getAllByRole(
+        'button'
+      )[0]
+      fireEvent.mouseEnter(plot, {
+        bubbles: true,
+        cancelable: true
+      })
+
+      expect(screen.getByText(yLabel)).toBeInTheDocument()
+    })
+
+    it('should not have a tooltip on the plot if none of the titles are cut', () => {
+      const title = 'Short title'
+
+      const plotEntry = {
+        ...templatePlotsFixture.plots[0].entries[0],
+        id: title
+      }
+      plotEntry.anchor_definitions['<DVC_METRIC_TITLE>'] = title
+
+      renderAppWithOptionalData({
+        template: {
+          ...templatePlotsFixture,
+          plots: [
+            {
+              entries: [plotEntry],
+              group: TemplatePlotGroup.SINGLE_VIEW
+            }
+          ]
+        }
+      })
+
+      expect(screen.queryByText(title)).not.toBeInTheDocument()
+
+      const plot = within(screen.getByTestId(`plot_${title}`)).getAllByRole(
+        'button'
+      )[0]
+      fireEvent.mouseEnter(plot, {
+        bubbles: true,
+        cancelable: true
+      })
+
+      expect(screen.queryByText(title)).not.toBeInTheDocument()
     })
 
     describe('Smooth Plots', () => {

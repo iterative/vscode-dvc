@@ -1,3 +1,4 @@
+import { AnchorDefinitions } from 'dvc/src/cli/dvc/contract'
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import { useCallback, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
@@ -6,7 +7,10 @@ import { plotDataStore } from '../components/plotDataStore'
 import { PlotsState } from '../store'
 import { fillTemplate } from '../components/vegaLite/util'
 
-export const useGetPlot = (section: PlotsSection, id: string) => {
+export const useGetPlot = (
+  section: PlotsSection,
+  id: string
+): [VisualizationSpec | undefined, Partial<AnchorDefinitions> | undefined] => {
   const isTemplatePlot = section === PlotsSection.TEMPLATE_PLOTS
   const storeSection = isTemplatePlot ? 'template' : 'custom'
   const {
@@ -16,6 +20,7 @@ export const useGetPlot = (section: PlotsSection, id: string) => {
   } = useSelector((state: PlotsState) => state[storeSection])
 
   const [spec, setSpec] = useState<VisualizationSpec | undefined>()
+  const [titles, setTitles] = useState<Partial<AnchorDefinitions> | undefined>()
 
   const setPlotData = useCallback(() => {
     const plot = plotDataStore[section][id]
@@ -23,13 +28,17 @@ export const useGetPlot = (section: PlotsSection, id: string) => {
     if (!spec) {
       return
     }
-
     setSpec(spec)
+    setTitles({
+      '<DVC_METRIC_TITLE>': plot.anchor_definitions['<DVC_METRIC_TITLE>'],
+      '<DVC_METRIC_X_LABEL>': plot.anchor_definitions['<DVC_METRIC_X_LABEL>'],
+      '<DVC_METRIC_Y_LABEL>': plot.anchor_definitions['<DVC_METRIC_Y_LABEL>']
+    })
   }, [section, id, nbItemsPerRow, height])
 
   useEffect(() => {
     setPlotData()
   }, [snapshot, setPlotData])
 
-  return spec
+  return [spec, titles]
 }

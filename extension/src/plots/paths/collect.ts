@@ -1,6 +1,5 @@
 import { sep } from 'path'
 import { TopLevelSpec } from 'vega-lite'
-import { VisualizationSpec } from 'react-vega'
 import { TemplatePlotGroup } from '../webview/contract'
 import {
   EXPERIMENT_WORKSPACE_ID,
@@ -50,9 +49,7 @@ const collectType = (plots: PlotOutput[]) => {
       continue
     }
 
-    isMultiViewPlot(
-      JSON.parse(plot.content) as TopLevelSpec | VisualizationSpec
-    )
+    isMultiViewPlot(JSON.parse(plot.content) as TopLevelSpec)
       ? type.add(PathType.TEMPLATE_MULTI)
       : type.add(PathType.TEMPLATE_SINGLE)
   }

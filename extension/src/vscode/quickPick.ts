@@ -241,7 +241,8 @@ const removeMissingUserOrderedItems = <T>(
 
 export const quickPickUserOrderedValues = <T>(
   items: QuickPickItemWithValue<T>[],
-  options: QuickPickOptions & { title: Title }
+  options: QuickPickOptions & { title: Title },
+  maxSelectedItems?: number
 ): Promise<T[] | undefined> =>
   new Promise(resolve => {
     const quickPick = createQuickPick(items, [], {
@@ -263,6 +264,10 @@ export const quickPickUserOrderedValues = <T>(
         selectedItemValues
       )
     })
+
+    if (maxSelectedItems) {
+      limitSelected<T>(quickPick, maxSelectedItems)
+    }
 
     quickPick.onDidAccept(() => {
       resolve(orderedSelection)

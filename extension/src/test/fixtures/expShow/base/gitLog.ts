@@ -4,7 +4,7 @@ import { COMMITS_SEPARATOR } from '../../../../cli/git/constants'
 const data = `${expShowFixture[1].rev}
 github-actions[bot]
 6 hours ago
-refNames:tag: 0.9.3, origin/main, origin/HEAD, main
+refNames:HEAD, tag: 0.9.3, origin/main, origin/HEAD, main
 message:Update version and CHANGELOG for release (#4022)
 
 Co-authored-by: Olivaw[bot] <olivaw@iterative.ai>${COMMITS_SEPARATOR}${expShowFixture[2].rev}

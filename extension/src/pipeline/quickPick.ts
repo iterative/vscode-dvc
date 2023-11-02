@@ -8,7 +8,11 @@ import {
   isValueTree
 } from '../cli/dvc/contract'
 import { getFileExtension, loadDataFiles } from '../fileSystem'
-import { quickPickOne, quickPickUserOrderedValues } from '../vscode/quickPick'
+import {
+  QuickPickItemWithValue,
+  quickPickOne,
+  quickPickUserOrderedValues
+} from '../vscode/quickPick'
 import { pickFiles } from '../vscode/resourcePicker'
 import { Title } from '../vscode/title'
 import { Toast } from '../vscode/toast'
@@ -86,14 +90,27 @@ const verifyXFields = (xValues: QuickPickFieldValues | undefined) => {
   return x
 }
 
-const verifyYFieldsWithMultiXFields = (
-  y: PlotConfigDataAxis,
-  yValues: QuickPickFieldValues,
+const pickYFieldsWithMultiXFields = async (
+  yItems: QuickPickItemWithValue<{ file: string; field: string } | undefined>[],
   xFieldsLength: number
 ) => {
-  if (yValues.length !== xFieldsLength) {
+  const yValues = (await quickPickUserOrderedValues(
+    yItems,
+    {
+      title: `Select ${xFieldsLength} Metrics for Y` as Title
+    },
+    xFieldsLength
+  )) as QuickPickFieldValues | undefined
+
+  const y = formatFieldQuickPickValues(yValues)
+
+  if (!y) {
+    return
+  }
+
+  if (yValues?.length !== xFieldsLength) {
     void Toast.showError(
-      `Found ${xFieldsLength} x metrics and ${yValues.length} y metric(s). When there are multiple x metrics selected there must be an equal number of y metrics. ${multipleXMetricsExample}`
+      `Found ${xFieldsLength} x metrics and ${yValues?.length} y metric(s). When there are multiple x metrics selected there must be an equal number of y metrics. ${multipleXMetricsExample}`
     )
     return
   }
@@ -107,22 +124,17 @@ const verifyYFieldsWithMultiXFields = (
   return y
 }
 
-const verifyYFields = (
-  yValues: QuickPickFieldValues | undefined,
-  xFieldsLength = 0
+const pickYFields = async (
+  yItems: QuickPickItemWithValue<{ file: string; field: string } | undefined>[]
 ) => {
+  const yValues = (await quickPickUserOrderedValues(yItems, {
+    title: Title.SELECT_PLOT_Y_METRIC
+  })) as QuickPickFieldValues | undefined
+
   const y = formatFieldQuickPickValues(yValues)
 
   if (!y) {
     return
-  }
-
-  if (xFieldsLength > 1) {
-    return verifyYFieldsWithMultiXFields(
-      y,
-      yValues as QuickPickFieldValues,
-      xFieldsLength
-    )
   }
 
   return y
@@ -133,8 +145,8 @@ const pickFields = async (
 ): Promise<
   | {
       fields: Omit<PlotConfigData, 'title' | 'template'>
-      firstXKey: string
-      firstYKey: string
+      firstXField: string
+      firstYField: string
     }
   | undefined
 > => {
@@ -160,28 +172,29 @@ const pickFields = async (
     return
   }
 
-  const yValues = (await quickPickUserOrderedValues(
-    items.filter(
-      item => item.value === undefined || !xValues?.includes(item.value)
-    ),
-    {
-      title: Title.SELECT_PLOT_Y_METRIC
-    }
-  )) as { file: string; field: string }[] | undefined
+  const xValuesLength = xValues?.length || 0
 
-  const y = verifyYFields(yValues, xValues?.length)
+  const yItems = items.filter(
+    item => item.value === undefined || !xValues?.includes(item.value)
+  )
+  const y =
+    xValuesLength > 1
+      ? await pickYFieldsWithMultiXFields(yItems, xValuesLength)
+      : await pickYFields(yItems)
 
   if (!y) {
     return
   }
 
+  const [firstXField] = Object.values(x)[0]
+  const [firstYField] = Object.values(y)[0]
+
   return {
     fields: { x, y },
-    firstXKey: (xValues as QuickPickFieldValues)[0].field,
-    firstYKey: (yValues as QuickPickFieldValues)[0].field
+    firstXField,
+    firstYField
   }
 }
-
 const pickPlotConfigData = async (
   fileFields: FileFields
 ): Promise<PlotConfigData | undefined> => {
@@ -197,11 +210,11 @@ const pickPlotConfigData = async (
     return
   }
 
-  const { fields, firstYKey, firstXKey } = fieldsInfo
+  const { fields, firstYField, firstXField } = fieldsInfo
 
   const title = await getInput(
     Title.ENTER_PLOT_TITLE,
-    `${firstXKey} vs ${firstYKey}`
+    `${firstXField} vs ${firstYField}`
   )
 
   if (!title) {

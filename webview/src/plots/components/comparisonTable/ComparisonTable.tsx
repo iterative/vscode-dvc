@@ -12,6 +12,7 @@ import { withScale, withVariant } from '../../../util/styles'
 import { PlotsState } from '../../store'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { reorderComparisonPlots } from '../../util/messages'
+import { WaitForPlotsInfo } from '../emptyState/WaitForPlotsInfo'
 
 export const ComparisonTable: React.FC = () => {
   const { revisions, plots, width } = useSelector(
@@ -54,7 +55,12 @@ export const ComparisonTable: React.FC = () => {
   }, [plots])
 
   if (!plots || plots.length === 0) {
-    return <EmptyState isFullScreen={false}>No Images to Compare</EmptyState>
+    return (
+      <EmptyState isFullScreen={false}>
+        No Images to Compare
+        <WaitForPlotsInfo />
+      </EmptyState>
+    )
   }
 
   const setColumnsOrder = (order: string[]) => {

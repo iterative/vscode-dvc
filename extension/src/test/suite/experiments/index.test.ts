@@ -534,31 +534,77 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to create a branch from an experiment', async () => {
-      const { mockMessageReceived } =
-        await stubWorkspaceGettersWebview(disposable)
+      const {
+        mockMessageReceived,
+        experimentsModel,
+        mockUpdateExperimentsData
+      } = await stubWorkspaceGettersWebview(disposable)
 
-      const mockBranch = 'mock-branch-input'
-      const inputEvent = getInputBoxEvent(mockBranch)
-
-      const mockExperimentBranch = stub(
-        DvcExecutor.prototype,
-        'expBranch'
-      ).resolves('undefined')
+      stub(Setup.prototype, 'getCliVersion').resolves('3.22.0')
 
       const mockExperimentId = 'exp-e7a67'
+      const mockBranch = 'mock-branch-input'
+      const mockExperimentBranch = stub(DvcExecutor.prototype, 'expBranch')
+      const mockSetSelectedBranches = stub(
+        experimentsModel,
+        'setSelectedBranches'
+      )
+      stub(window, 'showInputBox').resolves(mockBranch)
+
+      const failedExperimentBranchEvent = new Promise(resolve =>
+        mockExperimentBranch.onFirstCall().callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve('')
+        })
+      )
 
       mockMessageReceived.fire({
         payload: mockExperimentId,
         type: MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT
       })
 
-      await inputEvent
+      await failedExperimentBranchEvent
+
       expect(mockExperimentBranch).to.be.calledOnce
       expect(mockExperimentBranch).to.be.calledWithExactly(
         dvcDemoPath,
         mockExperimentId,
         mockBranch
       )
+      expect(mockSetSelectedBranches).not.to.be.called
+      expect(mockUpdateExperimentsData).not.to.be.called
+
+      const selectedBranches = ['main', 'other']
+      const selectedBranchesWithNewBranch = [
+        'main',
+        'mock-branch-input',
+        'other'
+      ]
+      mockExperimentBranch.onSecondCall().resolves('branch created')
+      stub(experimentsModel, 'getSelectedBranches')
+        .onFirstCall()
+        .returns(selectedBranches)
+      const waitForBranchesToBeSelected = new Promise(resolve =>
+        mockSetSelectedBranches.callsFake(() => resolve(undefined))
+      )
+
+      mockMessageReceived.fire({
+        payload: mockExperimentId,
+        type: MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT
+      })
+
+      await waitForBranchesToBeSelected
+
+      expect(mockExperimentBranch).to.be.calledTwice
+      expect(mockExperimentBranch).to.be.calledWithExactly(
+        dvcDemoPath,
+        mockExperimentId,
+        mockBranch
+      )
+      expect(mockSetSelectedBranches).to.be.calledWithExactly(
+        selectedBranchesWithNewBranch
+      )
+      expect(mockUpdateExperimentsData).to.be.calledOnce
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to rename an experiment', async () => {
@@ -1523,14 +1569,14 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a message to add a configuration', async () => {
-      const { mockMessageReceived, mockCheckOrAddPipeline } =
+      const { mockMessageReceived, mockAddPipeline } =
         await buildExperimentsWebview({ disposer: disposable })
 
       mockMessageReceived.fire({
         type: MessageFromWebviewType.ADD_CONFIGURATION
       })
 
-      expect(mockCheckOrAddPipeline).to.be.calledOnce
+      expect(mockAddPipeline).to.be.calledOnce
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a message to show more commits', async () => {

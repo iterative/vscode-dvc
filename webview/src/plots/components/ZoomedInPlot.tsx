@@ -1,10 +1,18 @@
 import React, { useEffect, useRef } from 'react'
 import { PlotHeight, PlotsSection } from 'dvc/src/plots/webview/contract'
+import { View } from 'react-vega'
 import { ExtendedVegaLite } from './vegaLite/ExtendedVegaLite'
 import styles from './styles.module.scss'
 import { plotDataStore } from './plotDataStore'
 import { fillTemplate } from './vegaLite/util'
+import { ZoomablePlotWrapper } from './ZoomablePlotWrapper'
 import {
+  preventSvgTruncation,
+  replaceThemeValuesForExport,
+  ThemeProperty
+} from '../../util/styles'
+import {
+  exportPlotAsSvg,
   exportPlotDataAsCsv,
   exportPlotDataAsJson,
   exportPlotDataAsTsv
@@ -25,6 +33,7 @@ const appendActionToVega = (
   rawDataAction.textContent = `Save as ${type}`
   rawDataAction.addEventListener('click', () => {
     onClick()
+    ;(vegaActions.parentNode as HTMLElement).removeAttribute('open')
   })
   rawDataAction.classList.add(styles.vegaCustomAction)
   vegaActions.append(rawDataAction)
@@ -46,13 +55,25 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
     }
   }, [])
 
-  const onNewView = () => {
+  const onNewView = (view: View) => {
     const actions: HTMLDivElement | null | undefined =
       zoomedInPlotRef.current?.querySelector('.vega-actions')
     if (!actions) {
       return
     }
 
+    appendActionToVega('SVG', actions, () => {
+      void view.toSVG().then(svg => {
+        const themedSvg = replaceThemeValuesForExport(svg, [
+          ThemeProperty.FOREGROUND_COLOR,
+          ThemeProperty.FONT
+        ])
+
+        const fullThemedSvg = preventSvgTruncation(themedSvg)
+
+        exportPlotAsSvg(fullThemedSvg)
+      })
+    })
     appendActionToVega('JSON', actions, () => exportPlotDataAsJson(id))
     appendActionToVega('CSV', actions, () => exportPlotDataAsCsv(id))
     appendActionToVega('TSV', actions, () => exportPlotDataAsTsv(id))
@@ -74,22 +95,24 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
   }
 
   return (
-    <div
-      className={styles.zoomedInPlot}
-      data-testid="zoomed-in-plot"
-      ref={zoomedInPlotRef}
-    >
-      <ExtendedVegaLite
-        actions={{
-          compiled: false,
-          editor: false,
-          export: true,
-          source: false
-        }}
-        id={id}
-        onNewView={onNewView}
-        spec={spec}
-      />
-    </div>
+    <ZoomablePlotWrapper titles={plot.anchor_definitions}>
+      <div
+        className={styles.zoomedInPlot}
+        data-testid="zoomed-in-plot"
+        ref={zoomedInPlotRef}
+      >
+        <ExtendedVegaLite
+          actions={{
+            compiled: false,
+            editor: false,
+            export: false,
+            source: false
+          }}
+          id={id}
+          onNewView={onNewView}
+          spec={spec}
+        />
+      </div>
+    </ZoomablePlotWrapper>
   )
 }
