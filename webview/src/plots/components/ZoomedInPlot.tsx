@@ -7,6 +7,7 @@ import { plotDataStore } from './plotDataStore'
 import { fillTemplate } from './vegaLite/util'
 import { ZoomablePlotWrapper } from './ZoomablePlotWrapper'
 import {
+  addExportBackgroundColor,
   preventSvgTruncation,
   replaceThemeValuesForExport,
   ThemeProperty
@@ -69,7 +70,9 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
           ThemeProperty.FONT
         ])
 
-        const fullThemedSvg = preventSvgTruncation(themedSvg)
+        const fullThemedSvg = addExportBackgroundColor(
+          preventSvgTruncation(themedSvg)
+        )
 
         exportPlotAsSvg(fullThemedSvg)
       })
