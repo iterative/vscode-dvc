@@ -1,5 +1,5 @@
 import React, { DragEvent, useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import cx from 'classnames'
 import { NoPlotsAdded } from './NoPlotsAdded'
@@ -17,7 +17,6 @@ interface CustomPlotsProps {
 }
 
 export const CustomPlots: React.FC<CustomPlotsProps> = ({ plotsIds }) => {
-  const dispatch = useDispatch()
   const [order, setOrder] = useState(plotsIds)
   const {
     nbItemsPerRow,

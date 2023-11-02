@@ -201,10 +201,11 @@ $gap: 20px;
   gap: 10px;
   right: 0;
   top: 0;
-  justify-self: flex-end;
   display: flex;
   justify-content: end;
   background-color: $bg-color;
+  z-index: 3;
+  justify-self: flex-end;
 }
 
 .sizeSlider {
