@@ -1,12 +1,13 @@
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import React from 'react'
+import { useDispatch } from 'react-redux'
 import cx from 'classnames'
 import { DropTarget } from './DropTarget'
 import { plotDataStore } from './plotDataStore'
 import styles from './styles.module.scss'
+import { changeDragAndDropMode } from './util'
 import { withScale } from '../../util/styles'
 import { VirtualizedGrid } from '../../shared/components/virtualizedGrid/VirtualizedGrid'
-import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
 import {
   DragDropContainer,
   OnDrop,
@@ -22,6 +23,7 @@ interface DragAndDropGridProps {
   useVirtualizedGrid?: boolean
   parentDraggedOver?: boolean
   multiView?: boolean
+  sectionKey: PlotsSection
 }
 
 export const DragAndDropGrid: React.FC<DragAndDropGridProps> = ({
@@ -32,8 +34,10 @@ export const DragAndDropGrid: React.FC<DragAndDropGridProps> = ({
   nbItemsPerRow,
   useVirtualizedGrid,
   parentDraggedOver,
-  multiView
+  multiView,
+  sectionKey
 }) => {
+  const dispatch = useDispatch()
   const items = order.map((plot: string) => {
     const colSpan =
       (multiView &&
@@ -52,12 +56,20 @@ export const DragAndDropGrid: React.FC<DragAndDropGridProps> = ({
         data-testid={`plot_${plot}`}
         style={withScale(colSpan)}
       >
-        <GripIcon className={styles.plotGripIcon} />
-
         <h2>{plot}</h2>
       </div>
     )
   })
+
+  const handleOnDrop = (
+    draggedId: string,
+    draggedGroup: string,
+    groupId: string,
+    position: number
+  ) => {
+    changeDragAndDropMode(sectionKey, dispatch, true)
+    onDrop?.(draggedId, draggedGroup, groupId, position)
+  }
 
   return (
     <DragDropContainer
@@ -65,7 +77,7 @@ export const DragAndDropGrid: React.FC<DragAndDropGridProps> = ({
       setOrder={setOrder}
       items={items}
       group={groupId}
-      onDrop={onDrop}
+      onDrop={handleOnDrop}
       dropTarget={<DropTarget />}
       wrapperComponent={
         useVirtualizedGrid

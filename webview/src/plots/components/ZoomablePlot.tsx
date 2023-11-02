@@ -8,9 +8,11 @@ import { TemplateVegaLite } from './templatePlots/TemplateVegaLite'
 import { setZoomedInPlot } from './webviewSlice'
 import styles from './styles.module.scss'
 import { config } from './constants'
+import { changeDragAndDropMode } from './util'
 import { zoomPlot } from '../util/messages'
 import { useGetPlot } from '../hooks/useGetPlot'
 import { Ellipsis } from '../../shared/components/icons'
+import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
 
 interface ZoomablePlotProps {
   id: string
@@ -73,8 +75,11 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
       <button
         className={styles.zoomablePlot}
         onClick={() => handleOnClick()}
+        onMouseDown={() => changeDragAndDropMode(section, dispatch, false)}
         aria-label="Open Plot in Popup"
       >
+        <GripIcon className={styles.plotGripIcon} />
+
         <span
           className={styles.plotActions}
           onClick={event => {
