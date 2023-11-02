@@ -4,7 +4,6 @@ import { Disposable, Disposer } from '@hediet/std/disposable'
 import isEmpty from 'lodash.isempty'
 import {
   DvcCliDetails,
-  STUDIO_URL,
   SetupSection,
   SetupData as TSetupData
 } from './webview/contract'
@@ -17,7 +16,7 @@ import { WebviewMessages } from './webview/messages'
 import { validateTokenInput } from './inputBox'
 import { findPythonBinForInstall } from './autoInstall'
 import { run, runWithRecheck, runWorkspace } from './runner'
-import { isStudioAccessToken, pollForStudioToken } from './token'
+import { Studio } from './studio'
 import {
   PYTHON_EXTENSION_ACTION,
   pickFocusedProjects,
@@ -52,13 +51,7 @@ import { createFileSystemWatcher } from '../fileSystem/watcher'
 import { EventName } from '../telemetry/constants'
 import { WorkspaceScale } from '../telemetry/collect'
 import { gitPath } from '../cli/git/constants'
-import {
-  Flag,
-  ConfigKey,
-  DOT_DVC,
-  Args,
-  SubCommand
-} from '../cli/dvc/constants'
+import { DOT_DVC, Args, SubCommand } from '../cli/dvc/constants'
 import { GLOBAL_WEBVIEW_DVCROOT } from '../webview/factory'
 import { getValidInput } from '../vscode/inputBox'
 import { Title } from '../vscode/title'
@@ -70,7 +63,6 @@ import {
   isActivePythonEnvGlobal,
   selectPythonInterpreter
 } from '../extensions/python'
-import { openUrl } from '../vscode/external'
 
 export class Setup
   extends BaseRepository<TSetupData>
@@ -88,6 +80,7 @@ export class Setup
 
   private readonly config: Config
   private readonly status: Status
+  private readonly studio: Studio
   private readonly internalCommands: InternalCommands
 
   private readonly webviewMessages: WebviewMessages
@@ -119,12 +112,6 @@ export class Setup
 
   private dotFolderWatcher?: Disposer
 
-  private studioAccessToken: string | undefined = undefined
-  private studioIsConnected = false
-  private studioVerifyUserUrl: string | undefined = undefined
-  private studioVerifyUserCode: string | null = null
-  private shareLiveToStudio: boolean | undefined = undefined
-
   private focusedSection: SetupSection | undefined = undefined
 
   constructor(
@@ -145,6 +132,12 @@ export class Setup
     this.internalCommands = internalCommands
 
     this.status = status
+
+    this.studio = new Studio(
+      internalCommands,
+      this.studioConnectionChanged,
+      () => this.getCwd()
+    )
 
     this.initialize = async () => {
       const result = initialize()
@@ -315,34 +308,12 @@ export class Setup
     }
   }
 
-  public async removeStudioAccessToken() {
+  public removeStudioAccessToken() {
     if (!this.getCliCompatible()) {
       return
     }
 
-    if (this.dvcRoots.length !== 1) {
-      const cwd = getFirstWorkspaceFolder()
-      if (!cwd) {
-        return
-      }
-      return await this.accessConfig(
-        cwd,
-        Flag.GLOBAL,
-        Flag.UNSET,
-        ConfigKey.STUDIO_TOKEN
-      )
-    }
-
-    const cwd = this.dvcRoots[0]
-
-    await this.accessConfig(cwd, Flag.LOCAL, Flag.UNSET, ConfigKey.STUDIO_TOKEN)
-
-    return await this.accessConfig(
-      cwd,
-      Flag.GLOBAL,
-      Flag.UNSET,
-      ConfigKey.STUDIO_TOKEN
-    )
+    return this.studio.removeStudioAccessToken(this.dvcRoots)
   }
 
   public async saveStudioAccessToken() {
@@ -361,20 +332,16 @@ export class Setup
       return
     }
 
-    return this.saveStudioAccessTokenInConfig(cwd, token)
+    await this.studio.saveStudioAccessTokenInConfig(cwd, token)
+    return this.updateStudioAndSend()
   }
 
   public getStudioAccessToken() {
-    return this.studioAccessToken
+    return this.studio.getStudioAccessToken()
   }
 
   public sendInitialWebviewData() {
     return this.sendDataToWebview()
-  }
-
-  private async saveStudioAccessTokenInConfig(cwd: string, token: string) {
-    await this.accessConfig(cwd, Flag.GLOBAL, ConfigKey.STUDIO_TOKEN, token)
-    return this.updateStudioAndSend()
   }
 
   private async getDvcCliDetails(): Promise<DvcCliDetails> {
@@ -446,15 +413,15 @@ export class Setup
       isPythonEnvironmentGlobal,
       isPythonExtensionInstalled: this.config.isPythonExtensionInstalled(),
       isPythonExtensionUsed,
-      isStudioConnected: this.studioIsConnected,
+      isStudioConnected: this.studio.getStudioIsConnected(),
       needsGitCommit,
       needsGitInitialized,
       projectInitialized,
       pythonBinPath: getBinDisplayText(pythonBinPath),
       remoteList,
       sectionCollapsed: collectSectionCollapsed(this.focusedSection),
-      shareLiveToStudio: !!this.shareLiveToStudio,
-      studioVerifyUserCode: this.getStudioVerifyUserCode()
+      shareLiveToStudio: !!this.studio.getShareLiveToStudio(),
+      studioVerifyUserCode: this.studio.getStudioVerifyUserCode()
     })
     this.focusedSection = undefined
   }
@@ -463,11 +430,11 @@ export class Setup
     const webviewMessages = new WebviewMessages(
       () => this.getWebview(),
       () => this.initializeGit(),
-      (offline: boolean) => this.updateStudioOffline(offline),
+      (offline: boolean) => this.studio.updateStudioOffline(offline),
       () => this.isPythonExtensionUsed(),
       () => this.updatePythonEnvironment(),
-      () => this.requestStudioAuthentication(),
-      () => this.openStudioVerifyUserUrl()
+      () => this.studio.requestStudioAuthentication(),
+      () => this.studio.openStudioVerifyUserUrl()
     )
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message =>
@@ -718,16 +685,8 @@ export class Setup
   }
 
   private async updateStudioAndSend() {
-    await this.updateIsStudioConnected()
+    await this.studio.updateIsStudioConnected()
     return this.sendDataToWebview()
-  }
-
-  private async updateIsStudioConnected() {
-    await this.setStudioValues()
-    const storedToken = this.getStudioAccessToken()
-    const isConnected = isStudioAccessToken(storedToken)
-    this.studioIsConnected = isConnected
-    return setContextValue(ContextKey.STUDIO_CONNECTED, isConnected)
   }
 
   private watchDvcConfigs() {
@@ -771,123 +730,6 @@ export class Setup
     ])
   }
 
-  private async setStudioValues() {
-    const cwd = this.getCwd()
-
-    const previousStudioAccessToken = this.studioAccessToken
-
-    if (!cwd) {
-      this.studioAccessToken = undefined
-      this.shareLiveToStudio = undefined
-
-      if (previousStudioAccessToken) {
-        this.studioConnectionChanged.fire()
-      }
-      return
-    }
-
-    const [studioAccessToken, shareLiveToStudio] = await Promise.all([
-      this.accessConfig(cwd, ConfigKey.STUDIO_TOKEN),
-      (await this.accessConfig(cwd, ConfigKey.STUDIO_OFFLINE)) !== 'true'
-    ])
-
-    this.studioAccessToken = studioAccessToken
-    this.shareLiveToStudio = shareLiveToStudio
-
-    if (previousStudioAccessToken !== this.studioAccessToken) {
-      this.studioConnectionChanged.fire()
-    }
-  }
-
-  private async updateStudioOffline(shareLive: boolean) {
-    const offline = !shareLive
-
-    const cwd = this.getCwd()
-
-    if (!cwd) {
-      return
-    }
-
-    await this.accessConfig(
-      cwd,
-      Flag.GLOBAL,
-      ConfigKey.STUDIO_OFFLINE,
-      String(offline)
-    )
-  }
-
-  private getStudioVerifyUserCode() {
-    return this.studioVerifyUserCode
-  }
-
-  private getStudioVerifyUserUrl() {
-    return this.studioVerifyUserUrl
-  }
-
-  private async requestStudioAuthentication() {
-    const response = await fetch(`${STUDIO_URL}/api/device-login`, {
-      body: JSON.stringify({
-        client_name: 'vscode'
-      }),
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      method: 'POST'
-    })
-
-    const {
-      token_uri: tokenUri,
-      verification_uri: verificationUri,
-      user_code: userCode,
-      device_code: deviceCode
-    } = (await response.json()) as {
-      token_uri: string
-      verification_uri: string
-      user_code: string
-      device_code: string
-    }
-    this.updateStudioUserVerifyDetails(userCode, verificationUri)
-
-    await this.sendDataToWebview()
-    void this.requestStudioToken(deviceCode, tokenUri)
-  }
-
-  private async requestStudioToken(
-    studioDeviceCode: string,
-    studioTokenRequestUri: string
-  ) {
-    const token = await pollForStudioToken(
-      studioTokenRequestUri,
-      studioDeviceCode
-    )
-
-    this.updateStudioUserVerifyDetails(null, undefined)
-
-    const cwd = this.getCwd()
-
-    if (!cwd) {
-      return
-    }
-
-    return this.saveStudioAccessTokenInConfig(cwd, token)
-  }
-
-  private openStudioVerifyUserUrl() {
-    const url = this.getStudioVerifyUserUrl()
-    if (!url) {
-      return
-    }
-    void openUrl(url)
-  }
-
-  private updateStudioUserVerifyDetails(
-    userCode: string | null,
-    verifyUrl: string | undefined
-  ) {
-    this.studioVerifyUserCode = userCode
-    this.studioVerifyUserUrl = verifyUrl
-  }
-
   private getCwd() {
     if (!this.getCliCompatible()) {
       return
@@ -895,14 +737,6 @@ export class Setup
     return this.dvcRoots.length === 1
       ? this.dvcRoots[0]
       : getFirstWorkspaceFolder()
-  }
-
-  private accessConfig(cwd: string, ...args: Args) {
-    return this.internalCommands.executeCommand(
-      AvailableCommands.CONFIG,
-      cwd,
-      ...args
-    )
   }
 
   private accessRemote(cwd: string, ...args: Args) {

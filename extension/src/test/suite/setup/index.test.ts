@@ -384,7 +384,8 @@ suite('Setup Test Suite', () => {
         pythonBinPath: undefined,
         remoteList: undefined,
         sectionCollapsed: undefined,
-        shareLiveToStudio: false
+        shareLiveToStudio: false,
+        studioVerifyUserCode: null
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -430,7 +431,8 @@ suite('Setup Test Suite', () => {
         pythonBinPath: undefined,
         remoteList: undefined,
         sectionCollapsed: undefined,
-        shareLiveToStudio: true
+        shareLiveToStudio: true,
+        studioVerifyUserCode: null
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -484,7 +486,8 @@ suite('Setup Test Suite', () => {
         pythonBinPath: undefined,
         remoteList: undefined,
         sectionCollapsed: undefined,
-        shareLiveToStudio: true
+        shareLiveToStudio: true,
+        studioVerifyUserCode: null
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -538,7 +541,8 @@ suite('Setup Test Suite', () => {
         pythonBinPath: undefined,
         remoteList: { [dvcDemoPath]: undefined },
         sectionCollapsed: undefined,
-        shareLiveToStudio: true
+        shareLiveToStudio: true,
+        studioVerifyUserCode: null
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
