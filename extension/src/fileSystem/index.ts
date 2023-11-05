@@ -384,19 +384,13 @@ export const writeJson = <
   return writeFile(path, json)
 }
 
-export const writeCsv = async (
-  path: string,
-  arr: Array<Record<string, unknown>>
-) => {
-  const csv = await json2csv(arr)
+export const writeCsv = (path: string, arr: Array<Record<string, unknown>>) => {
+  const csv = json2csv(arr)
   return writeFile(path, csv)
 }
 
-export const writeTsv = async (
-  path: string,
-  arr: Array<Record<string, unknown>>
-) => {
-  const csv = await json2csv(arr, { delimiter: { field: '\t' } })
+export const writeTsv = (path: string, arr: Array<Record<string, unknown>>) => {
+  const csv = json2csv(arr, { delimiter: { field: '\t' } })
   return writeFile(path, csv)
 }
 
