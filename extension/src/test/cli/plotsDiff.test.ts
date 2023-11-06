@@ -5,6 +5,7 @@ import { dvcReader, initializeDemoRepo, initializeEmptyRepo } from './util'
 import { dvcDemoPath } from '../util'
 import { ImagePlot } from '../../plots/webview/contract'
 import {
+  DVC_METRIC_DATA,
   EXPERIMENT_WORKSPACE_ID,
   PlotsOutput,
   PlotsType,
@@ -49,7 +50,7 @@ suite('plots diff -o <TEMP_DIR> --split --show-json', () => {
 
         const expectTemplate = (plot: TemplatePlot) => {
           expect(
-            plot?.anchor_definitions['<DVC_METRIC_DATA>'],
+            plot?.anchor_definitions[DVC_METRIC_DATA],
             'should have a datapoints anchor definition'
           ).to.be.a('string')
 
@@ -58,7 +59,7 @@ suite('plots diff -o <TEMP_DIR> --split --show-json', () => {
           )
 
           const datapoints =
-            JSON.parse(plot?.anchor_definitions['<DVC_METRIC_DATA>']) || []
+            JSON.parse(plot?.anchor_definitions[DVC_METRIC_DATA]) || []
           const revisions = new Set()
           for (const datapoint of datapoints) {
             revisions.add(datapoint.rev)

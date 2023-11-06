@@ -35,7 +35,13 @@ import {
   MessageToWebviewType
 } from 'dvc/src/webview/contract'
 import { act } from 'react-dom/test-utils'
-import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
+import {
+  DVC_METRIC_DATA,
+  DVC_METRIC_TITLE,
+  DVC_METRIC_X_LABEL,
+  DVC_METRIC_Y_LABEL,
+  EXPERIMENT_WORKSPACE_ID
+} from 'dvc/src/cli/dvc/contract'
 import { App } from './App'
 import { NewSectionBlock } from './templatePlots/TemplatePlots'
 import {
@@ -2027,7 +2033,7 @@ describe('App', () => {
       for (let i = 0; i < nbOfPlots; i++) {
         const id = `plot-${i}`
         plots.push({
-          anchor_definitions: { '<DVC_METRIC_DATA>': '[]' },
+          anchor_definitions: { DVC_METRIC_DATA: '[]' },
           content: JSON.stringify({
             $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
             encoding: {},
@@ -2604,7 +2610,7 @@ describe('App', () => {
           entries: [
             {
               anchor_definitions: {
-                '<DVC_METRIC_DATA>': JSON.stringify(
+                [DVC_METRIC_DATA]: JSON.stringify(
                   smoothTemplatePlotContent.data.values.slice(0, 10)
                 )
               },
@@ -2689,7 +2695,7 @@ describe('App', () => {
         ...templatePlotsFixture.plots[0].entries[0],
         id: title
       }
-      plotEntry.anchor_definitions['<DVC_METRIC_TITLE>'] = title
+      plotEntry.anchor_definitions[DVC_METRIC_TITLE] = title
 
       renderAppWithOptionalData({
         template: {
@@ -2723,7 +2729,7 @@ describe('App', () => {
         ...templatePlotsFixture.plots[0].entries[0],
         id: xLabel
       }
-      plotEntry.anchor_definitions['<DVC_METRIC_X_LABEL>'] = xLabel
+      plotEntry.anchor_definitions[DVC_METRIC_X_LABEL] = xLabel
 
       renderAppWithOptionalData({
         template: {
@@ -2757,7 +2763,7 @@ describe('App', () => {
         ...templatePlotsFixture.plots[0].entries[0],
         id: yLabel
       }
-      plotEntry.anchor_definitions['<DVC_METRIC_Y_LABEL>'] = yLabel
+      plotEntry.anchor_definitions[DVC_METRIC_Y_LABEL] = yLabel
 
       renderAppWithOptionalData({
         template: {
@@ -2791,7 +2797,7 @@ describe('App', () => {
         ...templatePlotsFixture.plots[0].entries[0],
         id: title
       }
-      plotEntry.anchor_definitions['<DVC_METRIC_TITLE>'] = title
+      plotEntry.anchor_definitions[DVC_METRIC_TITLE] = title
 
       renderAppWithOptionalData({
         template: {

@@ -135,17 +135,34 @@ export const isImagePlotOutput = (plot: {
   type: PlotsType
 }): plot is ImagePlotOutput => plot.type === PlotsType.IMAGE
 
+export const DVC_METRIC_COLOR = '<DVC_METRIC_COLOR>' as const
+export const DVC_METRIC_DATA = '<DVC_METRIC_DATA>' as const
+export const DVC_METRIC_SHAPE = '<DVC_METRIC_SHAPE>' as const
+export const DVC_METRIC_STROKE_DASH = '<DVC_METRIC_STROKE_DASH>' as const
+export const DVC_METRIC_TYPE = '<DVC_METRIC_TYPE>' as const
+export const DVC_METRIC_TITLE = '<DVC_METRIC_TITLE>' as const
+export const DVC_METRIC_X = '<DVC_METRIC_X>' as const
+export const DVC_METRIC_X_LABEL = '<DVC_METRIC_X_LABEL>' as const
+export const DVC_METRIC_Y = '<DVC_METRIC_Y>' as const
+export const DVC_METRIC_Y_LABEL = '<DVC_METRIC_Y_LABEL>' as const
+export const DVC_METRIC_ZOOM_AND_PAN = '<DVC_METRIC_ZOOM_AND_PAN>' as const
+export const DVC_PARAM_TYPE = '<DVC_PARAM_TYPE>' as const
+export const DVC_METRIC_PLOT_HEIGHT = '<DVC_METRIC_PLOT_HEIGHT>' as const
+export const DVC_METRIC_PLOT_WIDTH = '<DVC_METRIC_PLOT_WIDTH>' as const
+export const DVC_METRIC_COLUMN_WIDTH = '<DVC_METRIC_COLUMN_WIDTH>' as const
+export const DVC_METRIC_ROW_HEIGHT = '<DVC_METRIC_ROW_HEIGHT>' as const
+
 export type AnchorDefinitions = {
-  '<DVC_METRIC_COLOR>'?: string
-  '<DVC_METRIC_DATA>': string
-  '<DVC_METRIC_SHAPE>'?: string
-  '<DVC_METRIC_STROKE_DASH>'?: string
-  '<DVC_METRIC_TYPE>'?: 'quantitative' | 'nominal'
-  '<DVC_METRIC_TITLE>'?: string
-  '<DVC_METRIC_X_LABEL>'?: string
-  '<DVC_METRIC_Y_LABEL>'?: string
-  '<DVC_METRIC_ZOOM_AND_PAN>'?: string
-  '<DVC_PARAM_TYPE>'?: 'quantitative' | 'nominal'
+  [DVC_METRIC_COLOR]?: string
+  [DVC_METRIC_DATA]: string
+  [DVC_METRIC_SHAPE]?: string
+  [DVC_METRIC_STROKE_DASH]?: string
+  [DVC_METRIC_TYPE]?: 'quantitative' | 'nominal'
+  [DVC_METRIC_TITLE]?: string
+  [DVC_METRIC_X_LABEL]?: string
+  [DVC_METRIC_Y_LABEL]?: string
+  [DVC_METRIC_ZOOM_AND_PAN]?: string
+  [DVC_PARAM_TYPE]?: 'quantitative' | 'nominal'
 }
 
 export type TemplatePlot = {

@@ -1,4 +1,5 @@
 import {
+  DVC_METRIC_DATA,
   isImagePlotOutput,
   PlotOutput,
   PlotsOutputOrError,
@@ -28,7 +29,7 @@ const collectFromDatapoint = (
 
 const collectTemplateFiles = (acc: string[], plot: TemplatePlot): void => {
   for (const datapoint of JSON.parse(
-    plot.anchor_definitions['<DVC_METRIC_DATA>']
+    plot.anchor_definitions[DVC_METRIC_DATA]
   )) {
     collectFromDatapoint(acc, datapoint as Record<string, unknown>)
   }

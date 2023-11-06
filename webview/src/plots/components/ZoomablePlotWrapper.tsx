@@ -1,5 +1,10 @@
 import React, { ReactElement, PropsWithChildren } from 'react'
-import { AnchorDefinitions } from 'dvc/src/cli/dvc/contract'
+import {
+  AnchorDefinitions,
+  DVC_METRIC_TITLE,
+  DVC_METRIC_X_LABEL,
+  DVC_METRIC_Y_LABEL
+} from 'dvc/src/cli/dvc/contract'
 import styles from './styles.module.scss'
 import Tooltip from '../../shared/components/tooltip/Tooltip'
 
@@ -46,12 +51,11 @@ export const ZoomablePlotWrapper: React.FC<
   }
 
   const titleLengths = {
-    '<DVC_METRIC_TITLE>': 50,
-    '<DVC_METRIC_X_LABEL>': 50,
-    '<DVC_METRIC_Y_LABEL>': 30
+    [DVC_METRIC_TITLE]: 50,
+    [DVC_METRIC_X_LABEL]: 50,
+    [DVC_METRIC_Y_LABEL]: 30
   }
   const tooltipContentLines = []
-  // Pull out a constant.... weeeeeee
 
   for (const [titleKey, maxLength] of Object.entries(titleLengths)) {
     const title = titles[titleKey as keyof AnchorDefinitions]

@@ -12,7 +12,11 @@ import customPlotsFixture, {
   customPlotsOrderFixture,
   experimentsWithCommits
 } from '../../test/fixtures/expShow/base/customPlots'
-import { EXPERIMENT_WORKSPACE_ID, TemplatePlot } from '../../cli/dvc/contract'
+import {
+  DVC_METRIC_DATA,
+  EXPERIMENT_WORKSPACE_ID,
+  TemplatePlot
+} from '../../cli/dvc/contract'
 import { sameContents } from '../../util/array'
 import { CustomPlotData, ImagePlot } from '../webview/contract'
 import { exists } from '../../fileSystem'
@@ -55,8 +59,7 @@ describe('collectCustomPlots', () => {
       plotsOrderValues: customPlotsOrderFixture
     })
     expect(
-      JSON.parse(data[0].anchor_definitions['<DVC_METRIC_DATA>']).slice(-1)[0]
-        .id
+      JSON.parse(data[0].anchor_definitions[DVC_METRIC_DATA]).slice(-1)[0].id
     ).toStrictEqual('main')
   })
 
@@ -92,7 +95,7 @@ describe('collectData', () => {
     const { revisionData, comparisonData } = collectData(plotsDiffFixture)
 
     const values = JSON.parse(
-      logsLossPlot?.anchor_definitions?.['<DVC_METRIC_DATA>'] || '[]'
+      logsLossPlot?.anchor_definitions?.[DVC_METRIC_DATA] || '[]'
     ) as ({ rev: string } & Record<string, unknown>)[]
 
     expect(isEmpty(values)).toBeFalsy()

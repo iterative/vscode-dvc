@@ -1,9 +1,14 @@
 import { TopLevelSpec } from 'vega-lite'
 import { isMultiViewPlot } from '../../../plots/vega/util'
 import {
+  DVC_METRIC_COLOR,
+  DVC_METRIC_DATA,
+  DVC_METRIC_Y_LABEL,
+  DVC_METRIC_X_LABEL,
   EXPERIMENT_WORKSPACE_ID,
   PlotsOutput,
-  PlotsType
+  PlotsType,
+  DVC_METRIC_TITLE
 } from '../../../cli/dvc/contract'
 import {
   ComparisonRevisionData,
@@ -34,7 +39,7 @@ const basicVega = {
         'exp-e7a67'
       ],
       anchor_definitions: {
-        '<DVC_METRIC_DATA>': JSON.stringify([
+        [DVC_METRIC_DATA]: JSON.stringify([
           {
             loss: '2.298783302307129',
             step: '0',
@@ -306,16 +311,16 @@ const basicVega = {
             rev: 'exp-e7a67'
           }
         ]),
-        '<DVC_METRIC_TITLE>': '',
-        '<DVC_METRIC_X_LABEL>': 'step',
-        '<DVC_METRIC_Y_LABEL>': 'loss'
+        DVC_METRIC_TITLE: '',
+        DVC_METRIC_X_LABEL: 'step',
+        DVC_METRIC_Y_LABEL: 'loss'
       },
       content: JSON.stringify({
         $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
         data: {
-          values: '<DVC_METRIC_DATA>'
+          values: DVC_METRIC_DATA
         },
-        title: '<DVC_METRIC_TITLE>',
+        title: DVC_METRIC_TITLE,
         width: 300,
         height: 300,
         layer: [
@@ -324,12 +329,12 @@ const basicVega = {
               x: {
                 field: 'step',
                 type: 'quantitative',
-                title: '<DVC_METRIC_X_LABEL>'
+                title: DVC_METRIC_X_LABEL
               },
               y: {
                 field: 'loss',
                 type: 'quantitative',
-                title: '<DVC_METRIC_Y_LABEL>',
+                title: DVC_METRIC_Y_LABEL,
                 scale: { zero: false }
               },
               color: { field: 'rev', type: 'nominal' }
@@ -567,7 +572,7 @@ const extendedSpecs = (plotsOutput: TemplatePlots): TemplatePlotSection[] => {
       const plot = {
         anchor_definitions: {
           ...originalPlot.anchor_definitions,
-          '<DVC_METRIC_COLOR>': JSON.stringify({
+          [DVC_METRIC_COLOR]: JSON.stringify({
             scale: {
               domain: REVISIONS,
               range: copyOriginalColors().slice(0, 5)

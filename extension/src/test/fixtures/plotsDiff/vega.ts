@@ -1,12 +1,15 @@
 import { Title } from 'vega'
-import { EXPERIMENT_WORKSPACE_ID } from '../../../cli/dvc/contract'
+import {
+  DVC_METRIC_DATA,
+  EXPERIMENT_WORKSPACE_ID
+} from '../../../cli/dvc/contract'
 import { join } from '../../util/path'
 
 const data = {
   [join('logs', 'acc.tsv')]: [
     {
       anchor_definitions: {
-        '<DVC_METRIC_DATA>': JSON.stringify([
+        [DVC_METRIC_DATA]: JSON.stringify([
           {
             acc: '0.123',
             rev: EXPERIMENT_WORKSPACE_ID,
@@ -292,7 +295,7 @@ const data = {
       content: JSON.stringify({
         $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
         data: {
-          values: '<DVC_METRIC_DATA>'
+          values: DVC_METRIC_DATA
         },
         title: '',
         width: 300,
@@ -361,7 +364,6 @@ const data = {
               }
             ]
           }
-
         ]
       })
     }
@@ -370,7 +372,7 @@ const data = {
     {
       anchor_definitions: {
         // @ts-expect-error Expression produces a union type that is too complex to represent.
-        '<DVC_METRIC_DATA>': JSON.stringify([
+        [DVC_METRIC_DATA]: JSON.stringify([
           { actual: 7, predicted: 7, rev: EXPERIMENT_WORKSPACE_ID },
           { actual: 2, predicted: 0, rev: EXPERIMENT_WORKSPACE_ID },
           { actual: 1, predicted: 1, rev: EXPERIMENT_WORKSPACE_ID },
@@ -50386,7 +50388,7 @@ const data = {
       content: JSON.stringify({
         $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
         data: {
-          values: '<DVC_METRIC_DATA>'
+          values: DVC_METRIC_DATA
         },
         title: '',
         facet: { field: 'rev', type: 'nominal' },

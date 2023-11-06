@@ -1,5 +1,7 @@
 import { ShapeEncoding, StrokeDashEncoding } from './constants'
 import {
+  DVC_METRIC_SHAPE,
+  DVC_METRIC_STROKE_DASH,
   PlotsOutput,
   TemplatePlot,
   isImagePlotOutput
@@ -15,18 +17,18 @@ const collectEncoding = (
   id: string,
   plot: TemplatePlot
 ): void => {
-  if (plot.anchor_definitions['<DVC_METRIC_STROKE_DASH>']) {
+  if (plot.anchor_definitions[DVC_METRIC_STROKE_DASH]) {
     acc[id] = {
       strokeDash: JSON.parse(
-        plot.anchor_definitions['<DVC_METRIC_STROKE_DASH>']
+        plot.anchor_definitions[DVC_METRIC_STROKE_DASH]
       ) as StrokeDashEncoding
     }
     return
   }
-  if (plot.anchor_definitions['<DVC_METRIC_SHAPE>']) {
+  if (plot.anchor_definitions[DVC_METRIC_SHAPE]) {
     acc[id] = {
       shape: JSON.parse(
-        plot.anchor_definitions['<DVC_METRIC_SHAPE>']
+        plot.anchor_definitions[DVC_METRIC_SHAPE]
       ) as ShapeEncoding
     }
   }

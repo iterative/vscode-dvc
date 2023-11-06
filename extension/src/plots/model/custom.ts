@@ -1,6 +1,15 @@
 import { getCustomPlotId } from './collect'
 import { Column, ColumnType } from '../../experiments/webview/contract'
 import { FILE_SEPARATOR } from '../../experiments/columns/paths'
+import {
+  DVC_METRIC_COLOR,
+  DVC_METRIC_DATA,
+  DVC_METRIC_TYPE,
+  DVC_METRIC_X_LABEL,
+  DVC_METRIC_Y_LABEL,
+  DVC_METRIC_ZOOM_AND_PAN,
+  DVC_PARAM_TYPE
+} from '../../cli/dvc/contract'
 
 export type CustomPlotsOrderValue = {
   metric: string
@@ -56,9 +65,9 @@ export const getDataType = (type: string) =>
 export const getContent = (): string =>
   JSON.stringify({
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-    data: { values: '<DVC_METRIC_DATA>' },
+    data: { values: DVC_METRIC_DATA },
     encoding: {
-      color: '<DVC_METRIC_COLOR>',
+      color: DVC_METRIC_COLOR,
       x: {
         axis: {
           labelLimit: 75,
@@ -68,8 +77,8 @@ export const getContent = (): string =>
         scale: {
           zero: false
         },
-        title: '<DVC_METRIC_X_LABEL>',
-        type: '<DVC_PARAM_TYPE>'
+        title: DVC_METRIC_X_LABEL,
+        type: DVC_PARAM_TYPE
       },
       y: {
         axis: {
@@ -80,8 +89,8 @@ export const getContent = (): string =>
         scale: {
           zero: false
         },
-        title: '<DVC_METRIC_Y_LABEL>',
-        type: '<DVC_METRIC_TYPE>'
+        title: DVC_METRIC_Y_LABEL,
+        type: DVC_METRIC_TYPE
       }
     },
     height: 'container',
@@ -95,11 +104,11 @@ export const getContent = (): string =>
             },
             {
               field: 'metric',
-              title: '<DVC_METRIC_Y_LABEL>'
+              title: DVC_METRIC_Y_LABEL
             },
             {
               field: 'param',
-              title: '<DVC_METRIC_X_LABEL>'
+              title: DVC_METRIC_X_LABEL
             }
           ]
         },
@@ -108,7 +117,7 @@ export const getContent = (): string =>
           size: 60,
           type: 'point'
         },
-        params: ['<DVC_METRIC_ZOOM_AND_PAN>']
+        params: [DVC_METRIC_ZOOM_AND_PAN]
       }
     ],
     width: 'container'

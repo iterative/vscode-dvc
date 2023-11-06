@@ -1,4 +1,17 @@
-import { AnchorDefinitions } from 'dvc/src/cli/dvc/contract'
+import {
+  AnchorDefinitions,
+  DVC_METRIC_COLOR,
+  DVC_METRIC_PLOT_HEIGHT,
+  DVC_METRIC_PLOT_WIDTH,
+  DVC_METRIC_SHAPE,
+  DVC_METRIC_STROKE_DASH,
+  DVC_METRIC_TITLE,
+  DVC_METRIC_TYPE,
+  DVC_METRIC_X_LABEL,
+  DVC_METRIC_Y_LABEL,
+  DVC_METRIC_ZOOM_AND_PAN,
+  DVC_PARAM_TYPE
+} from 'dvc/src/cli/dvc/contract'
 import { DEFAULT_NB_ITEMS_PER_ROW } from 'dvc/src/plots/webview/contract'
 import { VisualizationSpec } from 'react-vega'
 import { truncate } from 'vega-util'
@@ -25,13 +38,13 @@ export const fillTemplate = (
   let specStr = content
 
   for (const [key, value] of Object.entries(anchor_definitions)) {
-    if (['<DVC_METRIC_TITLE>', '<DVC_METRIC_X_LABEL>'].includes(key)) {
+    if (([DVC_METRIC_TITLE, DVC_METRIC_X_LABEL] as string[]).includes(key)) {
       const truncatedValue = truncate(value, width, 'left')
       specStr = specStr.replace(new RegExp(key, 'g'), truncatedValue)
       continue
     }
 
-    if (key === '<DVC_METRIC_Y_LABEL>') {
+    if (key === DVC_METRIC_Y_LABEL) {
       const truncatedVerticalValue = truncate(
         value,
         Math.floor((50 - (nbItemsPerRow - height) * 5) * 0.75),
@@ -41,7 +54,7 @@ export const fillTemplate = (
       continue
     }
 
-    if (key === '<DVC_METRIC_ZOOM_AND_PAN>') {
+    if (key === DVC_METRIC_ZOOM_AND_PAN) {
       const suppressZoomAndPan = !plotFocused
       specStr = specStr.replace(
         new RegExp(`"${key}"`, 'g'),
@@ -51,11 +64,9 @@ export const fillTemplate = (
     }
 
     if (
-      [
-        '<DVC_METRIC_COLOR>',
-        '<DVC_METRIC_SHAPE>',
-        '<DVC_METRIC_STROKE_DASH>'
-      ].includes(key)
+      (
+        [DVC_METRIC_COLOR, DVC_METRIC_SHAPE, DVC_METRIC_STROKE_DASH] as string[]
+      ).includes(key)
     ) {
       const suppressLegend = !plotFocused
       if (suppressLegend) {
@@ -71,12 +82,16 @@ export const fillTemplate = (
       continue
     }
 
-    if (['<DVC_PARAM_TYPE>', '<DVC_METRIC_TYPE>'].includes(key)) {
+    if (([DVC_PARAM_TYPE, DVC_METRIC_TYPE] as string[]).includes(key)) {
       specStr = specStr.replace(new RegExp(key, 'g'), value)
       continue
     }
 
-    if (['<DVC_METRIC_PLOT_HEIGHT>', '<DVC_METRIC_PLOT_WIDTH>'].includes(key)) {
+    if (
+      ([DVC_METRIC_PLOT_HEIGHT, DVC_METRIC_PLOT_WIDTH] as string[]).includes(
+        key
+      )
+    ) {
       specStr = specStr.replace(new RegExp(key, 'g'), 'container')
       continue
     }

@@ -4,7 +4,11 @@ import { PathType } from './collect'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import { buildMockMemento } from '../../test/util'
 import { TemplatePlotGroup } from '../webview/contract'
-import { EXPERIMENT_WORKSPACE_ID, PlotsType } from '../../cli/dvc/contract'
+import {
+  DVC_METRIC_DATA,
+  EXPERIMENT_WORKSPACE_ID,
+  PlotsType
+} from '../../cli/dvc/contract'
 import { ErrorsModel } from '../errors/model'
 import { REVISIONS } from '../../test/fixtures/plotsDiff'
 
@@ -108,7 +112,7 @@ describe('PathsModel', () => {
       [previousPlotPath]: [
         {
           anchor_definitions: {
-            '<DVC_METRIC_DATA>': JSON.stringify([
+            [DVC_METRIC_DATA]: JSON.stringify([
               {
                 loss: '2.29',
                 rev: commitBeforePlots,

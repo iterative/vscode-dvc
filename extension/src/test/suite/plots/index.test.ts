@@ -44,6 +44,7 @@ import { RegisteredCommands } from '../../../commands/external'
 import { REVISIONS } from '../../fixtures/plotsDiff'
 import * as FileSystem from '../../../fileSystem'
 import {
+  DVC_METRIC_DATA,
   EXPERIMENT_WORKSPACE_ID,
   ExpShowOutput,
   TemplatePlot,
@@ -591,9 +592,7 @@ suite('Plots Test Suite', () => {
       expect(mockWriteJson).to.be.calledWithExactly(
         exportFile.path,
         [
-          ...(JSON.parse(
-            customPlot.anchor_definitions['<DVC_METRIC_DATA>']
-          ) as {
+          ...(JSON.parse(customPlot.anchor_definitions[DVC_METRIC_DATA]) as {
             id: string
           }[])
         ].sort(
@@ -683,7 +682,7 @@ suite('Plots Test Suite', () => {
       expect(mockWriteCsv).to.be.calledOnce
       expect(mockWriteCsv).to.be.calledWithExactly(
         exportFile.path,
-        JSON.parse(templatePlot.anchor_definitions['<DVC_METRIC_DATA>']) as {
+        JSON.parse(templatePlot.anchor_definitions[DVC_METRIC_DATA]) as {
           values: unknown[]
         }
       )
@@ -738,9 +737,7 @@ suite('Plots Test Suite', () => {
       expect(mockWriteTsv).to.be.calledWithExactly(
         exportFile.path,
         [
-          ...(JSON.parse(
-            customPlot.anchor_definitions['<DVC_METRIC_DATA>']
-          ) as {
+          ...(JSON.parse(customPlot.anchor_definitions[DVC_METRIC_DATA]) as {
             id: string
           }[])
         ].sort(
@@ -1008,9 +1005,9 @@ suite('Plots Test Suite', () => {
           ),
           [lossTsvPath]: lossTsv.map((plot, i) => {
             const anchor_definitions = { ...lossTsv[i].anchor_definitions }
-            anchor_definitions['<DVC_METRIC_DATA>'] = JSON.stringify(
+            anchor_definitions[DVC_METRIC_DATA] = JSON.stringify(
               (
-                JSON.parse(anchor_definitions['<DVC_METRIC_DATA>']) as Record<
+                JSON.parse(anchor_definitions[DVC_METRIC_DATA]) as Record<
                   string,
                   unknown
                 >[]
@@ -1079,7 +1076,7 @@ suite('Plots Test Suite', () => {
 
       const [roc] = singleViewSection.entries
       const rocDatapoints =
-        (JSON.parse(roc.anchor_definitions['<DVC_METRIC_DATA>']) as {
+        (JSON.parse(roc.anchor_definitions[DVC_METRIC_DATA]) as {
           rev: string
           filename: string | undefined
         }[]) || []
@@ -1123,9 +1120,7 @@ suite('Plots Test Suite', () => {
       const [confusionMatrix] = multiViewSection.entries
 
       const confusionMatrixDatapoints =
-        (JSON.parse(
-          confusionMatrix.anchor_definitions['<DVC_METRIC_DATA>']
-        ) as {
+        (JSON.parse(confusionMatrix.anchor_definitions[DVC_METRIC_DATA]) as {
           rev: string
           filename: string | undefined
         }[]) || []

@@ -13,6 +13,7 @@ import { TemplatePlotGroup } from '../webview/contract'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import { StrokeDash } from '../multiSource/constants'
 import {
+  DVC_METRIC_DATA,
   EXPERIMENT_WORKSPACE_ID,
   PlotsOutput,
   PlotsType
@@ -116,7 +117,7 @@ describe('collectPaths', () => {
           [remainingPath]: [
             {
               anchor_definitions: {
-                '<DVC_METRIC_DATA>': JSON.stringify([
+                [DVC_METRIC_DATA]: JSON.stringify([
                   {
                     loss: '2.43323',
                     rev: fetchedRevs[0],
@@ -214,7 +215,7 @@ describe('collectPaths', () => {
       data: {
         [join('logs', 'scalars', 'acc.tsv')]: [
           {
-            anchor_definitions: { '<DVC_METRIC_DATA>': '[]' },
+            anchor_definitions: { [DVC_METRIC_DATA]: '[]' },
             content: '{}',
             revisions,
             type: PlotsType.VEGA
@@ -222,7 +223,7 @@ describe('collectPaths', () => {
         ],
         [join('logs', 'scalars', 'loss.tsv')]: [
           {
-            anchor_definitions: { '<DVC_METRIC_DATA>': '[]' },
+            anchor_definitions: { [DVC_METRIC_DATA]: '[]' },
             content: '{}',
             revisions,
             type: PlotsType.VEGA
@@ -237,7 +238,7 @@ describe('collectPaths', () => {
         ],
         'predictions.json': [
           {
-            anchor_definitions: { '<DVC_METRIC_DATA>': '[]' },
+            anchor_definitions: { [DVC_METRIC_DATA]: '[]' },
             content: JSON.stringify({
               facet: { field: 'rev', type: 'nominal' }
             }),
@@ -247,7 +248,7 @@ describe('collectPaths', () => {
         ],
         [join(`dvc.yaml${FIELD_SEPARATOR}logs`, 'acc.tsv')]: [
           {
-            anchor_definitions: { '<DVC_METRIC_DATA>': '[]' },
+            anchor_definitions: { [DVC_METRIC_DATA]: '[]' },
             content: '{}',
             revisions,
             type: PlotsType.VEGA
@@ -260,7 +261,7 @@ describe('collectPaths', () => {
           'acc.tsv'
         )]: [
           {
-            anchor_definitions: { '<DVC_METRIC_DATA>': '[]' },
+            anchor_definitions: { [DVC_METRIC_DATA]: '[]' },
             content: '{}',
             revisions,
             type: PlotsType.VEGA

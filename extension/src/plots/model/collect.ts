@@ -17,6 +17,13 @@ import {
 } from '../webview/contract'
 import {
   AnchorDefinitions,
+  DVC_METRIC_COLOR,
+  DVC_METRIC_DATA,
+  DVC_METRIC_TYPE,
+  DVC_METRIC_X_LABEL,
+  DVC_METRIC_Y_LABEL,
+  DVC_METRIC_ZOOM_AND_PAN,
+  DVC_PARAM_TYPE,
   isImagePlotOutput,
   PlotOutput,
   PlotsOutput,
@@ -134,20 +141,20 @@ const getCustomPlotData = (
 
   return {
     anchor_definitions: {
-      '<DVC_METRIC_COLOR>': JSON.stringify({
+      [DVC_METRIC_COLOR]: JSON.stringify({
         field: 'id',
         scale: completeColorScale
       }),
-      '<DVC_METRIC_DATA>': JSON.stringify(values),
-      '<DVC_METRIC_TYPE>': getDataType(typeof metricVal),
-      '<DVC_METRIC_X_LABEL>': param,
-      '<DVC_METRIC_Y_LABEL>': metric,
-      '<DVC_METRIC_ZOOM_AND_PAN>': JSON.stringify({
+      [DVC_METRIC_DATA]: JSON.stringify(values),
+      [DVC_METRIC_TYPE]: getDataType(typeof metricVal),
+      [DVC_METRIC_X_LABEL]: param,
+      [DVC_METRIC_Y_LABEL]: metric,
+      [DVC_METRIC_ZOOM_AND_PAN]: JSON.stringify({
         bind: 'scales',
         name: 'grid',
         select: 'interval'
       }),
-      '<DVC_PARAM_TYPE>': getDataType(typeof paramVal)
+      [DVC_PARAM_TYPE]: getDataType(typeof paramVal)
     },
     content,
     id: getCustomPlotId(metric, param),
@@ -255,9 +262,9 @@ const collectPlotData = (
 ) => {
   initializeAcc(acc, path, plot.revisions || [])
 
-  for (const data of JSON.parse(
-    plot.anchor_definitions['<DVC_METRIC_DATA>']
-  ) as { rev?: string }[]) {
+  for (const data of JSON.parse(plot.anchor_definitions[DVC_METRIC_DATA]) as {
+    rev?: string
+  }[]) {
     const rev = data.rev
     if (!rev) {
       continue
@@ -392,7 +399,7 @@ const collectTemplateDetails = (
     return
   }
   const { anchor_definitions, content } = plot
-  delete anchor_definitions['<DVC_METRIC_COLOR>']
+  delete anchor_definitions[DVC_METRIC_COLOR]
   acc[path] = { anchorDefinitions: anchor_definitions, content }
 }
 
@@ -431,8 +438,8 @@ const collectTemplatePlot = (
   acc.push({
     anchor_definitions: {
       ...anchorDefinitions,
-      '<DVC_METRIC_COLOR>': JSON.stringify({ field: 'rev', scale: colorScale }),
-      '<DVC_METRIC_DATA>': JSON.stringify(datapoints)
+      [DVC_METRIC_COLOR]: JSON.stringify({ field: 'rev', scale: colorScale }),
+      [DVC_METRIC_DATA]: JSON.stringify(datapoints)
     },
     content,
     id: path,
