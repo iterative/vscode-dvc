@@ -112,21 +112,6 @@ describe('App', () => {
     return store
   }
 
-  const renderAppWithOptionalDataInDragAndDropMode = (
-    data?: PlotsData,
-    forCustomPlots?: boolean
-  ) => {
-    const store = renderAppWithOptionalData(data)
-
-    act(() => {
-      store.dispatch(
-        forCustomPlots
-          ? toggleCustomPlotsDragAndDropMode(true)
-          : toggleTemplatePlotsDragAndDropMode(true)
-      )
-    })
-  }
-
   const setWrapperSize = (store: typeof plotsStore, size = 2000) =>
     act(() => {
       store.dispatch(setMaxNbPlotsPerRow(size))
@@ -956,64 +941,6 @@ describe('App', () => {
     })
   })
 
-  it('should display the custom plots in the order stored', () => {
-    renderAppWithOptionalDataInDragAndDropMode(
-      {
-        custom: customPlotsFixture
-      },
-      true
-    )
-
-    let plots = screen.getAllByTestId(/summary\.json/)
-
-    expect(plots.map(plot => plot.id)).toStrictEqual([
-      'custom-summary.json:loss-params.yaml:log_file',
-      'custom-summary.json:accuracy-params.yaml:epochs'
-    ])
-
-    dragAndDrop(plots[1], plots[0])
-
-    plots = screen.getAllByTestId(/summary\.json/)
-
-    expect(plots.map(plot => plot.id)).toStrictEqual([
-      'custom-summary.json:accuracy-params.yaml:epochs',
-      'custom-summary.json:loss-params.yaml:log_file'
-    ])
-  })
-
-  it('should send a message to the extension when the custom plots are reordered', () => {
-    renderAppWithOptionalDataInDragAndDropMode(
-      {
-        custom: customPlotsFixture
-      },
-      true
-    )
-
-    const plots = screen.getAllByTestId(/summary\.json/)
-    expect(plots.map(plot => plot.id)).toStrictEqual([
-      'custom-summary.json:loss-params.yaml:log_file',
-      'custom-summary.json:accuracy-params.yaml:epochs'
-    ])
-
-    mockPostMessage.mockClear()
-
-    dragAndDrop(plots[1], plots[0])
-
-    const expectedOrder = [
-      'custom-summary.json:accuracy-params.yaml:epochs',
-      'custom-summary.json:loss-params.yaml:log_file'
-    ]
-
-    expect(mockPostMessage).toHaveBeenCalledTimes(1)
-    expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: expectedOrder,
-      type: MessageFromWebviewType.REORDER_PLOTS_CUSTOM
-    })
-    expect(
-      screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
-    ).toStrictEqual(expectedOrder)
-  })
-
   it('should add a custom plot if a user creates a custom plot', () => {
     renderAppWithOptionalData({
       custom: {
@@ -1451,6 +1378,21 @@ describe('App', () => {
   })
 
   describe('Drag and drop', () => {
+    const renderAppWithOptionalDataInDragAndDropMode = (
+      data?: PlotsData,
+      forCustomPlots?: boolean
+    ) => {
+      const store = renderAppWithOptionalData(data)
+
+      act(() => {
+        store.dispatch(
+          forCustomPlots
+            ? toggleCustomPlotsDragAndDropMode(true)
+            : toggleTemplatePlotsDragAndDropMode(true)
+        )
+      })
+    }
+
     it('should not be possible to drag a plot when the drag and drop mode is set to false', () => {
       const order = [
         join('logs', 'loss.tsv'),
@@ -1484,27 +1426,39 @@ describe('App', () => {
       expect(within(plot).getAllByRole('button').length).toBe(2)
     })
 
-    it('should toggle from normal to drag and drop mode when clicking the button', () => {
+    it('should toggle from normal to drag and drop mode when mouse down on a plot', () => {
       const store = renderAppWithOptionalData({
         template: complexTemplatePlotsFixture
       })
 
       expect(store.getState().template.isInDragAndDropMode).toBe(false)
 
-      fireEvent.click(screen.getAllByTestId('icon-menu-item')[0])
+      const [plot] = screen.getAllByTestId(/^plot_/)
+      fireEvent.mouseDown(within(plot).getAllByRole('button')[0])
+
+      expect(store.getState().template.isInDragAndDropMode).toBe(true)
+    })
+
+    it('should toggle from drag and drop to normal mode when dropping a plot', () => {
+      const store = renderAppWithOptionalData({
+        template: complexTemplatePlotsFixture
+      })
+
+      const [plot] = screen.getAllByTestId(/^plot_/)
+      fireEvent.mouseDown(within(plot).getAllByRole('button')[0])
 
       expect(store.getState().template.isInDragAndDropMode).toBe(true)
 
-      fireEvent.click(screen.getAllByTestId('icon-menu-item')[0])
+      const plots = screen.getAllByTestId(/^plot_/)
+      dragAndDrop(plots[0], plots[1])
 
       expect(store.getState().template.isInDragAndDropMode).toBe(false)
     })
 
     it('should show only the titles when in drag and drop mode', () => {
-      renderAppWithOptionalData({
+      renderAppWithOptionalDataInDragAndDropMode({
         template: complexTemplatePlotsFixture
       })
-      fireEvent.click(screen.getAllByTestId('icon-menu-item')[0])
 
       const [plot] = screen.getAllByTestId(/^plot_/)
 
@@ -1938,6 +1892,64 @@ describe('App', () => {
         ],
         type: MessageFromWebviewType.REORDER_PLOTS_TEMPLATES
       })
+    })
+
+    it('should send a message to the extension when the custom plots are reordered', () => {
+      renderAppWithOptionalDataInDragAndDropMode(
+        {
+          custom: customPlotsFixture
+        },
+        true
+      )
+
+      const plots = screen.getAllByTestId(/summary\.json/)
+      expect(plots.map(plot => plot.id)).toStrictEqual([
+        'custom-summary.json:loss-params.yaml:log_file',
+        'custom-summary.json:accuracy-params.yaml:epochs'
+      ])
+
+      mockPostMessage.mockClear()
+
+      dragAndDrop(plots[1], plots[0])
+
+      const expectedOrder = [
+        'custom-summary.json:accuracy-params.yaml:epochs',
+        'custom-summary.json:loss-params.yaml:log_file'
+      ]
+
+      expect(mockPostMessage).toHaveBeenCalledTimes(1)
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        payload: expectedOrder,
+        type: MessageFromWebviewType.REORDER_PLOTS_CUSTOM
+      })
+      expect(
+        screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
+      ).toStrictEqual(expectedOrder)
+    })
+
+    it('should display the custom plots in the order stored', () => {
+      renderAppWithOptionalDataInDragAndDropMode(
+        {
+          custom: customPlotsFixture
+        },
+        true
+      )
+
+      let plots = screen.getAllByTestId(/summary\.json/)
+
+      expect(plots.map(plot => plot.id)).toStrictEqual([
+        'custom-summary.json:loss-params.yaml:log_file',
+        'custom-summary.json:accuracy-params.yaml:epochs'
+      ])
+
+      dragAndDrop(plots[1], plots[0])
+
+      plots = screen.getAllByTestId(/summary\.json/)
+
+      expect(plots.map(plot => plot.id)).toStrictEqual([
+        'custom-summary.json:accuracy-params.yaml:epochs',
+        'custom-summary.json:loss-params.yaml:log_file'
+      ])
     })
   })
 
