@@ -227,10 +227,7 @@ export class PlotsModel extends ModelWithPersistence {
   }
 
   public savePlotDataAsJson(filePath: string, plotId: string) {
-    void this.savePlotData(filePath, plotId, data => {
-      writeJson(filePath, data, true)
-      return Promise.resolve()
-    })
+    this.savePlotData(filePath, plotId, data => writeJson(filePath, data, true))
   }
 
   public savePlotDataAsCsv(filePath: string, plotId: string) {
@@ -490,10 +487,10 @@ export class PlotsModel extends ModelWithPersistence {
     return collectCustomPlotRawData(orderValue, experiments)
   }
 
-  private async savePlotData(
+  private savePlotData(
     filePath: string,
     plotId: string,
-    writeToFile: (rawData: Array<Record<string, unknown>>) => Promise<void>
+    writeToFile: (rawData: Array<Record<string, unknown>>) => void
   ) {
     const foundCustomPlot = this.customPlotsOrder.find(
       ({ metric, param }) => getCustomPlotId(metric, param) === plotId
@@ -504,7 +501,7 @@ export class PlotsModel extends ModelWithPersistence {
       : this.getSelectedTemplatePlotData(plotId)
 
     try {
-      await writeToFile(rawData)
+      writeToFile(rawData)
       void openFileInEditor(filePath)
     } catch {
       void Toast.showError('Cannot write to file')
