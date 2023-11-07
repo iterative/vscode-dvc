@@ -37,13 +37,9 @@ export const changeDragAndDropMode = (
   dispatch: Dispatch,
   isDragAndDropMode: boolean
 ) => {
-  switch (sectionKey) {
-    case PlotsSection.TEMPLATE_PLOTS:
-      return dispatch(toggleTemplateDragAndDrop(!isDragAndDropMode))
-
-    case PlotsSection.CUSTOM_PLOTS:
-      return dispatch(toggleCustomDragAndDrop(!isDragAndDropMode))
-
-    default:
-  }
+  const toggleMode =
+    sectionKey === PlotsSection.TEMPLATE_PLOTS
+      ? toggleTemplateDragAndDrop
+      : toggleCustomDragAndDrop
+  return dispatch(toggleMode(!isDragAndDropMode))
 }
