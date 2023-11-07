@@ -76,7 +76,6 @@ export const DragAndDropGrid: React.FC<DragAndDropGridProps> = ({
           : undefined
       }
       parentDraggedOver={parentDraggedOver}
-      disabledDropIds={[]}
     />
   )
 }
