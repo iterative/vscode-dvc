@@ -98,9 +98,6 @@ export class Setup
     new EventEmitter()
   )
 
-  private readonly studioConnectionChanged: EventEmitter<void> =
-    this.dispose.track(new EventEmitter())
-
   private readonly onDidChangeWorkspace: Event<void> =
     this.workspaceChanged.event
 
@@ -146,16 +143,12 @@ export class Setup
     }
 
     this.collectWorkspaceScale = collectWorkspaceScale
-    this.onDidChangeStudioConnection = this.studioConnectionChanged.event
 
     this.setCommandsAvailability(false)
     this.setProjectAvailability()
 
-    this.studio = new Studio(
-      internalCommands,
-      this.studioConnectionChanged,
-      () => this.getCwd()
-    )
+    this.studio = new Studio(internalCommands, () => this.getCwd())
+    this.onDidChangeStudioConnection = this.studio.onDidChangeStudioConnection
 
     this.webviewMessages = this.createWebviewMessageHandler()
 

@@ -1,26 +1,37 @@
-import { EventEmitter } from 'vscode'
-import { isStudioAccessToken } from './token'
+import { Event, EventEmitter } from 'vscode'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
 import { Args, ConfigKey, Flag } from '../cli/dvc/constants'
 import { ContextKey, setContextValue } from '../vscode/context'
+import { Disposable } from '../class/dispose'
 
-export class Studio {
-  protected studioConnectionChanged: EventEmitter<void>
+export const isStudioAccessToken = (text?: string): boolean => {
+  if (!text) {
+    return false
+  }
+  return text.startsWith('isat_') && text.length >= 53
+}
+
+export class Studio extends Disposable {
+  public readonly onDidChangeStudioConnection: Event<void>
+  private readonly studioConnectionChanged: EventEmitter<void> =
+    this.dispose.track(new EventEmitter())
+
+  private readonly getCwd: () => string | undefined
+  private readonly internalCommands: InternalCommands
   private studioAccessToken: string | undefined = undefined
   private studioIsConnected = false
   private shareLiveToStudio: boolean | undefined = undefined
-  private readonly getCwd: () => string | undefined
-  private readonly internalCommands: InternalCommands
 
   constructor(
     internalCommands: InternalCommands,
-    studioConnectionChanged: EventEmitter<void>,
     getCwd: () => string | undefined
   ) {
+    super()
+
     this.internalCommands = internalCommands
-    this.studioConnectionChanged = studioConnectionChanged
     this.getCwd = getCwd
+    this.onDidChangeStudioConnection = this.studioConnectionChanged.event
   }
 
   public getStudioAccessToken() {
