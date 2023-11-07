@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { ensureFileSync, remove } from 'fs-extra'
 import { expect } from 'chai'
 import { SinonStub, restore, spy, stub } from 'sinon'
+import * as Fetch from 'node-fetch'
 import {
   MessageItem,
   QuickPickItem,
@@ -854,7 +855,96 @@ suite('Setup Test Suite', () => {
       ).to.be.calledWithExactly('setContext', 'dvc.cli.incompatible', false)
     })
 
-    it("should handle a message from the webview to save the user's Studio access token", async () => {
+    it('should handle a message to request a token from studio', async () => {
+      const { setup, mockFetch } = buildSetup({
+        disposer: disposable
+      })
+      const mockConfig = stub(DvcConfig.prototype, 'config')
+      mockConfig.resolves('')
+      const webview = await setup.showWebview()
+      await webview.isReady()
+
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const mockSendMessage = stub(BaseWebview.prototype, 'show')
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub(Setup.prototype as any, 'getCliCompatible').returns(true)
+
+      const mockStudioRes = {
+        device_code: 'Yi-NPd9ggvNUDBcam5bP8iivbtLhnqVgM_lSSbilqNw',
+        token_uri: 'https://studio.iterative.ai/api/device-login/token',
+        user_code: '40DWMKNA',
+        verification_uri: 'https://studio.iterative.ai/auth/device-login'
+      }
+      const mockToken = 'isat_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+      mockFetch
+        .onFirstCall()
+        .resolves({
+          json: () => Promise.resolve(mockStudioRes)
+        } as Fetch.Response)
+        .onSecondCall()
+        .resolves({
+          json: () =>
+            Promise.resolve({
+              access_token: mockToken
+            }),
+          status: 200
+        } as Fetch.Response)
+
+      const verifyUserStatusSent = new Promise(resolve =>
+        mockSendMessage.callsFake(data => {
+          resolve(undefined)
+          return Promise.resolve(!!data)
+        })
+      )
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.REQUEST_STUDIO_TOKEN
+      })
+
+      await verifyUserStatusSent
+
+      expect(mockSendMessage).to.be.calledOnce
+      expect(mockSendMessage).to.be.calledWithMatch({
+        isStudioConnected: false,
+        shareLiveToStudio: true,
+        studioVerifyUserCode: mockStudioRes.user_code
+      })
+
+      // next steps on this test
+      // check updateStudioUserVerifyDetails to make sure userCode and verifyUrl are updated
+      // stub waitForUriResponse (can probably wrap a stub in a event)
+      // call requestStudioToken in stub
+      // spy requestToken to make sure it's called with the right stuff
+      // check updateStudioUserVerifyDetails to make sure userCode and verifyUrl are updated
+      // config check time
+    })
+
+    it('should handle a message from the webview to open the studio verification url', async () => {
+      const { setup, studio, mockOpenExternal, urlOpenedEvent } = buildSetup({
+        disposer: disposable
+      })
+
+      const webview = await setup.showWebview()
+      await webview.isReady()
+
+      const mockStudioVerifyUrl =
+        'https://studio.iterative.ai/auth/device-login'
+      stub(studio, 'getStudioVerifyUserUrl')
+        .onFirstCall()
+        .returns(mockStudioVerifyUrl)
+
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.OPEN_STUDIO_VERIFY_USER_LINK
+      })
+
+      await urlOpenedEvent
+      expect(mockOpenExternal).to.be.calledWith(Uri.parse(mockStudioVerifyUrl))
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it("should handle a message from the webview to manually save the user's Studio access token", async () => {
       const mockToken = 'isat_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
 
       const { setup, mockExecuteCommand, messageSpy } = buildSetup({

@@ -434,7 +434,8 @@ export class Setup
       () => this.isPythonExtensionUsed(),
       () => this.updatePythonEnvironment(),
       () => this.studio.requestStudioAuthentication(),
-      () => this.studio.openStudioVerifyUserUrl()
+      () => this.studio.openStudioVerifyUserUrl(),
+      () => this.sendDataToWebview()
     )
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message =>

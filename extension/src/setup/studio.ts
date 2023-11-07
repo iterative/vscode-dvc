@@ -1,11 +1,11 @@
 import { EventEmitter } from 'vscode'
-import { isStudioAccessToken, pollForStudioToken } from './token'
+import { isStudioAccessToken } from './token'
 import { STUDIO_URL } from './webview/contract'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
 import { Args, ConfigKey, Flag } from '../cli/dvc/constants'
 import { ContextKey, setContextValue } from '../vscode/context'
-import { openUrl } from '../vscode/external'
+import { getCallBackUrl, openUrl, waitForUriResponse } from '../vscode/external'
 
 export class Studio {
   protected studioConnectionChanged: EventEmitter<void>
@@ -103,10 +103,18 @@ export class Studio {
     )
   }
 
+  public openStudioVerifyUserUrl() {
+    const url = this.getStudioVerifyUserUrl()
+    if (!url) {
+      return
+    }
+    void openUrl(url)
+  }
+
   public async requestStudioAuthentication() {
     const response = await fetch(`${STUDIO_URL}/api/device-login`, {
       body: JSON.stringify({
-        client_name: 'vscode'
+        client_name: 'VS Code'
       }),
       headers: {
         'Content-Type': 'application/json'
@@ -125,16 +133,19 @@ export class Studio {
       user_code: string
       device_code: string
     }
-    this.updateStudioUserVerifyDetails(userCode, verificationUri)
-    void this.requestStudioToken(deviceCode, tokenUri)
-  }
 
-  public openStudioVerifyUserUrl() {
-    const url = this.getStudioVerifyUserUrl()
-    if (!url) {
-      return
-    }
-    void openUrl(url)
+    const callbackUrl = await getCallBackUrl('/studio-complete-auth')
+    const verificationUrlWithCallback = new URL(verificationUri)
+
+    verificationUrlWithCallback.searchParams.append('redirect_uri', callbackUrl)
+    verificationUrlWithCallback.searchParams.append('code', userCode)
+    this.updateStudioUserVerifyDetails(
+      userCode,
+      verificationUrlWithCallback.toString()
+    )
+    void waitForUriResponse('/studio-complete-auth', () =>
+      this.requestStudioToken(deviceCode, tokenUri)
+    )
   }
 
   private updateStudioUserVerifyDetails(
@@ -173,14 +184,24 @@ export class Studio {
     }
   }
 
-  private async requestStudioToken(
-    studioDeviceCode: string,
-    studioTokenRequestUri: string
-  ) {
-    const token = await pollForStudioToken(
-      studioTokenRequestUri,
-      studioDeviceCode
-    )
+  private async requestStudioToken(deviceCode: string, tokenUri: string) {
+    const response = await fetch(tokenUri, {
+      body: JSON.stringify({
+        code: deviceCode
+      }),
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      method: 'POST'
+    })
+
+    if (response.status !== 200) {
+      return
+    }
+
+    const { access_token: accessToken } = (await response.json()) as {
+      access_token: string
+    }
 
     this.updateStudioUserVerifyDetails(null, undefined)
 
@@ -190,7 +211,7 @@ export class Studio {
       return
     }
 
-    return this.saveStudioAccessTokenInConfig(cwd, token)
+    return this.saveStudioAccessTokenInConfig(cwd, accessToken)
   }
 
   private accessConfig(cwd: string, ...args: Args) {

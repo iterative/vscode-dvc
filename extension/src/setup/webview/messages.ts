@@ -22,6 +22,7 @@ export class WebviewMessages {
   private readonly updatePythonEnv: () => Promise<void>
   private readonly requestStudioAuth: () => Promise<void>
   private readonly openStudioAuthLink: () => void
+  private readonly update: () => Promise<void>
 
   constructor(
     getWebview: () => BaseWebview<TSetupData> | undefined,
@@ -30,7 +31,8 @@ export class WebviewMessages {
     isPythonExtensionUsed: () => Promise<boolean>,
     updatePythonEnv: () => Promise<void>,
     requestStudioAuth: () => Promise<void>,
-    openStudioAuthLink: () => void
+    openStudioAuthLink: () => void,
+    update: () => Promise<void>
   ) {
     this.getWebview = getWebview
     this.initializeGit = initializeGit
@@ -39,6 +41,7 @@ export class WebviewMessages {
     this.updatePythonEnv = updatePythonEnv
     this.requestStudioAuth = requestStudioAuth
     this.openStudioAuthLink = openStudioAuthLink
+    this.update = update
   }
 
   public sendWebviewMessage(data: SetupData) {
@@ -82,7 +85,7 @@ export class WebviewMessages {
       case MessageFromWebviewType.SET_STUDIO_SHARE_EXPERIMENTS_LIVE:
         return this.updateStudioOffline(message.payload)
       case MessageFromWebviewType.REQUEST_STUDIO_TOKEN:
-        return this.requestStudioAuth()
+        return this.requestStudioAuthentication()
       case MessageFromWebviewType.OPEN_EXPERIMENTS_WEBVIEW:
         return commands.executeCommand(RegisteredCommands.EXPERIMENT_SHOW)
       case MessageFromWebviewType.REMOTE_ADD:
@@ -134,5 +137,15 @@ export class WebviewMessages {
     const isPythonExtensionUsed = await this.isPythonExtensionUsed()
 
     return autoInstallDvc(isPythonExtensionUsed)
+  }
+
+  private async requestStudioAuthentication() {
+    sendTelemetryEvent(
+      EventName.VIEWS_SETUP_REQUEST_STUDIO_AUTH,
+      undefined,
+      undefined
+    )
+    await this.requestStudioAuth()
+    return this.update()
   }
 }
