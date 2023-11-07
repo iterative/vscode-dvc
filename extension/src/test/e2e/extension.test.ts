@@ -192,7 +192,6 @@ describe('Source Control View', function () {
   // eslint-disable-next-line sonarjs/cognitive-complexity
   it('should show the expected changes after running an experiment', async function () {
     const expectedScmItemLabels = [
-      'demo DVC',
       'hist.csv',
       'model.pt',
       'plots, training',
@@ -216,19 +215,19 @@ describe('Source Control View', function () {
     const expectedScmSet = new Set(expectedScmItemLabels)
     let dvcTreeItemLabels: string[] = []
 
+    let openView = true
+
     await browser.waitUntil(
       async () => {
         dvcTreeItemLabels = []
-        const treeItems = await findScmTreeItems()
+        const treeItems = await findScmTreeItems(openView)
+        openView = false
         for (const treeItem of treeItems) {
           const treeItemLabel = await getLabel(treeItem)
           if (!expectedScmSet.has(treeItemLabel)) {
             continue
           }
           dvcTreeItemLabels.push(treeItemLabel)
-          if (treeItemLabel === 'demo DVC') {
-            continue
-          }
 
           const tooltip = await findDecorationTooltip(treeItem)
           expect(tooltip).toBeTruthy()
