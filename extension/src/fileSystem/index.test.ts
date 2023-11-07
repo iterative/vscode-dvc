@@ -245,8 +245,8 @@ describe('writeJson', () => {
 })
 
 describe('writeCsv', () => {
-  it('should write csv into given file', async () => {
-    await writeCsv('file-name.csv', [
+  it('should write csv into given file', () => {
+    writeCsv('file-name.csv', [
       { nested: { string: 'string1' }, value: 3 },
       { nested: { string: 'string2' }, value: 4 },
       { nested: { string: 'string3' }, value: 6 }
@@ -260,8 +260,8 @@ describe('writeCsv', () => {
 })
 
 describe('writeTsv', () => {
-  it('should write tsv into given file', async () => {
-    await writeTsv('file-name.tsv', [
+  it('should write tsv into given file', () => {
+    writeTsv('file-name.tsv', [
       { nested: { string: 'string1' }, value: 3 },
       { nested: { string: 'string2' }, value: 4 },
       { nested: { string: 'string3' }, value: 6 }

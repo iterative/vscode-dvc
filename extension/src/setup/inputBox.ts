@@ -1,4 +1,4 @@
-import { isStudioAccessToken } from './token'
+import { isStudioAccessToken } from './studio'
 
 export const validateTokenInput = (input: string | undefined) => {
   if (!isStudioAccessToken(input)) {

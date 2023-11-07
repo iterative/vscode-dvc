@@ -220,18 +220,24 @@ export const expectAllPlotsToBeFilled = async (webview: PlotsWebview) => {
   }
 }
 
-export const findScmTreeItems = async () => {
-  const workbench = await browser.getWorkbench()
-  const activityBar = workbench.getActivityBar()
-  const sourceControlIcon = await activityBar.getViewControl('Source Control')
+export const findScmTreeItems = async (openView: boolean) => {
+  if (openView) {
+    await browser
+      .action('key')
+      .down(Key.Control)
+      .down(Key.Shift)
+      .down('g')
+      .up(Key.Control)
+      .up(Key.Shift)
+      .up('g')
+      .pause(100)
+      .down(Key.Tab)
+      .up(Key.Tab)
+      .pause(100)
+      .perform()
+  }
 
-  await sourceControlIcon?.openView()
-
-  const visibleItems = await findCurrentTreeItems()
-
-  await visibleItems[visibleItems.length - 1].click()
-
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 30; i++) {
     await browser.keys('ArrowDown')
   }
 
