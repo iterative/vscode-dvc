@@ -75,11 +75,17 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
       <button
         className={styles.zoomablePlot}
         onClick={() => handleOnClick()}
-        onMouseDown={() => changeDragAndDropMode(section, dispatch, false)}
         aria-label="Open Plot in Popup"
       >
-        <GripIcon className={styles.plotGripIcon} />
-
+        {
+          // eslint-disable-next-line jsx-a11y/no-static-element-interactions
+          <div
+            data-testid="grip-icon"
+            onMouseDown={() => changeDragAndDropMode(section, dispatch, false)}
+          >
+            <GripIcon className={styles.plotGripIcon} />
+          </div>
+        }
         <span
           className={styles.plotActions}
           onClick={event => {

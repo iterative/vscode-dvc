@@ -1426,7 +1426,7 @@ describe('App', () => {
       expect(within(plot).getAllByRole('button').length).toBe(2)
     })
 
-    it('should toggle from normal to drag and drop mode when mouse down on a plot', () => {
+    it('should toggle from normal to drag and drop mode when the user presses down on a plot grip icon', () => {
       const store = renderAppWithOptionalData({
         template: complexTemplatePlotsFixture
       })
@@ -1434,7 +1434,7 @@ describe('App', () => {
       expect(store.getState().template.isInDragAndDropMode).toBe(false)
 
       const [plot] = screen.getAllByTestId(/^plot_/)
-      fireEvent.mouseDown(within(plot).getAllByRole('button')[0])
+      fireEvent.mouseDown(within(plot).getByTestId('grip-icon'))
 
       expect(store.getState().template.isInDragAndDropMode).toBe(true)
     })
@@ -1445,7 +1445,7 @@ describe('App', () => {
       })
 
       const [plot] = screen.getAllByTestId(/^plot_/)
-      fireEvent.mouseDown(within(plot).getAllByRole('button')[0])
+      fireEvent.mouseDown(within(plot).getByTestId('grip-icon'))
 
       expect(store.getState().template.isInDragAndDropMode).toBe(true)
 

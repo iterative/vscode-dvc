@@ -30,6 +30,7 @@ export const NormalGrid: React.FC<NormalGridProps> = ({
     const panels = document.querySelectorAll('.vega-bindings')
     for (const panel of Object.values(panels)) {
       panel.addEventListener('click', disableClick)
+      panel.addEventListener('mousedown', disableClick)
     }
   }, [disableClick])
 

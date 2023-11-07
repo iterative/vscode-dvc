@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux'
 import { PlotHeight, PlotsSection } from 'dvc/src/plots/webview/contract'
 import styles from './styles.module.scss'
 import { SizeSliders } from './SizeSliders'
+import { isDragAndDropModeSelector } from './util'
 import { PlotsState } from '../store'
 import { togglePlotsSection } from '../util/messages'
 import { IconMenuItemProps } from '../../shared/components/iconMenu/IconMenuItem'
@@ -38,6 +39,9 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
     (state: PlotsState) => state.webview.maxNbPlotsPerRow
   )
   const ribbonHeight = useSelector((state: PlotsState) => state.ribbon.height)
+  const isDragAndDropMode = useSelector((state: PlotsState) =>
+    isDragAndDropModeSelector(state, sectionKey)
+  )
 
   useEffect(() => {
     window.dispatchEvent(new Event('resize'))
@@ -87,7 +91,8 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
       <div
         className={cx({
           [styles.plotsWrapper]: sectionKey !== PlotsSection.COMPARISON_TABLE,
-          [styles.smallPlots]: nbItemsPerRowOrWidth >= 4
+          [styles.smallPlots]: nbItemsPerRowOrWidth >= 4,
+          [styles.plotGrabbed]: isDragAndDropMode
         })}
         style={
           {

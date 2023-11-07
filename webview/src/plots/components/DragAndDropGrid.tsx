@@ -13,6 +13,7 @@ import {
   OnDrop,
   WrapperProps
 } from '../../shared/components/dragDrop/DragDropContainer'
+import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
 
 interface DragAndDropGridProps {
   order: string[]
@@ -56,6 +57,9 @@ export const DragAndDropGrid: React.FC<DragAndDropGridProps> = ({
         data-testid={`plot_${plot}`}
         style={withScale(colSpan)}
       >
+        <div>
+          <GripIcon className={styles.plotGripIcon} />
+        </div>
         <h2>{plot}</h2>
       </div>
     )
