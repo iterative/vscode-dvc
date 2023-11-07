@@ -414,7 +414,7 @@ export class Setup
       remoteList,
       sectionCollapsed: collectSectionCollapsed(this.focusedSection),
       shareLiveToStudio: !!this.studio.getShareLiveToStudio(),
-      studioVerifyUserCode: this.studio.getStudioVerifyUserCode()
+      studioVerifyUser: !!this.studio.getStudioVerifyUserUrl()
     })
     this.focusedSection = undefined
   }
@@ -427,7 +427,7 @@ export class Setup
       () => this.isPythonExtensionUsed(),
       () => this.updatePythonEnvironment(),
       () => this.studio.requestStudioAuthentication(),
-      () => this.studio.openStudioVerifyUserUrl(),
+      () => this.studio.getStudioVerifyUserUrl(),
       () => this.sendDataToWebview()
     )
     this.dispose.track(

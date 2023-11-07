@@ -386,7 +386,7 @@ suite('Setup Test Suite', () => {
         remoteList: undefined,
         sectionCollapsed: undefined,
         shareLiveToStudio: false,
-        studioVerifyUserCode: null
+        studioVerifyUser: false
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -433,7 +433,7 @@ suite('Setup Test Suite', () => {
         remoteList: undefined,
         sectionCollapsed: undefined,
         shareLiveToStudio: true,
-        studioVerifyUserCode: null
+        studioVerifyUser: false
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -488,7 +488,7 @@ suite('Setup Test Suite', () => {
         remoteList: undefined,
         sectionCollapsed: undefined,
         shareLiveToStudio: true,
-        studioVerifyUserCode: null
+        studioVerifyUser: false
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -543,7 +543,7 @@ suite('Setup Test Suite', () => {
         remoteList: { [dvcDemoPath]: undefined },
         sectionCollapsed: undefined,
         shareLiveToStudio: true,
-        studioVerifyUserCode: null
+        studioVerifyUser: false
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -856,7 +856,7 @@ suite('Setup Test Suite', () => {
     })
 
     it('should handle a message to request a token from studio', async () => {
-      const { setup, mockFetch } = buildSetup({
+      const { setup, mockFetch, messageSpy } = buildSetup({
         disposer: disposable
       })
       const mockConfig = stub(DvcConfig.prototype, 'config')
@@ -865,8 +865,8 @@ suite('Setup Test Suite', () => {
       await webview.isReady()
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
+      messageSpy.restore()
       const mockSendMessage = stub(BaseWebview.prototype, 'show')
-
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       stub(Setup.prototype as any, 'getCliCompatible').returns(true)
 
@@ -892,7 +892,7 @@ suite('Setup Test Suite', () => {
         } as Fetch.Response)
 
       const verifyUserStatusSent = new Promise(resolve =>
-        mockSendMessage.callsFake(data => {
+        mockSendMessage.onSecondCall().callsFake(data => {
           resolve(undefined)
           return Promise.resolve(!!data)
         })
@@ -904,11 +904,9 @@ suite('Setup Test Suite', () => {
 
       await verifyUserStatusSent
 
-      expect(mockSendMessage).to.be.calledOnce
+      expect(mockSendMessage).to.be.calledTwice
       expect(mockSendMessage).to.be.calledWithMatch({
-        isStudioConnected: false,
-        shareLiveToStudio: true,
-        studioVerifyUserCode: mockStudioRes.user_code
+        studioVerifyUser: true
       })
 
       // next steps on this test

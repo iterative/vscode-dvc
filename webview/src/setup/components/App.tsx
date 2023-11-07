@@ -34,7 +34,7 @@ import { updateRemoteList } from '../state/remoteSlice'
 import {
   updateIsStudioConnected,
   updateShareLiveToStudio,
-  updateStudioUserCode
+  updateStudioVerifyUser
 } from '../state/studioSlice'
 import { setStudioShareExperimentsLive } from '../util/messages'
 
@@ -120,8 +120,8 @@ export const feedStore = (
       case 'shareLiveToStudio':
         dispatch(updateShareLiveToStudio(data.data.shareLiveToStudio))
         continue
-      case 'studioVerifyUserCode':
-        dispatch(updateStudioUserCode(data.data.studioVerifyUserCode))
+      case 'studioVerifyUser':
+        dispatch(updateStudioVerifyUser(data.data.studioVerifyUser))
         continue
       case 'remoteList':
         dispatch(updateRemoteList(data.data.remoteList))

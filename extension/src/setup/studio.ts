@@ -5,7 +5,7 @@ import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
 import { Args, ConfigKey, Flag } from '../cli/dvc/constants'
 import { ContextKey, setContextValue } from '../vscode/context'
 import { Disposable } from '../class/dispose'
-import { getCallBackUrl, openUrl, waitForUriResponse } from '../vscode/external'
+import { getCallBackUrl, waitForUriResponse } from '../vscode/external'
 
 export const isStudioAccessToken = (text?: string): boolean => {
   if (!text) {
@@ -25,7 +25,6 @@ export class Studio extends Disposable {
   private studioIsConnected = false
   private shareLiveToStudio: boolean | undefined = undefined
   private studioVerifyUserUrl: string | undefined = undefined
-  private studioVerifyUserCode: string | null = null
 
   constructor(
     internalCommands: InternalCommands,
@@ -48,10 +47,6 @@ export class Studio extends Disposable {
 
   public getStudioVerifyUserUrl() {
     return this.studioVerifyUserUrl
-  }
-
-  public getStudioVerifyUserCode() {
-    return this.studioVerifyUserCode
   }
 
   public getShareLiveToStudio() {
@@ -114,14 +109,6 @@ export class Studio extends Disposable {
     )
   }
 
-  public openStudioVerifyUserUrl() {
-    const url = this.getStudioVerifyUserUrl()
-    if (!url) {
-      return
-    }
-    void openUrl(url)
-  }
-
   public async requestStudioAuthentication() {
     const response = await fetch(`${STUDIO_URL}/api/device-login`, {
       body: JSON.stringify({
@@ -150,21 +137,11 @@ export class Studio extends Disposable {
 
     verificationUrlWithCallback.searchParams.append('redirect_uri', callbackUrl)
     verificationUrlWithCallback.searchParams.append('code', userCode)
-    this.updateStudioUserVerifyDetails(
-      userCode,
-      verificationUrlWithCallback.toString()
-    )
+    this.studioVerifyUserUrl = verificationUrlWithCallback.toString()
+
     void waitForUriResponse('/studio-complete-auth', () =>
       this.requestStudioToken(deviceCode, tokenUri)
     )
-  }
-
-  private updateStudioUserVerifyDetails(
-    userCode: string | null,
-    verifyUrl: string | undefined
-  ) {
-    this.studioVerifyUserCode = userCode
-    this.studioVerifyUserUrl = verifyUrl
   }
 
   private async setStudioValues() {
@@ -214,7 +191,7 @@ export class Studio extends Disposable {
       access_token: string
     }
 
-    this.updateStudioUserVerifyDetails(null, undefined)
+    this.studioVerifyUserUrl = undefined
 
     const cwd = this.getCwd()
 

@@ -7,20 +7,14 @@ import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { SetupState } from '../../store'
 
 export const Connect: React.FC = () => {
-  const { studioVerifyUserCode } = useSelector(
-    (state: SetupState) => state.studio
-  )
+  const { studioVerifyUser } = useSelector((state: SetupState) => state.studio)
   return (
     <EmptyState isFullScreen={false}>
       <div data-testid="setup-studio-content">
         <h1>
           Connect to <a href={STUDIO_URL}>Studio</a>
         </h1>
-        {studioVerifyUserCode ? (
-          <VerifyIdentity studioVerifyUserCode={studioVerifyUserCode} />
-        ) : (
-          <GetToken />
-        )}
+        {studioVerifyUser ? <VerifyIdentity /> : <GetToken />}
         <p>
           Don&apos;t Have an account? <a href={STUDIO_URL}>Get Started</a>
         </p>

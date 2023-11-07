@@ -23,7 +23,7 @@ export type SetupData = {
   remoteList: RemoteList
   sectionCollapsed: typeof DEFAULT_SECTION_COLLAPSED | undefined
   shareLiveToStudio: boolean
-  studioVerifyUserCode: string | null
+  studioVerifyUser: boolean
   isAboveLatestTestedVersion: boolean | undefined
 }
 

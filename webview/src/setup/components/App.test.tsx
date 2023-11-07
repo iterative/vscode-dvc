@@ -42,7 +42,7 @@ const DEFAULT_DATA = {
   remoteList: undefined,
   sectionCollapsed: undefined,
   shareLiveToStudio: false,
-  studioVerifyUserCode: null
+  studioVerifyUser: false
 }
 
 const renderApp = (overrideData: Partial<SetupData> = {}) => {
@@ -656,19 +656,12 @@ describe('App', () => {
       })
     })
 
-    it('should instruct the user to verify their identity if a user code exists', () => {
-      const userCode = '45JFHQ56'
+    it('should instruct the user to verify their identity after they have reqeusted a token', () => {
       renderApp({
-        studioVerifyUserCode: userCode
+        studioVerifyUser: true
       })
 
       mockPostMessage.mockClear()
-      const code = screen.getByText(userCode)
-      const copyButton = screen.getByTitle('Copy Code')
-
-      expect(code).toBeInTheDocument()
-      expect(copyButton).toBeInTheDocument()
-
       const verifyButton = screen.getByText('Verify Identity')
       fireEvent.click(verifyButton)
       expect(mockPostMessage).toHaveBeenCalledTimes(1)
