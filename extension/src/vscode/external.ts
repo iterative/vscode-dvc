@@ -10,14 +10,11 @@ export const getCallBackUrl = async (path: string) => {
   return uri.toString()
 }
 
-export const waitForUriResponse = (
-  path: string,
-  onResponse: (uri: Uri) => unknown
-) => {
+export const waitForUriResponse = (path: string, onResponse: () => unknown) => {
   window.registerUriHandler({
     handleUri(uri: Uri): ProviderResult<void> {
       if (uri.path.includes(path)) {
-        onResponse(uri)
+        onResponse()
       }
     }
   })

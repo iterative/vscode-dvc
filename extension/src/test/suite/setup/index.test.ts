@@ -44,8 +44,9 @@ import { MIN_CLI_VERSION } from '../../../cli/dvc/contract'
 import { run } from '../../../setup/runner'
 import * as Python from '../../../extensions/python'
 import { ContextKey } from '../../../vscode/context'
+import * as ExternalUtil from '../../../vscode/external'
 import { Setup } from '../../../setup'
-import { SetupSection } from '../../../setup/webview/contract'
+import { STUDIO_URL, SetupSection } from '../../../setup/webview/contract'
 import { getFirstWorkspaceFolder } from '../../../vscode/workspaceFolders'
 import { Response } from '../../../vscode/response'
 import { DvcConfig } from '../../../cli/dvc/config'
@@ -855,8 +856,8 @@ suite('Setup Test Suite', () => {
       ).to.be.calledWithExactly('setContext', 'dvc.cli.incompatible', false)
     })
 
-    it('should handle a message to request a token from studio', async () => {
-      const { setup, mockFetch, messageSpy } = buildSetup({
+    it('should handle a message from the webview to request a token from studio', async () => {
+      const { setup, mockFetch, studio } = buildSetup({
         disposer: disposable
       })
       const mockConfig = stub(DvcConfig.prototype, 'config')
@@ -865,10 +866,9 @@ suite('Setup Test Suite', () => {
       await webview.isReady()
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
-      messageSpy.restore()
-      const mockSendMessage = stub(BaseWebview.prototype, 'show')
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       stub(Setup.prototype as any, 'getCliCompatible').returns(true)
+      const mockWaitForUriRes = stub(ExternalUtil, 'waitForUriResponse')
 
       const mockStudioRes = {
         device_code: 'Yi-NPd9ggvNUDBcam5bP8iivbtLhnqVgM_lSSbilqNw',
@@ -876,46 +876,74 @@ suite('Setup Test Suite', () => {
         user_code: '40DWMKNA',
         verification_uri: 'https://studio.iterative.ai/auth/device-login'
       }
-      const mockToken = 'isat_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
-      mockFetch
-        .onFirstCall()
-        .resolves({
-          json: () => Promise.resolve(mockStudioRes)
-        } as Fetch.Response)
-        .onSecondCall()
-        .resolves({
-          json: () =>
-            Promise.resolve({
-              access_token: mockToken
-            }),
-          status: 200
-        } as Fetch.Response)
+      mockFetch.onFirstCall().resolves({
+        json: () => Promise.resolve(mockStudioRes)
+      } as Fetch.Response)
 
-      const verifyUserStatusSent = new Promise(resolve =>
-        mockSendMessage.onSecondCall().callsFake(data => {
-          resolve(undefined)
-          return Promise.resolve(!!data)
-        })
+      const callbackUriHandlerEvent: Promise<() => unknown> = new Promise(
+        resolve =>
+          mockWaitForUriRes.onFirstCall().callsFake((_, onResponse) => {
+            resolve(onResponse)
+          })
       )
 
       mockMessageReceived.fire({
         type: MessageFromWebviewType.REQUEST_STUDIO_TOKEN
       })
 
-      await verifyUserStatusSent
+      const onStudioResponse = await callbackUriHandlerEvent
 
-      expect(mockSendMessage).to.be.calledTwice
-      expect(mockSendMessage).to.be.calledWithMatch({
-        studioVerifyUser: true
+      expect(mockFetch).to.be.calledOnce
+      expect(mockFetch).to.be.calledOnceWithExactly(
+        `${STUDIO_URL}/api/device-login`,
+        {
+          body: JSON.stringify({
+            client_name: 'VS Code'
+          }),
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          method: 'POST'
+        }
+      )
+      const verifyUrl = new URL(studio.getStudioVerifyUserUrl() as string)
+      expect(verifyUrl.pathname).to.equal('/auth/device-login')
+      expect(verifyUrl.searchParams.get('code')).to.equal(
+        mockStudioRes.user_code
+      )
+      expect(verifyUrl.searchParams.get('redirect_uri')).to.be.string
+
+      const mockToken = 'isat_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+      mockFetch.onSecondCall().resolves({
+        json: () =>
+          Promise.resolve({
+            access_token: mockToken
+          }),
+        status: 200
+      } as Fetch.Response)
+      const mockSaveStudioToken = stub(studio, 'saveStudioAccessTokenInConfig')
+      const saveTokenEvent = new Promise(resolve =>
+        mockSaveStudioToken.onFirstCall().callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve('')
+        })
+      )
+
+      onStudioResponse()
+
+      await saveTokenEvent
+
+      expect(mockFetch).to.be.calledTwice
+      expect(mockFetch).to.be.calledWithExactly(mockStudioRes.token_uri, {
+        body: JSON.stringify({
+          code: mockStudioRes.device_code
+        }),
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        method: 'POST'
       })
-
-      // next steps on this test
-      // check updateStudioUserVerifyDetails to make sure userCode and verifyUrl are updated
-      // stub waitForUriResponse (can probably wrap a stub in a event)
-      // call requestStudioToken in stub
-      // spy requestToken to make sure it's called with the right stuff
-      // check updateStudioUserVerifyDetails to make sure userCode and verifyUrl are updated
-      // config check time
+      expect(mockSaveStudioToken).to.be.calledWith(dvcDemoPath, mockToken)
     })
 
     it('should handle a message from the webview to open the studio verification url', async () => {

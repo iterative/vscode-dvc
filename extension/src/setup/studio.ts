@@ -1,4 +1,5 @@
 import { Event, EventEmitter } from 'vscode'
+import fetch from 'node-fetch'
 import { STUDIO_URL } from './webview/contract'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
@@ -139,9 +140,9 @@ export class Studio extends Disposable {
     verificationUrlWithCallback.searchParams.append('code', userCode)
     this.studioVerifyUserUrl = verificationUrlWithCallback.toString()
 
-    void waitForUriResponse('/studio-complete-auth', () =>
-      this.requestStudioToken(deviceCode, tokenUri)
-    )
+    void waitForUriResponse('/studio-complete-auth', () => {
+      void this.requestStudioToken(deviceCode, tokenUri)
+    })
   }
 
   private async setStudioValues() {

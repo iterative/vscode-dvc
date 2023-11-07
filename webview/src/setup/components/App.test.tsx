@@ -656,7 +656,7 @@ describe('App', () => {
       })
     })
 
-    it('should instruct the user to verify their identity after they have reqeusted a token', () => {
+    it('should instruct the user to verify their identity after they have requested a token', () => {
       renderApp({
         studioVerifyUser: true
       })
