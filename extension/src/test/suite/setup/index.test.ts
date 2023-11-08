@@ -876,7 +876,7 @@ suite('Setup Test Suite', () => {
         user_code: '40DWMKNA',
         verification_uri: 'https://studio.iterative.ai/auth/device-login'
       }
-      const mockCallbackUrl = 'url-to-vscode/studio-complete-auth'
+      const mockCallbackUrl = 'url-to-vscode'
 
       mockFetch.onFirstCall().resolves({
         json: () => Promise.resolve(mockStudioRes)
