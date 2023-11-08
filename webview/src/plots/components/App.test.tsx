@@ -1378,19 +1378,26 @@ describe('App', () => {
   })
 
   describe('Drag and drop', () => {
+    const toggleDragMode = (
+      store: typeof plotsStore,
+      forCustomPlots: boolean,
+      on: boolean
+    ) => {
+      act(() => {
+        store.dispatch(
+          forCustomPlots
+            ? toggleCustomPlotsDragAndDropMode(on)
+            : toggleTemplatePlotsDragAndDropMode(on)
+        )
+      })
+    }
     const renderAppWithOptionalDataInDragAndDropMode = (
       data?: PlotsData,
       forCustomPlots?: boolean
     ) => {
       const store = renderAppWithOptionalData(data)
-
-      act(() => {
-        store.dispatch(
-          forCustomPlots
-            ? toggleCustomPlotsDragAndDropMode(true)
-            : toggleTemplatePlotsDragAndDropMode(true)
-        )
-      })
+      toggleDragMode(store, !!forCustomPlots, true)
+      return store
     }
 
     it('should not be possible to drag a plot when the drag and drop mode is set to false', () => {
@@ -1539,7 +1546,7 @@ describe('App', () => {
     })
 
     it('should move a template plot from one type in another section of the same type and show two drop targets', async () => {
-      renderAppWithOptionalDataInDragAndDropMode({
+      const store = renderAppWithOptionalDataInDragAndDropMode({
         template: complexTemplatePlotsFixture
       })
 
@@ -1548,6 +1555,7 @@ describe('App', () => {
 
       dragAndDrop(aSingleViewPlot, bottomSection)
 
+      toggleDragMode(store, false, true)
       await screen.findByTestId('plots-section_template-single_2')
       const anotherSingleViewPlot = screen.getByTestId(
         join('plot_logs', 'loss.tsv')
@@ -1574,7 +1582,7 @@ describe('App', () => {
     })
 
     it('should show a drop target at the end of the section when moving a plot from one section to another but not over any other plot', async () => {
-      renderAppWithOptionalDataInDragAndDropMode({
+      const store = renderAppWithOptionalDataInDragAndDropMode({
         template: complexTemplatePlotsFixture
       })
 
@@ -1582,6 +1590,7 @@ describe('App', () => {
       const aSingleViewPlot = screen.getByTestId(join('plot_other', 'plot.tsv'))
 
       dragAndDrop(aSingleViewPlot, bottomSection)
+      toggleDragMode(store, false, true)
 
       await screen.findByTestId('plots-section_template-single_2')
       const anotherSingleViewPlot = screen.getByTestId(
@@ -1800,7 +1809,7 @@ describe('App', () => {
     })
 
     it('should remove the drop target after exiting a section after dragging in and out of it', () => {
-      renderAppWithOptionalDataInDragAndDropMode({
+      const store = renderAppWithOptionalDataInDragAndDropMode({
         template: complexTemplatePlotsFixture
       })
 
@@ -1811,6 +1820,7 @@ describe('App', () => {
 
       dragAndDrop(aSingleViewPlot, bottomSection)
 
+      toggleDragMode(store, false, true)
       const movedPlot = screen.getByTestId(movingPlotId)
       const otherSingleSection = screen.getByTestId(
         join('plot_logs', 'loss.tsv')

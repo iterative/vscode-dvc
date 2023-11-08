@@ -142,6 +142,13 @@ $gap: 20px;
 
 .dropSectionWrapper {
   margin-top: -30px;
+  position: relative;
+  z-index: 5;
+
+  &:first-child {
+    margin-top: 0;
+    margin-bottom: -30px;
+  }
 }
 
 .dropSection {

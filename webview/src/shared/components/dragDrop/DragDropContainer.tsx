@@ -71,6 +71,7 @@ interface DragDropContainerProps {
   parentDraggedOver?: boolean
   vertical?: boolean
   onLayoutChange?: () => void
+  onDragEnd?: () => void
 }
 
 export const DragDropContainer: React.FC<DragDropContainerProps> = ({
@@ -86,7 +87,8 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   ghostElemStyle,
   parentDraggedOver,
   vertical,
-  onLayoutChange
+  onLayoutChange,
+  onDragEnd
   // eslint-disable-next-line sonarjs/cognitive-complexity
 }) => {
   const defaultDragEnterDirection = vertical
@@ -288,6 +290,11 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     </DropTarget>
   )
 
+  const handleDragEnd = () => {
+    onDragEnd?.()
+    cleanup()
+  }
+
   const wrappedItems = items
     .map(draggable => {
       const id = draggable.props.id
@@ -297,7 +304,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
       const item = (
         <DragDropItem
           key={draggable.key}
-          cleanup={cleanup}
+          onDragEnd={handleDragEnd}
           disabledDropIds={disabledDropIds}
           draggable={draggable}
           id={id}

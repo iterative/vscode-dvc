@@ -1,4 +1,4 @@
-import React, { DragEvent } from 'react'
+import React, { DragEvent, createRef } from 'react'
 
 interface DragDropItemProps {
   id: string
@@ -8,7 +8,7 @@ interface DragDropItemProps {
   onDragEnter: (e: DragEvent<HTMLElement>) => void
   onDrop: (e: DragEvent<HTMLElement>) => void
   onDragLeave: (e: DragEvent<HTMLElement>) => void
-  cleanup: () => void
+  onDragEnd: () => void
   disabledDropIds: string[]
   shouldShowOnDrag?: boolean
   draggedId?: string
@@ -23,20 +23,29 @@ export const DragDropItem: React.FC<DragDropItemProps> = ({
   onDragEnter,
   onDrop,
   onDragLeave,
-  cleanup,
+  onDragEnd,
   disabledDropIds,
   shouldShowOnDrag,
   draggedId,
   isDiv
 }) => {
   const Type = isDiv ? 'div' : draggable.type
+  const ref = createRef<HTMLDivElement>()
+
+  const handleDragStart = (e: DragEvent<HTMLElement>) => {
+    onDragStart(e)
+    // Because the dragged element is being created while being dragged for plots in grids, there is a problem where
+    // the dragend event is not being associated with the element. Re-adding the event makes sure it's being called.
+    ref.current?.addEventListener('dragend', onDragEnd)
+  }
   return (
     <Type
+      // The draggable ref is used by the comparison table rows to set height and does not have the dragend event problem
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ref={(draggable as any).ref}
+      ref={(draggable as any).ref || ref}
       {...draggable.props}
-      onDragStart={onDragStart}
-      onDragEnd={cleanup}
+      onDragStart={handleDragStart}
+      onDragEnd={onDragEnd}
       onDragOver={onDragOver}
       onDragEnter={onDragEnter}
       onDrop={onDrop}

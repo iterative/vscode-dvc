@@ -75,6 +75,10 @@ export const DragAndDropGrid: React.FC<DragAndDropGridProps> = ({
     onDrop?.(draggedId, draggedGroup, groupId, position)
   }
 
+  const handleDragEnd = () => {
+    changeDragAndDropMode(sectionKey, dispatch, true)
+  }
+
   return (
     <DragDropContainer
       order={order}
@@ -92,6 +96,7 @@ export const DragAndDropGrid: React.FC<DragAndDropGridProps> = ({
           : undefined
       }
       parentDraggedOver={parentDraggedOver}
+      onDragEnd={handleDragEnd}
     />
   )
 }
