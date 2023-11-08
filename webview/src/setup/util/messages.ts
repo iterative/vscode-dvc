@@ -57,7 +57,7 @@ export const setStudioShareExperimentsLive = (shouldShareLive: boolean) =>
 export const removeStudioToken = () =>
   sendMessage({ type: MessageFromWebviewType.REMOVE_STUDIO_TOKEN })
 
-export const requestStudioAuth = () =>
+export const requestStudioToken = () =>
   sendMessage({ type: MessageFromWebviewType.REQUEST_STUDIO_TOKEN })
 
 export const addRemote = () =>

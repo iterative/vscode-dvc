@@ -425,8 +425,7 @@ export class Setup
       (offline: boolean) => this.studio.updateStudioOffline(offline),
       () => this.isPythonExtensionUsed(),
       () => this.updatePythonEnvironment(),
-      () => this.studio.requestStudioAuthentication(),
-      () => this.sendDataToWebview()
+      () => this.studio.requestStudioTokenAuthentication()
     )
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message =>

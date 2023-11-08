@@ -20,8 +20,7 @@ export class WebviewMessages {
   private readonly updateStudioOffline: (offline: boolean) => Promise<void>
   private readonly isPythonExtensionUsed: () => Promise<boolean>
   private readonly updatePythonEnv: () => Promise<void>
-  private readonly requestStudioAuth: () => Promise<void>
-  private readonly update: () => Promise<void>
+  private readonly requestToken: () => Promise<void>
 
   constructor(
     getWebview: () => BaseWebview<TSetupData> | undefined,
@@ -29,16 +28,14 @@ export class WebviewMessages {
     updateStudioOffline: (shareLive: boolean) => Promise<void>,
     isPythonExtensionUsed: () => Promise<boolean>,
     updatePythonEnv: () => Promise<void>,
-    requestStudioAuth: () => Promise<void>,
-    update: () => Promise<void>
+    requestStudioToken: () => Promise<void>
   ) {
     this.getWebview = getWebview
     this.initializeGit = initializeGit
     this.updateStudioOffline = updateStudioOffline
     this.isPythonExtensionUsed = isPythonExtensionUsed
     this.updatePythonEnv = updatePythonEnv
-    this.requestStudioAuth = requestStudioAuth
-    this.update = update
+    this.requestToken = requestStudioToken
   }
 
   public sendWebviewMessage(data: SetupData) {
@@ -80,7 +77,7 @@ export class WebviewMessages {
       case MessageFromWebviewType.SET_STUDIO_SHARE_EXPERIMENTS_LIVE:
         return this.updateStudioOffline(message.payload)
       case MessageFromWebviewType.REQUEST_STUDIO_TOKEN:
-        return this.requestStudioAuthentication()
+        return this.requestStudioToken()
       case MessageFromWebviewType.OPEN_EXPERIMENTS_WEBVIEW:
         return commands.executeCommand(RegisteredCommands.EXPERIMENT_SHOW)
       case MessageFromWebviewType.REMOTE_ADD:
@@ -134,13 +131,12 @@ export class WebviewMessages {
     return autoInstallDvc(isPythonExtensionUsed)
   }
 
-  private async requestStudioAuthentication() {
+  private requestStudioToken() {
     sendTelemetryEvent(
-      EventName.VIEWS_SETUP_REQUEST_STUDIO_AUTH,
+      EventName.VIEWS_SETUP_REQUEST_STUDIO_TOKEN,
       undefined,
       undefined
     )
-    await this.requestStudioAuth()
-    return this.update()
+    return this.requestToken()
   }
 }

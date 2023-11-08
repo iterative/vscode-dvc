@@ -51,6 +51,7 @@ import { getFirstWorkspaceFolder } from '../../../vscode/workspaceFolders'
 import { Response } from '../../../vscode/response'
 import { DvcConfig } from '../../../cli/dvc/config'
 import * as QuickPickUtil from '../../../setup/quickPick'
+import { EventName } from '../../../telemetry/constants'
 
 suite('Setup Test Suite', () => {
   const disposable = Disposable.fn()
@@ -856,14 +857,16 @@ suite('Setup Test Suite', () => {
       const { setup, mockFetch, studio } = buildSetup({
         disposer: disposable
       })
+
       const mockConfig = stub(DvcConfig.prototype, 'config')
       mockConfig.resolves('')
       const webview = await setup.showWebview()
       await webview.isReady()
-
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       stub(Setup.prototype as any, 'getCliCompatible').returns(true)
+
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
       const mockGetCallbackUrl = stub(ExternalUtil, 'getCallBackUrl')
       const mockOpenUrl = stub(ExternalUtil, 'openUrl')
       const mockWaitForUriRes = stub(ExternalUtil, 'waitForUriResponse')
@@ -873,7 +876,7 @@ suite('Setup Test Suite', () => {
         user_code: '40DWMKNA',
         verification_uri: 'https://studio.iterative.ai/auth/device-login'
       }
-      const mockCallbackUrl = 'url-to-vscode'
+      const mockCallbackUrl = 'url-to-vscode/studio-complete-auth'
 
       mockFetch.onFirstCall().resolves({
         json: () => Promise.resolve(mockStudioRes)
@@ -893,6 +896,12 @@ suite('Setup Test Suite', () => {
 
       const mockOnStudioResponse = await callbackUriHandlerEvent
 
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWith(
+        EventName.VIEWS_SETUP_REQUEST_STUDIO_TOKEN,
+        undefined,
+        undefined
+      )
       expect(mockFetch).to.be.calledOnce
       expect(mockFetch).to.be.calledOnceWithExactly(
         `${STUDIO_URL}/api/device-login`,
@@ -910,7 +919,7 @@ suite('Setup Test Suite', () => {
       expect(mockGetCallbackUrl).to.be.calledWith('/studio-complete-auth')
       expect(mockOpenUrl).to.be.calledOnce
       expect(mockOpenUrl).to.be.calledWith(
-        `https://studio.iterative.ai/auth/device-login?redirect_uri=${mockCallbackUrl}&code=${mockStudioRes.user_code}`
+        `${mockStudioRes.verification_uri}?redirect_uri=${mockCallbackUrl}&code=${mockStudioRes.user_code}`
       )
 
       const mockToken = 'isat_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'

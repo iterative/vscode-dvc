@@ -105,7 +105,7 @@ export class Studio extends Disposable {
     )
   }
 
-  public async requestStudioAuthentication() {
+  public async requestStudioTokenAuthentication() {
     const response = await fetch(`${STUDIO_URL}/api/device-login`, {
       body: JSON.stringify({
         client_name: 'VS Code'

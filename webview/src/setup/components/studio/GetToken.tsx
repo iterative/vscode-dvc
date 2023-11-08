@@ -1,6 +1,6 @@
 import React from 'react'
 import styles from './styles.module.scss'
-import { requestStudioAuth, saveStudioToken } from '../../util/messages'
+import { requestStudioToken, saveStudioToken } from '../../util/messages'
 import { Button } from '../../../shared/components/button/Button'
 
 export const GetToken: React.FC = () => {
@@ -18,7 +18,7 @@ export const GetToken: React.FC = () => {
         </button>
         .
       </p>
-      <Button text="Get Token" onClick={requestStudioAuth} />
+      <Button text="Get Token" onClick={requestStudioToken} />
     </>
   )
 }

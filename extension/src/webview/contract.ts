@@ -45,7 +45,7 @@ export enum MessageFromWebviewType {
   RESET_COMMITS = 'reset-commits',
   RESIZE_COLUMN = 'resize-column',
   RESIZE_PLOTS = 'resize-plots',
-  REQUEST_STUDIO_TOKEN = 'request-studio-authentication',
+  REQUEST_STUDIO_TOKEN = 'request-studio-token',
   SAVE_STUDIO_TOKEN = 'save-studio-token',
   SET_COMPARISON_MULTI_PLOT_VALUE = 'update-comparison-multi-plot-value',
   SET_SMOOTH_PLOT_VALUE = 'update-smooth-plot-value',
