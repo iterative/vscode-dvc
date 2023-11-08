@@ -413,8 +413,7 @@ export class Setup
       pythonBinPath: getBinDisplayText(pythonBinPath),
       remoteList,
       sectionCollapsed: collectSectionCollapsed(this.focusedSection),
-      shareLiveToStudio: !!this.studio.getShareLiveToStudio(),
-      studioVerifyUser: !!this.studio.getStudioVerifyUserUrl()
+      shareLiveToStudio: !!this.studio.getShareLiveToStudio()
     })
     this.focusedSection = undefined
   }
@@ -427,7 +426,6 @@ export class Setup
       () => this.isPythonExtensionUsed(),
       () => this.updatePythonEnvironment(),
       () => this.studio.requestStudioAuthentication(),
-      () => this.studio.getStudioVerifyUserUrl(),
       () => this.sendDataToWebview()
     )
     this.dispose.track(

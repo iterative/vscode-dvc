@@ -41,8 +41,7 @@ const DEFAULT_DATA = {
   pythonBinPath: undefined,
   remoteList: undefined,
   sectionCollapsed: undefined,
-  shareLiveToStudio: false,
-  studioVerifyUser: false
+  shareLiveToStudio: false
 }
 
 const renderApp = (overrideData: Partial<SetupData> = {}) => {
@@ -635,7 +634,6 @@ describe('App', () => {
     it('should show a button which requests a token from Studio', () => {
       renderApp()
       mockPostMessage.mockClear()
-
       const button = screen.getByText('Get Token')
       fireEvent.click(button)
       expect(mockPostMessage).toHaveBeenCalledTimes(1)
@@ -646,27 +644,12 @@ describe('App', () => {
 
     it('should show a button-like link which lets the user save a token manually', () => {
       renderApp()
-
       mockPostMessage.mockClear()
       const button = screen.getByText('add an already created token')
       fireEvent.click(button)
       expect(mockPostMessage).toHaveBeenCalledTimes(1)
       expect(mockPostMessage).toHaveBeenCalledWith({
         type: MessageFromWebviewType.SAVE_STUDIO_TOKEN
-      })
-    })
-
-    it('should instruct the user to verify their identity after they have requested a token', () => {
-      renderApp({
-        studioVerifyUser: true
-      })
-
-      mockPostMessage.mockClear()
-      const verifyButton = screen.getByText('Verify Identity')
-      fireEvent.click(verifyButton)
-      expect(mockPostMessage).toHaveBeenCalledTimes(1)
-      expect(mockPostMessage).toHaveBeenCalledWith({
-        type: MessageFromWebviewType.OPEN_STUDIO_VERIFY_USER_LINK
       })
     })
 

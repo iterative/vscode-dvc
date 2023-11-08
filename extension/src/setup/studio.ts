@@ -6,7 +6,7 @@ import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
 import { Args, ConfigKey, Flag } from '../cli/dvc/constants'
 import { ContextKey, setContextValue } from '../vscode/context'
 import { Disposable } from '../class/dispose'
-import { getCallBackUrl, waitForUriResponse } from '../vscode/external'
+import { getCallBackUrl, openUrl, waitForUriResponse } from '../vscode/external'
 
 export const isStudioAccessToken = (text?: string): boolean => {
   if (!text) {
@@ -25,7 +25,6 @@ export class Studio extends Disposable {
   private studioAccessToken: string | undefined = undefined
   private studioIsConnected = false
   private shareLiveToStudio: boolean | undefined = undefined
-  private studioVerifyUserUrl: string | undefined = undefined
 
   constructor(
     internalCommands: InternalCommands,
@@ -44,10 +43,6 @@ export class Studio extends Disposable {
 
   public getStudioIsConnected() {
     return this.studioIsConnected
-  }
-
-  public getStudioVerifyUserUrl() {
-    return this.studioVerifyUserUrl
   }
 
   public getShareLiveToStudio() {
@@ -138,11 +133,39 @@ export class Studio extends Disposable {
 
     verificationUrlWithCallback.searchParams.append('redirect_uri', callbackUrl)
     verificationUrlWithCallback.searchParams.append('code', userCode)
-    this.studioVerifyUserUrl = verificationUrlWithCallback.toString()
 
+    void openUrl(verificationUrlWithCallback.toString())
     void waitForUriResponse('/studio-complete-auth', () => {
       void this.requestStudioToken(deviceCode, tokenUri)
     })
+  }
+
+  private async requestStudioToken(deviceCode: string, tokenUri: string) {
+    const response = await fetch(tokenUri, {
+      body: JSON.stringify({
+        code: deviceCode
+      }),
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      method: 'POST'
+    })
+
+    if (response.status !== 200) {
+      return
+    }
+
+    const { access_token: accessToken } = (await response.json()) as {
+      access_token: string
+    }
+
+    const cwd = this.getCwd()
+
+    if (!cwd) {
+      return
+    }
+
+    return this.saveStudioAccessTokenInConfig(cwd, accessToken)
   }
 
   private async setStudioValues() {
@@ -171,36 +194,6 @@ export class Studio extends Disposable {
     if (previousStudioAccessToken !== this.studioAccessToken) {
       this.studioConnectionChanged.fire()
     }
-  }
-
-  private async requestStudioToken(deviceCode: string, tokenUri: string) {
-    const response = await fetch(tokenUri, {
-      body: JSON.stringify({
-        code: deviceCode
-      }),
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      method: 'POST'
-    })
-
-    if (response.status !== 200) {
-      return
-    }
-
-    const { access_token: accessToken } = (await response.json()) as {
-      access_token: string
-    }
-
-    this.studioVerifyUserUrl = undefined
-
-    const cwd = this.getCwd()
-
-    if (!cwd) {
-      return
-    }
-
-    return this.saveStudioAccessTokenInConfig(cwd, accessToken)
   }
 
   private accessConfig(cwd: string, ...args: Args) {

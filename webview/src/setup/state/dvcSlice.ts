@@ -8,7 +8,6 @@ export type DvcState = Omit<
   | 'needsGitCommit'
   | 'sectionCollapsed'
   | 'shareLiveToStudio'
-  | 'studioVerifyUser'
 >
 
 export const dvcInitialState: DvcState = {

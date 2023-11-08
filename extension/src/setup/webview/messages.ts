@@ -13,7 +13,6 @@ import {
   RegisteredCommands
 } from '../../commands/external'
 import { autoInstallDvc, autoUpgradeDvc } from '../autoInstall'
-import { openUrl } from '../../vscode/external'
 
 export class WebviewMessages {
   private readonly getWebview: () => BaseWebview<TSetupData> | undefined
@@ -22,7 +21,6 @@ export class WebviewMessages {
   private readonly isPythonExtensionUsed: () => Promise<boolean>
   private readonly updatePythonEnv: () => Promise<void>
   private readonly requestStudioAuth: () => Promise<void>
-  private readonly getStudioVerifyUserUrl: () => string | undefined
   private readonly update: () => Promise<void>
 
   constructor(
@@ -32,7 +30,6 @@ export class WebviewMessages {
     isPythonExtensionUsed: () => Promise<boolean>,
     updatePythonEnv: () => Promise<void>,
     requestStudioAuth: () => Promise<void>,
-    getStudioVerifyUserUrl: () => string | undefined,
     update: () => Promise<void>
   ) {
     this.getWebview = getWebview
@@ -41,7 +38,6 @@ export class WebviewMessages {
     this.isPythonExtensionUsed = isPythonExtensionUsed
     this.updatePythonEnv = updatePythonEnv
     this.requestStudioAuth = requestStudioAuth
-    this.getStudioVerifyUserUrl = getStudioVerifyUserUrl
     this.update = update
   }
 
@@ -73,8 +69,6 @@ export class WebviewMessages {
         return commands.executeCommand(
           RegisteredCommands.EXTENSION_SETUP_WORKSPACE
         )
-      case MessageFromWebviewType.OPEN_STUDIO_VERIFY_USER_LINK:
-        return this.openStudioVerifyUserUrl()
       case MessageFromWebviewType.SAVE_STUDIO_TOKEN:
         return commands.executeCommand(
           RegisteredCommands.ADD_STUDIO_ACCESS_TOKEN
@@ -148,15 +142,5 @@ export class WebviewMessages {
     )
     await this.requestStudioAuth()
     return this.update()
-  }
-
-  private openStudioVerifyUserUrl() {
-    const url = this.getStudioVerifyUserUrl()
-
-    if (!url) {
-      return
-    }
-
-    return openUrl(url)
   }
 }

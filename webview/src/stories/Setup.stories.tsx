@@ -32,8 +32,7 @@ const DEFAULT_DATA: SetupData = {
     [SetupSection.REMOTES]: false,
     [SetupSection.STUDIO]: true
   },
-  shareLiveToStudio: false,
-  studioVerifyUser: false
+  shareLiveToStudio: false
 }
 
 const getUpdatedArgs = (data: Partial<SetupData>): { data: SetupData } => ({
@@ -88,14 +87,6 @@ NoDataNotConnected.parameters = {}
 NoDataNotConnected.args = getUpdatedArgs({
   isStudioConnected: false,
   sectionCollapsed: undefined
-})
-
-export const NoDataUserVerificationRequired = Template.bind({})
-NoDataUserVerificationRequired.parameters = {}
-NoDataUserVerificationRequired.args = getUpdatedArgs({
-  isStudioConnected: false,
-  sectionCollapsed: undefined,
-  studioVerifyUser: true
 })
 
 export const CompletedConnected = Template.bind({})

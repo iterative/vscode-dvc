@@ -386,8 +386,7 @@ suite('Setup Test Suite', () => {
         pythonBinPath: undefined,
         remoteList: undefined,
         sectionCollapsed: undefined,
-        shareLiveToStudio: false,
-        studioVerifyUser: false
+        shareLiveToStudio: false
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -433,8 +432,7 @@ suite('Setup Test Suite', () => {
         pythonBinPath: undefined,
         remoteList: undefined,
         sectionCollapsed: undefined,
-        shareLiveToStudio: true,
-        studioVerifyUser: false
+        shareLiveToStudio: true
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -488,8 +486,7 @@ suite('Setup Test Suite', () => {
         pythonBinPath: undefined,
         remoteList: undefined,
         sectionCollapsed: undefined,
-        shareLiveToStudio: true,
-        studioVerifyUser: false
+        shareLiveToStudio: true
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -543,8 +540,7 @@ suite('Setup Test Suite', () => {
         pythonBinPath: undefined,
         remoteList: { [dvcDemoPath]: undefined },
         sectionCollapsed: undefined,
-        shareLiveToStudio: true,
-        studioVerifyUser: false
+        shareLiveToStudio: true
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -868,17 +864,21 @@ suite('Setup Test Suite', () => {
       const mockMessageReceived = getMessageReceivedEmitter(webview)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       stub(Setup.prototype as any, 'getCliCompatible').returns(true)
+      const mockGetCallbackUrl = stub(ExternalUtil, 'getCallBackUrl')
+      const mockOpenUrl = stub(ExternalUtil, 'openUrl')
       const mockWaitForUriRes = stub(ExternalUtil, 'waitForUriResponse')
-
       const mockStudioRes = {
         device_code: 'Yi-NPd9ggvNUDBcam5bP8iivbtLhnqVgM_lSSbilqNw',
         token_uri: 'https://studio.iterative.ai/api/device-login/token',
         user_code: '40DWMKNA',
         verification_uri: 'https://studio.iterative.ai/auth/device-login'
       }
+      const mockCallbackUrl = 'url-to-vscode'
+
       mockFetch.onFirstCall().resolves({
         json: () => Promise.resolve(mockStudioRes)
       } as Fetch.Response)
+      mockGetCallbackUrl.onFirstCall().resolves(mockCallbackUrl)
 
       const callbackUriHandlerEvent: Promise<() => unknown> = new Promise(
         resolve =>
@@ -891,7 +891,7 @@ suite('Setup Test Suite', () => {
         type: MessageFromWebviewType.REQUEST_STUDIO_TOKEN
       })
 
-      const onStudioResponse = await callbackUriHandlerEvent
+      const mockOnStudioResponse = await callbackUriHandlerEvent
 
       expect(mockFetch).to.be.calledOnce
       expect(mockFetch).to.be.calledOnceWithExactly(
@@ -906,12 +906,12 @@ suite('Setup Test Suite', () => {
           method: 'POST'
         }
       )
-      const verifyUrl = new URL(studio.getStudioVerifyUserUrl() as string)
-      expect(verifyUrl.pathname).to.equal('/auth/device-login')
-      expect(verifyUrl.searchParams.get('code')).to.equal(
-        mockStudioRes.user_code
+      expect(mockGetCallbackUrl).to.be.calledOnce
+      expect(mockGetCallbackUrl).to.be.calledWith('/studio-complete-auth')
+      expect(mockOpenUrl).to.be.calledOnce
+      expect(mockOpenUrl).to.be.calledWith(
+        `https://studio.iterative.ai/auth/device-login?redirect_uri=${mockCallbackUrl}&code=${mockStudioRes.user_code}`
       )
-      expect(verifyUrl.searchParams.get('redirect_uri')).to.be.string
 
       const mockToken = 'isat_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
       mockFetch.onSecondCall().resolves({
@@ -929,7 +929,7 @@ suite('Setup Test Suite', () => {
         })
       )
 
-      onStudioResponse()
+      mockOnStudioResponse()
 
       await saveTokenEvent
 
@@ -945,30 +945,6 @@ suite('Setup Test Suite', () => {
       })
       expect(mockSaveStudioToken).to.be.calledWith(dvcDemoPath, mockToken)
     })
-
-    it('should handle a message from the webview to open the studio verification url', async () => {
-      const { setup, studio, mockOpenExternal, urlOpenedEvent } = buildSetup({
-        disposer: disposable
-      })
-
-      const webview = await setup.showWebview()
-      await webview.isReady()
-
-      const mockStudioVerifyUrl =
-        'https://studio.iterative.ai/auth/device-login'
-      stub(studio, 'getStudioVerifyUserUrl')
-        .onFirstCall()
-        .returns(mockStudioVerifyUrl)
-
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
-
-      mockMessageReceived.fire({
-        type: MessageFromWebviewType.OPEN_STUDIO_VERIFY_USER_LINK
-      })
-
-      await urlOpenedEvent
-      expect(mockOpenExternal).to.be.calledWith(Uri.parse(mockStudioVerifyUrl))
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it("should handle a message from the webview to manually save the user's Studio access token", async () => {
       const mockToken = 'isat_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'

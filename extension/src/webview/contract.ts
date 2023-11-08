@@ -30,7 +30,6 @@ export enum MessageFromWebviewType {
   OPEN_EXPERIMENTS_WEBVIEW = 'open-experiments-webview',
   OPEN_PARAMS_FILE_TO_THE_SIDE = 'open-params-file-to-the-side',
   OPEN_PLOTS_WEBVIEW = 'open-plots-webview',
-  OPEN_STUDIO_VERIFY_USER_LINK = 'open-studio-verify-user-link',
   PUSH_EXPERIMENT = 'push-experiment',
   REMOVE_COLUMN_FILTERS = 'remove-column-filters',
   REMOVE_COLUMN_SORT = 'remove-column-sort',
@@ -290,7 +289,6 @@ export type MessageFromWebview =
     }
   | { type: MessageFromWebviewType.UPGRADE_DVC }
   | { type: MessageFromWebviewType.SETUP_WORKSPACE }
-  | { type: MessageFromWebviewType.OPEN_STUDIO_VERIFY_USER_LINK }
   | { type: MessageFromWebviewType.SAVE_STUDIO_TOKEN }
   | { type: MessageFromWebviewType.REQUEST_STUDIO_TOKEN }
   | { type: MessageFromWebviewType.ADD_CONFIGURATION }
