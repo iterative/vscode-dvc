@@ -54,10 +54,9 @@ const cleanTitlePart = (title: string) => {
   if (!regexResult) {
     return title
   }
-  const fileSegment = regexResult[2]
 
   return (
-    fileSegment
+    regexResult[2]
       ?.replace(/_\d+$/g, '')
       .split(METRIC_PARAM_SEPARATOR)
       .map(part =>
