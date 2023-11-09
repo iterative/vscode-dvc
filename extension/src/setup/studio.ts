@@ -129,12 +129,12 @@ export class Studio extends Disposable {
     }
 
     const callbackUrl = await getCallBackUrl('/studio-complete-auth')
-    const verificationUrlWithCallback = new URL(verificationUri)
+    const verificationUrlWithParams = new URL(verificationUri)
 
-    verificationUrlWithCallback.searchParams.append('redirect_uri', callbackUrl)
-    verificationUrlWithCallback.searchParams.append('code', userCode)
+    verificationUrlWithParams.searchParams.append('redirect_uri', callbackUrl)
+    verificationUrlWithParams.searchParams.append('code', userCode)
 
-    void openUrl(verificationUrlWithCallback.toString())
+    void openUrl(verificationUrlWithParams.toString())
     void waitForUriResponse('/studio-complete-auth', () => {
       void this.requestStudioToken(deviceCode, tokenUri)
     })

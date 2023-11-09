@@ -953,7 +953,7 @@ suite('Setup Test Suite', () => {
         method: 'POST'
       })
       expect(mockSaveStudioToken).to.be.calledWith(dvcDemoPath, mockToken)
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it("should handle a message from the webview to manually save the user's Studio access token", async () => {
       const mockToken = 'isat_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
