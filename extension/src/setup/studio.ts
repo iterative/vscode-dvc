@@ -7,12 +7,43 @@ import { Args, ConfigKey, Flag } from '../cli/dvc/constants'
 import { ContextKey, setContextValue } from '../vscode/context'
 import { Disposable } from '../class/dispose'
 import { getCallBackUrl, openUrl, waitForUriResponse } from '../vscode/external'
+import { Toast } from '../vscode/toast'
 
 export const isStudioAccessToken = (text?: string): boolean => {
   if (!text) {
     return false
   }
   return text.startsWith('isat_') && text.length >= 53
+}
+
+export const fetchStudioToken = async (
+  deviceCode: string,
+  tokenUri: string,
+  retry = true
+): Promise<string | undefined> => {
+  const response = await fetch(tokenUri, {
+    body: JSON.stringify({
+      code: deviceCode
+    }),
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    method: 'POST'
+  })
+
+  if (response.status !== 200) {
+    if (retry) {
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      return fetchStudioToken(deviceCode, tokenUri, false)
+    }
+    return Toast.showError(
+      'Unable to get token. Please try again later or add an already created token.'
+    )
+  }
+  const { access_token: accessToken } = (await response.json()) as {
+    access_token: string
+  }
+  return accessToken
 }
 
 export class Studio extends Disposable {
@@ -141,31 +172,14 @@ export class Studio extends Disposable {
   }
 
   private async requestStudioToken(deviceCode: string, tokenUri: string) {
-    const response = await fetch(tokenUri, {
-      body: JSON.stringify({
-        code: deviceCode
-      }),
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      method: 'POST'
-    })
-
-    if (response.status !== 200) {
-      return
-    }
-
-    const { access_token: accessToken } = (await response.json()) as {
-      access_token: string
-    }
-
+    const token = await fetchStudioToken(deviceCode, tokenUri)
     const cwd = this.getCwd()
 
-    if (!cwd) {
+    if (!token || !cwd) {
       return
     }
 
-    return this.saveStudioAccessTokenInConfig(cwd, accessToken)
+    return this.saveStudioAccessTokenInConfig(cwd, token)
   }
 
   private async setStudioValues() {
