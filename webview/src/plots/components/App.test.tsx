@@ -833,7 +833,7 @@ describe('App', () => {
     })
   })
 
-  it('should toggle the custom plots sections on keyboard press', async () => {
+  it('should toggle the custom plots section on Enter key press', async () => {
     renderAppWithOptionalData({
       custom: customPlotsFixture
     })
