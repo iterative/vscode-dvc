@@ -71,7 +71,17 @@ export const SectionContainer: React.FC<
         open={open}
         className={styles.sectionContainer}
       >
-        <summary onClick={toggleSection} style={{ top: stickyHeaderTop }}>
+        <summary
+          onClick={toggleSection}
+          onKeyDown={event => {
+            if (event.key === 'Enter') {
+              onToggleSection()
+            }
+          }}
+          tabIndex={0}
+          role="button"
+          style={{ top: stickyHeaderTop }}
+        >
           <div className={styles.summaryTitle}>
             <Icon
               icon={open ? ChevronDown : ChevronRight}
