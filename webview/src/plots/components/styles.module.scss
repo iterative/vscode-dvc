@@ -52,8 +52,13 @@ $gap: 20px;
 }
 
 .dragAndDropPlotTitle {
-  display: block;
   text-align: center;
+}
+
+.dragAndDropPlotSubtitle {
+  text-align: center;
+  font-size: small;
+  margin-top: 0;
 }
 
 .plotGripIcon {

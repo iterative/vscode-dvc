@@ -56,7 +56,7 @@ export const DragAndDropGrid: React.FC<DragAndDropGridProps> = ({
         data-testid={`plot_${plot}`}
         style={withScale(colSpan)}
       >
-        <DragAndDropPlot plot={plot} />
+        <DragAndDropPlot plot={plot} sectionKey={sectionKey} />
       </div>
     )
   })

@@ -1,16 +1,14 @@
 import { join } from 'path'
+import {
+  DECODE_METRIC_PARAM_REGEX,
+  ENCODED_METRIC_PARAM_SEPARATOR,
+  ENCODE_METRIC_PARAM_REGEX,
+  FILE_SEPARATOR,
+  FILE_SPLIT_REGEX,
+  METRIC_PARAM_SEPARATOR
+} from './constants'
 import { definedAndNonEmpty } from '../../util/array'
 import { ColumnType } from '../webview/contract'
-
-export const METRIC_PARAM_SEPARATOR = '.'
-const ENCODED_METRIC_PARAM_SEPARATOR = '%2E'
-const ENCODE_METRIC_PARAM_REGEX = /\./g
-const DECODE_METRIC_PARAM_REGEX = /%2E/g
-
-export const FILE_SEPARATOR = ':'
-const FILE_SPLIT_REGEX = new RegExp(
-  `([^${FILE_SEPARATOR}]*)(?:${FILE_SEPARATOR}([^${FILE_SEPARATOR}]*))?(?:${FILE_SEPARATOR}(.*))?`
-)
 
 const encodeColumn = (segment: string) =>
   segment.replace(ENCODE_METRIC_PARAM_REGEX, ENCODED_METRIC_PARAM_SEPARATOR)
