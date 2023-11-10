@@ -195,12 +195,16 @@ $gap: 20px;
   padding: 20px;
 }
 
-.smallDropIcon {
-  padding: 5px;
-  border-width: 1px;
+.onPlotDropIcon {
+  padding: 20px;
+  opacity: 0.3;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
-.smallDropIcon,
+.onPlotDropIcon,
 .dropIcon {
   box-sizing: content-box;
 

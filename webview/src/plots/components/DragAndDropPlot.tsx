@@ -1,8 +1,9 @@
 import cx from 'classnames'
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
+import { useDispatch } from 'react-redux'
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import styles from './styles.module.scss'
-import { getMetricVsParamTitle } from './util'
+import { changeDragAndDropMode, getMetricVsParamTitle } from './util'
 import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
 import { Icon } from '../../shared/components/Icon'
 import { GraphLine } from '../../shared/components/icons'
@@ -17,7 +18,15 @@ export const DragAndDropPlot: React.FC<DragAndDropPlotProps> = ({
   plot,
   sectionKey
 }) => {
+  const dispatch = useDispatch()
+  const dragAndDropTimeout = useRef(0)
   const { spec, isTemplatePlot } = useGetPlot(sectionKey, plot)
+
+  useEffect(() => {
+    return () => {
+      clearTimeout(dragAndDropTimeout.current)
+    }
+  }, [])
 
   let title = spec?.titles.main.normal as unknown as string
   let subtitle = ''
@@ -30,11 +39,21 @@ export const DragAndDropPlot: React.FC<DragAndDropPlotProps> = ({
     subtitle = plot.replace('custom-', '')
   }
 
+  const handleEndOfDragAndDrop = () => {
+    // This makes sure every onDrop and onDragEnd events have been called before switching to normal mode
+    dragAndDropTimeout.current = window.setTimeout(() => {
+      changeDragAndDropMode(sectionKey, dispatch, true)
+    }, 100)
+  }
+
   return (
     <>
-      <div>
-        <GripIcon className={styles.plotGripIcon} />
-      </div>
+      {
+        // eslint-disable-next-line jsx-a11y/no-static-element-interactions
+        <div onMouseUp={handleEndOfDragAndDrop}>
+          <GripIcon className={styles.plotGripIcon} />
+        </div>
+      }
       <div className={styles.dragAndDropPlotContent}>
         <h2 className={styles.dragAndDropPlotTitle}>{title}</h2>
         {subtitle && (
@@ -42,9 +61,9 @@ export const DragAndDropPlot: React.FC<DragAndDropPlotProps> = ({
         )}
         <Icon
           icon={GraphLine}
-          className={cx(styles.dropIcon, styles.smallDropIcon)}
-          width={30}
-          height={30}
+          className={cx(styles.dropIcon, styles.onPlotDropIcon)}
+          width={70}
+          height={70}
         />
       </div>
     </>
