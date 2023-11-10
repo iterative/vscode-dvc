@@ -9,9 +9,6 @@ mockedEnv.openExternal = mockedOpenExternal
 mockedEnv.asExternalUri = mockedAsExternalUri
 mockedEnv.uriScheme = mockedUriScheme
 
-const mockedParseUri = jest.fn()
-Uri.parse = mockedParseUri
-
 const mockedWindow = jest.mocked(window)
 const mockedRegisterUriHandler = jest.fn()
 mockedWindow.registerUriHandler = mockedRegisterUriHandler
@@ -23,11 +20,7 @@ beforeEach(() => {
 describe('openUrl', () => {
   it('should call env.openExternal with the provided url', async () => {
     const mockUrl = 'https://github.com/iterative/vscode-dvc'
-    const mockUri = Uri.from({
-      authority: 'github.com',
-      scheme: 'https'
-    })
-    mockedParseUri.mockReturnValueOnce(mockUri)
+    const mockUri = Uri.parse(mockUrl)
 
     await openUrl(mockUrl)
 
@@ -39,21 +32,13 @@ describe('openUrl', () => {
 describe('getCallbackUrl', () => {
   it('should return a vscode uri with the provided path', async () => {
     const mockUrl = `${mockedUriScheme}://iterative.dvc/path`
-    const mockUri = Uri.from({
-      authority: 'iterative.dvc',
-      path: '/path',
-      scheme: mockedUriScheme
-    })
-    mockedParseUri.mockReturnValueOnce(mockUri)
+    const mockUri = Uri.parse(mockUrl)
     mockedAsExternalUri.mockResolvedValueOnce(mockUri)
 
     const result = await getCallBackUrl('/path')
 
-    expect(mockedParseUri).toHaveBeenCalledTimes(1)
-    expect(mockedParseUri).toHaveBeenCalledWith(mockUrl)
     expect(mockedAsExternalUri).toHaveBeenCalledTimes(1)
-    expect(mockedAsExternalUri).toHaveBeenCalledWith(mockUri)
-    expect(result).toStrictEqual(mockUri.toString())
+    expect(result).toStrictEqual(mockUrl)
   })
 })
 
@@ -64,7 +49,9 @@ describe('waitForUriResponse', () => {
     mockedRegisterUriHandler.mockImplementationOnce(({ handleUri }) => {
       mockHandleUriResponse = handleUri
     })
+
     void waitForUriResponse('/path', mockOnResponse)
+
     expect(mockedRegisterUriHandler).toHaveBeenCalledTimes(1)
 
     const uriWithoutPath = Uri.from({

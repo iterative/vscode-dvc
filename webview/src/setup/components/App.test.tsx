@@ -631,22 +631,19 @@ describe('App', () => {
   })
 
   describe('Studio not connected', () => {
-    it('should show a button which requests a token from Studio', () => {
+    it('should show buttons which request a token from Studio or add an already creatd one', () => {
       renderApp()
       mockPostMessage.mockClear()
-      const button = screen.getByText('Get Token')
-      fireEvent.click(button)
+      const getTokenButton = screen.getByText('Get Token')
+      fireEvent.click(getTokenButton)
       expect(mockPostMessage).toHaveBeenCalledTimes(1)
       expect(mockPostMessage).toHaveBeenCalledWith({
         type: MessageFromWebviewType.REQUEST_STUDIO_TOKEN
       })
-    })
 
-    it('should show a button-like link which lets the user save a token manually', () => {
-      renderApp()
       mockPostMessage.mockClear()
-      const button = screen.getByText('add an already created token')
-      fireEvent.click(button)
+      const saveCreatedButton = screen.getByText('Save Created Token')
+      fireEvent.click(saveCreatedButton)
       expect(mockPostMessage).toHaveBeenCalledTimes(1)
       expect(mockPostMessage).toHaveBeenCalledWith({
         type: MessageFromWebviewType.SAVE_STUDIO_TOKEN

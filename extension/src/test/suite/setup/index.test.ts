@@ -51,7 +51,6 @@ import { getFirstWorkspaceFolder } from '../../../vscode/workspaceFolders'
 import { Response } from '../../../vscode/response'
 import { DvcConfig } from '../../../cli/dvc/config'
 import * as QuickPickUtil from '../../../setup/quickPick'
-import * as StudioUtil from '../../../setup/studio'
 import { EventName } from '../../../telemetry/constants'
 
 suite('Setup Test Suite', () => {
@@ -923,28 +922,63 @@ suite('Setup Test Suite', () => {
         `${mockStudioRes.verification_uri}?redirect_uri=${mockCallbackUrl}&code=${mockStudioRes.user_code}`
       )
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const mockGetCwd = stub(studio as any, 'getCwd')
       const mockToken = 'isat_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
-      const mockFetchToken = stub(StudioUtil, 'fetchStudioToken')
-        .onFirstCall()
-        .resolves(mockToken)
       const mockSaveStudioToken = stub(studio, 'saveStudioAccessTokenInConfig')
-      const saveTokenEvent = new Promise(resolve =>
-        mockSaveStudioToken.onFirstCall().callsFake(() => {
+      mockFetch
+        .onSecondCall()
+        .resolves({
+          json: () =>
+            Promise.resolve({ detail: 'Request failed for some reason.' }),
+          status: 500
+        } as Fetch.Response)
+        .onThirdCall()
+        .resolves({
+          json: () => Promise.resolve({ access_token: mockToken }),
+          status: 200
+        } as Fetch.Response)
+
+      const failedTokenEvent = new Promise(resolve =>
+        mockGetCwd.onFirstCall().callsFake(() => {
           resolve(undefined)
-          return Promise.resolve('')
+          return dvcDemoPath
         })
       )
 
       mockOnStudioResponse()
 
-      await saveTokenEvent
+      await failedTokenEvent
 
-      expect(mockFetchToken).to.be.calledOnce
-      expect(mockFetchToken).to.be.calledWithExactly(
-        mockStudioRes.device_code,
-        mockStudioRes.token_uri
+      expect(mockFetch).to.be.calledTwice
+      expect(mockFetch).to.be.calledWithExactly(mockStudioRes.token_uri, {
+        body: JSON.stringify({
+          code: mockStudioRes.device_code
+        }),
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        method: 'POST'
+      })
+      expect(mockSaveStudioToken).not.to.be.called
+
+      const tokenEvent = new Promise(resolve =>
+        mockGetCwd.onSecondCall().callsFake(() => {
+          resolve(undefined)
+          return dvcDemoPath
+        })
       )
-      expect(mockSaveStudioToken).to.be.calledWith(dvcDemoPath, mockToken)
+
+      mockOnStudioResponse()
+
+      await tokenEvent
+
+      expect(mockFetch).to.be.calledThrice
+      expect(mockSaveStudioToken).to.be.calledOnce
+      expect(mockSaveStudioToken).to.be.calledWithExactly(
+        dvcDemoPath,
+        mockToken
+      )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it("should handle a message from the webview to manually save the user's Studio access token", async () => {

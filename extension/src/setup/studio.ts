@@ -16,36 +16,6 @@ export const isStudioAccessToken = (text?: string): boolean => {
   return text.startsWith('isat_') && text.length >= 53
 }
 
-export const fetchStudioToken = async (
-  deviceCode: string,
-  tokenUri: string,
-  retry = true
-): Promise<string | undefined> => {
-  const response = await fetch(tokenUri, {
-    body: JSON.stringify({
-      code: deviceCode
-    }),
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    method: 'POST'
-  })
-
-  if (response.status !== 200) {
-    if (retry) {
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      return fetchStudioToken(deviceCode, tokenUri, false)
-    }
-    return Toast.showError(
-      'Unable to get token. Please try again later or add an already created token.'
-    )
-  }
-  const { access_token: accessToken } = (await response.json()) as {
-    access_token: string
-  }
-  return accessToken
-}
-
 export class Studio extends Disposable {
   public readonly onDidChangeStudioConnection: Event<void>
   private readonly studioConnectionChanged: EventEmitter<void> =
@@ -137,15 +107,12 @@ export class Studio extends Disposable {
   }
 
   public async requestStudioTokenAuthentication() {
-    const response = await fetch(`${STUDIO_URL}/api/device-login`, {
-      body: JSON.stringify({
+    const response = await this.fetchFromStudio(
+      `${STUDIO_URL}/api/device-login`,
+      {
         client_name: 'VS Code'
-      }),
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      method: 'POST'
-    })
+      }
+    )
 
     const {
       token_uri: tokenUri,
@@ -165,14 +132,42 @@ export class Studio extends Disposable {
     verificationUrlWithParams.searchParams.append('redirect_uri', callbackUrl)
     verificationUrlWithParams.searchParams.append('code', userCode)
 
-    void openUrl(verificationUrlWithParams.toString())
+    await openUrl(verificationUrlWithParams.toString())
     void waitForUriResponse('/studio-complete-auth', () => {
       void this.requestStudioToken(deviceCode, tokenUri)
     })
   }
 
+  private fetchFromStudio(reqUri: string, body: Record<string, unknown>) {
+    return fetch(reqUri, {
+      body: JSON.stringify(body),
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      method: 'POST'
+    })
+  }
+
+  private async fetchStudioToken(deviceCode: string, tokenUri: string) {
+    const response = await this.fetchFromStudio(tokenUri, {
+      code: deviceCode
+    })
+
+    if (response.status !== 200) {
+      return Toast.showError(
+        'Unable to get token. Please try again later or add an already created token.'
+      )
+    }
+
+    const { access_token: accessToken } = (await response.json()) as {
+      access_token: string
+    }
+
+    return accessToken
+  }
+
   private async requestStudioToken(deviceCode: string, tokenUri: string) {
-    const token = await fetchStudioToken(deviceCode, tokenUri)
+    const token = await this.fetchStudioToken(deviceCode, tokenUri)
     const cwd = this.getCwd()
 
     if (!token || !cwd) {

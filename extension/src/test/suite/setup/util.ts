@@ -1,5 +1,5 @@
 import { join } from 'path'
-import { EventEmitter, commands, env } from 'vscode'
+import { EventEmitter, commands } from 'vscode'
 import * as Fetch from 'node-fetch'
 import { Disposer } from '@hediet/std/disposable'
 import { fake, spy, stub } from 'sinon'
@@ -97,14 +97,6 @@ export const buildSetup = ({
     undefined
   )
 
-  const mockOpenExternal = stub(env, 'openExternal')
-  const urlOpenedEvent = new Promise(resolve =>
-    mockOpenExternal.callsFake(() => {
-      resolve(undefined)
-      return Promise.resolve(true)
-    })
-  )
-
   const mockConfig = stub(dvcConfig, 'config').resolves('')
 
   const mockFetch = stub(Fetch, 'default')
@@ -142,7 +134,6 @@ export const buildSetup = ({
     mockGitVersion,
     mockGlobalVersion,
     mockInitializeGit,
-    mockOpenExternal,
     mockRemote,
     mockRunSetup,
     mockShowWebview,
@@ -150,8 +141,7 @@ export const buildSetup = ({
     resourceLocator,
     setup,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    studio: (setup as any).studio as Studio,
-    urlOpenedEvent
+    studio: (setup as any).studio as Studio
   }
 }
 

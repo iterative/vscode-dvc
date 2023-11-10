@@ -1,10 +1,6 @@
 @import '../../../shared/variables';
 @import '../../../shared/mixins';
 
-.buttonAsLink {
-  @extend %buttonAsLink;
-}
-
 .studioSettings {
   display: 'flex';
   margin-top: -20px;
