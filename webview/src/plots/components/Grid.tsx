@@ -38,6 +38,7 @@ export const Grid: React.FC<GridProps> = ({
       groupId={groupId}
       onDrop={onDrop}
       parentDraggedOver={parentDraggedOver}
+      sectionKey={sectionKey}
     />
   ) : (
     <NormalGrid

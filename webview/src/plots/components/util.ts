@@ -1,5 +1,10 @@
 import { Dispatch, createSelector } from '@reduxjs/toolkit'
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
+import {
+  DECODE_METRIC_PARAM_REGEX,
+  FILE_SPLIT_REGEX,
+  METRIC_PARAM_SEPARATOR
+} from 'dvc/src/experiments/columns/constants'
 import { toggleDragAndDropMode as toggleTemplateDragAndDrop } from './templatePlots/templatePlotsSlice'
 import { toggleDragAndDropMode as toggleCustomDragAndDrop } from './customPlots/customPlotsSlice'
 import { PlotsState } from '../store'
@@ -43,3 +48,22 @@ export const changeDragAndDropMode = (
       : toggleCustomDragAndDrop
   return dispatch(toggleMode(!isDragAndDropMode))
 }
+
+const cleanTitlePart = (title: string) => {
+  const regexResult = FILE_SPLIT_REGEX.exec(title)
+  if (!regexResult) {
+    return title
+  }
+
+  return (
+    regexResult[2]
+      ?.replace(/_\d+$/g, '')
+      .split(METRIC_PARAM_SEPARATOR)
+      .map(part =>
+        part.replace(DECODE_METRIC_PARAM_REGEX, METRIC_PARAM_SEPARATOR)
+      )
+      .pop() || title
+  )
+}
+export const getMetricVsParamTitle = (metric: string, param: string) =>
+  `${cleanTitlePart(metric)} vs. ${cleanTitlePart(param)}`

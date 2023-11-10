@@ -25,7 +25,6 @@ $gap: 20px;
 
 .plot {
   overflow: visible;
-  cursor: grab;
   position: relative;
   background: $fg-transparency-1;
   border: none;
@@ -40,6 +39,26 @@ $gap: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
+  cursor: grabbing;
+}
+
+.dragAndDropPlotContent {
+  padding: 20px;
+  flex-direction: column;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 100%;
+}
+
+.dragAndDropPlotTitle {
+  text-align: center;
+}
+
+.dragAndDropPlotSubtitle {
+  text-align: center;
+  font-size: small;
+  margin-top: 0;
 }
 
 .plotGripIcon {
@@ -52,12 +71,21 @@ $gap: 20px;
   width: 100%;
   border-top-left-radius: 5px;
   border-bottom-left-radius: 5px;
-  opacity: 0.5;
+  opacity: 0;
+  cursor: grab;
 
   path {
     transform: rotate(90deg);
     transform-origin: center;
   }
+
+  .plot:hover & {
+    opacity: 0.5;
+  }
+}
+
+.plotGrabbed {
+  cursor: grabbing;
 }
 
 .plotActions {
@@ -133,6 +161,13 @@ $gap: 20px;
 
 .dropSectionWrapper {
   margin-top: -30px;
+  position: relative;
+  z-index: 5;
+
+  &:first-child {
+    margin-top: 0;
+    margin-bottom: -30px;
+  }
 }
 
 .dropSection {
@@ -160,11 +195,16 @@ $gap: 20px;
   padding: 20px;
 }
 
-.smallDropIcon {
-  padding: 5px;
+.onPlotDropIcon {
+  padding: 20px;
+  opacity: 0.3;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
-.smallDropIcon,
+.onPlotDropIcon,
 .dropIcon {
   box-sizing: content-box;
 

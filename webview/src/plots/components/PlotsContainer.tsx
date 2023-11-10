@@ -1,14 +1,14 @@
 import cx from 'classnames'
 import React, { useEffect, DetailedHTMLProps, HTMLAttributes } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { PlotHeight, PlotsSection } from 'dvc/src/plots/webview/contract'
 import styles from './styles.module.scss'
-import { changeDragAndDropMode, isDragAndDropModeSelector } from './util'
 import { SizeSliders } from './SizeSliders'
+import { isDragAndDropModeSelector } from './util'
 import { PlotsState } from '../store'
 import { togglePlotsSection } from '../util/messages'
 import { IconMenuItemProps } from '../../shared/components/iconMenu/IconMenuItem'
-import { Trash, Move, Check } from '../../shared/components/icons'
+import { Trash } from '../../shared/components/icons'
 import { SectionContainer } from '../../shared/components/sectionContainer/SectionContainer'
 
 interface PlotsContainerProps {
@@ -35,7 +35,6 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   noHeight
 }) => {
   const open = !sectionCollapsed
-  const dispatch = useDispatch()
   const maxNbPlotsPerRow = useSelector(
     (state: PlotsState) => state.webview.maxNbPlotsPerRow
   )
@@ -48,22 +47,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
     window.dispatchEvent(new Event('resize'))
   }, [nbItemsPerRowOrWidth, height])
 
-  const changeMode = () =>
-    changeDragAndDropMode(sectionKey, dispatch, isDragAndDropMode)
-
   const menuItems: IconMenuItemProps[] = []
-
-  if (
-    [PlotsSection.CUSTOM_PLOTS, PlotsSection.TEMPLATE_PLOTS].includes(
-      sectionKey
-    )
-  ) {
-    menuItems.push({
-      icon: isDragAndDropMode ? Check : Move,
-      onClick: changeMode,
-      tooltip: isDragAndDropMode ? 'Save plots order' : 'Re-order the plots'
-    })
-  }
 
   if (removePlotsButton) {
     menuItems.push({
@@ -107,7 +91,8 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
       <div
         className={cx({
           [styles.plotsWrapper]: sectionKey !== PlotsSection.COMPARISON_TABLE,
-          [styles.smallPlots]: nbItemsPerRowOrWidth >= 4
+          [styles.smallPlots]: nbItemsPerRowOrWidth >= 4,
+          [styles.plotGrabbed]: isDragAndDropMode
         })}
         style={
           {
