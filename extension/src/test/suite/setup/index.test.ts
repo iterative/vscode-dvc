@@ -52,6 +52,7 @@ import { Response } from '../../../vscode/response'
 import { DvcConfig } from '../../../cli/dvc/config'
 import * as QuickPickUtil from '../../../setup/quickPick'
 import { EventName } from '../../../telemetry/constants'
+import { Modal } from '../../../vscode/modal'
 
 suite('Setup Test Suite', () => {
   const disposable = Disposable.fn()
@@ -924,20 +925,13 @@ suite('Setup Test Suite', () => {
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const mockGetCwd = stub(studio as any, 'getCwd')
-      const mockToken = 'isat_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+      const mockModalShowError = stub(Modal, 'errorWithOptions')
       const mockSaveStudioToken = stub(studio, 'saveStudioAccessTokenInConfig')
-      mockFetch
-        .onSecondCall()
-        .resolves({
-          json: () =>
-            Promise.resolve({ detail: 'Request failed for some reason.' }),
-          status: 500
-        } as Fetch.Response)
-        .onThirdCall()
-        .resolves({
-          json: () => Promise.resolve({ access_token: mockToken }),
-          status: 200
-        } as Fetch.Response)
+      mockFetch.onSecondCall().resolves({
+        json: () =>
+          Promise.resolve({ detail: 'Request failed for some reason.' }),
+        status: 500
+      } as Fetch.Response)
 
       const failedTokenEvent = new Promise(resolve =>
         mockGetCwd.onFirstCall().callsFake(() => {
@@ -960,8 +954,17 @@ suite('Setup Test Suite', () => {
         },
         method: 'POST'
       })
+      expect(mockModalShowError).to.be.calledOnce
+      expect(mockModalShowError).to.be.calledWithExactly(
+        'Unable to get token. Failed with "Request failed for some reason."'
+      )
       expect(mockSaveStudioToken).not.to.be.called
 
+      const mockToken = 'isat_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+      mockFetch.onThirdCall().resolves({
+        json: () => Promise.resolve({ access_token: mockToken }),
+        status: 200
+      } as Fetch.Response)
       const tokenEvent = new Promise(resolve =>
         mockGetCwd.onSecondCall().callsFake(() => {
           resolve(undefined)

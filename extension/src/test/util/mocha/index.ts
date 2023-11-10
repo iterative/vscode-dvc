@@ -29,7 +29,7 @@ export const runMocha = async (
   try {
     // eslint-disable-next-line sonarjs/cognitive-complexity
     await new Promise<void>((resolve, reject) => {
-      glob(`**/setup/index.test.${ext}`, { cwd }, (err, files) => {
+      glob(`**/**.test.${ext}`, { cwd }, (err, files) => {
         if (err) {
           return reject(err)
         }

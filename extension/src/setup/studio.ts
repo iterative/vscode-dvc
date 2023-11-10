@@ -7,7 +7,7 @@ import { Args, ConfigKey, Flag } from '../cli/dvc/constants'
 import { ContextKey, setContextValue } from '../vscode/context'
 import { Disposable } from '../class/dispose'
 import { getCallBackUrl, openUrl, waitForUriResponse } from '../vscode/external'
-import { Toast } from '../vscode/toast'
+import { Modal } from '../vscode/modal'
 
 export const isStudioAccessToken = (text?: string): boolean => {
   if (!text) {
@@ -154,8 +154,11 @@ export class Studio extends Disposable {
     })
 
     if (response.status !== 200) {
-      return Toast.showError(
-        'Unable to get token. Please try again later or add an already created token.'
+      const { detail } = (await response.json()) as {
+        detail: string
+      }
+      return Modal.errorWithOptions(
+        `Unable to get token. Failed with "${detail}"`
       )
     }
 
