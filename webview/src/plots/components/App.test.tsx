@@ -835,6 +835,22 @@ describe('App', () => {
     })
   })
 
+  it('should toggle the custom plots section on Enter key press', async () => {
+    renderAppWithOptionalData({
+      custom: customPlotsFixture
+    })
+    const summaryElement = await screen.findByText('Custom')
+
+    fireEvent.keyDown(summaryElement, {
+      key: 'Enter'
+    })
+
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      payload: { [PlotsSection.CUSTOM_PLOTS]: true },
+      type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
+    })
+  })
+
   it('should display a slider to pick the number of items per row if there are items and the action is available', () => {
     const store = renderAppWithOptionalData({
       custom: customPlotsFixture

@@ -16,7 +16,7 @@ import { WebviewMessages } from './webview/messages'
 import { validateTokenInput } from './inputBox'
 import { findPythonBinForInstall } from './autoInstall'
 import { run, runWithRecheck, runWorkspace } from './runner'
-import { isStudioAccessToken } from './token'
+import { Studio } from './studio'
 import {
   PYTHON_EXTENSION_ACTION,
   pickFocusedProjects,
@@ -51,13 +51,7 @@ import { createFileSystemWatcher } from '../fileSystem/watcher'
 import { EventName } from '../telemetry/constants'
 import { WorkspaceScale } from '../telemetry/collect'
 import { gitPath } from '../cli/git/constants'
-import {
-  Flag,
-  ConfigKey,
-  DOT_DVC,
-  Args,
-  SubCommand
-} from '../cli/dvc/constants'
+import { DOT_DVC, Args, SubCommand } from '../cli/dvc/constants'
 import { GLOBAL_WEBVIEW_DVCROOT } from '../webview/factory'
 import { getValidInput } from '../vscode/inputBox'
 import { Title } from '../vscode/title'
@@ -87,6 +81,7 @@ export class Setup
   private readonly config: Config
   private readonly status: Status
   private readonly internalCommands: InternalCommands
+  private readonly studio: Studio
 
   private readonly webviewMessages: WebviewMessages
   private readonly getHasData: () => boolean | undefined
@@ -103,9 +98,6 @@ export class Setup
     new EventEmitter()
   )
 
-  private readonly studioConnectionChanged: EventEmitter<void> =
-    this.dispose.track(new EventEmitter())
-
   private readonly onDidChangeWorkspace: Event<void> =
     this.workspaceChanged.event
 
@@ -116,10 +108,6 @@ export class Setup
   private gitAccessible: boolean | undefined
 
   private dotFolderWatcher?: Disposer
-
-  private studioAccessToken: string | undefined = undefined
-  private studioIsConnected = false
-  private shareLiveToStudio: boolean | undefined = undefined
 
   private focusedSection: SetupSection | undefined = undefined
 
@@ -155,10 +143,12 @@ export class Setup
     }
 
     this.collectWorkspaceScale = collectWorkspaceScale
-    this.onDidChangeStudioConnection = this.studioConnectionChanged.event
 
     this.setCommandsAvailability(false)
     this.setProjectAvailability()
+
+    this.studio = new Studio(internalCommands, () => this.getCwd())
+    this.onDidChangeStudioConnection = this.studio.onDidChangeStudioConnection
 
     this.webviewMessages = this.createWebviewMessageHandler()
 
@@ -311,34 +301,12 @@ export class Setup
     }
   }
 
-  public async removeStudioAccessToken() {
+  public removeStudioAccessToken() {
     if (!this.getCliCompatible()) {
       return
     }
 
-    if (this.dvcRoots.length !== 1) {
-      const cwd = getFirstWorkspaceFolder()
-      if (!cwd) {
-        return
-      }
-      return await this.accessConfig(
-        cwd,
-        Flag.GLOBAL,
-        Flag.UNSET,
-        ConfigKey.STUDIO_TOKEN
-      )
-    }
-
-    const cwd = this.dvcRoots[0]
-
-    await this.accessConfig(cwd, Flag.LOCAL, Flag.UNSET, ConfigKey.STUDIO_TOKEN)
-
-    return await this.accessConfig(
-      cwd,
-      Flag.GLOBAL,
-      Flag.UNSET,
-      ConfigKey.STUDIO_TOKEN
-    )
+    return this.studio.removeStudioAccessToken(this.dvcRoots)
   }
 
   public async saveStudioAccessToken() {
@@ -357,12 +325,12 @@ export class Setup
       return
     }
 
-    await this.accessConfig(cwd, Flag.GLOBAL, ConfigKey.STUDIO_TOKEN, token)
+    await this.studio.saveStudioAccessTokenInConfig(cwd, token)
     return this.updateStudioAndSend()
   }
 
   public getStudioAccessToken() {
-    return this.studioAccessToken
+    return this.studio.getStudioAccessToken()
   }
 
   public sendInitialWebviewData() {
@@ -438,14 +406,14 @@ export class Setup
       isPythonEnvironmentGlobal,
       isPythonExtensionInstalled: this.config.isPythonExtensionInstalled(),
       isPythonExtensionUsed,
-      isStudioConnected: this.studioIsConnected,
+      isStudioConnected: this.studio.getStudioIsConnected(),
       needsGitCommit,
       needsGitInitialized,
       projectInitialized,
       pythonBinPath: getBinDisplayText(pythonBinPath),
       remoteList,
       sectionCollapsed: collectSectionCollapsed(this.focusedSection),
-      shareLiveToStudio: !!this.shareLiveToStudio
+      shareLiveToStudio: !!this.studio.getShareLiveToStudio()
     })
     this.focusedSection = undefined
   }
@@ -454,7 +422,7 @@ export class Setup
     const webviewMessages = new WebviewMessages(
       () => this.getWebview(),
       () => this.initializeGit(),
-      (offline: boolean) => this.updateStudioOffline(offline),
+      (offline: boolean) => this.studio.updateStudioOffline(offline),
       () => this.isPythonExtensionUsed(),
       () => this.updatePythonEnvironment()
     )
@@ -707,16 +675,8 @@ export class Setup
   }
 
   private async updateStudioAndSend() {
-    await this.updateIsStudioConnected()
+    await this.studio.updateIsStudioConnected()
     return this.sendDataToWebview()
-  }
-
-  private async updateIsStudioConnected() {
-    await this.setStudioValues()
-    const storedToken = this.getStudioAccessToken()
-    const isConnected = isStudioAccessToken(storedToken)
-    this.studioIsConnected = isConnected
-    return setContextValue(ContextKey.STUDIO_CONNECTED, isConnected)
   }
 
   private watchDvcConfigs() {
@@ -760,51 +720,6 @@ export class Setup
     ])
   }
 
-  private async setStudioValues() {
-    const cwd = this.getCwd()
-
-    const previousStudioAccessToken = this.studioAccessToken
-
-    if (!cwd) {
-      this.studioAccessToken = undefined
-      this.shareLiveToStudio = undefined
-
-      if (previousStudioAccessToken) {
-        this.studioConnectionChanged.fire()
-      }
-      return
-    }
-
-    const [studioAccessToken, shareLiveToStudio] = await Promise.all([
-      this.accessConfig(cwd, ConfigKey.STUDIO_TOKEN),
-      (await this.accessConfig(cwd, ConfigKey.STUDIO_OFFLINE)) !== 'true'
-    ])
-
-    this.studioAccessToken = studioAccessToken
-    this.shareLiveToStudio = shareLiveToStudio
-
-    if (previousStudioAccessToken !== this.studioAccessToken) {
-      this.studioConnectionChanged.fire()
-    }
-  }
-
-  private async updateStudioOffline(shareLive: boolean) {
-    const offline = !shareLive
-
-    const cwd = this.getCwd()
-
-    if (!cwd) {
-      return
-    }
-
-    await this.accessConfig(
-      cwd,
-      Flag.GLOBAL,
-      ConfigKey.STUDIO_OFFLINE,
-      String(offline)
-    )
-  }
-
   private getCwd() {
     if (!this.getCliCompatible()) {
       return
@@ -812,14 +727,6 @@ export class Setup
     return this.dvcRoots.length === 1
       ? this.dvcRoots[0]
       : getFirstWorkspaceFolder()
-  }
-
-  private accessConfig(cwd: string, ...args: Args) {
-    return this.internalCommands.executeCommand(
-      AvailableCommands.CONFIG,
-      cwd,
-      ...args
-    )
   }
 
   private accessRemote(cwd: string, ...args: Args) {
