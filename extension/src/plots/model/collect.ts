@@ -151,10 +151,10 @@ const getCustomPlotData = (
   const updatedSpec = truncateVegaSpecTitles(spec, nbItemsPerRow, height)
 
   return {
+    content: updatedSpec,
     id: getCustomPlotId(metric, param),
     metric,
     param,
-    spec: updatedSpec,
     values
   } as CustomPlotData
 }

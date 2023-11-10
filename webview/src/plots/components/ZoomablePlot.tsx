@@ -1,4 +1,3 @@
-import { AnyAction } from '@reduxjs/toolkit'
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import { SpecWithTitles } from 'dvc/src/plots/vega/util'
 import React, { useEffect, useRef } from 'react'
@@ -9,32 +8,26 @@ import { TemplateVegaLite } from './templatePlots/TemplateVegaLite'
 import { setZoomedInPlot } from './webviewSlice'
 import styles from './styles.module.scss'
 import { config } from './constants'
+import { changeDragAndDropMode } from './util'
 import { zoomPlot } from '../util/messages'
 import { useGetPlot } from '../hooks/useGetPlot'
-import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
 import { Ellipsis } from '../../shared/components/icons'
+import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
 
 interface ZoomablePlotProps {
-  spec?: SpecWithTitles
   id: string
   onViewReady?: () => void
-  changeDisabledDragIds: (ids: string[]) => AnyAction
   currentSnapPoint: number
   section: PlotsSection
   shouldNotResize?: boolean
 }
 
 export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
-  spec: createdSpec,
   id,
   onViewReady,
   section
 }) => {
-  const {
-    data,
-    content: spec,
-    isTemplatePlot
-  } = useGetPlot(section, id, createdSpec)
+  const { data, spec, isTemplatePlot } = useGetPlot(section, id)
   const dispatch = useDispatch()
   const currentPlotProps = useRef<VegaLiteProps>()
 
@@ -84,7 +77,15 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
         onClick={() => handleOnClick()}
         aria-label="Open Plot in Popup"
       >
-        <GripIcon className={styles.plotGripIcon} />
+        {
+          // eslint-disable-next-line jsx-a11y/no-static-element-interactions
+          <div
+            data-testid="grip-icon"
+            onMouseDown={() => changeDragAndDropMode(section, dispatch, false)}
+          >
+            <GripIcon className={styles.plotGripIcon} />
+          </div>
+        }
         <span
           className={styles.plotActions}
           onClick={event => {

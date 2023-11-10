@@ -94,7 +94,7 @@ export type CustomPlot = {
 }
 
 export type CustomPlotData = CustomPlot & {
-  spec: SpecWithTitles
+  content: SpecWithTitles
 }
 
 export type CustomPlotsData = {

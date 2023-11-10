@@ -45,6 +45,8 @@ import {
   TemplatePlotsById
 } from './plotDataStore'
 import { setMaxNbPlotsPerRow } from './webviewSlice'
+import { toggleDragAndDropMode as toggleTemplatePlotsDragAndDropMode } from './templatePlots/templatePlotsSlice'
+import { toggleDragAndDropMode as toggleCustomPlotsDragAndDropMode } from './customPlots/customPlotsSlice'
 import { plotsReducers, plotsStore } from '../store'
 import { vsCodeApi } from '../../shared/api'
 import {
@@ -955,59 +957,6 @@ describe('App', () => {
     })
   })
 
-  it('should display the custom plots in the order stored', () => {
-    renderAppWithOptionalData({
-      comparison: comparisonTableFixture,
-      custom: customPlotsFixture
-    })
-
-    let plots = screen.getAllByTestId(/summary\.json/)
-
-    expect(plots.map(plot => plot.id)).toStrictEqual([
-      'custom-summary.json:loss-params.yaml:log_file',
-      'custom-summary.json:accuracy-params.yaml:epochs'
-    ])
-
-    dragAndDrop(plots[1], plots[0])
-
-    plots = screen.getAllByTestId(/summary\.json/)
-
-    expect(plots.map(plot => plot.id)).toStrictEqual([
-      'custom-summary.json:accuracy-params.yaml:epochs',
-      'custom-summary.json:loss-params.yaml:log_file'
-    ])
-  })
-
-  it('should send a message to the extension when the custom plots are reordered', () => {
-    renderAppWithOptionalData({
-      custom: customPlotsFixture
-    })
-
-    const plots = screen.getAllByTestId(/summary\.json/)
-    expect(plots.map(plot => plot.id)).toStrictEqual([
-      'custom-summary.json:loss-params.yaml:log_file',
-      'custom-summary.json:accuracy-params.yaml:epochs'
-    ])
-
-    mockPostMessage.mockClear()
-
-    dragAndDrop(plots[1], plots[0])
-
-    const expectedOrder = [
-      'custom-summary.json:accuracy-params.yaml:epochs',
-      'custom-summary.json:loss-params.yaml:log_file'
-    ]
-
-    expect(mockPostMessage).toHaveBeenCalledTimes(1)
-    expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: expectedOrder,
-      type: MessageFromWebviewType.REORDER_PLOTS_CUSTOM
-    })
-    expect(
-      screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
-    ).toStrictEqual(expectedOrder)
-  })
-
   it('should add a custom plot if a user creates a custom plot', () => {
     renderAppWithOptionalData({
       custom: {
@@ -1056,62 +1005,6 @@ describe('App', () => {
     ).toStrictEqual(['custom-summary.json:accuracy-params.yaml:epochs'])
   })
 
-  it('should not be possible to drag a plot from a section to another', () => {
-    renderAppWithOptionalData({
-      custom: customPlotsFixture,
-      template: templatePlotsFixture
-    })
-
-    const customPlots = screen.getAllByTestId(/summary\.json/)
-    const templatePlots = screen.getAllByTestId(/^plot_/)
-
-    dragAndDrop(templatePlots[0], customPlots[1])
-
-    expect(customPlots.map(plot => plot.id)).toStrictEqual([
-      'custom-summary.json:loss-params.yaml:log_file',
-      'custom-summary.json:accuracy-params.yaml:epochs'
-    ])
-  })
-
-  it('should reorder template plots and send a message to the extension on drop', () => {
-    renderAppWithOptionalData({
-      template: complexTemplatePlotsFixture
-    })
-
-    let plots = screen.getAllByTestId(/^plot_/)
-
-    expect(plots.map(plot => plot.id)).toStrictEqual([
-      join('logs', 'loss.tsv'),
-      join('other', 'plot.tsv'),
-      join('other', 'multiview.tsv')
-    ])
-
-    mockPostMessage.mockClear()
-    dragAndDrop(plots[1], plots[0])
-
-    plots = screen.getAllByTestId(/^plot_/)
-
-    expect(plots.map(plot => plot.id)).toStrictEqual([
-      join('other', 'plot.tsv'),
-      join('logs', 'loss.tsv'),
-      join('other', 'multiview.tsv')
-    ])
-    expect(mockPostMessage).toHaveBeenCalledTimes(1)
-    expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: [
-        {
-          group: TemplatePlotGroup.SINGLE_VIEW,
-          paths: [join('other', 'plot.tsv'), join('logs', 'loss.tsv')]
-        },
-        {
-          group: TemplatePlotGroup.MULTI_VIEW,
-          paths: [join('other', 'multiview.tsv')]
-        }
-      ],
-      type: MessageFromWebviewType.REORDER_PLOTS_TEMPLATES
-    })
-  })
-
   it('should render two template plot sections', () => {
     renderAppWithOptionalData({
       template: complexTemplatePlotsFixture
@@ -1123,371 +1016,6 @@ describe('App', () => {
       'template-single_0',
       'template-multi_1'
     ])
-  })
-
-  it('should create a new section above the others if the template plot type is different than the first section', () => {
-    renderAppWithOptionalData({
-      template: complexTemplatePlotsFixture
-    })
-
-    const topSection = screen.getByTestId(NewSectionBlock.TOP)
-    const multiViewPlot = screen.getByTestId(
-      join('plot_other', 'multiview.tsv')
-    )
-
-    dragAndDrop(multiViewPlot, topSection)
-
-    const sections = screen.getAllByTestId(/^plots-section_/)
-    expect(sections.map(section => section.id)).toStrictEqual([
-      'template-multi_0',
-      'template-single_1'
-    ])
-  })
-
-  it('should not create a new section above the others by dragging a template plot from the same type as the first section above it', () => {
-    renderAppWithOptionalData({
-      template: complexTemplatePlotsFixture
-    })
-
-    const topSection = screen.getByTestId(NewSectionBlock.TOP)
-    const aSingleViewPlot = screen.getByTestId(join('plot_other', 'plot.tsv'))
-
-    dragAndDrop(aSingleViewPlot, topSection)
-
-    const sections = screen.getAllByTestId(/^plots-section_/)
-    expect(sections.map(section => section.id)).toStrictEqual([
-      'template-single_0',
-      'template-multi_1'
-    ])
-  })
-
-  it('should create a new section below the others if the template plot type is different than the last section', () => {
-    renderAppWithOptionalData({
-      template: complexTemplatePlotsFixture
-    })
-
-    const bottomSection = screen.getByTestId(NewSectionBlock.BOTTOM)
-    const aSingleViewPlot = screen.getByTestId(join('plot_other', 'plot.tsv'))
-
-    dragAndDrop(aSingleViewPlot, bottomSection)
-
-    const sections = screen.getAllByTestId(/^plots-section_/)
-    expect(sections.map(section => section.id)).toStrictEqual([
-      'template-single_0',
-      'template-multi_1',
-      'template-single_2'
-    ])
-  })
-
-  it('should not create a new section below the others by dragging a template plot from the same type as the last section below it', () => {
-    renderAppWithOptionalData({
-      template: complexTemplatePlotsFixture
-    })
-
-    const bottomSection = screen.getByTestId(NewSectionBlock.BOTTOM)
-    const multiViewPlot = screen.getByTestId(
-      join('plot_other', 'multiview.tsv')
-    )
-
-    dragAndDrop(multiViewPlot, bottomSection)
-
-    const sections = screen.getAllByTestId(/^plots-section_/)
-    expect(sections.map(section => section.id)).toStrictEqual([
-      'template-single_0',
-      'template-multi_1'
-    ])
-  })
-
-  it('should move a template plot from one type in another section of the same type and show two drop targets', async () => {
-    renderAppWithOptionalData({
-      template: complexTemplatePlotsFixture
-    })
-
-    const bottomSection = screen.getByTestId(NewSectionBlock.BOTTOM)
-    const aSingleViewPlot = screen.getByTestId(join('plot_other', 'plot.tsv'))
-
-    dragAndDrop(aSingleViewPlot, bottomSection)
-
-    await screen.findByTestId('plots-section_template-single_2')
-    const anotherSingleViewPlot = screen.getByTestId(
-      join('plot_logs', 'loss.tsv')
-    )
-    const movedSingleViewPlot = screen.getByTestId(
-      join('plot_other', 'plot.tsv')
-    )
-
-    dragEnter(
-      anotherSingleViewPlot,
-      movedSingleViewPlot.id,
-      DragEnterDirection.LEFT
-    )
-
-    expect(screen.getAllByTestId('drop-target').length).toBe(2) // One in the old section and one in the new one
-
-    dragAndDrop(anotherSingleViewPlot, movedSingleViewPlot)
-
-    const sections = screen.getAllByTestId(/^plots-section_/)
-    expect(sections.map(section => section.id)).toStrictEqual([
-      'template-multi_0',
-      'template-single_1'
-    ])
-  })
-
-  it('should show a drop target at the end of the section when moving a plot from one section to another but not over any other plot', async () => {
-    renderAppWithOptionalData({
-      template: complexTemplatePlotsFixture
-    })
-
-    const bottomSection = screen.getByTestId(NewSectionBlock.BOTTOM)
-    const aSingleViewPlot = screen.getByTestId(join('plot_other', 'plot.tsv'))
-
-    dragAndDrop(aSingleViewPlot, bottomSection)
-
-    await screen.findByTestId('plots-section_template-single_2')
-    const anotherSingleViewPlot = screen.getByTestId(
-      join('plot_logs', 'loss.tsv')
-    )
-
-    dragEnter(
-      anotherSingleViewPlot,
-      'template-single_0',
-      DragEnterDirection.LEFT
-    )
-
-    expect(screen.getByTestId('plot_drop-target')).toBeInTheDocument()
-  })
-
-  it('should show a drop target at the end of the template plots section when moving a plot inside of one section but not over any other plot', () => {
-    renderAppWithOptionalData({
-      template: complexTemplatePlotsFixture
-    })
-
-    const aSingleViewPlot = screen.getByTestId(join('plot_other', 'plot.tsv'))
-
-    dragEnter(aSingleViewPlot, 'template-single_0', DragEnterDirection.LEFT)
-
-    expect(screen.getByTestId('plot_drop-target')).toBeInTheDocument()
-  })
-
-  it('should drop a plot at the end of the template plots section when moving a plot inside of one section but not over any other plot', () => {
-    renderAppWithOptionalData({
-      template: complexTemplatePlotsFixture
-    })
-
-    const aSingleViewPlot = screen.getByTestId(join('plot_other', 'plot.tsv'))
-    const topSection = screen.getByTestId('plots-section_template-single_0')
-
-    dragAndDrop(aSingleViewPlot, topSection)
-    const plots = within(topSection).getAllByTestId(/^plot_/)
-
-    expect(plots.map(plot => plot.id)).toStrictEqual([
-      join('logs', 'loss.tsv'),
-      join('other', 'plot.tsv')
-    ])
-  })
-
-  it('should show a drop target at the end of the custom plots when moving a plot inside the section but not over any other plot', () => {
-    renderAppWithOptionalData({
-      custom: customPlotsFixture,
-      template: templatePlotsFixture
-    })
-
-    const plots = screen.getAllByTestId(/summary\.json/)
-
-    dragEnter(plots[0], 'custom-plots', DragEnterDirection.LEFT)
-
-    expect(screen.getByTestId('plot_drop-target')).toBeInTheDocument()
-  })
-
-  it('should show a drop a plot at the end of the custom plots when moving a plot inside the section but not over any other plot', () => {
-    renderAppWithOptionalData({
-      custom: customPlotsFixture,
-      template: templatePlotsFixture
-    })
-
-    const plots = screen.getAllByTestId(/summary\.json/)
-
-    dragAndDrop(plots[0], screen.getByTestId('custom-plots'))
-
-    const expectedOrder = [
-      'custom-summary.json:accuracy-params.yaml:epochs',
-      'custom-summary.json:loss-params.yaml:log_file'
-    ]
-
-    expect(
-      screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
-    ).toStrictEqual(expectedOrder)
-  })
-
-  it('should show a drop zone when hovering a new section', () => {
-    renderAppWithOptionalData({
-      template: complexTemplatePlotsFixture
-    })
-
-    const topSection = screen.getByTestId(NewSectionBlock.TOP)
-    const multiViewPlot = screen.getByTestId(
-      join('plot_other', 'multiview.tsv')
-    )
-    let topDropIcon = screen.queryByTestId(`${NewSectionBlock.TOP}_drop-icon`)
-
-    expect(topDropIcon).not.toBeInTheDocument()
-
-    dragEnter(multiViewPlot, topSection.id, DragEnterDirection.LEFT)
-
-    topDropIcon = screen.queryByTestId(`${NewSectionBlock.TOP}_drop-icon`)
-
-    expect(topDropIcon).toBeInTheDocument()
-  })
-
-  it('should remove the drop zone when hovering out a new section', () => {
-    renderAppWithOptionalData({
-      template: complexTemplatePlotsFixture
-    })
-
-    const topSection = screen.getByTestId(NewSectionBlock.TOP)
-    const multiViewPlot = screen.getByTestId(
-      join('plot_other', 'multiview.tsv')
-    )
-
-    dragEnter(multiViewPlot, topSection.id, DragEnterDirection.LEFT)
-
-    let topDropIcon = screen.queryByTestId(`${NewSectionBlock.TOP}_drop-icon`)
-
-    expect(topDropIcon).toBeInTheDocument()
-
-    dragLeave(topSection)
-
-    topDropIcon = screen.queryByTestId(`${NewSectionBlock.TOP}_drop-icon`)
-
-    expect(topDropIcon).not.toBeInTheDocument()
-  })
-
-  it('should not show a drop target when moving an element from a whole different section (comparison to template)', () => {
-    renderAppWithOptionalData({
-      comparison: comparisonTableFixture,
-      selectedRevisions: plotsRevisionsFixture,
-      template: complexTemplatePlotsFixture
-    })
-
-    const headers = screen.getAllByRole('columnheader')
-    const bottomSection = screen.getByTestId(NewSectionBlock.BOTTOM)
-
-    dragEnter(headers[1], bottomSection.id, DragEnterDirection.LEFT)
-
-    const bottomDropIcon = screen.queryByTestId(
-      `${NewSectionBlock.BOTTOM}_drop-icon`
-    )
-
-    expect(bottomDropIcon).not.toBeInTheDocument()
-  })
-
-  it('should prevent default behaviour when dragging over a new section', () => {
-    renderAppWithOptionalData({
-      template: complexTemplatePlotsFixture
-    })
-
-    const topSection = screen.getByTestId(NewSectionBlock.TOP)
-
-    act(() => {
-      const dragOverEvent = createBubbledEvent('dragover', {
-        preventDefault: jest.fn()
-      })
-
-      topSection.dispatchEvent(dragOverEvent)
-      expect(dragOverEvent.preventDefault).toHaveBeenCalled()
-    })
-  })
-
-  it('should show a drop target before a plot on drag enter from the left', () => {
-    renderAppWithOptionalData({
-      template: complexTemplatePlotsFixture
-    })
-
-    const plots = screen.getAllByTestId(/^plot_/)
-
-    dragEnter(plots[1], plots[0].id, DragEnterDirection.LEFT)
-
-    const plotsWithDropTarget = screen.getAllByTestId(/^plot_/)
-    expect(plotsWithDropTarget.map(plot => plot.id)).toStrictEqual([
-      'plot-drop-target',
-      plots[0].id,
-      plots[1].id,
-      plots[2].id
-    ])
-  })
-
-  it('should show a drop target after a plot on drag enter from the right', () => {
-    renderAppWithOptionalData({
-      template: complexTemplatePlotsFixture
-    })
-
-    const plots = screen.getAllByTestId(/^plot_/)
-
-    dragEnter(
-      plots[0],
-      plots[1].id,
-      DragEnterDirection.RIGHT,
-      EventCurrentTargetDistances
-    )
-
-    const plotsWithDropTarget = screen.getAllByTestId(/^plot_/)
-
-    expect(plotsWithDropTarget.map(plot => plot.id)).toStrictEqual([
-      plots[0].id,
-      plots[1].id,
-      'plot-drop-target',
-      plots[2].id
-    ])
-  })
-
-  it('should hide the plot being dragged from the list', () => {
-    renderAppWithOptionalData({
-      template: complexTemplatePlotsFixture
-    })
-
-    const plots = screen.getAllByTestId(/^plot_/)
-    expect(plots[1].style.display).not.toBe('none')
-
-    dragEnter(plots[1], plots[1].id, DragEnterDirection.LEFT)
-
-    expect(plots[1].style.display).toBe('none')
-  })
-
-  it('should remove the drop target after exiting a section after dragging in and out of it', () => {
-    renderAppWithOptionalData({
-      template: complexTemplatePlotsFixture
-    })
-
-    const movingPlotId = join('plot_other', 'plot.tsv')
-
-    const bottomSection = screen.getByTestId(NewSectionBlock.BOTTOM)
-    const aSingleViewPlot = screen.getByTestId(movingPlotId)
-
-    dragAndDrop(aSingleViewPlot, bottomSection)
-
-    const movedPlot = screen.getByTestId(movingPlotId)
-    const otherSingleSection = screen.getByTestId(join('plot_logs', 'loss.tsv'))
-
-    dragEnter(movedPlot, otherSingleSection.id, DragEnterDirection.LEFT)
-
-    const topSection = screen.getByTestId('plots-section_template-single_0')
-
-    let topSectionPlots = within(topSection)
-      .getAllByTestId(/^plot_/)
-      .map(plot => plot.id)
-    expect(topSectionPlots.includes('plot-drop-target')).toBe(true)
-
-    const previousSection = screen.getByTestId(
-      'plots-section_template-single_2'
-    )
-    act(() => {
-      previousSection.dispatchEvent(createBubbledEvent('dragenter'))
-    })
-
-    topSectionPlots = within(topSection)
-      .getAllByTestId(/^plot_/)
-      .map(plot => plot.id)
-    expect(topSectionPlots.includes('plot-drop-target')).toBe(false)
   })
 
   it('should open a modal with the plot zoomed in when clicking a template plot', () => {
@@ -1561,7 +1089,7 @@ describe('App', () => {
 
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
 
-    const plot = within(screen.getAllByTestId(/^plot-/)[0]).getByLabelText(
+    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByLabelText(
       'Open Plot in Popup'
     )
 
@@ -1578,7 +1106,7 @@ describe('App', () => {
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
 
     const plotActionsButton = within(
-      screen.getAllByTestId(/^plot-/)[0]
+      screen.getAllByTestId(/^plot_/)[0]
     ).getByLabelText('See Plot Export Options')
 
     fireEvent.click(plotActionsButton)
@@ -1602,7 +1130,7 @@ describe('App', () => {
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
 
     const plotActionsButton = within(
-      screen.getAllByTestId(/^plot-/)[0]
+      screen.getAllByTestId(/^plot_/)[0]
     ).getByLabelText('See Plot Export Options')
 
     fireEvent.keyDown(plotActionsButton, { key: 'Enter' })
@@ -1865,6 +1393,616 @@ describe('App', () => {
     expect(multiViewPlot).toHaveStyle('--scale: 2')
   })
 
+  describe('Drag and drop', () => {
+    const toggleDragMode = (
+      store: typeof plotsStore,
+      forCustomPlots: boolean,
+      on: boolean
+    ) => {
+      act(() => {
+        store.dispatch(
+          forCustomPlots
+            ? toggleCustomPlotsDragAndDropMode(on)
+            : toggleTemplatePlotsDragAndDropMode(on)
+        )
+      })
+    }
+    const renderAppWithOptionalDataInDragAndDropMode = (
+      data?: PlotsData,
+      forCustomPlots?: boolean
+    ) => {
+      const store = renderAppWithOptionalData(data)
+      toggleDragMode(store, !!forCustomPlots, true)
+      return store
+    }
+
+    it('should not be possible to drag a plot when the drag and drop mode is set to false', () => {
+      const order = [
+        join('logs', 'loss.tsv'),
+        join('other', 'plot.tsv'),
+        join('other', 'multiview.tsv')
+      ]
+
+      renderAppWithOptionalData({
+        template: complexTemplatePlotsFixture
+      })
+
+      let plots = screen.getAllByTestId(/^plot_/)
+
+      expect(plots.map(plot => plot.id)).toStrictEqual(order)
+
+      mockPostMessage.mockClear()
+      dragAndDrop(plots[1], plots[0])
+
+      plots = screen.getAllByTestId(/^plot_/)
+
+      expect(plots.map(plot => plot.id)).toStrictEqual(order)
+    })
+
+    it('should show the normal plots when not in drag and drop mode', () => {
+      renderAppWithOptionalData({
+        template: complexTemplatePlotsFixture
+      })
+
+      const [plot] = screen.getAllByTestId(/^plot_/)
+
+      expect(within(plot).getAllByRole('button').length).toBe(2)
+    })
+
+    it('should toggle from normal to drag and drop mode when the user presses down on a plot grip icon', () => {
+      const store = renderAppWithOptionalData({
+        template: complexTemplatePlotsFixture
+      })
+
+      expect(store.getState().template.isInDragAndDropMode).toBe(false)
+
+      const [plot] = screen.getAllByTestId(/^plot_/)
+      fireEvent.mouseDown(within(plot).getByTestId('grip-icon'))
+
+      expect(store.getState().template.isInDragAndDropMode).toBe(true)
+    })
+
+    it('should toggle from drag and drop to normal mode when dropping a plot', () => {
+      const store = renderAppWithOptionalData({
+        template: complexTemplatePlotsFixture
+      })
+
+      const [plot] = screen.getAllByTestId(/^plot_/)
+      fireEvent.mouseDown(within(plot).getByTestId('grip-icon'))
+
+      expect(store.getState().template.isInDragAndDropMode).toBe(true)
+
+      const plots = screen.getAllByTestId(/^plot_/)
+      dragAndDrop(plots[0], plots[1])
+
+      expect(store.getState().template.isInDragAndDropMode).toBe(false)
+    })
+
+    it('should show only the titles when in drag and drop mode', () => {
+      renderAppWithOptionalDataInDragAndDropMode({
+        template: complexTemplatePlotsFixture
+      })
+
+      const [plot] = screen.getAllByTestId(/^plot_/)
+
+      expect(within(plot).queryByRole('button')).not.toBeInTheDocument()
+    })
+
+    it('should show a formatted title of the metric and param when in drag and drop mode for custom plots', () => {
+      renderAppWithOptionalDataInDragAndDropMode(
+        {
+          custom: customPlotsFixture
+        },
+        true
+      )
+
+      expect(screen.getByText('loss vs. log_file')).toBeInTheDocument()
+    })
+
+    it('should show a the full plot path as a subtitle when in drag and drop mode for custom plots', () => {
+      renderAppWithOptionalDataInDragAndDropMode(
+        {
+          custom: customPlotsFixture
+        },
+        true
+      )
+
+      expect(
+        screen.getByText('summary.json:loss-params.yaml:log_file')
+      ).toBeInTheDocument()
+    })
+
+    it('should create a new section above the others if the template plot type is different than the first section', () => {
+      renderAppWithOptionalDataInDragAndDropMode({
+        template: complexTemplatePlotsFixture
+      })
+
+      const topSection = screen.getByTestId(NewSectionBlock.TOP)
+      const multiViewPlot = screen.getByTestId(
+        join('plot_other', 'multiview.tsv')
+      )
+
+      dragAndDrop(multiViewPlot, topSection)
+
+      const sections = screen.getAllByTestId(/^plots-section_/)
+      expect(sections.map(section => section.id)).toStrictEqual([
+        'template-multi_0',
+        'template-single_1'
+      ])
+    })
+
+    it('should not create a new section above the others by dragging a template plot from the same type as the first section above it', () => {
+      renderAppWithOptionalDataInDragAndDropMode({
+        template: complexTemplatePlotsFixture
+      })
+
+      const topSection = screen.getByTestId(NewSectionBlock.TOP)
+      const aSingleViewPlot = screen.getByTestId(join('plot_other', 'plot.tsv'))
+
+      dragAndDrop(aSingleViewPlot, topSection)
+
+      const sections = screen.getAllByTestId(/^plots-section_/)
+      expect(sections.map(section => section.id)).toStrictEqual([
+        'template-single_0',
+        'template-multi_1'
+      ])
+    })
+
+    it('should create a new section below the others if the template plot type is different than the last section', () => {
+      renderAppWithOptionalDataInDragAndDropMode({
+        template: complexTemplatePlotsFixture
+      })
+
+      const bottomSection = screen.getByTestId(NewSectionBlock.BOTTOM)
+      const aSingleViewPlot = screen.getByTestId(join('plot_other', 'plot.tsv'))
+
+      dragAndDrop(aSingleViewPlot, bottomSection)
+
+      const sections = screen.getAllByTestId(/^plots-section_/)
+      expect(sections.map(section => section.id)).toStrictEqual([
+        'template-single_0',
+        'template-multi_1',
+        'template-single_2'
+      ])
+    })
+
+    it('should not create a new section below the others by dragging a template plot from the same type as the last section below it', () => {
+      renderAppWithOptionalDataInDragAndDropMode({
+        template: complexTemplatePlotsFixture
+      })
+
+      const bottomSection = screen.getByTestId(NewSectionBlock.BOTTOM)
+      const multiViewPlot = screen.getByTestId(
+        join('plot_other', 'multiview.tsv')
+      )
+
+      dragAndDrop(multiViewPlot, bottomSection)
+
+      const sections = screen.getAllByTestId(/^plots-section_/)
+      expect(sections.map(section => section.id)).toStrictEqual([
+        'template-single_0',
+        'template-multi_1'
+      ])
+    })
+
+    it('should move a template plot from one type in another section of the same type and show two drop targets', async () => {
+      const store = renderAppWithOptionalDataInDragAndDropMode({
+        template: complexTemplatePlotsFixture
+      })
+
+      const bottomSection = screen.getByTestId(NewSectionBlock.BOTTOM)
+      const aSingleViewPlot = screen.getByTestId(join('plot_other', 'plot.tsv'))
+
+      dragAndDrop(aSingleViewPlot, bottomSection)
+
+      toggleDragMode(store, false, true)
+      await screen.findByTestId('plots-section_template-single_2')
+      const anotherSingleViewPlot = screen.getByTestId(
+        join('plot_logs', 'loss.tsv')
+      )
+      const movedSingleViewPlot = screen.getByTestId(
+        join('plot_other', 'plot.tsv')
+      )
+
+      dragEnter(
+        anotherSingleViewPlot,
+        movedSingleViewPlot.id,
+        DragEnterDirection.LEFT
+      )
+
+      expect(screen.getAllByTestId('drop-target').length).toBe(2) // One in the old section and one in the new one
+
+      dragAndDrop(anotherSingleViewPlot, movedSingleViewPlot)
+
+      const sections = screen.getAllByTestId(/^plots-section_/)
+      expect(sections.map(section => section.id)).toStrictEqual([
+        'template-multi_0',
+        'template-single_1'
+      ])
+    })
+
+    it('should show a drop target at the end of the section when moving a plot from one section to another but not over any other plot', async () => {
+      const store = renderAppWithOptionalDataInDragAndDropMode({
+        template: complexTemplatePlotsFixture
+      })
+
+      const bottomSection = screen.getByTestId(NewSectionBlock.BOTTOM)
+      const aSingleViewPlot = screen.getByTestId(join('plot_other', 'plot.tsv'))
+
+      dragAndDrop(aSingleViewPlot, bottomSection)
+      toggleDragMode(store, false, true)
+
+      await screen.findByTestId('plots-section_template-single_2')
+      const anotherSingleViewPlot = screen.getByTestId(
+        join('plot_logs', 'loss.tsv')
+      )
+
+      dragEnter(
+        anotherSingleViewPlot,
+        'template-single_0',
+        DragEnterDirection.LEFT
+      )
+
+      expect(screen.getByTestId('plot_drop-target')).toBeInTheDocument()
+    })
+
+    it('should show a drop target at the end of the template plots section when moving a plot inside of one section but not over any other plot', () => {
+      renderAppWithOptionalDataInDragAndDropMode({
+        template: complexTemplatePlotsFixture
+      })
+
+      const aSingleViewPlot = screen.getByTestId(join('plot_other', 'plot.tsv'))
+
+      dragEnter(aSingleViewPlot, 'template-single_0', DragEnterDirection.LEFT)
+
+      expect(screen.getByTestId('plot_drop-target')).toBeInTheDocument()
+    })
+
+    it('should drop a plot at the end of the template plots section when moving a plot inside of one section but not over any other plot', () => {
+      renderAppWithOptionalDataInDragAndDropMode({
+        template: complexTemplatePlotsFixture
+      })
+
+      const aSingleViewPlot = screen.getByTestId(join('plot_other', 'plot.tsv'))
+      const topSection = screen.getByTestId('plots-section_template-single_0')
+
+      dragAndDrop(aSingleViewPlot, topSection)
+      const plots = within(topSection).getAllByTestId(/^plot_/)
+
+      expect(plots.map(plot => plot.id)).toStrictEqual([
+        join('logs', 'loss.tsv'),
+        join('other', 'plot.tsv')
+      ])
+    })
+
+    it('should show a drop target at the end of the custom plots when moving a plot inside the section but not over any other plot', () => {
+      renderAppWithOptionalDataInDragAndDropMode(
+        {
+          custom: customPlotsFixture,
+          template: templatePlotsFixture
+        },
+        true
+      )
+
+      const plots = screen.getAllByTestId(/summary\.json/)
+
+      dragEnter(plots[0], 'custom-plots', DragEnterDirection.LEFT)
+
+      expect(screen.getByTestId('plot_drop-target')).toBeInTheDocument()
+    })
+
+    it('should show a drop target a plot at the end of the custom plots when moving a plot inside the section but not over any other plot', () => {
+      renderAppWithOptionalDataInDragAndDropMode(
+        {
+          custom: customPlotsFixture,
+          template: templatePlotsFixture
+        },
+        true
+      )
+
+      const plots = screen.getAllByTestId(/summary\.json/)
+
+      dragAndDrop(plots[0], screen.getByTestId('custom-plots'))
+
+      const expectedOrder = [
+        'custom-summary.json:accuracy-params.yaml:epochs',
+        'custom-summary.json:loss-params.yaml:log_file'
+      ]
+
+      expect(
+        screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
+      ).toStrictEqual(expectedOrder)
+    })
+
+    it('should show a drop zone when hovering a new section', () => {
+      renderAppWithOptionalDataInDragAndDropMode({
+        template: complexTemplatePlotsFixture
+      })
+
+      const topSection = screen.getByTestId(NewSectionBlock.TOP)
+      const multiViewPlot = screen.getByTestId(
+        join('plot_other', 'multiview.tsv')
+      )
+      let topDropIcon = screen.queryByTestId(`${NewSectionBlock.TOP}_drop-icon`)
+
+      expect(topDropIcon).not.toBeInTheDocument()
+
+      dragEnter(multiViewPlot, topSection.id, DragEnterDirection.LEFT)
+
+      topDropIcon = screen.queryByTestId(`${NewSectionBlock.TOP}_drop-icon`)
+
+      expect(topDropIcon).toBeInTheDocument()
+    })
+
+    it('should remove the drop zone when hovering out a new section', () => {
+      renderAppWithOptionalDataInDragAndDropMode({
+        template: complexTemplatePlotsFixture
+      })
+
+      const topSection = screen.getByTestId(NewSectionBlock.TOP)
+      const multiViewPlot = screen.getByTestId(
+        join('plot_other', 'multiview.tsv')
+      )
+
+      dragEnter(multiViewPlot, topSection.id, DragEnterDirection.LEFT)
+
+      let topDropIcon = screen.queryByTestId(`${NewSectionBlock.TOP}_drop-icon`)
+
+      expect(topDropIcon).toBeInTheDocument()
+
+      dragLeave(topSection)
+
+      topDropIcon = screen.queryByTestId(`${NewSectionBlock.TOP}_drop-icon`)
+
+      expect(topDropIcon).not.toBeInTheDocument()
+    })
+
+    it('should not show a drop target when moving an element from a whole different section (comparison to template)', () => {
+      renderAppWithOptionalDataInDragAndDropMode({
+        comparison: comparisonTableFixture,
+        selectedRevisions: plotsRevisionsFixture,
+        template: complexTemplatePlotsFixture
+      })
+
+      const headers = screen.getAllByRole('columnheader')
+      const bottomSection = screen.getByTestId(NewSectionBlock.BOTTOM)
+
+      dragEnter(headers[1], bottomSection.id, DragEnterDirection.LEFT)
+
+      const bottomDropIcon = screen.queryByTestId(
+        `${NewSectionBlock.BOTTOM}_drop-icon`
+      )
+
+      expect(bottomDropIcon).not.toBeInTheDocument()
+    })
+
+    it('should prevent default behaviour when dragging over a new section', () => {
+      renderAppWithOptionalDataInDragAndDropMode({
+        template: complexTemplatePlotsFixture
+      })
+
+      const topSection = screen.getByTestId(NewSectionBlock.TOP)
+
+      act(() => {
+        const dragOverEvent = createBubbledEvent('dragover', {
+          preventDefault: jest.fn()
+        })
+
+        topSection.dispatchEvent(dragOverEvent)
+        expect(dragOverEvent.preventDefault).toHaveBeenCalled()
+      })
+    })
+
+    it('should show a drop target before a plot on drag enter from the left', () => {
+      renderAppWithOptionalDataInDragAndDropMode({
+        template: complexTemplatePlotsFixture
+      })
+
+      const plots = screen.getAllByTestId(/^plot_/)
+
+      dragEnter(plots[1], plots[0].id, DragEnterDirection.LEFT)
+
+      const plotsWithDropTarget = screen.getAllByTestId(/^plot_/)
+      expect(plotsWithDropTarget.map(plot => plot.id)).toStrictEqual([
+        'plot-drop-target',
+        plots[0].id,
+        plots[1].id,
+        plots[2].id
+      ])
+    })
+
+    it('should show a drop target after a plot on drag enter from the right', () => {
+      renderAppWithOptionalDataInDragAndDropMode({
+        template: complexTemplatePlotsFixture
+      })
+
+      const plots = screen.getAllByTestId(/^plot_/)
+
+      dragEnter(
+        plots[0],
+        plots[1].id,
+        DragEnterDirection.RIGHT,
+        EventCurrentTargetDistances
+      )
+
+      const plotsWithDropTarget = screen.getAllByTestId(/^plot_/)
+
+      expect(plotsWithDropTarget.map(plot => plot.id)).toStrictEqual([
+        plots[0].id,
+        plots[1].id,
+        'plot-drop-target',
+        plots[2].id
+      ])
+    })
+
+    it('should hide the plot being dragged from the list', () => {
+      renderAppWithOptionalDataInDragAndDropMode({
+        template: complexTemplatePlotsFixture
+      })
+
+      const plots = screen.getAllByTestId(/^plot_/)
+      expect(plots[1].style.display).not.toBe('none')
+
+      dragEnter(plots[1], plots[1].id, DragEnterDirection.LEFT)
+
+      expect(plots[1].style.display).toBe('none')
+    })
+
+    it('should remove the drop target after exiting a section after dragging in and out of it', () => {
+      const store = renderAppWithOptionalDataInDragAndDropMode({
+        template: complexTemplatePlotsFixture
+      })
+
+      const movingPlotId = join('plot_other', 'plot.tsv')
+
+      const bottomSection = screen.getByTestId(NewSectionBlock.BOTTOM)
+      const aSingleViewPlot = screen.getByTestId(movingPlotId)
+
+      dragAndDrop(aSingleViewPlot, bottomSection)
+
+      toggleDragMode(store, false, true)
+      const movedPlot = screen.getByTestId(movingPlotId)
+      const otherSingleSection = screen.getByTestId(
+        join('plot_logs', 'loss.tsv')
+      )
+
+      dragEnter(movedPlot, otherSingleSection.id, DragEnterDirection.LEFT)
+
+      const topSection = screen.getByTestId('plots-section_template-single_0')
+
+      let topSectionPlots = within(topSection)
+        .getAllByTestId(/^plot_/)
+        .map(plot => plot.id)
+      expect(topSectionPlots.includes('plot-drop-target')).toBe(true)
+
+      const previousSection = screen.getByTestId(
+        'plots-section_template-single_2'
+      )
+      act(() => {
+        previousSection.dispatchEvent(createBubbledEvent('dragenter'))
+      })
+
+      topSectionPlots = within(topSection)
+        .getAllByTestId(/^plot_/)
+        .map(plot => plot.id)
+      expect(topSectionPlots.includes('plot-drop-target')).toBe(false)
+    })
+
+    it('should not be possible to drag a plot from a section to another', () => {
+      renderAppWithOptionalDataInDragAndDropMode({
+        custom: customPlotsFixture,
+        template: templatePlotsFixture
+      })
+
+      const customPlots = screen.getAllByTestId(/summary\.json/)
+      const templatePlots = screen.getAllByTestId(/^plot_/)
+
+      dragAndDrop(templatePlots[0], customPlots[1])
+
+      expect(customPlots.map(plot => plot.id)).toStrictEqual([
+        'custom-summary.json:loss-params.yaml:log_file',
+        'custom-summary.json:accuracy-params.yaml:epochs'
+      ])
+    })
+
+    it('should reorder template plots and send a message to the extension on drop', () => {
+      renderAppWithOptionalDataInDragAndDropMode({
+        template: complexTemplatePlotsFixture
+      })
+
+      let plots = screen.getAllByTestId(/^plot_/)
+
+      expect(plots.map(plot => plot.id)).toStrictEqual([
+        join('logs', 'loss.tsv'),
+        join('other', 'plot.tsv'),
+        join('other', 'multiview.tsv')
+      ])
+
+      mockPostMessage.mockClear()
+      dragAndDrop(plots[1], plots[0])
+
+      plots = screen.getAllByTestId(/^plot_/)
+
+      expect(plots.map(plot => plot.id)).toStrictEqual([
+        join('other', 'plot.tsv'),
+        join('logs', 'loss.tsv'),
+        join('other', 'multiview.tsv')
+      ])
+      expect(mockPostMessage).toHaveBeenCalledTimes(1)
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        payload: [
+          {
+            group: TemplatePlotGroup.SINGLE_VIEW,
+            paths: [join('other', 'plot.tsv'), join('logs', 'loss.tsv')]
+          },
+          {
+            group: TemplatePlotGroup.MULTI_VIEW,
+            paths: [join('other', 'multiview.tsv')]
+          }
+        ],
+        type: MessageFromWebviewType.REORDER_PLOTS_TEMPLATES
+      })
+    })
+
+    it('should send a message to the extension when the custom plots are reordered', () => {
+      renderAppWithOptionalDataInDragAndDropMode(
+        {
+          custom: customPlotsFixture
+        },
+        true
+      )
+
+      const plots = screen.getAllByTestId(/summary\.json/)
+      expect(plots.map(plot => plot.id)).toStrictEqual([
+        'custom-summary.json:loss-params.yaml:log_file',
+        'custom-summary.json:accuracy-params.yaml:epochs'
+      ])
+
+      mockPostMessage.mockClear()
+
+      dragAndDrop(plots[1], plots[0])
+
+      const expectedOrder = [
+        'custom-summary.json:accuracy-params.yaml:epochs',
+        'custom-summary.json:loss-params.yaml:log_file'
+      ]
+
+      expect(mockPostMessage).toHaveBeenCalledTimes(1)
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        payload: expectedOrder,
+        type: MessageFromWebviewType.REORDER_PLOTS_CUSTOM
+      })
+      expect(
+        screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
+      ).toStrictEqual(expectedOrder)
+    })
+
+    it('should display the custom plots in the order stored', () => {
+      renderAppWithOptionalDataInDragAndDropMode(
+        {
+          custom: customPlotsFixture
+        },
+        true
+      )
+
+      let plots = screen.getAllByTestId(/summary\.json/)
+
+      expect(plots.map(plot => plot.id)).toStrictEqual([
+        'custom-summary.json:loss-params.yaml:log_file',
+        'custom-summary.json:accuracy-params.yaml:epochs'
+      ])
+
+      dragAndDrop(plots[1], plots[0])
+
+      plots = screen.getAllByTestId(/summary\.json/)
+
+      expect(plots.map(plot => plot.id)).toStrictEqual([
+        'custom-summary.json:accuracy-params.yaml:epochs',
+        'custom-summary.json:loss-params.yaml:log_file'
+      ])
+    })
+  })
+
   describe('Comparison Multi Image Plots', () => {
     it('should render cells with sliders', () => {
       renderAppWithOptionalData({
@@ -2044,10 +2182,7 @@ describe('App', () => {
       for (let i = 0; i < nbOfPlots; i++) {
         const id = `plot-${i}`
         plots.push({
-          id,
-          metric: '',
-          param: '',
-          spec: {
+          content: {
             $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
             encoding: {},
             height: 100,
@@ -2060,6 +2195,9 @@ describe('App', () => {
             transform: [],
             width: 100
           },
+          id,
+          metric: '',
+          param: '',
           values: []
         })
       }
@@ -2163,14 +2301,14 @@ describe('App', () => {
             PlotsSection.CUSTOM_PLOTS
           )
 
-          let plots = screen.getAllByTestId(/^plot-/)
+          let plots = screen.getAllByTestId(/^plot_/)
 
           expect(plots[4].id).toBe('plot-4')
           expect(plots.length).toBe(OVERSCAN_ROW_COUNT + 1)
 
           resizeScreen(5453, store)
 
-          plots = screen.getAllByTestId(/^plot-/)
+          plots = screen.getAllByTestId(/^plot_/)
 
           expect(plots[3].id).toBe('plot-3')
           expect(plots.length).toBe(OVERSCAN_ROW_COUNT + 1)
@@ -2185,7 +2323,7 @@ describe('App', () => {
 
           resizeScreen(1849, store)
 
-          const plots = screen.getAllByTestId(/^plot-/)
+          const plots = screen.getAllByTestId(/^plot_/)
 
           expect(plots[12].id).toBe('plot-12')
           expect(plots.length).toBe(OVERSCAN_ROW_COUNT + 1)
@@ -2200,7 +2338,7 @@ describe('App', () => {
 
           resizeScreen(936, store)
 
-          const plots = screen.getAllByTestId(/^plot-/)
+          const plots = screen.getAllByTestId(/^plot_/)
 
           expect(plots[14].id).toBe('plot-14')
           expect(plots.length).toBe(1 + OVERSCAN_ROW_COUNT) // Only the first and the next lines defined by the overscan row count will be rendered
@@ -2215,7 +2353,7 @@ describe('App', () => {
 
           resizeScreen(563, store)
 
-          const plots = screen.getAllByTestId(/^plot-/)
+          const plots = screen.getAllByTestId(/^plot_/)
 
           expect(plots[4].id).toBe('plot-4')
         })
@@ -2275,14 +2413,14 @@ describe('App', () => {
 
           resizeScreen(3200, store)
 
-          let plots = screen.getAllByTestId(/^plot-/)
+          let plots = screen.getAllByTestId(/^plot_/)
 
           expect(plots[20].id).toBe('plot-20')
           expect(plots.length).toBe(custom.plots.length)
 
           resizeScreen(6453, store)
 
-          plots = screen.getAllByTestId(/^plot-/)
+          plots = screen.getAllByTestId(/^plot_/)
 
           expect(plots[19].id).toBe('plot-19')
           expect(plots.length).toBe(custom.plots.length)
@@ -2297,7 +2435,7 @@ describe('App', () => {
 
           resizeScreen(1889, store)
 
-          const plots = screen.getAllByTestId(/^plot-/)
+          const plots = screen.getAllByTestId(/^plot_/)
 
           expect(plots[7].id).toBe('plot-7')
           expect(plots.length).toBe(custom.plots.length)
@@ -2312,7 +2450,7 @@ describe('App', () => {
 
           resizeScreen(938, store)
 
-          const plots = screen.getAllByTestId(/^plot-/)
+          const plots = screen.getAllByTestId(/^plot_/)
 
           expect(plots[7].id).toBe('plot-7')
           expect(plots.length).toBe(custom.plots.length)
@@ -2327,7 +2465,7 @@ describe('App', () => {
 
           resizeScreen(562, store)
 
-          const plots = screen.getAllByTestId(/^plot-/)
+          const plots = screen.getAllByTestId(/^plot_/)
 
           expect(plots[4].id).toBe('plot-4')
         })
@@ -2387,14 +2525,14 @@ describe('App', () => {
 
           resizeScreen(3004, store)
 
-          let plots = screen.getAllByTestId(/^plot-/)
+          let plots = screen.getAllByTestId(/^plot_/)
 
           expect(plots[7].id).toBe('plot-7')
           expect(plots.length).toBe(custom.plots.length)
 
           resizeScreen(5473, store)
 
-          plots = screen.getAllByTestId(/^plot-/)
+          plots = screen.getAllByTestId(/^plot_/)
 
           expect(plots[9].id).toBe('plot-9')
           expect(plots.length).toBe(custom.plots.length)
@@ -2409,7 +2547,7 @@ describe('App', () => {
 
           resizeScreen(1839, store)
 
-          const plots = screen.getAllByTestId(/^plot-/)
+          const plots = screen.getAllByTestId(/^plot_/)
 
           expect(plots[24].id).toBe('plot-24')
           expect(plots.length).toBe(custom.plots.length)
@@ -2424,7 +2562,7 @@ describe('App', () => {
 
           resizeScreen(956, store)
 
-          const plots = screen.getAllByTestId(/^plot-/)
+          const plots = screen.getAllByTestId(/^plot_/)
 
           expect(plots[9].id).toBe('plot-9')
           expect(plots.length).toBe(custom.plots.length)
@@ -2439,7 +2577,7 @@ describe('App', () => {
 
           resizeScreen(663, store)
 
-          const plots = screen.getAllByTestId(/^plot-/)
+          const plots = screen.getAllByTestId(/^plot_/)
 
           expect(plots[9].id).toBe('plot-9')
           expect(plots.length).toBe(custom.plots.length)
@@ -2454,7 +2592,7 @@ describe('App', () => {
 
           resizeScreen(569, store)
 
-          const plots = screen.getAllByTestId(/^plot-/)
+          const plots = screen.getAllByTestId(/^plot_/)
 
           expect(plots[4].id).toBe('plot-4')
         })
@@ -2643,45 +2781,6 @@ describe('App', () => {
           expect(plot.querySelectorAll('.marks')[0]).toBeInTheDocument(),
         { timeout: 5000 }
       )
-
-    const getPanel = async (smoothPlot: HTMLElement) => {
-      await waitFor(() =>
-        // eslint-disable-next-line testing-library/no-node-access
-        expect(smoothPlot.querySelector('.vega-bindings')).toBeInTheDocument()
-      )
-      // eslint-disable-next-line testing-library/no-node-access
-      return smoothPlot.querySelector('.vega-bindings')
-    }
-
-    it('should disable a template plot from drag and drop when hovering a vega panel', async () => {
-      renderAppWithOptionalData({ template: withVegaPanels })
-
-      const smoothPlot = screen.getByTestId(`plot_${smoothId}`)
-
-      await waitForVega(smoothPlot)
-
-      const panel = await getPanel(smoothPlot)
-
-      expect(smoothPlot.draggable).toBe(true)
-
-      panel && fireEvent.mouseEnter(panel)
-
-      expect(smoothPlot.draggable).toBe(false)
-    })
-
-    it('should re-enable a template plot for drag and drop when the mouse leaves a vega panel', async () => {
-      renderAppWithOptionalData({ template: withVegaPanels })
-
-      const smoothPlot = screen.getByTestId(`plot_${smoothId}`)
-
-      await waitForVega(smoothPlot)
-
-      const panel = await getPanel(smoothPlot)
-
-      panel && fireEvent.mouseEnter(panel)
-      panel && fireEvent.mouseLeave(panel)
-      expect(smoothPlot.draggable).toBe(true)
-    })
 
     it('should disable zooming the template plot when clicking inside the vega panel', async () => {
       renderAppWithOptionalData({ template: withVegaPanels })

@@ -1,7 +1,7 @@
 import { TopLevelSpec } from 'vega-lite'
 import { getCustomPlotId } from './collect'
 import { Column, ColumnType } from '../../experiments/webview/contract'
-import { FILE_SEPARATOR } from '../../experiments/columns/paths'
+import { FILE_SEPARATOR } from '../../experiments/columns/constants'
 import { ColorScale } from '../webview/contract'
 
 export type CustomPlotsOrderValue = {
