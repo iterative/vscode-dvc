@@ -3,17 +3,17 @@ import React from 'react'
 import { useDispatch } from 'react-redux'
 import cx from 'classnames'
 import { DropTarget } from './DropTarget'
-import { plotDataStore } from './plotDataStore'
-import styles from './styles.module.scss'
 import { changeDragAndDropMode } from './util'
-import { withScale } from '../../util/styles'
+import styles from './styles.module.scss'
+import { DragAndDropPlot } from './DragAndDropPlot'
+import { plotDataStore } from './plotDataStore'
 import { VirtualizedGrid } from '../../shared/components/virtualizedGrid/VirtualizedGrid'
 import {
   DragDropContainer,
   OnDrop,
   WrapperProps
 } from '../../shared/components/dragDrop/DragDropContainer'
-import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
+import { withScale } from '../../util/styles'
 
 interface DragAndDropGridProps {
   order: string[]
@@ -39,15 +39,14 @@ export const DragAndDropGrid: React.FC<DragAndDropGridProps> = ({
   sectionKey
 }) => {
   const dispatch = useDispatch()
+  const plotClassName = cx(styles.plot, styles.dragAndDropPlot, {
+    [styles.multiViewPlot]: multiView
+  })
   const items = order.map((plot: string) => {
     const colSpan =
       (multiView &&
         plotDataStore[PlotsSection.TEMPLATE_PLOTS][plot].revisions?.length) ||
       1
-
-    const plotClassName = cx(styles.plot, styles.dragAndDropPlot, {
-      [styles.multiViewPlot]: multiView
-    })
 
     return (
       <div
@@ -57,10 +56,7 @@ export const DragAndDropGrid: React.FC<DragAndDropGridProps> = ({
         data-testid={`plot_${plot}`}
         style={withScale(colSpan)}
       >
-        <div>
-          <GripIcon className={styles.plotGripIcon} />
-        </div>
-        <h2>{plot}</h2>
+        <DragAndDropPlot plot={plot} sectionKey={sectionKey} />
       </div>
     )
   })

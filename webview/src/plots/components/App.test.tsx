@@ -1472,6 +1472,30 @@ describe('App', () => {
       expect(within(plot).queryByRole('button')).not.toBeInTheDocument()
     })
 
+    it('should show a formatted title of the metric and param when in drag and drop mode for custom plots', () => {
+      renderAppWithOptionalDataInDragAndDropMode(
+        {
+          custom: customPlotsFixture
+        },
+        true
+      )
+
+      expect(screen.getByText('loss vs. log_file')).toBeInTheDocument()
+    })
+
+    it('should show a the full plot path as a subtitle when in drag and drop mode for custom plots', () => {
+      renderAppWithOptionalDataInDragAndDropMode(
+        {
+          custom: customPlotsFixture
+        },
+        true
+      )
+
+      expect(
+        screen.getByText('summary.json:loss-params.yaml:log_file')
+      ).toBeInTheDocument()
+    })
+
     it('should create a new section above the others if the template plot type is different than the first section', () => {
       renderAppWithOptionalDataInDragAndDropMode({
         template: complexTemplatePlotsFixture

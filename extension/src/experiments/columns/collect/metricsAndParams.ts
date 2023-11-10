@@ -16,11 +16,8 @@ import {
   fileHasError,
   MetricsOrParams
 } from '../../../cli/dvc/contract'
-import {
-  buildMetricOrParamPath,
-  FILE_SEPARATOR,
-  METRIC_PARAM_SEPARATOR
-} from '../paths'
+import { buildMetricOrParamPath } from '../paths'
+import { FILE_SEPARATOR, METRIC_PARAM_SEPARATOR } from '../constants'
 
 const collectMetricOrParam = (
   acc: ColumnAccumulator,
