@@ -1,9 +1,13 @@
 import { Event, EventEmitter } from 'vscode'
+import fetch from 'node-fetch'
+import { STUDIO_URL } from './webview/contract'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
 import { Args, ConfigKey, Flag } from '../cli/dvc/constants'
 import { ContextKey, setContextValue } from '../vscode/context'
 import { Disposable } from '../class/dispose'
+import { getCallBackUrl, openUrl, waitForUriResponse } from '../vscode/external'
+import { Modal } from '../vscode/modal'
 
 export const isStudioAccessToken = (text?: string): boolean => {
   if (!text) {
@@ -100,6 +104,80 @@ export class Studio extends Disposable {
       ConfigKey.STUDIO_OFFLINE,
       String(offline)
     )
+  }
+
+  public async requestStudioTokenAuthentication() {
+    const response = await this.fetchFromStudio(
+      `${STUDIO_URL}/api/device-login`,
+      {
+        client_name: 'VS Code'
+      }
+    )
+
+    const {
+      token_uri: tokenUri,
+      verification_uri: verificationUri,
+      user_code: userCode,
+      device_code: deviceCode
+    } = (await response.json()) as {
+      token_uri: string
+      verification_uri: string
+      user_code: string
+      device_code: string
+    }
+
+    const callbackUrl = await getCallBackUrl('/studio-complete-auth')
+    const verificationUrlWithParams = new URL(verificationUri)
+
+    verificationUrlWithParams.searchParams.append('redirect_uri', callbackUrl)
+    verificationUrlWithParams.searchParams.append('code', userCode)
+
+    await openUrl(verificationUrlWithParams.toString())
+    void waitForUriResponse('/studio-complete-auth', () => {
+      void this.requestStudioToken(deviceCode, tokenUri)
+    })
+  }
+
+  private fetchFromStudio(reqUri: string, body: Record<string, unknown>) {
+    return fetch(reqUri, {
+      body: JSON.stringify(body),
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      method: 'POST'
+    })
+  }
+
+  private async fetchStudioToken(deviceCode: string, tokenUri: string) {
+    const response = await this.fetchFromStudio(tokenUri, {
+      code: deviceCode
+    })
+
+    if (response.status !== 200) {
+      const { detail } = (await response.json()) as {
+        detail: string
+      }
+      return Modal.errorWithOptions(
+        `Unable to get token. Failed with "${detail}"`
+      )
+    }
+
+    const { access_token: accessToken } = (await response.json()) as {
+      access_token: string
+    }
+
+    return accessToken
+  }
+
+  private async requestStudioToken(deviceCode: string, tokenUri: string) {
+    const token = await this.fetchStudioToken(deviceCode, tokenUri)
+    const cwd = this.getCwd()
+
+    if (!token || !cwd) {
+      return
+    }
+
+    return this.saveStudioAccessTokenInConfig(cwd, token)
   }
 
   private async setStudioValues() {

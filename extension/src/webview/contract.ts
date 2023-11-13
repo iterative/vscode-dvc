@@ -30,8 +30,6 @@ export enum MessageFromWebviewType {
   OPEN_EXPERIMENTS_WEBVIEW = 'open-experiments-webview',
   OPEN_PARAMS_FILE_TO_THE_SIDE = 'open-params-file-to-the-side',
   OPEN_PLOTS_WEBVIEW = 'open-plots-webview',
-  OPEN_STUDIO = 'open-studio',
-  OPEN_STUDIO_PROFILE = 'open-studio-profile',
   PUSH_EXPERIMENT = 'push-experiment',
   REMOVE_COLUMN_FILTERS = 'remove-column-filters',
   REMOVE_COLUMN_SORT = 'remove-column-sort',
@@ -47,6 +45,7 @@ export enum MessageFromWebviewType {
   RESET_COMMITS = 'reset-commits',
   RESIZE_COLUMN = 'resize-column',
   RESIZE_PLOTS = 'resize-plots',
+  REQUEST_STUDIO_TOKEN = 'request-studio-token',
   SAVE_STUDIO_TOKEN = 'save-studio-token',
   SET_COMPARISON_MULTI_PLOT_VALUE = 'update-comparison-multi-plot-value',
   SET_SMOOTH_PLOT_VALUE = 'update-smooth-plot-value',
@@ -290,9 +289,8 @@ export type MessageFromWebview =
     }
   | { type: MessageFromWebviewType.UPGRADE_DVC }
   | { type: MessageFromWebviewType.SETUP_WORKSPACE }
-  | { type: MessageFromWebviewType.OPEN_STUDIO }
-  | { type: MessageFromWebviewType.OPEN_STUDIO_PROFILE }
   | { type: MessageFromWebviewType.SAVE_STUDIO_TOKEN }
+  | { type: MessageFromWebviewType.REQUEST_STUDIO_TOKEN }
   | { type: MessageFromWebviewType.ADD_CONFIGURATION }
   | { type: MessageFromWebviewType.ZOOM_PLOT; payload?: string }
   | { type: MessageFromWebviewType.OPEN_EXPERIMENTS_WEBVIEW }

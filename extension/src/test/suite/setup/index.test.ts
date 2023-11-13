@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { ensureFileSync, remove } from 'fs-extra'
 import { expect } from 'chai'
 import { SinonStub, restore, spy, stub } from 'sinon'
+import * as Fetch from 'node-fetch'
 import {
   MessageItem,
   QuickPickItem,
@@ -43,12 +44,15 @@ import { MIN_CLI_VERSION } from '../../../cli/dvc/contract'
 import { run } from '../../../setup/runner'
 import * as Python from '../../../extensions/python'
 import { ContextKey } from '../../../vscode/context'
+import * as ExternalUtil from '../../../vscode/external'
 import { Setup } from '../../../setup'
-import { SetupSection } from '../../../setup/webview/contract'
+import { STUDIO_URL, SetupSection } from '../../../setup/webview/contract'
 import { getFirstWorkspaceFolder } from '../../../vscode/workspaceFolders'
 import { Response } from '../../../vscode/response'
 import { DvcConfig } from '../../../cli/dvc/config'
 import * as QuickPickUtil from '../../../setup/quickPick'
+import { EventName } from '../../../telemetry/constants'
+import { Modal } from '../../../vscode/modal'
 
 suite('Setup Test Suite', () => {
   const disposable = Disposable.fn()
@@ -850,49 +854,137 @@ suite('Setup Test Suite', () => {
       ).to.be.calledWithExactly('setContext', 'dvc.cli.incompatible', false)
     })
 
-    it('should handle a message from the webview to open Studio', async () => {
-      const { mockOpenExternal, setup, urlOpenedEvent } = buildSetup({
+    it('should handle a message from the webview to request a token from studio', async () => {
+      const { setup, mockFetch, studio } = buildSetup({
         disposer: disposable
       })
 
+      const mockConfig = stub(DvcConfig.prototype, 'config')
+      mockConfig.resolves('')
       const webview = await setup.showWebview()
       await webview.isReady()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub(Setup.prototype as any, 'getCliCompatible').returns(true)
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockGetCallbackUrl = stub(ExternalUtil, 'getCallBackUrl')
+      const mockOpenUrl = stub(ExternalUtil, 'openUrl')
+      const mockWaitForUriRes = stub(ExternalUtil, 'waitForUriResponse')
+      const mockStudioRes = {
+        device_code: 'Yi-NPd9ggvNUDBcam5bP8iivbtLhnqVgM_lSSbilqNw',
+        token_uri: 'https://studio.iterative.ai/api/device-login/token',
+        user_code: '40DWMKNA',
+        verification_uri: 'https://studio.iterative.ai/auth/device-login'
+      }
+      const mockCallbackUrl = 'url-to-vscode'
+
+      mockFetch.onFirstCall().resolves({
+        json: () => Promise.resolve(mockStudioRes)
+      } as Fetch.Response)
+      mockGetCallbackUrl.onFirstCall().resolves(mockCallbackUrl)
+
+      const callbackUriHandlerEvent: Promise<() => unknown> = new Promise(
+        resolve =>
+          mockWaitForUriRes.onFirstCall().callsFake((_, onResponse) => {
+            resolve(onResponse)
+          })
+      )
 
       mockMessageReceived.fire({
-        type: MessageFromWebviewType.OPEN_STUDIO
+        type: MessageFromWebviewType.REQUEST_STUDIO_TOKEN
       })
 
-      await urlOpenedEvent
-      expect(mockOpenExternal).to.be.calledWith(
-        Uri.parse('https://studio.iterative.ai')
+      const mockOnStudioResponse = await callbackUriHandlerEvent
+
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWith(
+        EventName.VIEWS_SETUP_REQUEST_STUDIO_TOKEN,
+        undefined,
+        undefined
+      )
+      expect(mockFetch).to.be.calledOnce
+      expect(mockFetch).to.be.calledOnceWithExactly(
+        `${STUDIO_URL}/api/device-login`,
+        {
+          body: JSON.stringify({
+            client_name: 'VS Code'
+          }),
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          method: 'POST'
+        }
+      )
+      expect(mockGetCallbackUrl).to.be.calledOnce
+      expect(mockGetCallbackUrl).to.be.calledWith('/studio-complete-auth')
+      expect(mockOpenUrl).to.be.calledOnce
+      expect(mockOpenUrl).to.be.calledWith(
+        `${mockStudioRes.verification_uri}?redirect_uri=${mockCallbackUrl}&code=${mockStudioRes.user_code}`
+      )
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const mockGetCwd = stub(studio as any, 'getCwd')
+      const mockModalShowError = stub(Modal, 'errorWithOptions')
+      const mockSaveStudioToken = stub(studio, 'saveStudioAccessTokenInConfig')
+      mockFetch.onSecondCall().resolves({
+        json: () =>
+          Promise.resolve({ detail: 'Request failed for some reason.' }),
+        status: 500
+      } as Fetch.Response)
+
+      const failedTokenEvent = new Promise(resolve =>
+        mockGetCwd.onFirstCall().callsFake(() => {
+          resolve(undefined)
+          return dvcDemoPath
+        })
+      )
+
+      mockOnStudioResponse()
+
+      await failedTokenEvent
+
+      expect(mockFetch).to.be.calledTwice
+      expect(mockFetch).to.be.calledWithExactly(mockStudioRes.token_uri, {
+        body: JSON.stringify({
+          code: mockStudioRes.device_code
+        }),
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        method: 'POST'
+      })
+      expect(mockModalShowError).to.be.calledOnce
+      expect(mockModalShowError).to.be.calledWithExactly(
+        'Unable to get token. Failed with "Request failed for some reason."'
+      )
+      expect(mockSaveStudioToken).not.to.be.called
+
+      const mockToken = 'isat_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+      mockFetch.onThirdCall().resolves({
+        json: () => Promise.resolve({ access_token: mockToken }),
+        status: 200
+      } as Fetch.Response)
+      const tokenEvent = new Promise(resolve =>
+        mockGetCwd.onSecondCall().callsFake(() => {
+          resolve(undefined)
+          return dvcDemoPath
+        })
+      )
+
+      mockOnStudioResponse()
+
+      await tokenEvent
+
+      expect(mockFetch).to.be.calledThrice
+      expect(mockSaveStudioToken).to.be.calledOnce
+      expect(mockSaveStudioToken).to.be.calledWithExactly(
+        dvcDemoPath,
+        mockToken
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it("should handle a message from the webview to open the user's Studio profile", async () => {
-      const { setup, mockOpenExternal, urlOpenedEvent } = buildSetup({
-        disposer: disposable
-      })
-
-      const webview = await setup.showWebview()
-      await webview.isReady()
-
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
-
-      mockMessageReceived.fire({
-        type: MessageFromWebviewType.OPEN_STUDIO_PROFILE
-      })
-
-      await urlOpenedEvent
-      expect(mockOpenExternal).to.be.calledWith(
-        Uri.parse(
-          'https://studio.iterative.ai/user/_/profile?section=accessToken'
-        )
-      )
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
-
-    it("should handle a message from the webview to save the user's Studio access token", async () => {
+    it("should handle a message from the webview to manually save the user's Studio access token", async () => {
       const mockToken = 'isat_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
 
       const { setup, mockExecuteCommand, messageSpy } = buildSetup({

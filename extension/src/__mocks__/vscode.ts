@@ -24,6 +24,7 @@ export enum TreeItemCollapsibleState {
 export const Uri = {
   file: URI.file,
   from: URI.from,
+  parse: URI.parse,
   joinPath: Utils.joinPath
 }
 export const window = {

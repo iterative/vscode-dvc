@@ -631,44 +631,19 @@ describe('App', () => {
   })
 
   describe('Studio not connected', () => {
-    it('should show three buttons which walk the user through saving a token', async () => {
+    it('should show buttons which request a token from Studio or add an already creatd one', () => {
       renderApp()
-      const buttons = await within(
-        await screen.findByTestId('setup-studio-content')
-      ).findAllByRole('button')
-      expect(buttons).toHaveLength(3)
-    })
-
-    it('should show a button which opens Studio', () => {
-      renderApp()
-
       mockPostMessage.mockClear()
-      const button = screen.getByText('Sign In')
-      fireEvent.click(button)
+      const getTokenButton = screen.getByText('Get Token')
+      fireEvent.click(getTokenButton)
       expect(mockPostMessage).toHaveBeenCalledTimes(1)
       expect(mockPostMessage).toHaveBeenCalledWith({
-        type: MessageFromWebviewType.OPEN_STUDIO
+        type: MessageFromWebviewType.REQUEST_STUDIO_TOKEN
       })
-    })
-
-    it("should show a button which opens the user's Studio profile", () => {
-      renderApp()
 
       mockPostMessage.mockClear()
-      const button = screen.getByText('Get Token')
-      fireEvent.click(button)
-      expect(mockPostMessage).toHaveBeenCalledTimes(1)
-      expect(mockPostMessage).toHaveBeenCalledWith({
-        type: MessageFromWebviewType.OPEN_STUDIO_PROFILE
-      })
-    })
-
-    it("should show a button which allows the user's to save their Studio access token", () => {
-      renderApp()
-
-      mockPostMessage.mockClear()
-      const button = screen.getByText('Save Token')
-      fireEvent.click(button)
+      const saveCreatedButton = screen.getByText('Save Created Token')
+      fireEvent.click(saveCreatedButton)
       expect(mockPostMessage).toHaveBeenCalledTimes(1)
       expect(mockPostMessage).toHaveBeenCalledWith({
         type: MessageFromWebviewType.SAVE_STUDIO_TOKEN

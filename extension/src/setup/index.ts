@@ -424,7 +424,8 @@ export class Setup
       () => this.initializeGit(),
       (offline: boolean) => this.studio.updateStudioOffline(offline),
       () => this.isPythonExtensionUsed(),
-      () => this.updatePythonEnvironment()
+      () => this.updatePythonEnvironment(),
+      () => this.studio.requestStudioTokenAuthentication()
     )
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message =>
