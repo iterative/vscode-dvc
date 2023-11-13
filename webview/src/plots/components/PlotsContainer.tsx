@@ -1,21 +1,15 @@
 import cx from 'classnames'
-import React, {
-  useEffect,
-  DetailedHTMLProps,
-  HTMLAttributes,
-  useCallback
-} from 'react'
-import { AnyAction } from '@reduxjs/toolkit'
-import { useDispatch, useSelector } from 'react-redux'
+import React, { useEffect, DetailedHTMLProps, HTMLAttributes } from 'react'
+import { useSelector } from 'react-redux'
 import { PlotHeight, PlotsSection } from 'dvc/src/plots/webview/contract'
-import { PlotsPicker, PlotsPickerProps } from './PlotsPicker'
 import styles from './styles.module.scss'
-import { IconMenuItemProps } from '../../shared/components/iconMenu/IconMenuItem'
-import { ListFilter, Add, Trash } from '../../shared/components/icons'
-import { Slider } from '../../shared/components/slider/Slider'
+import { SizeSliders } from './SizeSliders'
+import { isDragAndDropModeSelector } from './util'
 import { PlotsState } from '../store'
+import { togglePlotsSection } from '../util/messages'
+import { IconMenuItemProps } from '../../shared/components/iconMenu/IconMenuItem'
+import { Trash } from '../../shared/components/icons'
 import { SectionContainer } from '../../shared/components/sectionContainer/SectionContainer'
-import { resizePlots, togglePlotsSection } from '../util/messages'
 
 interface PlotsContainerProps {
   sectionCollapsed: boolean
@@ -23,12 +17,6 @@ interface PlotsContainerProps {
   title: string
   nbItemsPerRowOrWidth: number
   height: PlotHeight
-  changeSize: (payload: {
-    nbItemsPerRowOrWidth: number
-    height: PlotHeight
-  }) => AnyAction
-  menu?: PlotsPickerProps
-  addPlotsButton?: { onClick: () => void }
   removePlotsButton?: { onClick: () => void }
   children: React.ReactNode
   hasItems?: boolean
@@ -42,19 +30,18 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   children,
   nbItemsPerRowOrWidth,
   height,
-  menu,
-  addPlotsButton,
   removePlotsButton,
-  changeSize,
   hasItems,
   noHeight
 }) => {
   const open = !sectionCollapsed
-  const dispatch = useDispatch()
   const maxNbPlotsPerRow = useSelector(
     (state: PlotsState) => state.webview.maxNbPlotsPerRow
   )
   const ribbonHeight = useSelector((state: PlotsState) => state.ribbon.height)
+  const isDragAndDropMode = useSelector((state: PlotsState) =>
+    isDragAndDropModeSelector(state, sectionKey)
+  )
 
   useEffect(() => {
     window.dispatchEvent(new Event('resize'))
@@ -62,49 +49,15 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
 
   const menuItems: IconMenuItemProps[] = []
 
-  if (menu) {
-    menuItems.unshift({
-      icon: ListFilter,
-      onClickNode: <PlotsPicker {...menu} />,
-      tooltip: 'Select Plots'
-    })
-  }
-
-  if (addPlotsButton) {
-    menuItems.unshift({
-      icon: Add,
-      onClick: addPlotsButton.onClick,
-      tooltip: 'Add Plot'
-    })
-  }
-
   if (removePlotsButton) {
-    menuItems.unshift({
+    menuItems.push({
       icon: Trash,
       onClick: removePlotsButton.onClick,
       tooltip: 'Remove Plots'
     })
   }
 
-  const handleResize = useCallback(
-    (nbItems: number, newHeight: PlotHeight) => {
-      const positiveNbItems = Math.abs(nbItems)
-      dispatch(
-        changeSize({
-          height: newHeight,
-          nbItemsPerRowOrWidth: positiveNbItems
-        })
-      )
-      resizePlots(newHeight, positiveNbItems, sectionKey)
-    },
-    [dispatch, changeSize, sectionKey]
-  )
-
   const toggleSection = () => togglePlotsSection(sectionKey, sectionCollapsed)
-
-  const plotHeights = Object.values(PlotHeight).filter(
-    value => typeof value !== 'string'
-  ) as number[]
 
   return (
     <SectionContainer
@@ -124,42 +77,22 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
       stickyHeaderTop={ribbonHeight - 4}
       headerChildren={
         open &&
-        hasItems &&
-        maxNbPlotsPerRow > 1 && (
-          <div className={styles.sizeSliders} data-testid="size-sliders">
-            <div className={styles.sizeSlider}>
-              <Slider
-                maximum={-1}
-                minimum={-maxNbPlotsPerRow}
-                label="Plot Width"
-                onChange={nbItems => handleResize(nbItems, height)}
-                defaultValue={-nbItemsPerRowOrWidth}
-              />
-            </div>
-            {!noHeight && (
-              <div className={styles.sizeSlider}>
-                <Slider
-                  minimum={Math.min(...plotHeights)}
-                  maximum={Math.max(...plotHeights)}
-                  label="Plot Height"
-                  onChange={newHeight =>
-                    handleResize(
-                      nbItemsPerRowOrWidth,
-                      newHeight as unknown as PlotHeight
-                    )
-                  }
-                  defaultValue={height}
-                />
-              </div>
-            )}
-          </div>
+        hasItems && (
+          <SizeSliders
+            maxNbPlotsPerRow={maxNbPlotsPerRow}
+            height={height}
+            noHeight={noHeight}
+            nbItemsPerRowOrWidth={nbItemsPerRowOrWidth}
+            sectionKey={sectionKey}
+          />
         )
       }
     >
       <div
         className={cx({
           [styles.plotsWrapper]: sectionKey !== PlotsSection.COMPARISON_TABLE,
-          [styles.smallPlots]: nbItemsPerRowOrWidth >= 4
+          [styles.smallPlots]: nbItemsPerRowOrWidth >= 4,
+          [styles.plotGrabbed]: isDragAndDropMode
         })}
         style={
           {
