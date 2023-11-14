@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.14] - 2023-11-13
+
+### 🚀 New Features and Enhancements
+
+- Add Studio Token Auth Flow [#4931](https://github.com/iterative/vscode-dvc/pull/4931) by [@julieg18](https://github.com/julieg18)
+
 ## [1.1.13] - 2023-11-10
 
 ### 🚀 New Features and Enhancements
