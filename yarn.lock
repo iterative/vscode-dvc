@@ -5920,10 +5920,10 @@
   dependencies:
     "@types/lodash" "*"
 
-"@types/lodash.isempty@4.4.8":
-  version "4.4.8"
-  resolved "https://registry.yarnpkg.com/@types/lodash.isempty/-/lodash.isempty-4.4.8.tgz#f609eb59175b263d4e66d55667daeb5520533cbc"
-  integrity sha512-cfBlgq2xgy5Hg3SWKGQeTnJdHeZ4ZZ6FBCn9F6OZVW2codhsZVysluDu01iHvSS/hneAhcjkF8Td8hFMzBrUUQ==
+"@types/lodash.isempty@4.4.9":
+  version "4.4.9"
+  resolved "https://registry.yarnpkg.com/@types/lodash.isempty/-/lodash.isempty-4.4.9.tgz#e23281fa1284af996e5dd4e0c125f22c74105781"
+  integrity sha512-DPSFfnT2JmZiAWNWOU8IRZws/Ha6zyGF5m06TydfsY+0dVoQqby2J61Na2QU4YtwiZ+moC6cJS6zWYBJq4wBVw==
   dependencies:
     "@types/lodash" "*"
 
