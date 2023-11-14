@@ -5641,10 +5641,10 @@
   resolved "https://registry.yarnpkg.com/@types/chai/-/chai-4.3.0.tgz#23509ebc1fa32f1b4d50d6a66c4032d5b8eaabdc"
   integrity sha512-/ceqdqeRraGolFTcfoXNiqjyQhZzbINDngeoAq9GoHa8PPK1yNzTaxWjA6BFWp5Ua9JpXEMSS4s5i9tS0hOJtw==
 
-"@types/chai@4.3.9":
-  version "4.3.9"
-  resolved "https://registry.yarnpkg.com/@types/chai/-/chai-4.3.9.tgz#144d762491967db8c6dea38e03d2206c2623feec"
-  integrity sha512-69TtiDzu0bcmKQv3yg1Zx409/Kd7r0b5F1PfpYJfSHzLGtB53547V4u+9iqKYsTu/O2ai6KTb0TInNpvuQ3qmg==
+"@types/chai@4.3.10":
+  version "4.3.10"
+  resolved "https://registry.yarnpkg.com/@types/chai/-/chai-4.3.10.tgz#2ad2959d1767edee5b0e4efb1a0cd2b500747317"
+  integrity sha512-of+ICnbqjmFCiixUnqRulbylyXQrPqIGf/B3Jax1wIF3DvSheysQxAWvqHhZiW3IQrycvokcLcFQlveGp+vyNg==
 
 "@types/clone@~2.1.1":
   version "2.1.1"
@@ -5774,10 +5774,10 @@
   resolved "https://registry.yarnpkg.com/@types/find-cache-dir/-/find-cache-dir-3.2.1.tgz#7b959a4b9643a1e6a1a5fe49032693cc36773501"
   integrity sha512-frsJrz2t/CeGifcu/6uRo4b+SzAwT4NYCVPu1GN8IB9XTzrpPkGuV0tmh9mN+/L0PklAlsC3u5Fxt0ju00LXIw==
 
-"@types/fs-extra@11.0.3":
-  version "11.0.3"
-  resolved "https://registry.yarnpkg.com/@types/fs-extra/-/fs-extra-11.0.3.tgz#72c3a247c8dd5703c93d900c584e006476146866"
-  integrity sha512-sF59BlXtUdzEAL1u0MSvuzWd7PdZvZEtnaVkzX5mjpdWTJ8brG0jUqve3jPCzSzvAKKMHTG8F8o/WMQLtleZdQ==
+"@types/fs-extra@11.0.4":
+  version "11.0.4"
+  resolved "https://registry.yarnpkg.com/@types/fs-extra/-/fs-extra-11.0.4.tgz#e16a863bb8843fba8c5004362b5a73e17becca45"
+  integrity sha512-yTbItCNreRooED33qjunPthRcSjERP1r4MqCZc7wv0u2sUkzTFp45tgUfS5+r7FrZPdmCCNflLhVSP/o+SemsQ==
   dependencies:
     "@types/jsonfile" "*"
     "@types/node" "*"
@@ -5858,10 +5858,10 @@
   dependencies:
     "@types/istanbul-lib-report" "*"
 
-"@types/jest@29.5.7":
-  version "29.5.7"
-  resolved "https://registry.yarnpkg.com/@types/jest/-/jest-29.5.7.tgz#2c0dafe2715dd958a455bc10e2ec3e1ec47b5036"
-  integrity sha512-HLyetab6KVPSiF+7pFcUyMeLsx25LDNDemw9mGsJBkai/oouwrjTycocSDYopMEwFhN2Y4s9oPyOCZNofgSt2g==
+"@types/jest@29.5.8":
+  version "29.5.8"
+  resolved "https://registry.yarnpkg.com/@types/jest/-/jest-29.5.8.tgz#ed5c256fe2bc7c38b1915ee5ef1ff24a3427e120"
+  integrity sha512-fXEFTxMV2Co8ZF5aYFJv+YeA08RTYJfhtN5c9JSv/mFEMe+xxjufCb+PHL+bJcMs/ebPUsBu+UNTEz+ydXrR6g==
   dependencies:
     expect "^29.0.0"
     pretty-format "^29.0.0"
