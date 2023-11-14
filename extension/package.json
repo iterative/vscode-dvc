@@ -1746,7 +1746,7 @@
     "@types/lodash.merge": "4.6.9",
     "@types/lodash.omit": "4.5.9",
     "@types/mocha": "10.0.4",
-    "@types/mock-require": "2.0.2",
+    "@types/mock-require": "2.0.3",
     "@types/node": "16.x",
     "@types/react-vega": "7.0.0",
     "@types/sinon-chai": "3.2.11",
