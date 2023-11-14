@@ -1304,5 +1304,33 @@ suite('Plots Test Suite', () => {
         'should no long provide decorations to the plots paths tree'
       ).to.deep.equal(new Set([]))
     })
+
+    it('should togglePathStatus to true when calling selectPlots with more than 20 plots', async () => {
+      const { plots, pathsModel } = await buildPlotsWebview({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
+      const mockSetCustomSelection = stub(pathsModel, 'setHasCustomSelection')
+
+      stub(pathsModel, 'getTerminalNodes').returns(Array.from({ length: 32 }))
+
+      plots.togglePathStatus(dvcDemoPath)
+
+      expect(mockSetCustomSelection).to.be.calledWith(true)
+    })
+
+    it('should togglePathStatus to false when calling selectPlots with 20 plots or less', async () => {
+      const { plots, pathsModel } = await buildPlotsWebview({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
+      const mockSetCustomSelection = stub(pathsModel, 'setHasCustomSelection')
+
+      stub(pathsModel, 'getTerminalNodes').returns(Array.from({ length: 20 }))
+
+      plots.togglePathStatus(dvcDemoPath)
+
+      expect(mockSetCustomSelection).to.be.calledWith(false)
+    })
   })
 })
