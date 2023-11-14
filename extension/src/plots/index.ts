@@ -91,6 +91,7 @@ export class Plots extends BaseRepository<TPlotsData> {
     const status = this.paths.toggleStatus(path)
     this.paths.setTemplateOrder()
     this.notifyChanged()
+    this.paths.setHasCustomSelection(true)
     return status
   }
 
@@ -104,6 +105,7 @@ export class Plots extends BaseRepository<TPlotsData> {
 
     this.paths.setSelected(selected)
     this.paths.setTemplateOrder()
+    this.paths.setHasCustomSelection(true)
     return this.notifyChanged()
   }
 
@@ -244,6 +246,7 @@ export class Plots extends BaseRepository<TPlotsData> {
         collectInitialIdShas()
         this.setupExperimentsListener(experiments)
         void this.initializeData()
+        this.paths.checkIfHasPreviousCustomSelection()
       })
     )
   }
