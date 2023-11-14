@@ -6096,10 +6096,10 @@
   dependencies:
     react-vega "*"
 
-"@types/react-virtualized@9.21.26":
-  version "9.21.26"
-  resolved "https://registry.yarnpkg.com/@types/react-virtualized/-/react-virtualized-9.21.26.tgz#a92cc39ac07505e050604e7c10f21caed429743f"
-  integrity sha512-fUpUyQqF8PTrFmBZzE9PcdtPwL8xgqUdXmtrYadNgFDYwbKBl3Lz0khp+tZ7dyKIHUVDO9NDlgQx8q1+LIUk+A==
+"@types/react-virtualized@9.21.27":
+  version "9.21.27"
+  resolved "https://registry.yarnpkg.com/@types/react-virtualized/-/react-virtualized-9.21.27.tgz#80e64a2ca5a37fc29c4276fc226161cb8a399d0f"
+  integrity sha512-DVAmqFXw4vKXLYHBMJKKt8+0t+O550uV2KT81aXRSztj7ieBSxIXL1X1cupwReb3Oux1RUfvmhEcRB2Jr6Z0Yw==
   dependencies:
     "@types/prop-types" "*"
     "@types/react" "*"
