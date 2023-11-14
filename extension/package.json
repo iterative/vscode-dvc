@@ -1742,7 +1742,7 @@
     "@types/lodash.clonedeep": "4.5.9",
     "@types/lodash.get": "4.4.9",
     "@types/lodash.isempty": "4.4.9",
-    "@types/lodash.isequal": "4.5.7",
+    "@types/lodash.isequal": "4.5.8",
     "@types/lodash.merge": "4.6.8",
     "@types/lodash.omit": "4.5.9",
     "@types/mocha": "10.0.4",
