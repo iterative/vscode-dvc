@@ -1737,7 +1737,7 @@
     "@types/chai": "4.3.10",
     "@types/chai-as-promised": "7.1.8",
     "@types/copy-webpack-plugin": "10.1.0",
-    "@types/fs-extra": "11.0.3",
+    "@types/fs-extra": "11.0.4",
     "@types/jest": "29.5.7",
     "@types/lodash.clonedeep": "4.5.9",
     "@types/lodash.get": "4.4.9",
