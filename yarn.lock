@@ -5641,10 +5641,10 @@
   resolved "https://registry.yarnpkg.com/@types/chai/-/chai-4.3.0.tgz#23509ebc1fa32f1b4d50d6a66c4032d5b8eaabdc"
   integrity sha512-/ceqdqeRraGolFTcfoXNiqjyQhZzbINDngeoAq9GoHa8PPK1yNzTaxWjA6BFWp5Ua9JpXEMSS4s5i9tS0hOJtw==
 
-"@types/chai@4.3.9":
-  version "4.3.9"
-  resolved "https://registry.yarnpkg.com/@types/chai/-/chai-4.3.9.tgz#144d762491967db8c6dea38e03d2206c2623feec"
-  integrity sha512-69TtiDzu0bcmKQv3yg1Zx409/Kd7r0b5F1PfpYJfSHzLGtB53547V4u+9iqKYsTu/O2ai6KTb0TInNpvuQ3qmg==
+"@types/chai@4.3.10":
+  version "4.3.10"
+  resolved "https://registry.yarnpkg.com/@types/chai/-/chai-4.3.10.tgz#2ad2959d1767edee5b0e4efb1a0cd2b500747317"
+  integrity sha512-of+ICnbqjmFCiixUnqRulbylyXQrPqIGf/B3Jax1wIF3DvSheysQxAWvqHhZiW3IQrycvokcLcFQlveGp+vyNg==
 
 "@types/clone@~2.1.1":
   version "2.1.1"
@@ -5993,10 +5993,10 @@
   resolved "https://registry.yarnpkg.com/@types/mocha/-/mocha-10.0.1.tgz#2f4f65bb08bc368ac39c96da7b2f09140b26851b"
   integrity sha512-/fvYntiO1GeICvqbQ3doGDIP97vWmvFt83GKguJ6prmQM2iXZfFcq6YE8KteFyRtX2/h5Hf91BYvPodJKFYv5Q==
 
-"@types/mock-require@2.0.2":
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/@types/mock-require/-/mock-require-2.0.2.tgz#004a20eddcfbdc0ee051868ab40bcf585a0c7354"
-  integrity sha512-+gdhqQrG7NLVr3TZMzDa6ovD8drpMdXDlA0f4wDODWjl/PLCInPRWtrk9iPvscM48J44Cosed1cqCXR3u8ttMg==
+"@types/mock-require@2.0.3":
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/@types/mock-require/-/mock-require-2.0.3.tgz#00470eaeebd3f933b7d7a9d992ee16b6a098ac15"
+  integrity sha512-0Hd1krmO7Dwa8haImu+eZXZ6FeCtixS8S1xvM6LWNJE5DFV5A92/zpAkQCDPOA/Z13d1xY3LqS7hpSWqlDzxrQ==
   dependencies:
     "@types/node" "*"
 
@@ -6096,10 +6096,10 @@
   dependencies:
     react-vega "*"
 
-"@types/react-virtualized@9.21.26":
-  version "9.21.26"
-  resolved "https://registry.yarnpkg.com/@types/react-virtualized/-/react-virtualized-9.21.26.tgz#a92cc39ac07505e050604e7c10f21caed429743f"
-  integrity sha512-fUpUyQqF8PTrFmBZzE9PcdtPwL8xgqUdXmtrYadNgFDYwbKBl3Lz0khp+tZ7dyKIHUVDO9NDlgQx8q1+LIUk+A==
+"@types/react-virtualized@9.21.27":
+  version "9.21.27"
+  resolved "https://registry.yarnpkg.com/@types/react-virtualized/-/react-virtualized-9.21.27.tgz#80e64a2ca5a37fc29c4276fc226161cb8a399d0f"
+  integrity sha512-DVAmqFXw4vKXLYHBMJKKt8+0t+O550uV2KT81aXRSztj7ieBSxIXL1X1cupwReb3Oux1RUfvmhEcRB2Jr6Z0Yw==
   dependencies:
     "@types/prop-types" "*"
     "@types/react" "*"
