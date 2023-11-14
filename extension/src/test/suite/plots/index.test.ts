@@ -55,9 +55,15 @@ import { BaseWebview } from '../../../webview'
 import * as PlotsCollectUtils from '../../../plots/model/collect'
 import { Operator } from '../../../experiments/model/filterBy'
 import * as External from '../../../vscode/external'
+import { PlotPath } from '../../../plots/paths/collect'
 
 suite('Plots Test Suite', () => {
   const disposable = Disposable.fn()
+
+  const createTerminalNodesArray = (length: number) =>
+    Array.from({ length }, i => ({ path: i })) as unknown as (PlotPath & {
+      selected: boolean
+    })[]
 
   beforeEach(() => {
     restore()
@@ -1311,8 +1317,9 @@ suite('Plots Test Suite', () => {
         plotsDiff: plotsDiffFixture
       })
       const mockSetCustomSelection = stub(pathsModel, 'setHasCustomSelection')
-
-      stub(pathsModel, 'getTerminalNodes').returns(Array.from({ length: 32 }))
+      stub(pathsModel, 'setTemplateOrder')
+      stub(pathsModel, 'toggleStatus')
+      stub(pathsModel, 'getTerminalNodes').returns(createTerminalNodesArray(32))
 
       plots.togglePathStatus(dvcDemoPath)
 
@@ -1325,8 +1332,9 @@ suite('Plots Test Suite', () => {
         plotsDiff: plotsDiffFixture
       })
       const mockSetCustomSelection = stub(pathsModel, 'setHasCustomSelection')
-
-      stub(pathsModel, 'getTerminalNodes').returns(Array.from({ length: 20 }))
+      stub(pathsModel, 'setTemplateOrder')
+      stub(pathsModel, 'toggleStatus')
+      stub(pathsModel, 'getTerminalNodes').returns(createTerminalNodesArray(20))
 
       plots.togglePathStatus(dvcDemoPath)
 
