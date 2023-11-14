@@ -61,7 +61,7 @@
     "@types/react": "18.2.36",
     "@types/react-dom": "18.2.14",
     "@types/react-virtualized": "9.21.27",
-    "@types/webpack": "5.28.4",
+    "@types/webpack": "5.28.5",
     "@welldone-software/why-did-you-render": "7.0.1",
     "clean-webpack-plugin": "4.0.0",
     "css-loader": "6.8.1",
