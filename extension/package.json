@@ -1739,7 +1739,7 @@
     "@types/copy-webpack-plugin": "10.1.0",
     "@types/fs-extra": "11.0.3",
     "@types/jest": "29.5.7",
-    "@types/lodash.clonedeep": "4.5.8",
+    "@types/lodash.clonedeep": "4.5.9",
     "@types/lodash.get": "4.4.8",
     "@types/lodash.isempty": "4.4.8",
     "@types/lodash.isequal": "4.5.7",
