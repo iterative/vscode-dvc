@@ -39,7 +39,7 @@
     "theme": "dark"
   },
   "engines": {
-    "vscode": "^1.64.0",
+    "vscode": "^2023.0.0",
     "node": ">=16.13.0"
   },
   "activationEvents": [
