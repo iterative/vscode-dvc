@@ -8,6 +8,8 @@ import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 import { ErrorsModel } from '../errors/model'
 import { REVISIONS } from '../../test/fixtures/plotsDiff'
 import { SpecWithTitles } from '../vega/util'
+import { PersistenceKey } from '../../persistence/constants'
+import { Status } from '../../path/selection/model'
 
 describe('PathsModel', () => {
   const mockDvcRoot = 'test'
@@ -501,5 +503,76 @@ describe('PathsModel', () => {
     )
 
     expect(model.getTerminalNodes()).toStrictEqual([])
+  })
+
+  it('should not change hasCustomSelection when checking for if it is already defined', () => {
+    const memento = buildMockMemento({
+      [PersistenceKey.PLOTS_HAS_CUSTOM_SELECTION + mockDvcRoot]: true
+    })
+    const model = new PathsModel(mockDvcRoot, buildMockErrorsModel(), memento)
+    const setHasCustomSelectionSpy = jest.spyOn(model, 'setHasCustomSelection')
+
+    model.checkIfHasPreviousCustomSelection()
+    expect(setHasCustomSelectionSpy).not.toHaveBeenCalled()
+  })
+
+  it('should set hasCustomSelection to false if there are less than 20 plots', () => {
+    const model = new PathsModel(
+      mockDvcRoot,
+      buildMockErrorsModel(),
+      buildMockMemento()
+    )
+    const setHasCustomSelectionSpy = jest.spyOn(model, 'setHasCustomSelection')
+    jest
+      .spyOn(model, 'getTerminalNodeStatuses')
+      .mockImplementation(() => [
+        Status.SELECTED,
+        Status.SELECTED,
+        Status.SELECTED,
+        Status.SELECTED
+      ])
+
+    model.checkIfHasPreviousCustomSelection()
+    expect(setHasCustomSelectionSpy).toHaveBeenCalledWith(false)
+  })
+
+  it('should set hasCustomSelection to false if there are 20 selected plots', () => {
+    const model = new PathsModel(
+      mockDvcRoot,
+      buildMockErrorsModel(),
+      buildMockMemento()
+    )
+    const setHasCustomSelectionSpy = jest.spyOn(model, 'setHasCustomSelection')
+    const statuses = [Status.UNSELECTED]
+    for (let i = 0; i < 20; i++) {
+      statuses.push(Status.SELECTED)
+    }
+    statuses.push(Status.UNSELECTED)
+    jest
+      .spyOn(model, 'getTerminalNodeStatuses')
+      .mockImplementation(() => statuses)
+
+    model.checkIfHasPreviousCustomSelection()
+    expect(setHasCustomSelectionSpy).toHaveBeenCalledWith(false)
+  })
+
+  it('should set hasCustomSelection to true if there are more than 20 plots and the number of selected plots is not 20', () => {
+    const model = new PathsModel(
+      mockDvcRoot,
+      buildMockErrorsModel(),
+      buildMockMemento()
+    )
+    const setHasCustomSelectionSpy = jest.spyOn(model, 'setHasCustomSelection')
+    const statuses = [Status.UNSELECTED]
+    for (let i = 0; i < 19; i++) {
+      statuses.push(Status.SELECTED)
+    }
+    statuses.push(Status.UNSELECTED)
+    jest
+      .spyOn(model, 'getTerminalNodeStatuses')
+      .mockImplementation(() => statuses)
+
+    model.checkIfHasPreviousCustomSelection()
+    expect(setHasCustomSelectionSpy).toHaveBeenCalledWith(true)
   })
 })
