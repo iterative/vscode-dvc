@@ -505,7 +505,7 @@ describe('PathsModel', () => {
     expect(model.getTerminalNodes()).toStrictEqual([])
   })
 
-  it('should not change hasCustomSelection when checking for it if it is already defined', () => {
+  it('should not change hasCustomSelection when checking for if it is already defined', () => {
     const memento = buildMockMemento({
       [PersistenceKey.PLOTS_HAS_CUSTOM_SELECTION + mockDvcRoot]: true
     })
