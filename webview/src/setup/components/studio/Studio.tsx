@@ -5,12 +5,19 @@ import { Connect } from './Connect'
 import { Settings } from './Settings'
 import { SetupState } from '../../store'
 import { CliIncompatible } from '../shared/CliIncompatible'
+import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 
 export const Studio: React.FC<{
   cliCompatible: boolean
   setShareLiveToStudio: (shareLiveToStudio: boolean) => void
 }> = ({ cliCompatible, setShareLiveToStudio }) => {
-  const { isStudioConnected } = useSelector((state: SetupState) => state.studio)
+  const { isStudioConnected, isStudioConnecting } = useSelector(
+    (state: SetupState) => state.studio
+  )
+
+  if (isStudioConnecting) {
+    return <EmptyState isFullScreen={false}>Connecting to Studio...</EmptyState>
+  }
 
   if (!cliCompatible) {
     return (

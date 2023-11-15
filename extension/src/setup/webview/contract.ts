@@ -16,6 +16,7 @@ export type SetupData = {
   isPythonExtensionInstalled: boolean
   isPythonExtensionUsed: boolean
   isStudioConnected: boolean
+  isStudioConnecting: boolean
   needsGitCommit: boolean
   needsGitInitialized: boolean | undefined
   projectInitialized: boolean

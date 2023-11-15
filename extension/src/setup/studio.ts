@@ -22,19 +22,23 @@ export class Studio extends Disposable {
     this.dispose.track(new EventEmitter())
 
   private readonly getCwd: () => string | undefined
+  private readonly update: () => Promise<void>
   private readonly internalCommands: InternalCommands
   private studioAccessToken: string | undefined = undefined
   private studioIsConnected = false
+  private studioIsConnecting = false
   private shareLiveToStudio: boolean | undefined = undefined
 
   constructor(
     internalCommands: InternalCommands,
-    getCwd: () => string | undefined
+    getCwd: () => string | undefined,
+    update: () => Promise<void>
   ) {
     super()
 
     this.internalCommands = internalCommands
     this.getCwd = getCwd
+    this.update = update
     this.onDidChangeStudioConnection = this.studioConnectionChanged.event
   }
 
@@ -46,8 +50,17 @@ export class Studio extends Disposable {
     return this.studioIsConnected
   }
 
+  public getStudioIsConnecting() {
+    return this.studioIsConnecting
+  }
+
   public getShareLiveToStudio() {
     return this.shareLiveToStudio
+  }
+
+  public setIsStudioConnecting() {
+    this.studioIsConnecting = true
+    void this.update()
   }
 
   public async removeStudioAccessToken(dvcRoots: string[]) {
@@ -86,7 +99,8 @@ export class Studio extends Disposable {
     const storedToken = this.getStudioAccessToken()
     const isConnected = isStudioAccessToken(storedToken)
     this.studioIsConnected = isConnected
-    return setContextValue(ContextKey.STUDIO_CONNECTED, isConnected)
+    await setContextValue(ContextKey.STUDIO_CONNECTED, isConnected)
+    this.studioIsConnecting = false
   }
 
   public async updateStudioOffline(shareLive: boolean) {
@@ -170,6 +184,7 @@ export class Studio extends Disposable {
   }
 
   private async requestStudioToken(deviceCode: string, tokenUri: string) {
+    this.setIsStudioConnecting()
     const token = await this.fetchStudioToken(deviceCode, tokenUri)
     const cwd = this.getCwd()
 

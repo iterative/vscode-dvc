@@ -5,6 +5,7 @@ export type DvcState = Omit<
   SetupData,
   | 'hasData'
   | 'isStudioConnected'
+  | 'isStudioConnecting'
   | 'needsGitCommit'
   | 'sectionCollapsed'
   | 'shareLiveToStudio'

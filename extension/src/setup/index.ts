@@ -147,7 +147,11 @@ export class Setup
     this.setCommandsAvailability(false)
     this.setProjectAvailability()
 
-    this.studio = new Studio(internalCommands, () => this.getCwd())
+    this.studio = new Studio(
+      internalCommands,
+      () => this.getCwd(),
+      () => this.sendDataToWebview()
+    )
     this.onDidChangeStudioConnection = this.studio.onDidChangeStudioConnection
 
     this.webviewMessages = this.createWebviewMessageHandler()
@@ -407,6 +411,7 @@ export class Setup
       isPythonExtensionInstalled: this.config.isPythonExtensionInstalled(),
       isPythonExtensionUsed,
       isStudioConnected: this.studio.getStudioIsConnected(),
+      isStudioConnecting: this.studio.getStudioIsConnecting(),
       needsGitCommit,
       needsGitInitialized,
       projectInitialized,

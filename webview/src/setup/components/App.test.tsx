@@ -35,6 +35,7 @@ const DEFAULT_DATA = {
   isPythonExtensionInstalled: false,
   isPythonExtensionUsed: false,
   isStudioConnected: false,
+  isStudioConnecting: false,
   needsGitCommit: false,
   needsGitInitialized: false,
   projectInitialized: true,
@@ -631,7 +632,7 @@ describe('App', () => {
   })
 
   describe('Studio not connected', () => {
-    it('should show buttons which request a token from Studio or add an already creatd one', () => {
+    it('should show buttons which request a token from Studio or add an already created one', () => {
       renderApp()
       mockPostMessage.mockClear()
       const getTokenButton = screen.getByText('Get Token')
@@ -648,6 +649,14 @@ describe('App', () => {
       expect(mockPostMessage).toHaveBeenCalledWith({
         type: MessageFromWebviewType.SAVE_STUDIO_TOKEN
       })
+    })
+
+    it('should show a loading message if studio is connecting', () => {
+      renderApp({ isStudioConnecting: true })
+
+      const message = screen.getByText('Connecting to Studio...')
+
+      expect(message).toBeInTheDocument()
     })
 
     it('should show an error icon if dvc is not compatible', () => {

@@ -21,6 +21,7 @@ const DEFAULT_DATA: SetupData = {
   isPythonExtensionInstalled: true,
   isPythonExtensionUsed: true,
   isStudioConnected: true,
+  isStudioConnecting: false,
   needsGitCommit: false,
   needsGitInitialized: false,
   projectInitialized: true,
