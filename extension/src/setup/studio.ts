@@ -58,11 +58,6 @@ export class Studio extends Disposable {
     return this.shareLiveToStudio
   }
 
-  public setIsStudioConnecting() {
-    this.studioIsConnecting = true
-    void this.update()
-  }
-
   public async removeStudioAccessToken(dvcRoots: string[]) {
     if (dvcRoots.length !== 1) {
       const cwd = getFirstWorkspaceFolder()
@@ -100,7 +95,7 @@ export class Studio extends Disposable {
     const isConnected = isStudioAccessToken(storedToken)
     this.studioIsConnected = isConnected
     await setContextValue(ContextKey.STUDIO_CONNECTED, isConnected)
-    this.studioIsConnecting = false
+    this.setIsStudioConnecting(this.studioIsConnecting)
   }
 
   public async updateStudioOffline(shareLive: boolean) {
@@ -162,6 +157,15 @@ export class Studio extends Disposable {
     })
   }
 
+  private setIsStudioConnecting(isConnecting: boolean) {
+    this.studioIsConnecting = isConnecting
+  }
+
+  private updateIsStudioConnecting(isConnecting: boolean) {
+    this.setIsStudioConnecting(isConnecting)
+    void this.update()
+  }
+
   private async fetchStudioToken(deviceCode: string, tokenUri: string) {
     const response = await this.fetchFromStudio(tokenUri, {
       code: deviceCode
@@ -184,11 +188,12 @@ export class Studio extends Disposable {
   }
 
   private async requestStudioToken(deviceCode: string, tokenUri: string) {
-    this.setIsStudioConnecting()
+    this.updateIsStudioConnecting(true)
     const token = await this.fetchStudioToken(deviceCode, tokenUri)
     const cwd = this.getCwd()
 
     if (!token || !cwd) {
+      this.updateIsStudioConnecting(false)
       return
     }
 

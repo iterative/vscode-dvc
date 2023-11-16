@@ -17,7 +17,8 @@ import {
   closeAllEditors,
   getMessageReceivedEmitter,
   quickPickInitialized,
-  selectQuickPickItem
+  selectQuickPickItem,
+  waitForSpyCall
 } from '../util'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
 import { MessageFromWebviewType } from '../../../webview/contract'
@@ -382,6 +383,7 @@ suite('Setup Test Suite', () => {
         isPythonExtensionInstalled: false,
         isPythonExtensionUsed: false,
         isStudioConnected: false,
+        isStudioConnecting: false,
         needsGitCommit: true,
         needsGitInitialized: true,
         projectInitialized: false,
@@ -428,6 +430,7 @@ suite('Setup Test Suite', () => {
         isPythonExtensionInstalled: false,
         isPythonExtensionUsed: false,
         isStudioConnected: false,
+        isStudioConnecting: false,
         needsGitCommit: true,
         needsGitInitialized: true,
         projectInitialized: false,
@@ -482,6 +485,7 @@ suite('Setup Test Suite', () => {
         isPythonExtensionInstalled: false,
         isPythonExtensionUsed: false,
         isStudioConnected: false,
+        isStudioConnecting: false,
         needsGitCommit: false,
         needsGitInitialized: false,
         projectInitialized: false,
@@ -536,6 +540,7 @@ suite('Setup Test Suite', () => {
         isPythonExtensionInstalled: false,
         isPythonExtensionUsed: false,
         isStudioConnected: false,
+        isStudioConnecting: false,
         needsGitCommit: true,
         needsGitInitialized: false,
         projectInitialized: true,
@@ -923,27 +928,27 @@ suite('Setup Test Suite', () => {
         `${mockStudioRes.verification_uri}?redirect_uri=${mockCallbackUrl}&code=${mockStudioRes.user_code}`
       )
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const mockGetCwd = stub(studio as any, 'getCwd')
       const mockModalShowError = stub(Modal, 'errorWithOptions')
       const mockSaveStudioToken = stub(studio, 'saveStudioAccessTokenInConfig')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const studioUpdateSpy = spy(studio as any, 'update')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const updateIsConnectingSpy = spy(studio as any, 'setIsStudioConnecting')
       mockFetch.onSecondCall().resolves({
         json: () =>
           Promise.resolve({ detail: 'Request failed for some reason.' }),
         status: 500
       } as Fetch.Response)
 
-      const failedTokenEvent = new Promise(resolve =>
-        mockGetCwd.onFirstCall().callsFake(() => {
-          resolve(undefined)
-          return dvcDemoPath
-        })
-      )
+      const failedTokenEvent = waitForSpyCall(studioUpdateSpy, 1)
 
       mockOnStudioResponse()
 
       await failedTokenEvent
 
+      expect(updateIsConnectingSpy).to.be.calledTwice
+      expect(studioUpdateSpy).to.be.calledTwice
+      expect(updateIsConnectingSpy.firstCall.firstArg).to.equal(true)
       expect(mockFetch).to.be.calledTwice
       expect(mockFetch).to.be.calledWithExactly(mockStudioRes.token_uri, {
         body: JSON.stringify({
@@ -958,6 +963,7 @@ suite('Setup Test Suite', () => {
       expect(mockModalShowError).to.be.calledWithExactly(
         'Unable to get token. Failed with "Request failed for some reason."'
       )
+      expect(updateIsConnectingSpy.secondCall.firstArg).to.equal(false)
       expect(mockSaveStudioToken).not.to.be.called
 
       const mockToken = 'isat_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
@@ -966,9 +972,9 @@ suite('Setup Test Suite', () => {
         status: 200
       } as Fetch.Response)
       const tokenEvent = new Promise(resolve =>
-        mockGetCwd.onSecondCall().callsFake(() => {
+        mockSaveStudioToken.onFirstCall().callsFake(() => {
           resolve(undefined)
-          return dvcDemoPath
+          return Promise.resolve(mockToken)
         })
       )
 
@@ -976,6 +982,9 @@ suite('Setup Test Suite', () => {
 
       await tokenEvent
 
+      expect(studioUpdateSpy).to.be.calledThrice
+      expect(updateIsConnectingSpy).to.be.calledThrice
+      expect(updateIsConnectingSpy.thirdCall.firstArg).to.equal(true)
       expect(mockFetch).to.be.calledThrice
       expect(mockSaveStudioToken).to.be.calledOnce
       expect(mockSaveStudioToken).to.be.calledWithExactly(
