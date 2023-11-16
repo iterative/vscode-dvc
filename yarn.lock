@@ -11497,10 +11497,10 @@ eslint-plugin-sort-keys-fix@1.1.2:
     natural-compare "^1.4.0"
     requireindex "~1.2.0"
 
-eslint-plugin-testing-library@6.1.0:
-  version "6.1.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-testing-library/-/eslint-plugin-testing-library-6.1.0.tgz#6f4fbc50dfbac100b0c6083b1e6b06cea9a86feb"
-  integrity sha512-r7kE+az3tbp8vyRwfyAGZ6V/xw+XvdWFPicIo6jbOPZoossOFDeHizARqPGV6gEkyF8hyCFhhH3mlQOGS3N5Sg==
+eslint-plugin-testing-library@6.1.1:
+  version "6.1.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-testing-library/-/eslint-plugin-testing-library-6.1.1.tgz#8ee6313c5e5c49c3dd541c679b1c38724632f997"
+  integrity sha512-hngaSyZckb/zOPUd+74OXx+hY2YgHOoSkBnwd6L94iMHjt4DstWcvB4FT301ClyGEobmHDxgdhRPhd6ie8NPhQ==
   dependencies:
     "@typescript-eslint/utils" "^5.58.0"
 
