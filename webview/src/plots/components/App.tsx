@@ -29,7 +29,8 @@ import {
   updateCliError,
   updateHasPlots,
   updateHasUnselectedPlots,
-  updateSelectedRevisions
+  updateSelectedRevisions,
+  updateShouldShowTooMAnyPlotsMessage
 } from './webviewSlice'
 import { PlotsDispatch } from '../store'
 import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
@@ -81,6 +82,11 @@ export const feedStore = (
           continue
         case PlotsDataKeys.SELECTED_REVISIONS:
           dispatch(updateSelectedRevisions(data.data[key] as Revision[]))
+          continue
+        case PlotsDataKeys.SHOW_TOO_MANY_PLOTS:
+          dispatch(
+            updateShouldShowTooMAnyPlotsMessage(data.data[key] as boolean)
+          )
           continue
         default:
           continue

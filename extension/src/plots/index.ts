@@ -229,7 +229,8 @@ export class Plots extends BaseRepository<TPlotsData> {
       errors,
       experiments,
       () => this.getWebview(),
-      () => this.selectPlots()
+      () => this.selectPlots(),
+      () => this.paths.getHasTooManyPlots()
     )
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message =>

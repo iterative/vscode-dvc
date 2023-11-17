@@ -175,6 +175,25 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
     }
   }
 
+  public getHasTooManyPlots() {
+    return !!(this.getTerminalNodes().length > 20 && !this.hasCustomSelection)
+  }
+
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+  protected setNewStatuses(data: { path: string }[]) {
+    if (!this.hasCustomSelection) {
+      let selected = 0
+      for (const { path } of data) {
+        if (this.status[path] === undefined) {
+          this.status[path] =
+            selected < 20 ? Status.SELECTED : Status.UNSELECTED
+          selected++
+        }
+      }
+    }
+    super.setNewStatuses(data)
+  }
+
   private handleCliError() {
     this.data = []
   }

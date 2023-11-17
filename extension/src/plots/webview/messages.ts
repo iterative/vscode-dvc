@@ -44,6 +44,7 @@ export class WebviewMessages {
 
   private readonly getWebview: () => BaseWebview<TPlotsData> | undefined
   private readonly selectPlots: () => Promise<void>
+  private readonly shouldShowTooManyPlotsMessage: () => boolean
 
   constructor(
     dvcRoot: string,
@@ -52,7 +53,8 @@ export class WebviewMessages {
     errors: ErrorsModel,
     experiments: Experiments,
     getWebview: () => BaseWebview<TPlotsData> | undefined,
-    selectPlots: () => Promise<void>
+    selectPlots: () => Promise<void>,
+    shouldShowTooManyPlotsMessage: () => boolean
   ) {
     this.dvcRoot = dvcRoot
     this.paths = paths
@@ -61,6 +63,7 @@ export class WebviewMessages {
     this.experiments = experiments
     this.getWebview = getWebview
     this.selectPlots = selectPlots
+    this.shouldShowTooManyPlotsMessage = shouldShowTooManyPlotsMessage
   }
 
   public async sendWebviewMessage() {
@@ -165,6 +168,7 @@ export class WebviewMessages {
       this.plots.getSectionCollapsed(),
       this.getTemplatePlots(selectedRevisions)
     ])
+    const shouldShowTooManyPlotsMessage = this.shouldShowTooManyPlotsMessage()
 
     return {
       cliError,
@@ -174,6 +178,7 @@ export class WebviewMessages {
       hasUnselectedPlots,
       sectionCollapsed,
       selectedRevisions,
+      shouldShowTooManyPlotsMessage,
       template
     }
   }

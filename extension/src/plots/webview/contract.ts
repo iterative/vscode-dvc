@@ -176,7 +176,8 @@ export enum PlotsDataKeys {
   HAS_PLOTS = 'hasPlots',
   SELECTED_REVISIONS = 'selectedRevisions',
   TEMPLATE = 'template',
-  SECTION_COLLAPSED = 'sectionCollapsed'
+  SECTION_COLLAPSED = 'sectionCollapsed',
+  SHOW_TOO_MANY_PLOTS = 'shouldShowTooManyPlotsMessage'
 }
 
 export type PlotsData =
@@ -189,5 +190,6 @@ export type PlotsData =
       [PlotsDataKeys.SELECTED_REVISIONS]?: Revision[]
       [PlotsDataKeys.TEMPLATE]?: TemplatePlotsData | null
       [PlotsDataKeys.SECTION_COLLAPSED]?: SectionCollapsed
+      [PlotsDataKeys.SHOW_TOO_MANY_PLOTS]?: boolean
     }
   | undefined
