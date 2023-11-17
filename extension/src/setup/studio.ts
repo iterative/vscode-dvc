@@ -173,19 +173,22 @@ export class Studio extends Disposable {
   private requestStudioToken(deviceCode: string, tokenUri: string) {
     return Toast.showProgress('Connecting to Studio', async progress => {
       progress.report({ increment: 0 })
-      progress.report({ increment: 25, message: 'Grabbing token...' })
+      progress.report({ increment: 25, message: 'Fetching token...' })
       const token = await this.fetchStudioToken(deviceCode, tokenUri)
       const cwd = this.getCwd()
 
       if (!token || !cwd) {
-        return Toast.reportProgressError('Connecting failed', progress)
+        const error = new Error('Connection failed')
+        return Toast.reportProgressError(error, progress)
       }
 
       await this.saveStudioAccessTokenInConfig(cwd, token)
+
       progress.report({
         increment: 75,
-        message: 'Token added'
+        message: 'Token saved'
       })
+
       return Toast.delayProgressClosing(15000)
     })
   }
