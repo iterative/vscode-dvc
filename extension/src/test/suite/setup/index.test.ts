@@ -54,6 +54,7 @@ import { DvcConfig } from '../../../cli/dvc/config'
 import * as QuickPickUtil from '../../../setup/quickPick'
 import { EventName } from '../../../telemetry/constants'
 import { Modal } from '../../../vscode/modal'
+import { Toast } from '../../../vscode/toast'
 
 suite('Setup Test Suite', () => {
   const disposable = Disposable.fn()
@@ -383,7 +384,6 @@ suite('Setup Test Suite', () => {
         isPythonExtensionInstalled: false,
         isPythonExtensionUsed: false,
         isStudioConnected: false,
-        isStudioConnecting: false,
         needsGitCommit: true,
         needsGitInitialized: true,
         projectInitialized: false,
@@ -430,7 +430,6 @@ suite('Setup Test Suite', () => {
         isPythonExtensionInstalled: false,
         isPythonExtensionUsed: false,
         isStudioConnected: false,
-        isStudioConnecting: false,
         needsGitCommit: true,
         needsGitInitialized: true,
         projectInitialized: false,
@@ -485,7 +484,6 @@ suite('Setup Test Suite', () => {
         isPythonExtensionInstalled: false,
         isPythonExtensionUsed: false,
         isStudioConnected: false,
-        isStudioConnecting: false,
         needsGitCommit: false,
         needsGitInitialized: false,
         projectInitialized: false,
@@ -540,7 +538,6 @@ suite('Setup Test Suite', () => {
         isPythonExtensionInstalled: false,
         isPythonExtensionUsed: false,
         isStudioConnected: false,
-        isStudioConnecting: false,
         needsGitCommit: true,
         needsGitInitialized: false,
         projectInitialized: true,
@@ -930,25 +927,21 @@ suite('Setup Test Suite', () => {
 
       const mockModalShowError = stub(Modal, 'errorWithOptions')
       const mockSaveStudioToken = stub(studio, 'saveStudioAccessTokenInConfig')
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const studioUpdateSpy = spy(studio as any, 'update')
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const updateIsConnectingSpy = spy(studio as any, 'setIsStudioConnecting')
+      const showProgressSpy = spy(Toast, 'showProgress')
+      const reportProgressErrorSpy = spy(Toast, 'reportProgressError')
+      const delayProgressClosingSpy = spy(Toast, 'delayProgressClosing')
       mockFetch.onSecondCall().resolves({
         json: () =>
           Promise.resolve({ detail: 'Request failed for some reason.' }),
         status: 500
       } as Fetch.Response)
 
-      const failedTokenEvent = waitForSpyCall(studioUpdateSpy, 1)
+      const failedTokenEvent = waitForSpyCall(delayProgressClosingSpy, 0)
 
       mockOnStudioResponse()
 
       await failedTokenEvent
 
-      expect(updateIsConnectingSpy).to.be.calledTwice
-      expect(studioUpdateSpy).to.be.calledTwice
-      expect(updateIsConnectingSpy.firstCall.firstArg).to.equal(true)
       expect(mockFetch).to.be.calledTwice
       expect(mockFetch).to.be.calledWithExactly(mockStudioRes.token_uri, {
         body: JSON.stringify({
@@ -963,7 +956,8 @@ suite('Setup Test Suite', () => {
       expect(mockModalShowError).to.be.calledWithExactly(
         'Unable to get token. Failed with "Request failed for some reason."'
       )
-      expect(updateIsConnectingSpy.secondCall.firstArg).to.equal(false)
+      expect(showProgressSpy).to.be.calledOnce
+      expect(reportProgressErrorSpy).to.be.calledOnce
       expect(mockSaveStudioToken).not.to.be.called
 
       const mockToken = 'isat_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
@@ -971,26 +965,21 @@ suite('Setup Test Suite', () => {
         json: () => Promise.resolve({ access_token: mockToken }),
         status: 200
       } as Fetch.Response)
-      const tokenEvent = new Promise(resolve =>
-        mockSaveStudioToken.onFirstCall().callsFake(() => {
-          resolve(undefined)
-          return Promise.resolve(mockToken)
-        })
-      )
+      const tokenEvent = waitForSpyCall(delayProgressClosingSpy, 1)
 
       mockOnStudioResponse()
 
       await tokenEvent
 
-      expect(studioUpdateSpy).to.be.calledThrice
-      expect(updateIsConnectingSpy).to.be.calledThrice
-      expect(updateIsConnectingSpy.thirdCall.firstArg).to.equal(true)
       expect(mockFetch).to.be.calledThrice
       expect(mockSaveStudioToken).to.be.calledOnce
       expect(mockSaveStudioToken).to.be.calledWithExactly(
         dvcDemoPath,
         mockToken
       )
+      expect(showProgressSpy).to.be.calledTwice
+      expect(reportProgressErrorSpy).not.to.be.calledTwice
+      expect(delayProgressClosingSpy).to.be.calledTwice
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it("should handle a message from the webview to manually save the user's Studio access token", async () => {

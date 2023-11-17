@@ -8,6 +8,7 @@ import { ContextKey, setContextValue } from '../vscode/context'
 import { Disposable } from '../class/dispose'
 import { getCallBackUrl, openUrl, waitForUriResponse } from '../vscode/external'
 import { Modal } from '../vscode/modal'
+import { Toast } from '../vscode/toast'
 
 export const isStudioAccessToken = (text?: string): boolean => {
   if (!text) {
@@ -22,23 +23,19 @@ export class Studio extends Disposable {
     this.dispose.track(new EventEmitter())
 
   private readonly getCwd: () => string | undefined
-  private readonly update: () => Promise<void>
   private readonly internalCommands: InternalCommands
   private studioAccessToken: string | undefined = undefined
   private studioIsConnected = false
-  private studioIsConnecting = false
   private shareLiveToStudio: boolean | undefined = undefined
 
   constructor(
     internalCommands: InternalCommands,
-    getCwd: () => string | undefined,
-    update: () => Promise<void>
+    getCwd: () => string | undefined
   ) {
     super()
 
     this.internalCommands = internalCommands
     this.getCwd = getCwd
-    this.update = update
     this.onDidChangeStudioConnection = this.studioConnectionChanged.event
   }
 
@@ -48,10 +45,6 @@ export class Studio extends Disposable {
 
   public getStudioIsConnected() {
     return this.studioIsConnected
-  }
-
-  public getStudioIsConnecting() {
-    return this.studioIsConnecting
   }
 
   public getShareLiveToStudio() {
@@ -95,7 +88,6 @@ export class Studio extends Disposable {
     const isConnected = isStudioAccessToken(storedToken)
     this.studioIsConnected = isConnected
     await setContextValue(ContextKey.STUDIO_CONNECTED, isConnected)
-    this.setIsStudioConnecting(this.studioIsConnecting)
   }
 
   public async updateStudioOffline(shareLive: boolean) {
@@ -157,15 +149,6 @@ export class Studio extends Disposable {
     })
   }
 
-  private setIsStudioConnecting(isConnecting: boolean) {
-    this.studioIsConnecting = isConnecting
-  }
-
-  private updateIsStudioConnecting(isConnecting: boolean) {
-    this.setIsStudioConnecting(isConnecting)
-    void this.update()
-  }
-
   private async fetchStudioToken(deviceCode: string, tokenUri: string) {
     const response = await this.fetchFromStudio(tokenUri, {
       code: deviceCode
@@ -187,17 +170,24 @@ export class Studio extends Disposable {
     return accessToken
   }
 
-  private async requestStudioToken(deviceCode: string, tokenUri: string) {
-    this.updateIsStudioConnecting(true)
-    const token = await this.fetchStudioToken(deviceCode, tokenUri)
-    const cwd = this.getCwd()
+  private requestStudioToken(deviceCode: string, tokenUri: string) {
+    return Toast.showProgress('Connecting to Studio', async progress => {
+      progress.report({ increment: 0 })
+      progress.report({ increment: 25, message: 'Grabbing token...' })
+      const token = await this.fetchStudioToken(deviceCode, tokenUri)
+      const cwd = this.getCwd()
 
-    if (!token || !cwd) {
-      this.updateIsStudioConnecting(false)
-      return
-    }
+      if (!token || !cwd) {
+        return Toast.reportProgressError('Connecting failed', progress)
+      }
 
-    return this.saveStudioAccessTokenInConfig(cwd, token)
+      await this.saveStudioAccessTokenInConfig(cwd, token)
+      progress.report({
+        increment: 75,
+        message: 'Token added'
+      })
+      return Toast.delayProgressClosing(15000)
+    })
   }
 
   private async setStudioValues() {

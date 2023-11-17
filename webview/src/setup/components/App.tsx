@@ -33,7 +33,6 @@ import {
 import { updateRemoteList } from '../state/remoteSlice'
 import {
   updateIsStudioConnected,
-  updateIsStudioConnecting,
   updateShareLiveToStudio
 } from '../state/studioSlice'
 import { setStudioShareExperimentsLive } from '../util/messages'
@@ -101,9 +100,6 @@ export const feedStore = (
         continue
       case 'isStudioConnected':
         dispatch(updateIsStudioConnected(data.data.isStudioConnected))
-        continue
-      case 'isStudioConnecting':
-        dispatch(updateIsStudioConnecting(data.data.isStudioConnecting))
         continue
       case 'needsGitCommit':
         dispatch(updateNeedsGitCommit(data.data.needsGitCommit))
