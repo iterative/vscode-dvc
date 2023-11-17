@@ -1,6 +1,6 @@
 import { join } from 'path'
 import { PathsModel } from './model'
-import { PathType } from './collect'
+import { PathType, PlotPath } from './collect'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import { buildMockMemento } from '../../test/util'
 import { PlotsType, TemplatePlotGroup } from '../webview/contract'
@@ -574,5 +574,59 @@ describe('PathsModel', () => {
 
     model.checkIfHasPreviousCustomSelection()
     expect(setHasCustomSelectionSpy).toHaveBeenCalledWith(true)
+  })
+
+  it('should return false when calling getHasTooManyPlots when there is a custom selection', () => {
+    const model = new PathsModel(
+      mockDvcRoot,
+      buildMockErrorsModel(),
+      buildMockMemento()
+    )
+
+    model.setHasCustomSelection(true)
+
+    expect(model.getHasTooManyPlots()).toBe(false)
+  })
+
+  it('should return false when calling getHasTooManyPlots when there is no custom selection and there are fewer than 20 plots', () => {
+    const model = new PathsModel(
+      mockDvcRoot,
+      buildMockErrorsModel(),
+      buildMockMemento()
+    )
+
+    model.setHasCustomSelection(false)
+
+    const nodes = [{}]
+    for (let i = 0; i < 19; i++) {
+      nodes.push({})
+    }
+
+    jest
+      .spyOn(model, 'getTerminalNodes')
+      .mockImplementation(() => nodes as (PlotPath & { selected: boolean })[])
+
+    expect(model.getHasTooManyPlots()).toBe(false)
+  })
+
+  it('should return true when calling getHasTooManyPlots when there is no custom selection and there are more than 20 plots', () => {
+    const model = new PathsModel(
+      mockDvcRoot,
+      buildMockErrorsModel(),
+      buildMockMemento()
+    )
+
+    model.setHasCustomSelection(false)
+
+    const nodes = [{}]
+    for (let i = 0; i < 20; i++) {
+      nodes.push({})
+    }
+
+    jest
+      .spyOn(model, 'getTerminalNodes')
+      .mockImplementation(() => nodes as (PlotPath & { selected: boolean })[])
+
+    expect(model.getHasTooManyPlots()).toBe(true)
   })
 })
