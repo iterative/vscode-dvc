@@ -1,7 +1,7 @@
 import React from 'react'
-import { MessageBand } from './MessageBand'
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
+import { MessageBand } from './MessageBand'
 
 describe('MessageBand', () => {
   it('should not be hidden by default', () => {
@@ -14,7 +14,7 @@ describe('MessageBand', () => {
     render(<MessageBand id="test">Test</MessageBand>)
 
     const toggleButton = screen.getByTestId('message-band-toggler')
-    toggleButton.click()
+    fireEvent.click(toggleButton)
 
     expect(screen.getByTestId('test')).toHaveClass('messageBandHidden')
   })
