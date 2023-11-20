@@ -3083,5 +3083,27 @@ describe('App', () => {
         })
       })
     })
+
+    describe('Too many plots message', () => {
+      it('should not display a message that only 20 plots are shown if shouldShowTooManyPlotsMessage is false', () => {
+        renderAppWithOptionalData({
+          shouldShowTooManyPlotsMessage: false,
+          template: templatePlotsFixture
+        })
+
+        expect(
+          screen.queryByTestId('too-many-plots-message')
+        ).not.toBeInTheDocument()
+      })
+
+      it('should display a message that only 20 plots are shown if shouldShowTooManyPlotsMessage is true', () => {
+        renderAppWithOptionalData({
+          shouldShowTooManyPlotsMessage: true,
+          template: templatePlotsFixture
+        })
+
+        expect(screen.getByTestId('too-many-plots-message')).toBeInTheDocument()
+      })
+    })
   })
 })
