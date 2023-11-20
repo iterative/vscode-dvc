@@ -25,6 +25,9 @@ describe('PathsModel', () => {
       hasCliError: () => undefined
     }) as unknown as ErrorsModel
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const getModelAsAny = (model: PathsModel) => model as any
+
   it('should return the expected paths when given the default output fixture', () => {
     const comparisonType = new Set([PathType.COMPARISON])
     const singleType = new Set([PathType.TEMPLATE_SINGLE])
@@ -628,5 +631,53 @@ describe('PathsModel', () => {
       .mockImplementation(() => nodes as (PlotPath & { selected: boolean })[])
 
     expect(model.getHasTooManyPlots()).toBe(true)
+  })
+
+  it('should set the new statuses on plots to selected for the first 20 plots', () => {
+    const paths = [{ path: '0' }]
+    for (let i = 1; i < 40; i++) {
+      paths.push({ path: i.toString() })
+    }
+
+    const model = new PathsModel(
+      mockDvcRoot,
+      buildMockErrorsModel(),
+      buildMockMemento()
+    )
+    const modelAsAny = getModelAsAny(model)
+
+    modelAsAny.setNewStatuses(paths)
+
+    const selected = Object.values(modelAsAny.status).filter(
+      s => s === Status.SELECTED
+    )
+    expect(selected).toHaveLength(20)
+  })
+
+  it('should set the new statuses on plots to selected for up to 20 plots', () => {
+    const paths = [{ path: 'a' }, { path: 'b' }, { path: 'c' }]
+    for (let i = 0; i < 40; i++) {
+      paths.push({ path: i.toString() })
+    }
+
+    const model = new PathsModel(
+      mockDvcRoot,
+      buildMockErrorsModel(),
+      buildMockMemento()
+    )
+
+    const modelAsAny = getModelAsAny(model)
+
+    modelAsAny.status = {
+      a: Status.SELECTED,
+      b: Status.SELECTED,
+      c: Status.SELECTED
+    }
+    modelAsAny.setNewStatuses(paths)
+
+    const selected = Object.values(modelAsAny.status).filter(
+      s => s === Status.SELECTED
+    )
+    expect(selected).toHaveLength(20)
   })
 })

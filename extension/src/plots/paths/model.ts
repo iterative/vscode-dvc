@@ -179,13 +179,19 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
     return !!(this.getTerminalNodes().length > 20 && !this.hasCustomSelection)
   }
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   protected setNewStatuses(data: { path: string }[]) {
-    const selected = Object.values(this.status).filter(
+    let selected = Object.values(this.status).filter(
       status => status === Status.SELECTED
     ).length
     for (const { path } of data) {
       if (this.status[path] === undefined) {
-        this.status[path] = selected < 20 ? Status.SELECTED : Status.UNSELECTED
+        if (selected < 20) {
+          this.status[path] = Status.SELECTED
+          selected++
+        } else {
+          this.status[path] = Status.UNSELECTED
+        }
       }
     }
     super.setNewStatuses(data)
