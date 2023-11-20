@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.15] - 2023-11-20
+
+### 🚀 New Features and Enhancements
+
+- Add constant to verify if there is a custom selection of plots [#4989](https://github.com/iterative/vscode-dvc/pull/4989) by [@sroy3](https://github.com/sroy3)
+
+### 🔨 Maintenance
+
+- Update webview test timeout [#4987](https://github.com/iterative/vscode-dvc/pull/4987) by [@julieg18](https://github.com/julieg18)
+- Update demo project and latest tested CLI version (3.29.0)  [#4986](https://github.com/iterative/vscode-dvc/pull/4986) by [@julieg18](https://github.com/julieg18)
+- Update demo project and latest tested CLI version (3.30.0)  [#5003](https://github.com/iterative/vscode-dvc/pull/5003) by [@julieg18](https://github.com/julieg18)
+- Revert @vscode/extension-telemetry to 0.8.5 [#5009](https://github.com/iterative/vscode-dvc/pull/5009) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.1.14] - 2023-11-13
 
 ### 🚀 New Features and Enhancements
