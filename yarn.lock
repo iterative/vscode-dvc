@@ -6729,10 +6729,10 @@
   optionalDependencies:
     keytar "^7.7.0"
 
-"@vscode/webview-ui-toolkit@1.2.2":
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/@vscode/webview-ui-toolkit/-/webview-ui-toolkit-1.2.2.tgz#f071ec7434b2733d1c724fa874341ec20998f930"
-  integrity sha512-xIQoF4FC3Xh6d7KNKIoIezSiFWYFuf6gQMdDyKueKBFGeKwaHWEn+dY2g3makvvEsNMEDji/woEwvg9QSbuUsw==
+"@vscode/webview-ui-toolkit@1.3.1":
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/@vscode/webview-ui-toolkit/-/webview-ui-toolkit-1.3.1.tgz#df5d7cb0cbd751349c782a9df2034dfaf77be7ba"
+  integrity sha512-vrP45vHytXGl3EeBBkgZFsl70w1FQaPNG/Z3YXbm3ee+4/+WK1F2StFgtpFPYxUYxZFogtR3CmHNW4pb5DjLrw==
   dependencies:
     "@microsoft/fast-element" "^1.6.2"
     "@microsoft/fast-foundation" "^2.38.0"
