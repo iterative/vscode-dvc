@@ -91,11 +91,11 @@ const PlotsContent = () => {
 
   return (
     <div ref={wrapperRef} className={styles.plotsContent}>
-      <TooManyPlots />
       <Ribbon />
       <TemplatePlotsWrapper />
       <ComparisonTableWrapper />
       <CustomPlotsWrapper />
+      <TooManyPlots />
       {modal}
     </div>
   )

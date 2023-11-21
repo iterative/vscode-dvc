@@ -78,12 +78,29 @@ export abstract class PathSelectionModel<
     this.removeMissingSelected(paths)
   }
 
-  private removeMissingSelected(paths: Set<string>) {
+  protected removeMissingSelected(paths: Set<string>) {
     for (const [path, status] of Object.entries(this.status)) {
       if (!paths.has(path) && status === Status.SELECTED) {
         delete this.status[path]
       }
     }
+  }
+
+  protected getStatus(parentPath: string) {
+    const statuses = this.getTerminalNodeStatuses(parentPath)
+
+    const isAnyChildSelected = statuses.includes(Status.SELECTED)
+    const isAnyChildUnselected = statuses.includes(Status.UNSELECTED)
+
+    if (isAnyChildSelected && isAnyChildUnselected) {
+      return Status.INDETERMINATE
+    }
+
+    if (!isAnyChildUnselected) {
+      return Status.SELECTED
+    }
+
+    return Status.UNSELECTED
   }
 
   private setStatus(path: string, status: Status) {
@@ -123,23 +140,6 @@ export abstract class PathSelectionModel<
     const status = this.getStatus(parentPath)
     this.status[parentPath] = status
     this.setAreParentsSelected(parentPath)
-  }
-
-  private getStatus(parentPath: string) {
-    const statuses = this.getTerminalNodeStatuses(parentPath)
-
-    const isAnyChildSelected = statuses.includes(Status.SELECTED)
-    const isAnyChildUnselected = statuses.includes(Status.UNSELECTED)
-
-    if (isAnyChildSelected && isAnyChildUnselected) {
-      return Status.INDETERMINATE
-    }
-
-    if (!isAnyChildUnselected) {
-      return Status.SELECTED
-    }
-
-    return Status.UNSELECTED
   }
 
   private getNextStatus(path: string) {

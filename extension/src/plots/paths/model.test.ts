@@ -680,4 +680,42 @@ describe('PathsModel', () => {
     )
     expect(selected).toHaveLength(20)
   })
+
+  it('should not count the parent paths inside the 20 plots limit', () => {
+    const paths = [{ hasChildren: true, path: '0' }]
+    for (let i = 1; i < 40; i++) {
+      paths.push({
+        hasChildren: false,
+        path: i.toString()
+      })
+    }
+    const model = new PathsModel(
+      mockDvcRoot,
+      buildMockErrorsModel(),
+      buildMockMemento()
+    )
+    const modelAsAny = getModelAsAny(model)
+
+    modelAsAny.setNewStatuses(paths)
+
+    expect(modelAsAny.status['0']).not.toBe(Status.SELECTED)
+  })
+
+  it('should correctly set the status of the parent paths', () => {
+    const paths: { path: string; hasChildren: boolean; parentPath?: string }[] =
+      [{ hasChildren: true, path: '0' }]
+    for (let i = 1; i < 40; i++) {
+      paths.push({ hasChildren: false, parentPath: '0', path: i.toString() })
+    }
+    const model = new PathsModel(
+      mockDvcRoot,
+      buildMockErrorsModel(),
+      buildMockMemento()
+    )
+    const modelAsAny = getModelAsAny(model)
+
+    modelAsAny.setNewStatuses(paths)
+
+    expect(modelAsAny.status['0']).toBe(Status.INDETERMINATE)
+  })
 })

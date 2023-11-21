@@ -180,21 +180,40 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
   }
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
-  protected setNewStatuses(data: { path: string }[]) {
+  protected setNewStatuses(
+    data: { path: string; hasChildren: boolean; parentPath?: string }[]
+  ) {
     let selected = Object.values(this.status).filter(
       status => status === Status.SELECTED
     ).length
-    for (const { path } of data) {
-      if (this.status[path] === undefined) {
-        if (selected < 20) {
-          this.status[path] = Status.SELECTED
-          selected++
-        } else {
-          this.status[path] = Status.UNSELECTED
-        }
+    const paths = new Set<string>()
+
+    const sortedData = [...data].sort((a, b) => a.path.localeCompare(b.path))
+
+    for (const { path, hasChildren, parentPath } of sortedData) {
+      let status = Status.UNSELECTED
+      if (!hasChildren && this.status[path] === undefined && selected < 20) {
+        status = Status.SELECTED
+        this.status[path] = status
+        selected++
       }
+
+      if (parentPath) {
+        this.updateParentPathStatus(parentPath, status)
+      }
+
+      paths.add(path)
     }
-    super.setNewStatuses(data)
+
+    this.removeMissingSelected(paths)
+  }
+
+  private updateParentPathStatus(parentPath: string, status: Status) {
+    const isIndeterminate =
+      (this.status[parentPath] && this.status[parentPath] !== status) ||
+      this.status[parentPath] === Status.INDETERMINATE
+
+    this.status[parentPath] = isIndeterminate ? Status.INDETERMINATE : status
   }
 
   private handleCliError() {
