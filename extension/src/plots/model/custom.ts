@@ -1,6 +1,5 @@
 import { getCustomPlotId } from './collect'
 import { Column, ColumnType } from '../../experiments/webview/contract'
-import { FILE_SEPARATOR } from '../../experiments/columns/paths'
 import {
   DVC_METRIC_COLOR,
   DVC_METRIC_DATA,
@@ -10,6 +9,7 @@ import {
   DVC_METRIC_ZOOM_AND_PAN,
   DVC_PARAM_TYPE
 } from '../../cli/dvc/contract'
+import { FILE_SEPARATOR } from '../../experiments/columns/constants'
 
 export type CustomPlotsOrderValue = {
   metric: string

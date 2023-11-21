@@ -1,4 +1,3 @@
-import { AnyAction } from '@reduxjs/toolkit'
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import React, { useRef } from 'react'
 import { useDispatch } from 'react-redux'
@@ -7,15 +6,15 @@ import { ExtendedVegaLite } from './vegaLite/ExtendedVegaLite'
 import { setZoomedInPlot } from './webviewSlice'
 import styles from './styles.module.scss'
 import { ZoomablePlotWrapper } from './ZoomablePlotWrapper'
+import { changeDragAndDropMode } from './util'
 import { zoomPlot } from '../util/messages'
 import { useGetPlot } from '../hooks/useGetPlot'
-import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
 import { Ellipsis } from '../../shared/components/icons'
+import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
 
 interface ZoomablePlotProps {
   id: string
   onViewReady?: () => void
-  changeDisabledDragIds: (ids: string[]) => AnyAction
   currentSnapPoint: number
   section: PlotsSection
   shouldNotResize?: boolean
@@ -55,7 +54,15 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
         onClick={() => handleOnClick()}
         aria-label="Open Plot in Popup"
       >
-        <GripIcon className={styles.plotGripIcon} />
+        {
+          // eslint-disable-next-line jsx-a11y/no-static-element-interactions
+          <div
+            data-testid="grip-icon"
+            onMouseDown={() => changeDragAndDropMode(section, dispatch, false)}
+          >
+            <GripIcon className={styles.plotGripIcon} />
+          </div>
+        }
         <span
           className={styles.plotActions}
           onClick={event => {

@@ -27,6 +27,8 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
 
   private selectedRevisions: string[] = []
 
+  private hasCustomSelection: boolean | undefined = undefined
+
   constructor(dvcRoot: string, errors: ErrorsModel, workspaceState: Memento) {
     super(dvcRoot, workspaceState, PersistenceKey.PLOT_PATH_STATUS)
 
@@ -36,6 +38,11 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
     this.comparisonPathsOrder = this.revive(
       PersistenceKey.PLOT_COMPARISON_PATHS_ORDER,
       []
+    )
+
+    this.hasCustomSelection = this.revive(
+      PersistenceKey.PLOTS_HAS_CUSTOM_SELECTION,
+      undefined
     )
   }
 
@@ -142,6 +149,30 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
 
   public hasPaths() {
     return this.data.length > 0
+  }
+
+  public setHasCustomSelection(hasCustomSelection: boolean) {
+    this.hasCustomSelection = hasCustomSelection
+    this.persist(
+      PersistenceKey.PLOTS_HAS_CUSTOM_SELECTION,
+      this.hasCustomSelection
+    )
+  }
+
+  public checkIfHasPreviousCustomSelection() {
+    if (this.hasCustomSelection === undefined) {
+      const statuses = this.getTerminalNodeStatuses()
+      const plotsLength = statuses.length
+
+      const hasCustomSelection =
+        plotsLength > 20
+          ? plotsLength -
+              statuses.filter(nodeStatus => nodeStatus !== Status.SELECTED)
+                .length !==
+            20
+          : false
+      this.setHasCustomSelection(hasCustomSelection)
+    }
   }
 
   private handleCliError() {

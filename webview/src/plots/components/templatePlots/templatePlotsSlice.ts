@@ -17,15 +17,15 @@ export interface TemplatePlotsState extends Omit<TemplatePlotsData, 'plots'> {
   hasItems: boolean
   plotsSnapshots: { [key: string]: string }
   sections: PlotGroup[]
-  disabledDragPlotIds: string[]
+  isInDragAndDropMode: boolean
 }
 
 export const templatePlotsInitialState: TemplatePlotsState = {
-  disabledDragPlotIds: [],
   hasData: false,
   hasItems: false,
   height: DEFAULT_HEIGHT[PlotsSection.TEMPLATE_PLOTS],
   isCollapsed: DEFAULT_SECTION_COLLAPSED[PlotsSection.TEMPLATE_PLOTS],
+  isInDragAndDropMode: false,
   nbItemsPerRow:
     DEFAULT_SECTION_NB_ITEMS_PER_ROW_OR_WIDTH[PlotsSection.TEMPLATE_PLOTS],
   plotsSnapshots: {},
@@ -37,9 +37,6 @@ export const templatePlotsSlice = createSlice({
   initialState: templatePlotsInitialState,
   name: 'template',
   reducers: {
-    changeDisabledDragIds: (state, action: PayloadAction<string[]>) => {
-      state.disabledDragPlotIds = action.payload
-    },
     changeSize: (
       state,
       action: PayloadAction<{
@@ -52,6 +49,9 @@ export const templatePlotsSlice = createSlice({
     },
     setCollapsed: (state, action: PayloadAction<boolean>) => {
       state.isCollapsed = action.payload
+    },
+    toggleDragAndDropMode: (state, action: PayloadAction<boolean>) => {
+      state.isInDragAndDropMode = action.payload
     },
     update: (state, action: PayloadAction<TemplatePlotsData>) => {
       if (!action.payload) {
@@ -97,7 +97,7 @@ export const {
   update,
   setCollapsed,
   changeSize,
-  changeDisabledDragIds,
+  toggleDragAndDropMode,
   updateSections
 } = templatePlotsSlice.actions
 

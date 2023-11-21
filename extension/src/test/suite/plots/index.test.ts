@@ -56,9 +56,15 @@ import { BaseWebview } from '../../../webview'
 import * as PlotsCollectUtils from '../../../plots/model/collect'
 import { Operator } from '../../../experiments/model/filterBy'
 import * as External from '../../../vscode/external'
+import { PlotPath } from '../../../plots/paths/collect'
 
 suite('Plots Test Suite', () => {
   const disposable = Disposable.fn()
+
+  const createTerminalNodesArray = (length: number) =>
+    Array.from({ length }, i => ({ path: i })) as unknown as (PlotPath & {
+      selected: boolean
+    })[]
 
   beforeEach(() => {
     restore()
@@ -1319,6 +1325,36 @@ suite('Plots Test Suite', () => {
         errorsModel.getErrorPaths(plotsModel.getSelectedRevisionIds(), []),
         'should no long provide decorations to the plots paths tree'
       ).to.deep.equal(new Set([]))
+    })
+
+    it('should togglePathStatus to true when calling selectPlots with more than 20 plots', async () => {
+      const { plots, pathsModel } = await buildPlotsWebview({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
+      const mockSetCustomSelection = stub(pathsModel, 'setHasCustomSelection')
+      stub(pathsModel, 'setTemplateOrder')
+      stub(pathsModel, 'toggleStatus')
+      stub(pathsModel, 'getTerminalNodes').returns(createTerminalNodesArray(32))
+
+      plots.togglePathStatus(dvcDemoPath)
+
+      expect(mockSetCustomSelection).to.be.calledWith(true)
+    })
+
+    it('should togglePathStatus to false when calling selectPlots with 20 plots or less', async () => {
+      const { plots, pathsModel } = await buildPlotsWebview({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
+      const mockSetCustomSelection = stub(pathsModel, 'setHasCustomSelection')
+      stub(pathsModel, 'setTemplateOrder')
+      stub(pathsModel, 'toggleStatus')
+      stub(pathsModel, 'getTerminalNodes').returns(createTerminalNodesArray(20))
+
+      plots.togglePathStatus(dvcDemoPath)
+
+      expect(mockSetCustomSelection).to.be.calledWith(false)
     })
   })
 })

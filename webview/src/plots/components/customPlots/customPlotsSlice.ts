@@ -15,17 +15,17 @@ export interface CustomPlotsState extends Omit<CustomPlotsData, 'plots'> {
   hasItems: boolean
   plotsIds: string[]
   plotsSnapshots: { [key: string]: string }
-  disabledDragPlotIds: string[]
+  isInDragAndDropMode: boolean
 }
 
 export const customPlotsInitialState: CustomPlotsState = {
-  disabledDragPlotIds: [],
   hasAddedPlots: false,
   hasData: false,
   hasItems: false,
   hasUnfilteredExperiments: false,
   height: DEFAULT_HEIGHT[PlotsSection.CUSTOM_PLOTS],
   isCollapsed: DEFAULT_SECTION_COLLAPSED[PlotsSection.CUSTOM_PLOTS],
+  isInDragAndDropMode: false,
   nbItemsPerRow:
     DEFAULT_SECTION_NB_ITEMS_PER_ROW_OR_WIDTH[PlotsSection.CUSTOM_PLOTS],
   plotsIds: [],
@@ -36,9 +36,6 @@ export const customPlotsSlice = createSlice({
   initialState: customPlotsInitialState,
   name: 'custom',
   reducers: {
-    changeDisabledDragIds: (state, action: PayloadAction<string[]>) => {
-      state.disabledDragPlotIds = action.payload
-    },
     changeSize: (
       state,
       action: PayloadAction<{
@@ -51,6 +48,9 @@ export const customPlotsSlice = createSlice({
     },
     setCollapsed: (state, action: PayloadAction<boolean>) => {
       state.isCollapsed = action.payload
+    },
+    toggleDragAndDropMode: (state, action: PayloadAction<boolean>) => {
+      state.isInDragAndDropMode = action.payload
     },
     update: (state, action: PayloadAction<CustomPlotsData>) => {
       if (!action.payload) {
@@ -75,7 +75,7 @@ export const customPlotsSlice = createSlice({
   }
 })
 
-export const { update, setCollapsed, changeSize, changeDisabledDragIds } =
+export const { update, setCollapsed, changeSize, toggleDragAndDropMode } =
   customPlotsSlice.actions
 
 export default customPlotsSlice.reducer

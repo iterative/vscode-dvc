@@ -28,6 +28,7 @@ export const IconMenuItem: React.FC<IconMenuItemAllProps> = ({
 }) => {
   const handleOnClick = (e: MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation()
+    e.preventDefault()
     onClick?.()
   }
   let button = (

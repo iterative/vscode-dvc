@@ -1,5 +1,6 @@
 import { join } from 'path'
-import { EventEmitter, commands, env } from 'vscode'
+import { EventEmitter, commands } from 'vscode'
+import * as Fetch from 'node-fetch'
 import { Disposer } from '@hediet/std/disposable'
 import { fake, spy, stub } from 'sinon'
 import { ensureDirSync } from 'fs-extra'
@@ -19,6 +20,7 @@ import { Resource } from '../../../resourceLocator'
 import { MIN_CLI_VERSION } from '../../../cli/dvc/contract'
 import { Status } from '../../../status'
 import { BaseWebview } from '../../../webview'
+import { Studio } from '../../../setup/studio'
 
 export const TEMP_DIR = join(dvcDemoPath, 'temp-empty-watcher-dir')
 
@@ -95,15 +97,9 @@ export const buildSetup = ({
     undefined
   )
 
-  const mockOpenExternal = stub(env, 'openExternal')
-  const urlOpenedEvent = new Promise(resolve =>
-    mockOpenExternal.callsFake(() => {
-      resolve(undefined)
-      return Promise.resolve(true)
-    })
-  )
-
   const mockConfig = stub(dvcConfig, 'config').resolves('')
+
+  const mockFetch = stub(Fetch, 'default')
 
   const setup = disposer.track(
     new Setup(
@@ -133,18 +129,19 @@ export const buildSetup = ({
     mockAutoUpgradeDvc,
     mockConfig,
     mockExecuteCommand,
+    mockFetch,
     mockGetGitRepositoryRoot,
     mockGitVersion,
     mockGlobalVersion,
     mockInitializeGit,
-    mockOpenExternal,
     mockRemote,
     mockRunSetup,
     mockShowWebview,
     mockVersion,
     resourceLocator,
     setup,
-    urlOpenedEvent
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    studio: (setup as any).studio as Studio
   }
 }
 

@@ -15,6 +15,7 @@ export enum PersistenceKey {
   PLOT_METRIC_ORDER = 'plotMetricOrder:',
   PLOT_NB_ITEMS_PER_ROW_OR_WIDTH = 'plotNbItemsPerRowOrWidth:',
   PLOTS_CUSTOM_ORDER = 'plotCustomOrder:',
+  PLOTS_HAS_CUSTOM_SELECTION = 'plotsCustomCollection:',
   PLOT_SECTION_COLLAPSED = 'plotSectionCollapsed:',
   PLOT_SELECTED_METRICS = 'plotSelectedMetrics:',
   PLOTS_SMOOTH_PLOT_VALUES = 'plotSmoothPlotValues:',

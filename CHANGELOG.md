@@ -2,6 +2,44 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.15] - 2023-11-20
+
+### 🚀 New Features and Enhancements
+
+- Add constant to verify if there is a custom selection of plots [#4989](https://github.com/iterative/vscode-dvc/pull/4989) by [@sroy3](https://github.com/sroy3)
+
+### 🔨 Maintenance
+
+- Update webview test timeout [#4987](https://github.com/iterative/vscode-dvc/pull/4987) by [@julieg18](https://github.com/julieg18)
+- Update demo project and latest tested CLI version (3.29.0)  [#4986](https://github.com/iterative/vscode-dvc/pull/4986) by [@julieg18](https://github.com/julieg18)
+- Update demo project and latest tested CLI version (3.30.0)  [#5003](https://github.com/iterative/vscode-dvc/pull/5003) by [@julieg18](https://github.com/julieg18)
+- Revert @vscode/extension-telemetry to 0.8.5 [#5009](https://github.com/iterative/vscode-dvc/pull/5009) by [@mattseddon](https://github.com/mattseddon)
+
+## [1.1.14] - 2023-11-13
+
+### 🚀 New Features and Enhancements
+
+- Add Studio Token Auth Flow [#4931](https://github.com/iterative/vscode-dvc/pull/4931) by [@julieg18](https://github.com/julieg18)
+
+## [1.1.13] - 2023-11-10
+
+### 🚀 New Features and Enhancements
+
+- Add drag and drop mode to plots [#4934](https://github.com/iterative/vscode-dvc/pull/4934) by [@sroy3](https://github.com/sroy3)
+
+### 🐛 Bug Fixes
+
+- Fix e2e tests (SCM entry removed by insiders) [#4955](https://github.com/iterative/vscode-dvc/pull/4955) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Increase plot webview test timeout [#4923](https://github.com/iterative/vscode-dvc/pull/4923) by [@julieg18](https://github.com/julieg18)
+- Increase timeouts of webview tests [#4928](https://github.com/iterative/vscode-dvc/pull/4928) by [@mattseddon](https://github.com/mattseddon)
+- Remove unused dependencies [#4930](https://github.com/iterative/vscode-dvc/pull/4930) by [@sroy3](https://github.com/sroy3)
+- Update demo project and latest tested CLI version (3.28.0) [#4936](https://github.com/iterative/vscode-dvc/pull/4936) by [@julieg18](https://github.com/julieg18)
+- Update version of Python used in CI [#4944](https://github.com/iterative/vscode-dvc/pull/4944) by [@mattseddon](https://github.com/mattseddon)
+- Add Setup Studio module [#4943](https://github.com/iterative/vscode-dvc/pull/4943) by [@julieg18](https://github.com/julieg18)
+
 ## [1.1.12] - 2023-10-27
 
 ### 🚀 New Features and Enhancements

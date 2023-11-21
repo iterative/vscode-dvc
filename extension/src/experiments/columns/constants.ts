@@ -20,3 +20,12 @@ export const DEFAULT_COLUMN_IDS = [
   BRANCH_COLUMN_ID,
   COMMIT_COLUMN_ID
 ]
+
+export const ENCODED_METRIC_PARAM_SEPARATOR = '%2E'
+export const ENCODE_METRIC_PARAM_REGEX = /\./g
+export const DECODE_METRIC_PARAM_REGEX = /%2E/g
+export const METRIC_PARAM_SEPARATOR = '.'
+export const FILE_SEPARATOR = ':'
+export const FILE_SPLIT_REGEX = new RegExp(
+  `([^${FILE_SEPARATOR}]*)(?:${FILE_SEPARATOR}([^${FILE_SEPARATOR}]*))?(?:${FILE_SEPARATOR}(.*))?`
+)

@@ -1,5 +1,5 @@
 import { commands } from 'vscode'
-import { STUDIO_URL, SetupData, SetupData as TSetupData } from './contract'
+import { SetupData, SetupData as TSetupData } from './contract'
 import { Logger } from '../../common/logger'
 import {
   MessageFromWebview,
@@ -12,7 +12,6 @@ import {
   RegisteredCliCommands,
   RegisteredCommands
 } from '../../commands/external'
-import { openUrl } from '../../vscode/external'
 import { autoInstallDvc, autoUpgradeDvc } from '../autoInstall'
 
 export class WebviewMessages {
@@ -21,19 +20,22 @@ export class WebviewMessages {
   private readonly updateStudioOffline: (offline: boolean) => Promise<void>
   private readonly isPythonExtensionUsed: () => Promise<boolean>
   private readonly updatePythonEnv: () => Promise<void>
+  private readonly requestToken: () => Promise<void>
 
   constructor(
     getWebview: () => BaseWebview<TSetupData> | undefined,
     initializeGit: () => void,
     updateStudioOffline: (shareLive: boolean) => Promise<void>,
     isPythonExtensionUsed: () => Promise<boolean>,
-    updatePythonEnv: () => Promise<void>
+    updatePythonEnv: () => Promise<void>,
+    requestStudioToken: () => Promise<void>
   ) {
     this.getWebview = getWebview
     this.initializeGit = initializeGit
     this.updateStudioOffline = updateStudioOffline
     this.isPythonExtensionUsed = isPythonExtensionUsed
     this.updatePythonEnv = updatePythonEnv
+    this.requestToken = requestStudioToken
   }
 
   public sendWebviewMessage(data: SetupData) {
@@ -64,10 +66,6 @@ export class WebviewMessages {
         return commands.executeCommand(
           RegisteredCommands.EXTENSION_SETUP_WORKSPACE
         )
-      case MessageFromWebviewType.OPEN_STUDIO:
-        return this.openStudio()
-      case MessageFromWebviewType.OPEN_STUDIO_PROFILE:
-        return this.openStudioProfile()
       case MessageFromWebviewType.SAVE_STUDIO_TOKEN:
         return commands.executeCommand(
           RegisteredCommands.ADD_STUDIO_ACCESS_TOKEN
@@ -78,6 +76,8 @@ export class WebviewMessages {
         )
       case MessageFromWebviewType.SET_STUDIO_SHARE_EXPERIMENTS_LIVE:
         return this.updateStudioOffline(message.payload)
+      case MessageFromWebviewType.REQUEST_STUDIO_TOKEN:
+        return this.requestStudioToken()
       case MessageFromWebviewType.OPEN_EXPERIMENTS_WEBVIEW:
         return commands.executeCommand(RegisteredCommands.EXPERIMENT_SHOW)
       case MessageFromWebviewType.REMOTE_ADD:
@@ -131,11 +131,12 @@ export class WebviewMessages {
     return autoInstallDvc(isPythonExtensionUsed)
   }
 
-  private openStudio() {
-    return openUrl(STUDIO_URL)
-  }
-
-  private openStudioProfile() {
-    return openUrl(`${STUDIO_URL}/user/_/profile?section=accessToken`)
+  private requestStudioToken() {
+    sendTelemetryEvent(
+      EventName.VIEWS_SETUP_REQUEST_STUDIO_TOKEN,
+      undefined,
+      undefined
+    )
+    return this.requestToken()
   }
 }

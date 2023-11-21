@@ -3,7 +3,7 @@ import { Icon } from '../Icon'
 import { Gripper } from '../icons'
 
 interface GripIconProps {
-  className: string
+  className?: string
 }
 
 export const GripIcon: React.FC<GripIconProps> = ({ className }) => (
