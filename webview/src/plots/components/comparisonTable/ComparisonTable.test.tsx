@@ -15,7 +15,10 @@ import React from 'react'
 import { Revision } from 'dvc/src/plots/webview/contract'
 import { act } from 'react-dom/test-utils'
 import { ComparisonTable } from './ComparisonTable'
-import { comparisonTableInitialState } from './comparisonTableSlice'
+import {
+  comparisonTableInitialState,
+  toggleDragAndDropMode
+} from './comparisonTableSlice'
 import {
   createBubbledEvent,
   dragAndDrop,
@@ -23,7 +26,7 @@ import {
 } from '../../../test/dragDrop'
 import { vsCodeApi } from '../../../shared/api'
 import { DragEnterDirection } from '../../../shared/components/dragDrop/util'
-import { plotsReducers } from '../../store'
+import { plotsReducers, plotsStore } from '../../store'
 import { webviewInitialState } from '../webviewSlice'
 import { getThemeValue, hexToRGB, ThemeProperty } from '../../../util/styles'
 import * as EventCurrentTargetDistances from '../../../shared/components/dragDrop/currentTarget'
@@ -64,27 +67,39 @@ describe('ComparisonTable', () => {
     props = comparisonTableFixture,
     renderWith: (ui: React.ReactElement) => RenderResult | void = render
   ) => {
-    return (
+    const store = configureStore({
+      preloadedState: {
+        comparison: {
+          ...comparisonTableInitialState,
+          ...props
+        },
+        webview: {
+          ...webviewInitialState,
+          zoomedInPlot: undefined
+        }
+      },
+      reducer: plotsReducers
+    })
+    const { rerender } =
       renderWith(
-        <Provider
-          store={configureStore({
-            preloadedState: {
-              comparison: {
-                ...comparisonTableInitialState,
-                ...props
-              },
-              webview: {
-                ...webviewInitialState,
-                zoomedInPlot: undefined
-              }
-            },
-            reducer: plotsReducers
-          })}
-        >
+        <Provider store={store}>
           <ComparisonTable />
         </Provider>
       ) || {}
-    )
+
+    return { rerender, store }
+  }
+
+  const getIntoDragAndDropMode = (store: typeof plotsStore) => {
+    act(() => {
+      store.dispatch(toggleDragAndDropMode(true))
+    })
+  }
+
+  const renderTableInDragAndDropMode = () => {
+    const { store } = renderTable()
+    getIntoDragAndDropMode(store)
+    return store
   }
 
   it('should render a table', () => {
@@ -147,7 +162,7 @@ describe('ComparisonTable', () => {
   })
 
   it('should unpin a column with a second click', () => {
-    renderTable()
+    renderTableInDragAndDropMode()
 
     const [, secondColumn, thirdColumn] = screen.getAllByRole('columnheader')
     const [, secondExperiment, thirdExperiment] = revisions
@@ -214,7 +229,7 @@ describe('ComparisonTable', () => {
   })
 
   it('should remove a column if it is not part of the revisions anymore', () => {
-    const { rerender } = renderTable() as RenderResult
+    const { rerender } = renderTable() as unknown as RenderResult
 
     let headers = getHeaders().map(header => header.textContent)
 
@@ -242,7 +257,7 @@ describe('ComparisonTable', () => {
   })
 
   it('should add a new column if there is a new revision', () => {
-    const { rerender } = renderTable() as RenderResult
+    const { rerender } = renderTable() as unknown as RenderResult
 
     const newRevName = 'newRev'
     const newRevisions = [
@@ -384,7 +399,7 @@ describe('ComparisonTable', () => {
     }
 
     it('should make the columns draggable if they are not pinned', () => {
-      renderTable()
+      renderTableInDragAndDropMode()
 
       const headers = getHeaders()
 
@@ -400,7 +415,7 @@ describe('ComparisonTable', () => {
     })
 
     it('should reorder the columns accordingly and send a message to the extension after a column drag and drop', () => {
-      renderTable()
+      renderTableInDragAndDropMode()
 
       const [, endingNode, , startingNode] = getHeaders()
 
@@ -431,7 +446,7 @@ describe('ComparisonTable', () => {
     })
 
     it('should not change the column order if a column is dropped on a pinned column', () => {
-      renderTable()
+      renderTableInDragAndDropMode()
 
       pinSecondColumn()
 
@@ -454,7 +469,7 @@ describe('ComparisonTable', () => {
     })
 
     it('should not show a drop placeholder to replace a pinned column', () => {
-      renderTable()
+      renderTableInDragAndDropMode()
 
       pinSecondColumn()
       const [endingNode, startingNode] = getHeaders()
@@ -467,7 +482,7 @@ describe('ComparisonTable', () => {
     })
 
     it('should prevent default behaviour when dragging over', () => {
-      renderTable()
+      renderTableInDragAndDropMode()
 
       const [firstNode] = getHeaders()
 
@@ -481,7 +496,7 @@ describe('ComparisonTable', () => {
     })
 
     it('should show the header being dragged in its original position until the drop', () => {
-      renderTable()
+      renderTableInDragAndDropMode()
 
       const [endingNode, startingNode] = getHeaders()
 
@@ -493,7 +508,7 @@ describe('ComparisonTable', () => {
     })
 
     it('should wrap the drop target with the header we are dragging over', () => {
-      renderTable()
+      renderTableInDragAndDropMode()
 
       const [endingNode, startingNode] = getHeaders()
 
@@ -512,13 +527,14 @@ describe('ComparisonTable', () => {
     })
 
     it('should not change the order when dropping a header in its own spot', () => {
-      renderTable()
+      const store = renderTableInDragAndDropMode()
 
       const [startingNode] = getHeaders()
 
       dragAndDrop(startingNode, startingNode, DragEnterDirection.RIGHT)
       expect(mockPostMessage).not.toHaveBeenCalled()
 
+      getIntoDragAndDropMode(store)
       const [start, end] = getHeaders()
 
       dragAndDrop(start, end, DragEnterDirection.RIGHT)
@@ -537,7 +553,7 @@ describe('ComparisonTable', () => {
         '#ffffff'
       )
 
-      renderTable()
+      renderTableInDragAndDropMode()
 
       const [header] = getHeaders()
 
