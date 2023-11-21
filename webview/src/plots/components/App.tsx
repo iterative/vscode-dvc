@@ -5,7 +5,6 @@ import {
   PlotsComparisonData,
   PlotsData,
   PlotsDataKeys,
-  Revision,
   PlotsSection,
   SectionCollapsed,
   TemplatePlotsData
@@ -54,7 +53,8 @@ export const feedStore = (
 ) => {
   if (data.data) {
     dispatch(initialize())
-    for (const key of Object.keys(data.data)) {
+    const keys = Object.keys(data.data) as PlotsDataKeys[]
+    for (const key of keys) {
       switch (key) {
         case PlotsDataKeys.CLI_ERROR:
           dispatch(updateCliError(data.data[key]))
@@ -81,7 +81,7 @@ export const feedStore = (
           dispatch(updateHasUnselectedPlots(!!data.data[key]))
           continue
         case PlotsDataKeys.SELECTED_REVISIONS:
-          dispatch(updateSelectedRevisions(data.data[key] as Revision[]))
+          dispatch(updateSelectedRevisions(data.data[key]))
           continue
         case PlotsDataKeys.SHOW_TOO_MANY_PLOTS:
           dispatch(
