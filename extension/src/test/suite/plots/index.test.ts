@@ -686,9 +686,10 @@ suite('Plots Test Suite', () => {
       await openFileEvent
 
       expect(mockWriteCsv).to.be.calledOnce
-      expect(mockWriteCsv).to.be.calledWithExactly(exportFile.path, {
-        values: templatePlot.anchorDefinitions[PLOT_DATA_ANCHOR]
-      })
+      expect(mockWriteCsv).to.be.calledWithExactly(
+        exportFile.path,
+        templatePlot.anchorDefinitions[PLOT_DATA_ANCHOR]
+      )
       expect(mockOpenFile).to.calledWithExactly(exportFile.path)
       expect(mockSendTelemetryEvent).to.be.calledOnce
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
@@ -1057,10 +1058,11 @@ suite('Plots Test Suite', () => {
     })
 
     it('should send the correct data to the webview for flexible plots', async () => {
+      const expectedRevisions = [REVISIONS[0], REVISIONS[1]]
       const { messageSpy, mockPlotsDiff } = await buildPlotsWebview({
         disposer: disposable,
         plotsDiff: multiSourcePlotsDiffFixture,
-        selectedExperiments: [REVISIONS[0], REVISIONS[1]]
+        selectedExperiments: expectedRevisions
       })
 
       expect(mockPlotsDiff).to.be.called
@@ -1091,33 +1093,6 @@ suite('Plots Test Suite', () => {
         multiViewSection.entries.map(({ id }: { id: string }) => id)
       ).to.deep.equal(['dvc.yaml::Confusion-Matrix'])
 
-      const expectedRevisions = [
-        `${REVISIONS[1]}::${join(
-          'evaluation',
-          'test',
-          'plots',
-          'confusion_matrix.json'
-        )}`,
-        `${REVISIONS[0]}::${join(
-          'evaluation',
-          'test',
-          'plots',
-          'confusion_matrix.json'
-        )}`,
-        `${REVISIONS[1]}::${join(
-          'evaluation',
-          'train',
-          'plots',
-          'confusion_matrix.json'
-        )}`,
-        `${REVISIONS[0]}::${join(
-          'evaluation',
-          'train',
-          'plots',
-          'confusion_matrix.json'
-        )}`
-      ].sort()
-
       const [confusionMatrix] = multiViewSection.entries
 
       const confusionMatrixDatapoints =
@@ -1128,10 +1103,8 @@ suite('Plots Test Suite', () => {
 
       expect(confusionMatrixDatapoints.length).to.be.greaterThan(0)
 
-      expect(confusionMatrix.revisions?.length).to.equal(4)
-      expect([...(confusionMatrix.revisions || [])].sort()).to.deep.equal(
-        expectedRevisions
-      )
+      expect(confusionMatrix.revisions?.length).to.equal(2)
+      expect(confusionMatrix.revisions).to.deep.equal(expectedRevisions)
 
       for (const entry of confusionMatrixDatapoints) {
         expect(expectedRevisions).to.include(entry.rev)

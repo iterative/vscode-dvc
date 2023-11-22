@@ -44,55 +44,55 @@ const basicVega = {
             loss: '2.298783302307129',
             step: '0',
             timestamp: '1641966224600',
-            rev: EXPERIMENT_WORKSPACE_ID
+            rev: 'workspace'
           },
           {
             loss: '2.2779736518859863',
             step: '1',
             timestamp: '1641966239108',
-            rev: EXPERIMENT_WORKSPACE_ID
+            rev: 'workspace'
           },
           {
             loss: '2.2572131156921387',
             step: '2',
             timestamp: '1641966253176',
-            rev: EXPERIMENT_WORKSPACE_ID
+            rev: 'workspace'
           },
           {
             loss: '2.238112688064575',
             step: '3',
             timestamp: '1641966267354',
-            rev: EXPERIMENT_WORKSPACE_ID
+            rev: 'workspace'
           },
           {
             loss: '2.212251901626587',
             step: '4',
             timestamp: '1641966285745',
-            rev: EXPERIMENT_WORKSPACE_ID
+            rev: 'workspace'
           },
           {
             loss: '2.1894900798797607',
             step: '5',
             timestamp: '1641966303339',
-            rev: EXPERIMENT_WORKSPACE_ID
+            rev: 'workspace'
           },
           {
             loss: '2.165510654449463',
             step: '6',
             timestamp: '1641966320693',
-            rev: EXPERIMENT_WORKSPACE_ID
+            rev: 'workspace'
           },
           {
             loss: '2.135964870452881',
             step: '7',
             timestamp: '1641966335781',
-            rev: EXPERIMENT_WORKSPACE_ID
+            rev: 'workspace'
           },
           {
             loss: '2.114135265350342',
             step: '8',
             timestamp: '1641966351758',
-            rev: EXPERIMENT_WORKSPACE_ID
+            rev: 'workspace'
           },
           {
             loss: '2.298783302307129',
@@ -147,6 +147,60 @@ const basicVega = {
             step: '8',
             timestamp: '1641966351758',
             rev: 'main'
+          },
+          {
+            loss: '2.0380799770355225',
+            step: '0',
+            timestamp: '1642041230991',
+            rev: 'exp-e7a67'
+          },
+          {
+            loss: '2.0002100467681885',
+            step: '1',
+            timestamp: '1642041244696',
+            rev: 'exp-e7a67'
+          },
+          {
+            loss: '1.9573605060577393',
+            step: '2',
+            timestamp: '1642041257185',
+            rev: 'exp-e7a67'
+          },
+          {
+            loss: '1.91573965549469',
+            step: '3',
+            timestamp: '1642041270652',
+            rev: 'exp-e7a67'
+          },
+          {
+            loss: '1.8714964389801025',
+            step: '4',
+            timestamp: '1642041284801',
+            rev: 'exp-e7a67'
+          },
+          {
+            loss: '1.8267308473587036',
+            step: '5',
+            timestamp: '1642041301919',
+            rev: 'exp-e7a67'
+          },
+          {
+            loss: '1.7825157642364502',
+            step: '6',
+            timestamp: '1642041318814',
+            rev: 'exp-e7a67'
+          },
+          {
+            loss: '1.7360031604766846',
+            step: '7',
+            timestamp: '1642041335775',
+            rev: 'exp-e7a67'
+          },
+          {
+            loss: '1.6929490566253662',
+            step: '8',
+            timestamp: '1642041350855',
+            rev: 'exp-e7a67'
           },
           {
             loss: '1.6454246044158936',
@@ -255,60 +309,6 @@ const basicVega = {
             step: '8',
             timestamp: '1642041648829',
             rev: 'exp-83425'
-          },
-          {
-            loss: '2.0380799770355225',
-            step: '0',
-            timestamp: '1642041230991',
-            rev: 'exp-e7a67'
-          },
-          {
-            loss: '2.0002100467681885',
-            step: '1',
-            timestamp: '1642041244696',
-            rev: 'exp-e7a67'
-          },
-          {
-            loss: '1.9573605060577393',
-            step: '2',
-            timestamp: '1642041257185',
-            rev: 'exp-e7a67'
-          },
-          {
-            loss: '1.91573965549469',
-            step: '3',
-            timestamp: '1642041270652',
-            rev: 'exp-e7a67'
-          },
-          {
-            loss: '1.8714964389801025',
-            step: '4',
-            timestamp: '1642041284801',
-            rev: 'exp-e7a67'
-          },
-          {
-            loss: '1.8267308473587036',
-            step: '5',
-            timestamp: '1642041301919',
-            rev: 'exp-e7a67'
-          },
-          {
-            loss: '1.7825157642364502',
-            step: '6',
-            timestamp: '1642041318814',
-            rev: 'exp-e7a67'
-          },
-          {
-            loss: '1.7360031604766846',
-            step: '7',
-            timestamp: '1642041335775',
-            rev: 'exp-e7a67'
-          },
-          {
-            loss: '1.6929490566253662',
-            step: '8',
-            timestamp: '1642041350855',
-            rev: 'exp-e7a67'
           }
         ],
         [PLOT_TITLE_ANCHOR]: '',
