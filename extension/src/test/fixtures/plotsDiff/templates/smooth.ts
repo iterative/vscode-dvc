@@ -1,32 +1,32 @@
 import { TopLevelSpec } from 'vega-lite'
 import {
-  DVC_METRIC_DATA,
-  DVC_METRIC_TITLE,
-  DVC_METRIC_X,
-  DVC_METRIC_X_LABEL,
-  DVC_METRIC_Y,
-  DVC_METRIC_Y_LABEL
+  PLOT_DATA_ANCHOR,
+  PLOT_TITLE_ANCHOR,
+  PLOT_X_ANCHOR,
+  PLOT_X_LABEL_ANCHOR,
+  PLOT_Y_ANCHOR,
+  PLOT_Y_LABEL_ANCHOR
 } from '../../../../cli/dvc/contract'
 
 const data = {
   $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
   data: {
-    values: DVC_METRIC_DATA
+    values: PLOT_DATA_ANCHOR
   },
-  title: DVC_METRIC_TITLE,
+  title: PLOT_TITLE_ANCHOR,
   mark: {
     type: 'line'
   },
   encoding: {
     x: {
-      field: DVC_METRIC_X,
+      field: PLOT_X_ANCHOR,
       type: 'quantitative',
-      title: DVC_METRIC_X_LABEL
+      title: PLOT_X_LABEL_ANCHOR
     },
     y: {
-      field: DVC_METRIC_Y,
+      field: PLOT_Y_ANCHOR,
       type: 'quantitative',
-      title: DVC_METRIC_Y_LABEL,
+      title: PLOT_Y_LABEL_ANCHOR,
       scale: {
         zero: false
       }
@@ -38,8 +38,8 @@ const data = {
   },
   transform: [
     {
-      loess: DVC_METRIC_Y,
-      on: DVC_METRIC_X,
+      loess: PLOT_Y_ANCHOR,
+      on: PLOT_X_ANCHOR,
       groupby: ['rev'],
       bandwidth: 0.3
     }

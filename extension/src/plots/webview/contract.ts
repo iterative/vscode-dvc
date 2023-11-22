@@ -1,9 +1,10 @@
+import type { TopLevelSpec } from 'vega-lite'
 import { Color } from '../../experiments/model/status/colors'
 import {
   AnchorDefinitions,
   ImagePlotOutput,
   PlotsType,
-  TemplatePlot
+  TemplatePlotOutput
 } from '../../cli/dvc/contract'
 
 export const DEFAULT_NB_ITEMS_PER_ROW = 2
@@ -98,8 +99,8 @@ export type CustomPlot = {
 }
 
 export type CustomPlotData = CustomPlot & {
-  content: string
-  anchor_definitions: AnchorDefinitions
+  content: TopLevelSpec
+  anchorDefinitions: AnchorDefinitions
 }
 
 export type CustomPlotsData = {
@@ -120,16 +121,21 @@ export type ImagePlot = ImagePlotOutput & {
 export const isImagePlot = (plot: { type: PlotsType }): plot is ImagePlot =>
   plot.type === PlotsType.IMAGE
 
+export type TemplatePlot = Omit<TemplatePlotOutput, 'anchor_definitions'> & {
+  anchorDefinitions: AnchorDefinitions
+  id: string
+}
+
 export type Plot = TemplatePlot | ImagePlot
 
-export type TemplatePlots = { [path: string]: TemplatePlot[] }
+export type TemplatePlots = { [path: string]: TemplatePlotOutput[] }
 
 export enum TemplatePlotGroup {
   MULTI_VIEW = 'template-multi',
   SINGLE_VIEW = 'template-single'
 }
 
-export type TemplatePlotEntry = TemplatePlot & { id: string }
+export type TemplatePlotEntry = TemplatePlot
 
 export type TemplatePlotSection = {
   group: TemplatePlotGroup

@@ -1,5 +1,4 @@
 import { join } from 'dvc/src/test/util/path'
-import { Title } from 'dvc/src/vscode/title'
 import { configureStore } from '@reduxjs/toolkit'
 import React from 'react'
 import { Provider } from 'react-redux'
@@ -36,10 +35,10 @@ import {
 } from 'dvc/src/webview/contract'
 import { act } from 'react-dom/test-utils'
 import {
-  DVC_METRIC_DATA,
-  DVC_METRIC_TITLE,
-  DVC_METRIC_X_LABEL,
-  DVC_METRIC_Y_LABEL,
+  PLOT_DATA_ANCHOR,
+  PLOT_TITLE_ANCHOR,
+  PLOT_X_LABEL_ANCHOR,
+  PLOT_Y_LABEL_ANCHOR,
   EXPERIMENT_WORKSPACE_ID
 } from 'dvc/src/cli/dvc/contract'
 import { App } from './App'
@@ -2187,20 +2186,15 @@ describe('App', () => {
       for (let i = 0; i < nbOfPlots; i++) {
         const id = `plot-${i}`
         plots.push({
-          anchor_definitions: { DVC_METRIC_DATA: '[]' },
-          content: JSON.stringify({
+          anchorDefinitions: { DVC_METRIC_DATA: [] },
+          content: {
             $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
             encoding: {},
             height: 100,
             layer: [],
-            titles: {
-              main: { normal: '' as unknown as Title, truncated: '' },
-              x: { normal: '' as unknown as Title, truncated: '' },
-              y: { normal: '' as unknown as Title, truncated: '' }
-            },
             transform: [],
             width: 100
-          }),
+          },
           id,
           metric: '',
           param: ''
@@ -2763,12 +2757,14 @@ describe('App', () => {
         {
           entries: [
             {
-              anchor_definitions: {
-                [DVC_METRIC_DATA]: JSON.stringify(
-                  smoothTemplatePlotContent.data.values.slice(0, 10)
-                )
+              anchorDefinitions: {
+                [PLOT_DATA_ANCHOR]: (
+                  smoothTemplatePlotContent as {
+                    data: { values: Record<string, unknown>[] }
+                  }
+                ).data.values.slice(0, 10)
               },
-              content: JSON.stringify(smoothTemplatePlotContent),
+              content: smoothTemplatePlotContent,
               id: smoothId,
               revisions: [EXPERIMENT_WORKSPACE_ID],
               type: PlotsType.VEGA
@@ -2810,7 +2806,7 @@ describe('App', () => {
         ...templatePlotsFixture.plots[0].entries[0],
         id: title
       }
-      plotEntry.anchor_definitions[DVC_METRIC_TITLE] = title
+      plotEntry.anchorDefinitions[PLOT_TITLE_ANCHOR] = title
 
       renderAppWithOptionalData({
         template: {
@@ -2844,7 +2840,7 @@ describe('App', () => {
         ...templatePlotsFixture.plots[0].entries[0],
         id: xLabel
       }
-      plotEntry.anchor_definitions[DVC_METRIC_X_LABEL] = xLabel
+      plotEntry.anchorDefinitions[PLOT_X_LABEL_ANCHOR] = xLabel
 
       renderAppWithOptionalData({
         template: {
@@ -2878,7 +2874,7 @@ describe('App', () => {
         ...templatePlotsFixture.plots[0].entries[0],
         id: yLabel
       }
-      plotEntry.anchor_definitions[DVC_METRIC_Y_LABEL] = yLabel
+      plotEntry.anchorDefinitions[PLOT_Y_LABEL_ANCHOR] = yLabel
 
       renderAppWithOptionalData({
         template: {
@@ -2912,7 +2908,7 @@ describe('App', () => {
         ...templatePlotsFixture.plots[0].entries[0],
         id: title
       }
-      plotEntry.anchor_definitions[DVC_METRIC_TITLE] = title
+      plotEntry.anchorDefinitions[PLOT_TITLE_ANCHOR] = title
 
       renderAppWithOptionalData({
         template: {

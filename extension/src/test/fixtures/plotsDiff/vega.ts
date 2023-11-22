@@ -1,6 +1,6 @@
-import { Title } from 'vega'
+import type { Title } from 'vega'
 import {
-  DVC_METRIC_DATA,
+  PLOT_DATA_ANCHOR,
   EXPERIMENT_WORKSPACE_ID
 } from '../../../cli/dvc/contract'
 import { join } from '../../util/path'
@@ -9,7 +9,7 @@ const data = {
   [join('logs', 'acc.tsv')]: [
     {
       anchor_definitions: {
-        [DVC_METRIC_DATA]: JSON.stringify([
+        [PLOT_DATA_ANCHOR]: [
           {
             acc: '0.123',
             rev: EXPERIMENT_WORKSPACE_ID,
@@ -281,7 +281,7 @@ const data = {
             step: '8',
             timestamp: '1642041350856'
           }
-        ])
+        ]
       },
       multiView: false,
       type: 'vega',
@@ -292,10 +292,10 @@ const data = {
         'exp-83425',
         'exp-e7a67'
       ],
-      content: JSON.stringify({
+      content: {
         $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
         data: {
-          values: DVC_METRIC_DATA
+          values: PLOT_DATA_ANCHOR
         },
         title: '',
         width: 300,
@@ -365,14 +365,14 @@ const data = {
             ]
           }
         ]
-      })
+      }
     }
   ],
   'predictions.json': [
     {
       anchor_definitions: {
         // @ts-expect-error Expression produces a union type that is too complex to represent.
-        [DVC_METRIC_DATA]: JSON.stringify([
+        [PLOT_DATA_ANCHOR]: [
           { actual: 7, predicted: 7, rev: EXPERIMENT_WORKSPACE_ID },
           { actual: 2, predicted: 0, rev: EXPERIMENT_WORKSPACE_ID },
           { actual: 1, predicted: 1, rev: EXPERIMENT_WORKSPACE_ID },
@@ -50374,7 +50374,7 @@ const data = {
           { actual: 4, predicted: 8, rev: 'exp-e7a67' },
           { actual: 5, predicted: 2, rev: 'exp-e7a67' },
           { actual: 6, predicted: 6, rev: 'exp-e7a67' }
-        ])
+        ]
       },
       multiView: true,
       type: 'vega',
@@ -50385,10 +50385,10 @@ const data = {
         'exp-83425',
         'exp-e7a67'
       ],
-      content: JSON.stringify({
+      content: {
         $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
         data: {
-          values: DVC_METRIC_DATA
+          values: PLOT_DATA_ANCHOR
         },
         title: '',
         facet: { field: 'rev', type: 'nominal' },
@@ -50469,7 +50469,7 @@ const data = {
           x: { normal: '' as unknown as Title, truncated: '' },
           y: { normal: '' as unknown as Title, truncated: '' }
         }
-      })
+      }
     }
   ]
 }

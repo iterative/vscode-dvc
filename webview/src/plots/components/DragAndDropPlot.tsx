@@ -3,9 +3,9 @@ import React, { useEffect, useRef } from 'react'
 import { useDispatch } from 'react-redux'
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import {
-  DVC_METRIC_TITLE,
-  DVC_METRIC_X_LABEL,
-  DVC_METRIC_Y_LABEL
+  PLOT_TITLE_ANCHOR,
+  PLOT_X_LABEL_ANCHOR,
+  PLOT_Y_LABEL_ANCHOR
 } from 'dvc/src/cli/dvc/contract'
 import styles from './styles.module.scss'
 import { changeDragAndDropMode, getMetricVsParamTitle } from './util'
@@ -33,12 +33,12 @@ export const DragAndDropPlot: React.FC<DragAndDropPlotProps> = ({
     }
   }, [])
 
-  let title = titles?.[DVC_METRIC_TITLE]
+  let title = titles?.[PLOT_TITLE_ANCHOR]
   let subtitle = ''
 
   // ONLY FOR CUSTOM PLOTS
-  const yTitle = titles?.[DVC_METRIC_Y_LABEL] as string
-  const xTitle = titles?.[DVC_METRIC_X_LABEL] as string
+  const yTitle = titles?.[PLOT_Y_LABEL_ANCHOR] as string
+  const xTitle = titles?.[PLOT_X_LABEL_ANCHOR] as string
 
   title = getMetricVsParamTitle(yTitle, xTitle)
   subtitle = plot.replace('custom-', '')

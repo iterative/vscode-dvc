@@ -13,9 +13,9 @@ import customPlotsFixture, {
   experimentsWithCommits
 } from '../../test/fixtures/expShow/base/customPlots'
 import {
-  DVC_METRIC_DATA,
+  PLOT_DATA_ANCHOR,
   EXPERIMENT_WORKSPACE_ID,
-  TemplatePlot
+  TemplatePlotOutput
 } from '../../cli/dvc/contract'
 import { sameContents } from '../../util/array'
 import { CustomPlotData, ImagePlot } from '../webview/contract'
@@ -33,7 +33,7 @@ beforeEach(() => {
 const logsLossPath = join('logs', 'loss.tsv')
 
 const logsLossPlot = (plotsDiffFixture.data[logsLossPath][0] ||
-  {}) as TemplatePlot
+  {}) as TemplatePlotOutput
 
 describe('collectCustomPlots', () => {
   it('should return the expected data from the test fixture', () => {
@@ -59,7 +59,7 @@ describe('collectCustomPlots', () => {
       plotsOrderValues: customPlotsOrderFixture
     })
     expect(
-      JSON.parse(data[0].anchor_definitions[DVC_METRIC_DATA]).slice(-1)[0].id
+      (data[0].anchorDefinitions[PLOT_DATA_ANCHOR] || []).slice(-1)[0].id
     ).toStrictEqual('main')
   })
 
@@ -94,9 +94,7 @@ describe('collectData', () => {
   it('should return the expected output from the test fixture', () => {
     const { revisionData, comparisonData } = collectData(plotsDiffFixture)
 
-    const values = JSON.parse(
-      logsLossPlot?.anchor_definitions?.[DVC_METRIC_DATA] || '[]'
-    ) as ({ rev: string } & Record<string, unknown>)[]
+    const values = logsLossPlot?.anchor_definitions?.[PLOT_DATA_ANCHOR] || []
 
     expect(isEmpty(values)).toBeFalsy()
 

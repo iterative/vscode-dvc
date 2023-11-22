@@ -1,9 +1,9 @@
 import {
-  DVC_METRIC_DATA,
+  PLOT_DATA_ANCHOR,
   isImagePlotOutput,
   PlotOutput,
   PlotsOutputOrError,
-  TemplatePlot
+  TemplatePlotOutput
 } from '../../cli/dvc/contract'
 import { isDvcError } from '../../cli/dvc/reader'
 import { uniqueValues } from '../../util/array'
@@ -27,11 +27,12 @@ const collectFromDatapoint = (
   acc.push(filename)
 }
 
-const collectTemplateFiles = (acc: string[], plot: TemplatePlot): void => {
-  for (const datapoint of JSON.parse(
-    plot.anchor_definitions[DVC_METRIC_DATA]
-  )) {
-    collectFromDatapoint(acc, datapoint as Record<string, unknown>)
+const collectTemplateFiles = (
+  acc: string[],
+  plot: TemplatePlotOutput
+): void => {
+  for (const datapoint of plot.anchor_definitions[PLOT_DATA_ANCHOR] || []) {
+    collectFromDatapoint(acc, datapoint)
   }
 }
 

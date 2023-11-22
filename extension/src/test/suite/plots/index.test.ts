@@ -44,10 +44,10 @@ import { RegisteredCommands } from '../../../commands/external'
 import { REVISIONS } from '../../fixtures/plotsDiff'
 import * as FileSystem from '../../../fileSystem'
 import {
-  DVC_METRIC_DATA,
+  PLOT_DATA_ANCHOR,
   EXPERIMENT_WORKSPACE_ID,
   ExpShowOutput,
-  TemplatePlot,
+  TemplatePlotOutput,
   experimentHasError
 } from '../../../cli/dvc/contract'
 import { Experiment } from '../../../experiments/webview/contract'
@@ -598,7 +598,7 @@ suite('Plots Test Suite', () => {
       expect(mockWriteJson).to.be.calledWithExactly(
         exportFile.path,
         [
-          ...(JSON.parse(customPlot.anchor_definitions[DVC_METRIC_DATA]) as {
+          ...(customPlot.anchorDefinitions[PLOT_DATA_ANCHOR] as {
             id: string
           }[])
         ].sort(
@@ -686,12 +686,9 @@ suite('Plots Test Suite', () => {
       await openFileEvent
 
       expect(mockWriteCsv).to.be.calledOnce
-      expect(mockWriteCsv).to.be.calledWithExactly(
-        exportFile.path,
-        JSON.parse(templatePlot.anchor_definitions[DVC_METRIC_DATA]) as {
-          values: unknown[]
-        }
-      )
+      expect(mockWriteCsv).to.be.calledWithExactly(exportFile.path, {
+        values: templatePlot.anchorDefinitions[PLOT_DATA_ANCHOR]
+      })
       expect(mockOpenFile).to.calledWithExactly(exportFile.path)
       expect(mockSendTelemetryEvent).to.be.calledOnce
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
@@ -743,7 +740,7 @@ suite('Plots Test Suite', () => {
       expect(mockWriteTsv).to.be.calledWithExactly(
         exportFile.path,
         [
-          ...(JSON.parse(customPlot.anchor_definitions[DVC_METRIC_DATA]) as {
+          ...(customPlot.anchorDefinitions[PLOT_DATA_ANCHOR] as {
             id: string
           }[])
         ].sort(
@@ -993,7 +990,9 @@ suite('Plots Test Suite', () => {
         ...plotsDiffFixture.data[join('plots', 'acc.png')]
       ] as ImagePlot[]
       const lossTsvPath = join('logs', 'loss.tsv')
-      const lossTsv = [...plotsDiffFixture.data[lossTsvPath]] as TemplatePlot[]
+      const lossTsv = [
+        ...plotsDiffFixture.data[lossTsvPath]
+      ] as TemplatePlotOutput[]
 
       const plotsDiffOutput = {
         data: {
@@ -1011,14 +1010,10 @@ suite('Plots Test Suite', () => {
           ),
           [lossTsvPath]: lossTsv.map((plot, i) => {
             const anchor_definitions = { ...lossTsv[i].anchor_definitions }
-            anchor_definitions[DVC_METRIC_DATA] = JSON.stringify(
-              (
-                JSON.parse(anchor_definitions[DVC_METRIC_DATA]) as Record<
-                  string,
-                  unknown
-                >[]
-              ).filter(({ rev }) => rev !== brokenExp)
-            )
+            anchor_definitions[PLOT_DATA_ANCHOR] =
+              anchor_definitions[PLOT_DATA_ANCHOR]?.filter(
+                ({ rev }) => rev !== brokenExp
+              ) || []
 
             return {
               ...plot,
@@ -1082,7 +1077,7 @@ suite('Plots Test Suite', () => {
 
       const [roc] = singleViewSection.entries
       const rocDatapoints =
-        (JSON.parse(roc.anchor_definitions[DVC_METRIC_DATA]) as {
+        (roc.anchorDefinitions[PLOT_DATA_ANCHOR] as {
           rev: string
           filename: string | undefined
         }[]) || []
@@ -1126,7 +1121,7 @@ suite('Plots Test Suite', () => {
       const [confusionMatrix] = multiViewSection.entries
 
       const confusionMatrixDatapoints =
-        (JSON.parse(confusionMatrix.anchor_definitions[DVC_METRIC_DATA]) as {
+        (confusionMatrix.anchorDefinitions[PLOT_DATA_ANCHOR] as {
           rev: string
           filename: string | undefined
         }[]) || []

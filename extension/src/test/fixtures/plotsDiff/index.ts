@@ -1,14 +1,14 @@
-import { TopLevelSpec } from 'vega-lite'
+import type { TopLevelSpec } from 'vega-lite'
 import { isMultiViewPlot } from '../../../plots/vega/util'
 import {
-  DVC_METRIC_COLOR,
-  DVC_METRIC_DATA,
-  DVC_METRIC_Y_LABEL,
-  DVC_METRIC_X_LABEL,
   EXPERIMENT_WORKSPACE_ID,
+  PLOT_COLOR_ANCHOR,
+  PLOT_DATA_ANCHOR,
+  PLOT_TITLE_ANCHOR,
+  PLOT_X_LABEL_ANCHOR,
+  PLOT_Y_LABEL_ANCHOR,
   PlotsOutput,
-  PlotsType,
-  DVC_METRIC_TITLE
+  PlotsType
 } from '../../../cli/dvc/contract'
 import {
   ComparisonRevisionData,
@@ -39,7 +39,7 @@ const basicVega = {
         'exp-e7a67'
       ],
       anchor_definitions: {
-        [DVC_METRIC_DATA]: JSON.stringify([
+        [PLOT_DATA_ANCHOR]: [
           {
             loss: '2.298783302307129',
             step: '0',
@@ -310,17 +310,17 @@ const basicVega = {
             timestamp: '1642041350855',
             rev: 'exp-e7a67'
           }
-        ]),
-        DVC_METRIC_TITLE: '',
-        DVC_METRIC_X_LABEL: 'step',
-        DVC_METRIC_Y_LABEL: 'loss'
+        ],
+        [PLOT_TITLE_ANCHOR]: '',
+        [PLOT_X_LABEL_ANCHOR]: 'step',
+        [PLOT_Y_LABEL_ANCHOR]: 'loss'
       },
-      content: JSON.stringify({
+      content: {
         $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
         data: {
-          values: DVC_METRIC_DATA
+          values: PLOT_DATA_ANCHOR
         },
-        title: DVC_METRIC_TITLE,
+        title: PLOT_TITLE_ANCHOR,
         width: 300,
         height: 300,
         layer: [
@@ -329,12 +329,12 @@ const basicVega = {
               x: {
                 field: 'step',
                 type: 'quantitative',
-                title: DVC_METRIC_X_LABEL
+                title: PLOT_X_LABEL_ANCHOR
               },
               y: {
                 field: 'loss',
                 type: 'quantitative',
-                title: DVC_METRIC_Y_LABEL,
+                title: PLOT_Y_LABEL_ANCHOR,
                 scale: { zero: false }
               },
               color: { field: 'rev', type: 'nominal' }
@@ -392,7 +392,7 @@ const basicVega = {
             ]
           }
         ]
-      }),
+      } as TopLevelSpec,
       multiView: false
     }
   ]
@@ -570,21 +570,22 @@ const extendedSpecs = (plotsOutput: TemplatePlots): TemplatePlotSection[] => {
   for (const [path, plots] of Object.entries(plotsOutput)) {
     for (const originalPlot of plots) {
       const plot = {
-        anchor_definitions: {
+        anchorDefinitions: {
           ...originalPlot.anchor_definitions,
-          [DVC_METRIC_COLOR]: JSON.stringify({
+          [PLOT_COLOR_ANCHOR]: {
+            field: 'rev',
             scale: {
               domain: REVISIONS,
               range: copyOriginalColors().slice(0, 5)
             }
-          })
+          }
         },
         content: originalPlot.content,
         id: path,
         revisions: REVISIONS,
         type: PlotsType.VEGA
       }
-      if (isMultiViewPlot(JSON.parse(originalPlot.content) as TopLevelSpec)) {
+      if (isMultiViewPlot(originalPlot.content)) {
         multiViewPlots.entries.push(plot)
         continue
       }

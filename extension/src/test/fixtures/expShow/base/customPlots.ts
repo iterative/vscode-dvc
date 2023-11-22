@@ -1,3 +1,4 @@
+import type { TopLevelSpec } from 'vega-lite'
 import type { CustomPlotsOrderValue } from '../../../../plots/model/custom'
 import {
   CustomPlotsData,
@@ -6,13 +7,14 @@ import {
 } from '../../../../plots/webview/contract'
 import { Experiment } from '../../../../experiments/webview/contract'
 import {
-  DVC_METRIC_COLOR,
-  DVC_METRIC_DATA,
-  DVC_METRIC_TYPE,
-  DVC_METRIC_X_LABEL,
-  DVC_METRIC_Y_LABEL,
-  DVC_METRIC_ZOOM_AND_PAN,
-  DVC_PARAM_TYPE
+  PLOT_COLOR_ANCHOR,
+  PLOT_DATA_ANCHOR,
+  PLOT_METRIC_TYPE_ANCHOR,
+  PLOT_X_LABEL_ANCHOR,
+  PLOT_Y_LABEL_ANCHOR,
+  PLOT_ZOOM_AND_PAN_ANCHOR,
+  PLOT_PARAM_TYPE_ANCHOR,
+  ZOOM_AND_PAN_PROP
 } from '../../../../cli/dvc/contract'
 
 export const customPlotsOrderFixture: CustomPlotsOrderValue[] = [
@@ -107,11 +109,11 @@ const data: CustomPlotsData = {
       id: 'custom-summary.json:loss-params.yaml:log_file',
       metric: 'summary.json:loss',
       param: 'params.yaml:log_file',
-      content: JSON.stringify({
+      content: {
         $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-        data: { values: DVC_METRIC_DATA },
+        data: { values: PLOT_DATA_ANCHOR },
         encoding: {
-          color: DVC_METRIC_COLOR,
+          color: PLOT_COLOR_ANCHOR,
           x: {
             axis: {
               labelLimit: 75,
@@ -121,8 +123,8 @@ const data: CustomPlotsData = {
             scale: {
               zero: false
             },
-            title: DVC_METRIC_X_LABEL,
-            type: DVC_PARAM_TYPE
+            title: PLOT_X_LABEL_ANCHOR,
+            type: PLOT_PARAM_TYPE_ANCHOR
           },
           y: {
             axis: {
@@ -133,8 +135,8 @@ const data: CustomPlotsData = {
             scale: {
               zero: false
             },
-            title: DVC_METRIC_Y_LABEL,
-            type: DVC_METRIC_TYPE
+            title: PLOT_Y_LABEL_ANCHOR,
+            type: PLOT_METRIC_TYPE_ANCHOR
           }
         },
         height: 'container',
@@ -148,11 +150,11 @@ const data: CustomPlotsData = {
                 },
                 {
                   field: 'metric',
-                  title: DVC_METRIC_Y_LABEL
+                  title: PLOT_Y_LABEL_ANCHOR
                 },
                 {
                   field: 'param',
-                  title: DVC_METRIC_X_LABEL
+                  title: PLOT_X_LABEL_ANCHOR
                 }
               ]
             },
@@ -161,14 +163,14 @@ const data: CustomPlotsData = {
               size: 60,
               type: 'point'
             },
-            params: [DVC_METRIC_ZOOM_AND_PAN]
+            params: [PLOT_ZOOM_AND_PAN_ANCHOR]
           }
         ],
         width: 'container'
-      }),
-      anchor_definitions: {
-        [DVC_PARAM_TYPE]: 'nominal',
-        [DVC_METRIC_COLOR]: JSON.stringify({
+      } as unknown as TopLevelSpec,
+      anchorDefinitions: {
+        [PLOT_PARAM_TYPE_ANCHOR]: 'nominal',
+        [PLOT_COLOR_ANCHOR]: {
           field: 'id',
           scale: {
             domain: [
@@ -188,8 +190,8 @@ const data: CustomPlotsData = {
               '#4c78a8'
             ]
           }
-        }),
-        [DVC_METRIC_DATA]: JSON.stringify([
+        },
+        [PLOT_DATA_ANCHOR]: [
           { id: '7df876c', metric: 2.048856019973755, param: 'logs.csv' },
           {
             id: 'fe2919b',
@@ -204,24 +206,20 @@ const data: CustomPlotsData = {
             metric: 1.775016188621521,
             param: 'logs.csv'
           }
-        ]),
-        [DVC_METRIC_TYPE]: 'quantitative',
-        [DVC_METRIC_X_LABEL]: 'params.yaml:log_file',
-        [DVC_METRIC_Y_LABEL]: 'summary.json:loss',
-        [DVC_METRIC_ZOOM_AND_PAN]: JSON.stringify({
-          bind: 'scales',
-          name: 'grid',
-          select: 'interval'
-        })
+        ],
+        [PLOT_METRIC_TYPE_ANCHOR]: 'quantitative',
+        [PLOT_X_LABEL_ANCHOR]: 'params.yaml:log_file',
+        [PLOT_Y_LABEL_ANCHOR]: 'summary.json:loss',
+        [PLOT_ZOOM_AND_PAN_ANCHOR]: ZOOM_AND_PAN_PROP
       }
     },
     {
       id: 'custom-summary.json:accuracy-params.yaml:epochs',
       metric: 'summary.json:accuracy',
       param: 'params.yaml:epochs',
-      anchor_definitions: {
-        [DVC_PARAM_TYPE]: 'quantitative',
-        [DVC_METRIC_COLOR]: JSON.stringify({
+      anchorDefinitions: {
+        [PLOT_PARAM_TYPE_ANCHOR]: 'quantitative',
+        [PLOT_COLOR_ANCHOR]: {
           field: 'id',
           scale: {
             domain: [
@@ -241,8 +239,8 @@ const data: CustomPlotsData = {
               '#4c78a8'
             ]
           }
-        }),
-        [DVC_METRIC_DATA]: JSON.stringify([
+        },
+        [PLOT_DATA_ANCHOR]: [
           {
             id: '7df876c',
             metric: 0.3484833240509033,
@@ -273,21 +271,17 @@ const data: CustomPlotsData = {
             metric: 0.5926499962806702,
             param: 5
           }
-        ]),
-        [DVC_METRIC_TYPE]: 'quantitative',
-        [DVC_METRIC_X_LABEL]: 'params.yaml:epochs',
-        [DVC_METRIC_Y_LABEL]: 'summary.json:accuracy',
-        [DVC_METRIC_ZOOM_AND_PAN]: JSON.stringify({
-          bind: 'scales',
-          name: 'grid',
-          select: 'interval'
-        })
+        ],
+        [PLOT_METRIC_TYPE_ANCHOR]: 'quantitative',
+        [PLOT_X_LABEL_ANCHOR]: 'params.yaml:epochs',
+        [PLOT_Y_LABEL_ANCHOR]: 'summary.json:accuracy',
+        [PLOT_ZOOM_AND_PAN_ANCHOR]: ZOOM_AND_PAN_PROP
       },
-      content: JSON.stringify({
+      content: {
         $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-        data: { values: DVC_METRIC_DATA },
+        data: { values: PLOT_DATA_ANCHOR },
         encoding: {
-          color: DVC_METRIC_COLOR,
+          color: PLOT_COLOR_ANCHOR,
           x: {
             axis: {
               labelLimit: 75,
@@ -297,8 +291,8 @@ const data: CustomPlotsData = {
             scale: {
               zero: false
             },
-            title: DVC_METRIC_X_LABEL,
-            type: DVC_PARAM_TYPE
+            title: PLOT_X_LABEL_ANCHOR,
+            type: PLOT_PARAM_TYPE_ANCHOR
           },
           y: {
             axis: {
@@ -309,8 +303,8 @@ const data: CustomPlotsData = {
             scale: {
               zero: false
             },
-            title: DVC_METRIC_Y_LABEL,
-            type: DVC_METRIC_TYPE
+            title: PLOT_Y_LABEL_ANCHOR,
+            type: PLOT_METRIC_TYPE_ANCHOR
           }
         },
         height: 'container',
@@ -324,11 +318,11 @@ const data: CustomPlotsData = {
                 },
                 {
                   field: 'metric',
-                  title: DVC_METRIC_Y_LABEL
+                  title: PLOT_Y_LABEL_ANCHOR
                 },
                 {
                   field: 'param',
-                  title: DVC_METRIC_X_LABEL
+                  title: PLOT_X_LABEL_ANCHOR
                 }
               ]
             },
@@ -337,11 +331,11 @@ const data: CustomPlotsData = {
               size: 60,
               type: 'point'
             },
-            params: [DVC_METRIC_ZOOM_AND_PAN]
+            params: [PLOT_ZOOM_AND_PAN_ANCHOR]
           }
         ],
         width: 'container'
-      })
+      } as unknown as TopLevelSpec
     }
   ],
   nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,

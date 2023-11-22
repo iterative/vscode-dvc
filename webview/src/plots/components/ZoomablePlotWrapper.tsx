@@ -1,9 +1,9 @@
 import React, { ReactElement, PropsWithChildren } from 'react'
 import {
   AnchorDefinitions,
-  DVC_METRIC_TITLE,
-  DVC_METRIC_X_LABEL,
-  DVC_METRIC_Y_LABEL
+  PLOT_TITLE_ANCHOR,
+  PLOT_X_LABEL_ANCHOR,
+  PLOT_Y_LABEL_ANCHOR
 } from 'dvc/src/cli/dvc/contract'
 import styles from './styles.module.scss'
 import Tooltip from '../../shared/components/tooltip/Tooltip'
@@ -29,7 +29,7 @@ const getLine = (axis: string, title: string) => {
           {title}
         </>
       ),
-      key: axis
+      key: `${axis}-${title}`
     }
   }
 
@@ -39,7 +39,7 @@ const getLine = (axis: string, title: string) => {
         <span className={styles.plotTooltipLabel}>Title:</span> {title}
       </>
     ),
-    key: 'main'
+    key: `main-${title}`
   }
 }
 
@@ -51,14 +51,14 @@ export const ZoomablePlotWrapper: React.FC<
   }
 
   const titleLengths = {
-    [DVC_METRIC_TITLE]: 50,
-    [DVC_METRIC_X_LABEL]: 50,
-    [DVC_METRIC_Y_LABEL]: 30
+    [PLOT_TITLE_ANCHOR]: 50,
+    [PLOT_X_LABEL_ANCHOR]: 50,
+    [PLOT_Y_LABEL_ANCHOR]: 30
   }
   const tooltipContentLines = []
 
   for (const [titleKey, maxLength] of Object.entries(titleLengths)) {
-    const title = titles[titleKey as keyof AnchorDefinitions]
+    const title = titles[titleKey as keyof AnchorDefinitions] as string
     if (isTitleCut(title, maxLength)) {
       tooltipContentLines.push(getLine(titleKey, title))
     }

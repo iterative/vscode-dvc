@@ -98,7 +98,7 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
   }
 
   return (
-    <ZoomablePlotWrapper titles={plot.anchor_definitions}>
+    <ZoomablePlotWrapper titles={plot.anchorDefinitions}>
       <div
         className={styles.zoomedInPlot}
         data-testid="zoomed-in-plot"

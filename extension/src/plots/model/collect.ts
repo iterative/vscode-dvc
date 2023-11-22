@@ -1,4 +1,5 @@
 import get from 'lodash.get'
+import type { TopLevelSpec } from 'vega-lite'
 import {
   getContent,
   CustomPlotsOrderValue,
@@ -17,18 +18,18 @@ import {
 } from '../webview/contract'
 import {
   AnchorDefinitions,
-  DVC_METRIC_COLOR,
-  DVC_METRIC_DATA,
-  DVC_METRIC_TYPE,
-  DVC_METRIC_X_LABEL,
-  DVC_METRIC_Y_LABEL,
-  DVC_METRIC_ZOOM_AND_PAN,
-  DVC_PARAM_TYPE,
+  PLOT_COLOR_ANCHOR,
+  PLOT_DATA_ANCHOR,
+  PLOT_METRIC_TYPE_ANCHOR,
+  PLOT_X_LABEL_ANCHOR,
+  PLOT_Y_LABEL_ANCHOR,
+  PLOT_ZOOM_AND_PAN_ANCHOR,
+  PLOT_PARAM_TYPE_ANCHOR,
   isImagePlotOutput,
   PlotOutput,
   PlotsOutput,
   PlotsType,
-  TemplatePlot
+  TemplatePlotOutput
 } from '../../cli/dvc/contract'
 import { splitColumnPath } from '../../experiments/columns/paths'
 import { ColumnType, Experiment } from '../../experiments/webview/contract'
@@ -140,21 +141,21 @@ const getCustomPlotData = (
   const content = getContent()
 
   return {
-    anchor_definitions: {
-      [DVC_METRIC_COLOR]: JSON.stringify({
+    anchorDefinitions: {
+      [PLOT_COLOR_ANCHOR]: {
         field: 'id',
         scale: completeColorScale
-      }),
-      [DVC_METRIC_DATA]: JSON.stringify(values),
-      [DVC_METRIC_TYPE]: getDataType(typeof metricVal),
-      [DVC_METRIC_X_LABEL]: param,
-      [DVC_METRIC_Y_LABEL]: metric,
-      [DVC_METRIC_ZOOM_AND_PAN]: JSON.stringify({
+      },
+      [PLOT_DATA_ANCHOR]: values,
+      [PLOT_METRIC_TYPE_ANCHOR]: getDataType(typeof metricVal),
+      [PLOT_PARAM_TYPE_ANCHOR]: getDataType(typeof paramVal),
+      [PLOT_X_LABEL_ANCHOR]: param,
+      [PLOT_Y_LABEL_ANCHOR]: metric,
+      [PLOT_ZOOM_AND_PAN_ANCHOR]: {
         bind: 'scales',
         name: 'grid',
         select: 'interval'
-      }),
-      [DVC_PARAM_TYPE]: getDataType(typeof paramVal)
+      }
     },
     content,
     id: getCustomPlotId(metric, param),
@@ -258,11 +259,11 @@ const initializeAcc = (
 const collectPlotData = (
   acc: RevisionData,
   path: string,
-  plot: TemplatePlot
+  plot: TemplatePlotOutput
 ) => {
   initializeAcc(acc, path, plot.revisions || [])
 
-  for (const data of JSON.parse(plot.anchor_definitions[DVC_METRIC_DATA]) as {
+  for (const data of plot.anchor_definitions[PLOT_DATA_ANCHOR] as {
     rev?: string
   }[]) {
     const rev = data.rev
@@ -385,7 +386,7 @@ export const collectSelectedComparisonPlots = ({
 
 export type TemplateDetailsAccumulator = {
   [path: string]: {
-    content: string
+    content: TopLevelSpec
     anchorDefinitions: AnchorDefinitions
   }
 }
@@ -399,7 +400,7 @@ const collectTemplateDetails = (
     return
   }
   const { anchor_definitions, content } = plot
-  delete anchor_definitions[DVC_METRIC_COLOR]
+  delete anchor_definitions[PLOT_COLOR_ANCHOR]
   acc[path] = { anchorDefinitions: anchor_definitions, content }
 }
 
@@ -422,7 +423,7 @@ const collectTemplatePlot = (
   acc: TemplatePlotEntry[],
   selectedRevisions: string[],
   path: string,
-  content: string,
+  content: TopLevelSpec,
   anchorDefinitions: AnchorDefinitions,
   revisionData: RevisionData,
   colorScale: ColorScale
@@ -436,10 +437,10 @@ const collectTemplatePlot = (
   }
 
   acc.push({
-    anchor_definitions: {
+    anchorDefinitions: {
       ...anchorDefinitions,
-      [DVC_METRIC_COLOR]: JSON.stringify({ field: 'rev', scale: colorScale }),
-      [DVC_METRIC_DATA]: JSON.stringify(datapoints)
+      [PLOT_COLOR_ANCHOR]: { field: 'rev', scale: colorScale },
+      [PLOT_DATA_ANCHOR]: datapoints
     },
     content,
     id: path,

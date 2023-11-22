@@ -1,13 +1,14 @@
+import type { TopLevelSpec } from 'vega-lite'
 import { getCustomPlotId } from './collect'
 import { Column, ColumnType } from '../../experiments/webview/contract'
 import {
-  DVC_METRIC_COLOR,
-  DVC_METRIC_DATA,
-  DVC_METRIC_TYPE,
-  DVC_METRIC_X_LABEL,
-  DVC_METRIC_Y_LABEL,
-  DVC_METRIC_ZOOM_AND_PAN,
-  DVC_PARAM_TYPE
+  PLOT_COLOR_ANCHOR,
+  PLOT_DATA_ANCHOR,
+  PLOT_METRIC_TYPE_ANCHOR,
+  PLOT_X_LABEL_ANCHOR,
+  PLOT_Y_LABEL_ANCHOR,
+  PLOT_ZOOM_AND_PAN_ANCHOR,
+  PLOT_PARAM_TYPE_ANCHOR
 } from '../../cli/dvc/contract'
 import { FILE_SEPARATOR } from '../../experiments/columns/constants'
 
@@ -62,12 +63,12 @@ export const getCustomPlotPathsFromColumns = (
 export const getDataType = (type: string) =>
   type === 'number' ? 'quantitative' : 'nominal'
 
-export const getContent = (): string =>
-  JSON.stringify({
+export const getContent = (): TopLevelSpec =>
+  ({
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-    data: { values: DVC_METRIC_DATA },
+    data: { values: PLOT_DATA_ANCHOR },
     encoding: {
-      color: DVC_METRIC_COLOR,
+      color: PLOT_COLOR_ANCHOR,
       x: {
         axis: {
           labelLimit: 75,
@@ -77,8 +78,8 @@ export const getContent = (): string =>
         scale: {
           zero: false
         },
-        title: DVC_METRIC_X_LABEL,
-        type: DVC_PARAM_TYPE
+        title: PLOT_X_LABEL_ANCHOR,
+        type: PLOT_PARAM_TYPE_ANCHOR
       },
       y: {
         axis: {
@@ -89,8 +90,8 @@ export const getContent = (): string =>
         scale: {
           zero: false
         },
-        title: DVC_METRIC_Y_LABEL,
-        type: DVC_METRIC_TYPE
+        title: PLOT_Y_LABEL_ANCHOR,
+        type: PLOT_METRIC_TYPE_ANCHOR
       }
     },
     height: 'container',
@@ -104,11 +105,11 @@ export const getContent = (): string =>
             },
             {
               field: 'metric',
-              title: DVC_METRIC_Y_LABEL
+              title: PLOT_Y_LABEL_ANCHOR
             },
             {
               field: 'param',
-              title: DVC_METRIC_X_LABEL
+              title: PLOT_X_LABEL_ANCHOR
             }
           ]
         },
@@ -117,8 +118,8 @@ export const getContent = (): string =>
           size: 60,
           type: 'point'
         },
-        params: [DVC_METRIC_ZOOM_AND_PAN]
+        params: [PLOT_ZOOM_AND_PAN_ANCHOR]
       }
     ],
     width: 'container'
-  })
+  }) as unknown as TopLevelSpec

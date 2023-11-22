@@ -14,8 +14,8 @@ import {
 } from 'vega-lite/build/src/spec/repeat'
 import { TopLevelUnitSpec } from 'vega-lite/build/src/spec/unit'
 import { ColorScale } from '../webview/contract'
-import { ShapeEncoding, StrokeDashEncoding } from '../multiSource/constants'
 import { Color } from '../../experiments/model/status/colors'
+import { ShapeEncoding, StrokeDashEncoding } from '../../cli/dvc/contract'
 
 const getFacetField = (template: TopLevelSpec): string | null => {
   const facetSpec = template as TopLevelFacetSpec
@@ -67,6 +67,7 @@ const isVegaRepeatPlot = (template: TopLevelSpec): boolean => {
   )
 }
 
+// double check multiview horizontal bar
 export const isMultiViewPlot = (template?: TopLevelSpec): boolean =>
   !template ||
   isVegaFacetPlot(template) ||

@@ -1,5 +1,4 @@
 import { sep } from 'path'
-import { TopLevelSpec } from 'vega-lite'
 import { TemplatePlotGroup } from '../webview/contract'
 import {
   EXPERIMENT_WORKSPACE_ID,
@@ -9,18 +8,16 @@ import {
   PlotOutput,
   PlotsData,
   PlotsOutput,
-  TemplatePlot
+  ShapeScale,
+  ShapeValue,
+  StrokeDashScale,
+  StrokeDashValue,
+  TemplatePlotOutput
 } from '../../cli/dvc/contract'
 import { getParent, getPath, getPathArray } from '../../fileSystem/util'
 import { splitMatchedOrdered, definedAndNonEmpty } from '../../util/array'
 import { isMultiViewPlot } from '../vega/util'
 import { createTypedAccumulator } from '../../util/object'
-import {
-  ShapeScale,
-  ShapeValue,
-  StrokeDashScale,
-  StrokeDashValue
-} from '../multiSource/constants'
 import { truncate } from '../../util/string'
 import { FIELD_SEPARATOR, MULTI_IMAGE_PATH_REG } from '../../cli/dvc/constants'
 import { MultiSourceEncoding } from '../multiSource/collect'
@@ -49,7 +46,7 @@ const collectType = (plots: PlotOutput[]) => {
       continue
     }
 
-    isMultiViewPlot(JSON.parse(plot.content) as TopLevelSpec)
+    isMultiViewPlot(plot.content)
       ? type.add(PathType.TEMPLATE_MULTI)
       : type.add(PathType.TEMPLATE_SINGLE)
   }
@@ -90,7 +87,7 @@ const collectImageRevision = (
 
 const collectTemplateRevisions = (
   acc: Set<string>,
-  plot: TemplatePlot
+  plot: TemplatePlotOutput
 ): void => {
   for (const rev of plot.revisions || []) {
     acc.add(rev)

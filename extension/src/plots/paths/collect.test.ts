@@ -1,4 +1,5 @@
 import { join, sep } from 'path'
+import type { TopLevelSpec } from 'vega-lite'
 import isEqual from 'lodash.isequal'
 import {
   collectEncodingElements,
@@ -11,15 +12,17 @@ import {
 } from './collect'
 import { TemplatePlotGroup } from '../webview/contract'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
-import { StrokeDash } from '../multiSource/constants'
 import {
-  DVC_METRIC_DATA,
+  PLOT_DATA_ANCHOR,
   EXPERIMENT_WORKSPACE_ID,
   PlotsOutput,
-  PlotsType
+  PlotsType,
+  PLOT_STROKE_DASH
 } from '../../cli/dvc/contract'
 import { REVISIONS } from '../../test/fixtures/plotsDiff'
 import { FIELD_SEPARATOR } from '../../cli/dvc/constants'
+
+const mockTopLevelSpec = {} as TopLevelSpec
 
 const plotsDiffFixturePaths: PlotPath[] = [
   {
@@ -117,7 +120,7 @@ describe('collectPaths', () => {
           [remainingPath]: [
             {
               anchor_definitions: {
-                [DVC_METRIC_DATA]: JSON.stringify([
+                [PLOT_DATA_ANCHOR]: [
                   {
                     loss: '2.43323',
                     rev: fetchedRevs[0],
@@ -133,9 +136,9 @@ describe('collectPaths', () => {
                     rev: fetchedRevs[2],
                     step: '0'
                   }
-                ])
+                ]
               },
-              content: '{}',
+              content: mockTopLevelSpec,
               revisions: fetchedRevs,
               type: PlotsType.VEGA
             }
@@ -215,16 +218,16 @@ describe('collectPaths', () => {
       data: {
         [join('logs', 'scalars', 'acc.tsv')]: [
           {
-            anchor_definitions: { [DVC_METRIC_DATA]: '[]' },
-            content: '{}',
+            anchor_definitions: { [PLOT_DATA_ANCHOR]: [] },
+            content: mockTopLevelSpec,
             revisions,
             type: PlotsType.VEGA
           }
         ],
         [join('logs', 'scalars', 'loss.tsv')]: [
           {
-            anchor_definitions: { [DVC_METRIC_DATA]: '[]' },
-            content: '{}',
+            anchor_definitions: { [PLOT_DATA_ANCHOR]: [] },
+            content: mockTopLevelSpec,
             revisions,
             type: PlotsType.VEGA
           }
@@ -238,18 +241,18 @@ describe('collectPaths', () => {
         ],
         'predictions.json': [
           {
-            anchor_definitions: { [DVC_METRIC_DATA]: '[]' },
-            content: JSON.stringify({
+            anchor_definitions: { [PLOT_DATA_ANCHOR]: [] },
+            content: {
               facet: { field: 'rev', type: 'nominal' }
-            }),
+            } as TopLevelSpec,
             revisions,
             type: PlotsType.VEGA
           }
         ],
         [join(`dvc.yaml${FIELD_SEPARATOR}logs`, 'acc.tsv')]: [
           {
-            anchor_definitions: { [DVC_METRIC_DATA]: '[]' },
-            content: '{}',
+            anchor_definitions: { [PLOT_DATA_ANCHOR]: [] },
+            content: mockTopLevelSpec,
             revisions,
             type: PlotsType.VEGA
           }
@@ -261,8 +264,8 @@ describe('collectPaths', () => {
           'acc.tsv'
         )]: [
           {
-            anchor_definitions: { [DVC_METRIC_DATA]: '[]' },
-            content: '{}',
+            anchor_definitions: { [PLOT_DATA_ANCHOR]: [] },
+            content: mockTopLevelSpec,
             revisions,
             type: PlotsType.VEGA
           }
@@ -685,7 +688,11 @@ describe('collectEncodingElements', () => {
           field: 'field',
           scale: {
             domain: ['A', 'B', 'C'],
-            range: [StrokeDash[0], StrokeDash[1], StrokeDash[2]]
+            range: [
+              PLOT_STROKE_DASH[0],
+              PLOT_STROKE_DASH[1],
+              PLOT_STROKE_DASH[2]
+            ]
           }
         }
       }
@@ -694,17 +701,17 @@ describe('collectEncodingElements', () => {
       {
         label: 'A',
         type: EncodingType.STROKE_DASH,
-        value: StrokeDash[0]
+        value: PLOT_STROKE_DASH[0]
       },
       {
         label: 'B',
         type: EncodingType.STROKE_DASH,
-        value: StrokeDash[1]
+        value: PLOT_STROKE_DASH[1]
       },
       {
         label: 'C',
         type: EncodingType.STROKE_DASH,
-        value: StrokeDash[2]
+        value: PLOT_STROKE_DASH[2]
       }
     ])
   })

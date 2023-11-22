@@ -1,110 +1,123 @@
+import { TopLevelSpec } from 'vega-lite'
 import {
   AnchorDefinitions,
-  DVC_METRIC_COLOR,
-  DVC_METRIC_PLOT_HEIGHT,
-  DVC_METRIC_PLOT_WIDTH,
-  DVC_METRIC_SHAPE,
-  DVC_METRIC_STROKE_DASH,
-  DVC_METRIC_TITLE,
-  DVC_METRIC_TYPE,
-  DVC_METRIC_X_LABEL,
-  DVC_METRIC_Y_LABEL,
-  DVC_METRIC_ZOOM_AND_PAN,
-  DVC_PARAM_TYPE
+  PLOT_COLOR_ANCHOR,
+  PLOT_HEIGHT_ANCHOR,
+  PLOT_WIDTH_ANCHOR,
+  PLOT_SHAPE_ANCHOR,
+  PLOT_STROKE_DASH_ANCHOR,
+  PLOT_TITLE_ANCHOR,
+  PLOT_X_LABEL_ANCHOR,
+  PLOT_Y_LABEL_ANCHOR,
+  PLOT_ZOOM_AND_PAN_ANCHOR,
+  ZOOM_AND_PAN_PROP
 } from 'dvc/src/cli/dvc/contract'
 import { DEFAULT_NB_ITEMS_PER_ROW } from 'dvc/src/plots/webview/contract'
-import { VisualizationSpec } from 'react-vega'
+import { isMultiViewPlot } from 'dvc/src/plots/vega/util'
 import { truncate } from 'vega-util'
 
+const isAnchor = (
+  value: unknown,
+  anchorDefinitions: AnchorDefinitions
+): value is keyof AnchorDefinitions =>
+  typeof value === 'string' && value in anchorDefinitions
+
+const replaceAnchors = (
+  value: unknown,
+  anchorDefinitions: AnchorDefinitions
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+): unknown => {
+  if (!value) {
+    return value
+  }
+
+  if (isAnchor(value, anchorDefinitions)) {
+    return anchorDefinitions[value]
+  }
+
+  if (value && typeof value === 'object') {
+    if (Array.isArray(value)) {
+      const updatedArray = []
+      for (const item of value) {
+        updatedArray.push(replaceAnchors(item, anchorDefinitions))
+      }
+      return updatedArray
+    }
+
+    const updatedObject: Record<string, unknown> = {}
+    for (const [key, item] of Object.entries(value)) {
+      updatedObject[key] = replaceAnchors(item, anchorDefinitions)
+    }
+    return updatedObject
+  }
+
+  return value
+}
+
+// come back to the width of titles
 export const fillTemplate = (
   plot:
     | {
-        content: string
-        anchor_definitions: AnchorDefinitions
+        content: TopLevelSpec
+        anchorDefinitions: AnchorDefinitions
       }
     | undefined,
   nbItemsPerRow: number,
   height: number,
   plotFocused: boolean
   // eslint-disable-next-line sonarjs/cognitive-complexity
-): VisualizationSpec | undefined => {
+): TopLevelSpec | undefined => {
   if (!plot) {
     return
   }
 
-  const { content, anchor_definitions } = plot
+  const { content, anchorDefinitions } = plot
+
+  const updatedAnchors: Record<string, unknown> = {}
 
   const width = nbItemsPerRow > DEFAULT_NB_ITEMS_PER_ROW ? 30 : 50
-  let specStr = content
 
-  for (const [key, value] of Object.entries(anchor_definitions)) {
-    if (([DVC_METRIC_TITLE, DVC_METRIC_X_LABEL] as string[]).includes(key)) {
-      const truncatedValue = truncate(value, width, 'left')
-      specStr = specStr.replace(new RegExp(key, 'g'), truncatedValue)
-      continue
+  for (const [key, value] of Object.entries(anchorDefinitions)) {
+    if (key === PLOT_TITLE_ANCHOR || key === PLOT_X_LABEL_ANCHOR) {
+      const strValue = String(value)
+      updatedAnchors[key] = plotFocused
+        ? strValue
+        : truncate(strValue, width, 'left')
     }
 
-    if (key === DVC_METRIC_Y_LABEL) {
-      const truncatedVerticalValue = truncate(
-        value,
+    if (key === PLOT_Y_LABEL_ANCHOR) {
+      updatedAnchors[key] = truncate(
+        value as string,
         Math.floor((50 - (nbItemsPerRow - height) * 5) * 0.75),
         'left'
       )
-      specStr = specStr.replace(new RegExp(key, 'g'), truncatedVerticalValue)
-      continue
-    }
-
-    if (key === DVC_METRIC_ZOOM_AND_PAN) {
-      const suppressZoomAndPan = !plotFocused
-      specStr = specStr.replace(
-        new RegExp(`"${key}"`, 'g'),
-        suppressZoomAndPan ? '{}' : value
-      )
-      continue
     }
 
     if (
-      (
-        [DVC_METRIC_COLOR, DVC_METRIC_SHAPE, DVC_METRIC_STROKE_DASH] as string[]
-      ).includes(key)
+      !plotFocused &&
+      (key === PLOT_COLOR_ANCHOR ||
+        key === PLOT_SHAPE_ANCHOR ||
+        key === PLOT_STROKE_DASH_ANCHOR)
     ) {
-      const suppressLegend = !plotFocused
-      if (suppressLegend) {
-        const obj = JSON.parse(value) as { [key: string]: unknown }
-        obj.legend = null
-        specStr = specStr.replace(
-          new RegExp(`"${key}"`, 'g'),
-          JSON.stringify(obj)
-        )
-      } else {
-        specStr = specStr.replace(new RegExp(`"${key}"`, 'g'), value)
+      updatedAnchors[key] = {
+        ...(value as AnchorDefinitions[typeof PLOT_COLOR_ANCHOR]),
+        legend: null
       }
-      continue
     }
-
-    if (([DVC_PARAM_TYPE, DVC_METRIC_TYPE] as string[]).includes(key)) {
-      specStr = specStr.replace(new RegExp(key, 'g'), value)
-      continue
-    }
-
-    if (
-      ([DVC_METRIC_PLOT_HEIGHT, DVC_METRIC_PLOT_WIDTH] as string[]).includes(
-        key
-      )
-    ) {
-      specStr = specStr.replace(new RegExp(key, 'g'), 'container')
-      continue
-    }
-
-    if (
-      ['<DVC_METRIC_COLUMN_WIDTH>', '<DVC_METRIC_ROW_HEIGHT>'].includes(key)
-    ) {
-      specStr = specStr.replace(new RegExp(`"${key}"`, 'g'), '300')
-      continue
-    }
-
-    specStr = specStr.replace(new RegExp(`"${key}"`, 'g'), value)
   }
 
-  return JSON.parse(specStr) as VisualizationSpec
+  updatedAnchors[PLOT_ZOOM_AND_PAN_ANCHOR] = plotFocused
+    ? ZOOM_AND_PAN_PROP
+    : {}
+
+  const isMultiView = isMultiViewPlot(content)
+
+  updatedAnchors[PLOT_HEIGHT_ANCHOR] = isMultiView ? 300 : 'container'
+
+  updatedAnchors[PLOT_WIDTH_ANCHOR] = isMultiView ? 300 : 'container'
+
+  return replaceAnchors(content, {
+    ...anchorDefinitions,
+    ...updatedAnchors
+  }) as TopLevelSpec
 }

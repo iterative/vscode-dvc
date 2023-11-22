@@ -1,3 +1,5 @@
+import type { TopLevelSpec } from 'vega-lite'
+
 export const MIN_CLI_VERSION = '2.58.1'
 export const LATEST_TESTED_CLI_VERSION = '3.30.1'
 
@@ -135,39 +137,93 @@ export const isImagePlotOutput = (plot: {
   type: PlotsType
 }): plot is ImagePlotOutput => plot.type === PlotsType.IMAGE
 
-export const DVC_METRIC_COLOR = '<DVC_METRIC_COLOR>' as const
-export const DVC_METRIC_DATA = '<DVC_METRIC_DATA>' as const
-export const DVC_METRIC_SHAPE = '<DVC_METRIC_SHAPE>' as const
-export const DVC_METRIC_STROKE_DASH = '<DVC_METRIC_STROKE_DASH>' as const
-export const DVC_METRIC_TYPE = '<DVC_METRIC_TYPE>' as const
-export const DVC_METRIC_TITLE = '<DVC_METRIC_TITLE>' as const
-export const DVC_METRIC_X = '<DVC_METRIC_X>' as const
-export const DVC_METRIC_X_LABEL = '<DVC_METRIC_X_LABEL>' as const
-export const DVC_METRIC_Y = '<DVC_METRIC_Y>' as const
-export const DVC_METRIC_Y_LABEL = '<DVC_METRIC_Y_LABEL>' as const
-export const DVC_METRIC_ZOOM_AND_PAN = '<DVC_METRIC_ZOOM_AND_PAN>' as const
-export const DVC_PARAM_TYPE = '<DVC_PARAM_TYPE>' as const
-export const DVC_METRIC_PLOT_HEIGHT = '<DVC_METRIC_PLOT_HEIGHT>' as const
-export const DVC_METRIC_PLOT_WIDTH = '<DVC_METRIC_PLOT_WIDTH>' as const
-export const DVC_METRIC_COLUMN_WIDTH = '<DVC_METRIC_COLUMN_WIDTH>' as const
-export const DVC_METRIC_ROW_HEIGHT = '<DVC_METRIC_ROW_HEIGHT>' as const
+export const PLOT_REV_FIELD = 'rev' as const
+export const PLOT_COLOR_ANCHOR = '<DVC_METRIC_COLOR>' as const
+export const PLOT_DATA_ANCHOR = '<DVC_METRIC_DATA>' as const
+export const PLOT_SHAPE_ANCHOR = '<DVC_METRIC_SHAPE>' as const
+export const PLOT_STROKE_DASH_ANCHOR = '<DVC_METRIC_STROKE_DASH>' as const
+export const PLOT_METRIC_TYPE_ANCHOR = '<DVC_METRIC_TYPE>' as const
+export const PLOT_TITLE_ANCHOR = '<DVC_METRIC_TITLE>' as const
+export const PLOT_X_ANCHOR = '<DVC_METRIC_X>' as const
+export const PLOT_X_LABEL_ANCHOR = '<DVC_METRIC_X_LABEL>' as const
+export const PLOT_Y_ANCHOR = '<DVC_METRIC_Y>' as const
+export const PLOT_Y_LABEL_ANCHOR = '<DVC_METRIC_Y_LABEL>' as const
+export const PLOT_ZOOM_AND_PAN_ANCHOR = '<DVC_METRIC_ZOOM_AND_PAN>' as const
+export const PLOT_PARAM_TYPE_ANCHOR = '<DVC_PARAM_TYPE>' as const
+export const PLOT_HEIGHT_ANCHOR = '<DVC_METRIC_PLOT_HEIGHT>' as const
+export const PLOT_WIDTH_ANCHOR = '<DVC_METRIC_PLOT_WIDTH>' as const
 
-export type AnchorDefinitions = {
-  [DVC_METRIC_COLOR]?: string
-  [DVC_METRIC_DATA]: string
-  [DVC_METRIC_SHAPE]?: string
-  [DVC_METRIC_STROKE_DASH]?: string
-  [DVC_METRIC_TYPE]?: 'quantitative' | 'nominal'
-  [DVC_METRIC_TITLE]?: string
-  [DVC_METRIC_X_LABEL]?: string
-  [DVC_METRIC_Y_LABEL]?: string
-  [DVC_METRIC_ZOOM_AND_PAN]?: string
-  [DVC_PARAM_TYPE]?: 'quantitative' | 'nominal'
+export const ZOOM_AND_PAN_PROP = {
+  bind: 'scales',
+  name: 'grid',
+  select: 'interval'
+} as const
+
+type FieldDef = { field: string }
+
+type EmptyObject = Record<string, never>
+
+export const PLOT_STROKE_DASH = [
+  [1, 0],
+  [8, 8],
+  [8, 4],
+  [4, 4],
+  [4, 2],
+  [2, 1],
+  [1, 1]
+] as const
+export type StrokeDashValue = (typeof PLOT_STROKE_DASH)[number]
+
+export const PLOT_SHAPE = ['square', 'circle', 'triangle', 'diamond'] as const
+
+export type ShapeValue = (typeof PLOT_SHAPE)[number]
+
+type Scale<T extends StrokeDashValue | string> = {
+  domain: string[]
+  range: T[]
 }
 
-export type TemplatePlot = {
+export type StrokeDashScale = Scale<StrokeDashValue>
+
+export type ShapeScale = Scale<ShapeValue>
+
+type Encoding<T extends StrokeDashValue | string> = FieldDef & {
+  scale: Scale<T>
+  legend?: null | {
+    symbolType?: string
+    symbolFillColor?: string
+    symbolStrokeColor?: string
+  }
+}
+
+type MultiSourceEncoding<T extends StrokeDashValue | ShapeValue> =
+  | Encoding<T>
+  | EmptyObject
+
+export type StrokeDashEncoding = MultiSourceEncoding<StrokeDashValue>
+
+export type ShapeEncoding = MultiSourceEncoding<ShapeValue>
+
+export type AnchorDefinitions = {
+  [PLOT_COLOR_ANCHOR]?: Encoding<string>
+  [PLOT_DATA_ANCHOR]?: Array<Record<string, unknown>>
+  [PLOT_HEIGHT_ANCHOR]?: number | 'container'
+  [PLOT_METRIC_TYPE_ANCHOR]?: 'quantitative' | 'nominal'
+  [PLOT_PARAM_TYPE_ANCHOR]?: 'quantitative' | 'nominal'
+  [PLOT_SHAPE_ANCHOR]?: MultiSourceEncoding<ShapeValue>
+  [PLOT_STROKE_DASH_ANCHOR]?: MultiSourceEncoding<StrokeDashValue>
+  [PLOT_TITLE_ANCHOR]?: string
+  [PLOT_WIDTH_ANCHOR]?: number | 'container'
+  [PLOT_X_ANCHOR]?: string
+  [PLOT_X_LABEL_ANCHOR]?: string
+  [PLOT_Y_ANCHOR]?: string
+  [PLOT_Y_LABEL_ANCHOR]?: string
+  [PLOT_ZOOM_AND_PAN_ANCHOR]?: typeof ZOOM_AND_PAN_PROP
+}
+
+export type TemplatePlotOutput = {
   anchor_definitions: AnchorDefinitions
-  content: string
+  content: TopLevelSpec
   revisions: string[]
   type: PlotsType
 }
@@ -178,7 +234,7 @@ export type ImagePlotOutput = {
   url: string
 }
 
-export type PlotOutput = TemplatePlot | ImagePlotOutput
+export type PlotOutput = TemplatePlotOutput | ImagePlotOutput
 
 export interface PlotsData {
   [path: string]: PlotOutput[]

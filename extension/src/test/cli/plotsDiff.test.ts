@@ -5,11 +5,11 @@ import { dvcReader, initializeDemoRepo, initializeEmptyRepo } from './util'
 import { dvcDemoPath } from '../util'
 import { ImagePlot } from '../../plots/webview/contract'
 import {
-  DVC_METRIC_DATA,
+  PLOT_DATA_ANCHOR,
   EXPERIMENT_WORKSPACE_ID,
   PlotsOutput,
   PlotsType,
-  TemplatePlot,
+  TemplatePlotOutput,
   isImagePlotOutput
 } from '../../cli/dvc/contract'
 import { isDvcError } from '../../cli/dvc/reader'
@@ -48,9 +48,9 @@ suite('plots diff -o <TEMP_DIR> --split --show-json', () => {
           expect(plot.revisions, 'should have one revision').to.have.lengthOf(1)
         }
 
-        const expectTemplate = (plot: TemplatePlot) => {
+        const expectTemplate = (plot: TemplatePlotOutput) => {
           expect(
-            plot?.anchor_definitions[DVC_METRIC_DATA],
+            plot?.anchor_definitions[PLOT_DATA_ANCHOR],
             'should have a datapoints anchor definition'
           ).to.be.a('string')
 
@@ -58,8 +58,7 @@ suite('plots diff -o <TEMP_DIR> --split --show-json', () => {
             2
           )
 
-          const datapoints =
-            JSON.parse(plot?.anchor_definitions[DVC_METRIC_DATA]) || []
+          const datapoints = plot?.anchor_definitions[PLOT_DATA_ANCHOR] || []
           const revisions = new Set()
           for (const datapoint of datapoints) {
             revisions.add(datapoint.rev)

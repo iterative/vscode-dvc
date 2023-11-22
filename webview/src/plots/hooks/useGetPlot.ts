@@ -1,8 +1,8 @@
 import {
   AnchorDefinitions,
-  DVC_METRIC_TITLE,
-  DVC_METRIC_X_LABEL,
-  DVC_METRIC_Y_LABEL
+  PLOT_TITLE_ANCHOR,
+  PLOT_X_LABEL_ANCHOR,
+  PLOT_Y_LABEL_ANCHOR
 } from 'dvc/src/cli/dvc/contract'
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import { useCallback, useEffect, useState } from 'react'
@@ -35,9 +35,13 @@ export const useGetPlot = (
     }
     setSpec(spec)
     setTitles({
-      [DVC_METRIC_TITLE]: plot.anchor_definitions[DVC_METRIC_TITLE],
-      [DVC_METRIC_X_LABEL]: plot.anchor_definitions[DVC_METRIC_X_LABEL],
-      [DVC_METRIC_Y_LABEL]: plot.anchor_definitions[DVC_METRIC_Y_LABEL]
+      [PLOT_TITLE_ANCHOR]: plot.anchorDefinitions[PLOT_TITLE_ANCHOR] as string,
+      [PLOT_X_LABEL_ANCHOR]: plot.anchorDefinitions[
+        PLOT_X_LABEL_ANCHOR
+      ] as string,
+      [PLOT_Y_LABEL_ANCHOR]: plot.anchorDefinitions[
+        PLOT_Y_LABEL_ANCHOR
+      ] as string
     })
   }, [section, id, nbItemsPerRow, height])
 

@@ -1,10 +1,11 @@
-import { ShapeEncoding, StrokeDashEncoding } from './constants'
 import {
-  DVC_METRIC_SHAPE,
-  DVC_METRIC_STROKE_DASH,
+  isImagePlotOutput,
+  PLOT_SHAPE_ANCHOR,
+  PLOT_STROKE_DASH_ANCHOR,
   PlotsOutput,
-  TemplatePlot,
-  isImagePlotOutput
+  ShapeEncoding,
+  StrokeDashEncoding,
+  TemplatePlotOutput
 } from '../../cli/dvc/contract'
 
 export type MultiSourceEncoding = Record<
@@ -15,21 +16,19 @@ export type MultiSourceEncoding = Record<
 const collectEncoding = (
   acc: MultiSourceEncoding,
   id: string,
-  plot: TemplatePlot
+  plot: TemplatePlotOutput
 ): void => {
-  if (plot.anchor_definitions[DVC_METRIC_STROKE_DASH]) {
+  const strokeDashEncoding = plot.anchor_definitions[PLOT_STROKE_DASH_ANCHOR]
+  if (strokeDashEncoding) {
     acc[id] = {
-      strokeDash: JSON.parse(
-        plot.anchor_definitions[DVC_METRIC_STROKE_DASH]
-      ) as StrokeDashEncoding
+      strokeDash: strokeDashEncoding
     }
     return
   }
-  if (plot.anchor_definitions[DVC_METRIC_SHAPE]) {
+  const shapeEncoding = plot.anchor_definitions[PLOT_SHAPE_ANCHOR]
+  if (shapeEncoding) {
     acc[id] = {
-      shape: JSON.parse(
-        plot.anchor_definitions[DVC_METRIC_SHAPE]
-      ) as ShapeEncoding
+      shape: shapeEncoding
     }
   }
 }

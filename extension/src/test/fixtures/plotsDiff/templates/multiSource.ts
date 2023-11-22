@@ -1,31 +1,31 @@
 import { TopLevelSpec } from 'vega-lite'
 import {
-  DVC_METRIC_DATA,
-  DVC_METRIC_TITLE,
-  DVC_METRIC_X,
-  DVC_METRIC_X_LABEL,
-  DVC_METRIC_Y,
-  DVC_METRIC_Y_LABEL
+  PLOT_DATA_ANCHOR,
+  PLOT_TITLE_ANCHOR,
+  PLOT_X_ANCHOR,
+  PLOT_X_LABEL_ANCHOR,
+  PLOT_Y_ANCHOR,
+  PLOT_Y_LABEL_ANCHOR
 } from '../../../../cli/dvc/contract'
 
 const data = {
   $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-  data: DVC_METRIC_DATA,
-  title: DVC_METRIC_TITLE,
+  data: PLOT_DATA_ANCHOR,
+  title: PLOT_TITLE_ANCHOR,
   width: 300,
   height: 300,
   layer: [
     {
       encoding: {
         x: {
-          field: DVC_METRIC_X,
+          field: PLOT_X_ANCHOR,
           type: 'quantitative',
-          title: DVC_METRIC_X_LABEL
+          title: PLOT_X_LABEL_ANCHOR
         },
         y: {
-          field: DVC_METRIC_Y,
+          field: PLOT_Y_ANCHOR,
           type: 'quantitative',
-          title: DVC_METRIC_Y_LABEL,
+          title: PLOT_Y_LABEL_ANCHOR,
           scale: { zero: false }
         },
         color: {
@@ -40,7 +40,7 @@ const data = {
               type: 'single',
               nearest: true,
               on: 'mouseover',
-              encodings: [DVC_METRIC_X],
+              encodings: [PLOT_X_ANCHOR],
               empty: 'none',
               clear: 'mouseout'
             }
@@ -60,13 +60,13 @@ const data = {
       layer: [
         {
           mark: { type: 'rule', color: 'gray' },
-          encoding: { x: { field: DVC_METRIC_X, type: 'quantitative' } }
+          encoding: { x: { field: PLOT_X_ANCHOR, type: 'quantitative' } }
         },
         {
           encoding: {
-            text: { type: 'quantitative', field: DVC_METRIC_Y },
-            x: { field: DVC_METRIC_X, type: 'quantitative' },
-            y: { field: DVC_METRIC_Y, type: 'quantitative' }
+            text: { type: 'quantitative', field: PLOT_Y_ANCHOR },
+            x: { field: PLOT_X_ANCHOR, type: 'quantitative' },
+            y: { field: PLOT_Y_ANCHOR, type: 'quantitative' }
           },
           layer: [
             {

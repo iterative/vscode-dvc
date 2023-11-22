@@ -1,11 +1,12 @@
 import { join } from 'path'
+import type { TopLevelSpec } from 'vega-lite'
 import { PathsModel } from './model'
 import { PathType } from './collect'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import { buildMockMemento } from '../../test/util'
 import { TemplatePlotGroup } from '../webview/contract'
 import {
-  DVC_METRIC_DATA,
+  PLOT_DATA_ANCHOR,
   EXPERIMENT_WORKSPACE_ID,
   PlotsType
 } from '../../cli/dvc/contract'
@@ -114,7 +115,7 @@ describe('PathsModel', () => {
       [previousPlotPath]: [
         {
           anchor_definitions: {
-            [DVC_METRIC_DATA]: JSON.stringify([
+            [PLOT_DATA_ANCHOR]: [
               {
                 loss: '2.29',
                 rev: commitBeforePlots,
@@ -130,9 +131,9 @@ describe('PathsModel', () => {
                 rev: commitBeforePlots,
                 step: '2'
               }
-            ])
+            ]
           },
-          content: '{}',
+          content: {} as TopLevelSpec,
           revisions: [commitBeforePlots],
           type: PlotsType.VEGA
         }
