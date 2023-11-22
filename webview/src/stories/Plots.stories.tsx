@@ -6,8 +6,6 @@ import { userEvent, within, fireEvent } from '@storybook/testing-library'
 import {
   PlotsData,
   DEFAULT_SECTION_COLLAPSED,
-  TemplatePlotGroup,
-  TemplatePlotSection,
   DEFAULT_NB_ITEMS_PER_ROW
 } from 'dvc/src/plots/webview/contract'
 import { MessageToWebviewType } from 'dvc/src/webview/contract'
@@ -16,7 +14,6 @@ import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template'
 import manyTemplatePlots from 'dvc/src/test/fixtures/plotsDiff/template/virtualization'
 import comparisonPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
-import smoothTemplatePlotContent from 'dvc/src/test/fixtures/plotsDiff/template/smoothTemplatePlot'
 import {
   CHROMATIC_VIEWPORTS_WITH_DELAY,
   DISABLE_CHROMATIC_SNAPSHOTS
@@ -279,30 +276,6 @@ MultiviewZoomedInPlot.play = async ({ canvasElement }) => {
   const plotButton = await within(plot).findByLabelText('Open Plot in Popup')
 
   return userEvent.click(plotButton)
-}
-
-export const SmoothTemplate = Template.bind({})
-SmoothTemplate.args = {
-  data: {
-    template: {
-      ...templatePlotsFixture,
-      plots: [
-        {
-          entries: templatePlotsFixture.plots[0].entries.map(plot => ({
-            ...plot,
-            content: { ...smoothTemplatePlotContent }
-          })),
-          group: TemplatePlotGroup.SINGLE_VIEW
-        } as unknown as TemplatePlotSection
-      ]
-    }
-  }
-}
-SmoothTemplate.parameters = {
-  chromatic: {
-    ...CHROMATIC_VIEWPORTS_WITH_DELAY.chromatic,
-    disableSnapshot: true
-  }
 }
 
 export const ScrolledHeaders = Template.bind({})

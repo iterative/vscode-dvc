@@ -1,6 +1,15 @@
 import {
   PLOT_DATA_ANCHOR,
-  EXPERIMENT_WORKSPACE_ID
+  EXPERIMENT_WORKSPACE_ID,
+  PLOT_Y_LABEL_ANCHOR,
+  PLOT_X_LABEL_ANCHOR,
+  PLOT_ZOOM_AND_PAN_ANCHOR,
+  PLOT_COLOR_ANCHOR,
+  PLOT_STROKE_DASH_ANCHOR,
+  PLOT_TITLE_ANCHOR,
+  PLOT_WIDTH_ANCHOR,
+  PLOT_HEIGHT_ANCHOR,
+  ZOOM_AND_PAN_PROP
 } from '../../../cli/dvc/contract'
 import { join } from '../../util/path'
 
@@ -280,7 +289,14 @@ const data = {
             step: '8',
             timestamp: '1642041648863'
           }
-        ]
+        ],
+        [PLOT_HEIGHT_ANCHOR]: 300,
+        [PLOT_STROKE_DASH_ANCHOR]: {},
+        [PLOT_TITLE_ANCHOR]: 'dvc.yaml::Accuracy',
+        [PLOT_WIDTH_ANCHOR]: 300,
+        [PLOT_X_LABEL_ANCHOR]: 'step',
+        [PLOT_Y_LABEL_ANCHOR]: 'accuracy',
+        [PLOT_ZOOM_AND_PAN_ANCHOR]: ZOOM_AND_PAN_PROP
       },
       multiView: false,
       type: 'vega',
@@ -292,74 +308,171 @@ const data = {
         'exp-e7a67'
       ],
       content: {
-        $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
+        $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
         data: {
           values: PLOT_DATA_ANCHOR
         },
-        title: '',
-        width: 300,
-        height: 300,
+        title: PLOT_TITLE_ANCHOR,
+        width: PLOT_WIDTH_ANCHOR,
+        height: PLOT_HEIGHT_ANCHOR,
+        params: [
+          {
+            name: 'smooth',
+            value: 0.001,
+            bind: {
+              input: 'range',
+              min: 0.001,
+              max: 1,
+              step: 0.001
+            }
+          }
+        ],
+        encoding: {
+          x: {
+            field: 'step',
+            type: 'quantitative',
+            title: PLOT_X_LABEL_ANCHOR
+          },
+          color: PLOT_COLOR_ANCHOR,
+          strokeDash: PLOT_STROKE_DASH_ANCHOR
+        },
         layer: [
           {
+            layer: [
+              {
+                params: [PLOT_ZOOM_AND_PAN_ANCHOR],
+                mark: 'line'
+              },
+              {
+                transform: [
+                  {
+                    filter: {
+                      param: 'hover',
+                      empty: false
+                    }
+                  }
+                ],
+                mark: 'point'
+              }
+            ],
             encoding: {
-              x: { field: 'step', type: 'quantitative', title: 'step' },
               y: {
                 field: 'acc',
                 type: 'quantitative',
-                title: 'acc',
-                scale: { zero: false }
+                title: PLOT_Y_LABEL_ANCHOR,
+                scale: {
+                  zero: false
+                }
               },
-              color: { field: 'rev', type: 'nominal' }
+              color: {
+                field: 'rev',
+                type: 'nominal'
+              }
             },
-            layer: [
-              { mark: 'line' },
+            transform: [
               {
-                selection: {
-                  label: {
-                    type: 'single',
-                    nearest: true,
-                    on: 'mouseover',
-                    encodings: ['x'],
-                    empty: 'none',
-                    clear: 'mouseout'
-                  }
-                },
-                mark: 'point',
-                encoding: {
-                  opacity: {
-                    condition: { selection: 'label', value: 1 },
-                    value: 0
-                  }
+                loess: 'acc',
+                on: 'step',
+                groupby: ['rev'],
+                bandwidth: {
+                  signal: 'smooth'
                 }
               }
             ]
           },
           {
-            transform: [{ filter: { selection: 'label' } }],
-            layer: [
+            mark: {
+              type: 'line',
+              opacity: 0.2
+            },
+            encoding: {
+              x: {
+                field: 'step',
+                type: 'quantitative',
+                title: PLOT_X_LABEL_ANCHOR
+              },
+              y: {
+                field: 'acc',
+                type: 'quantitative',
+                title: PLOT_Y_LABEL_ANCHOR,
+                scale: {
+                  zero: false
+                }
+              },
+              color: {
+                field: 'rev',
+                type: 'nominal'
+              }
+            }
+          },
+          {
+            mark: {
+              type: 'circle',
+              size: 10
+            },
+            encoding: {
+              x: {
+                aggregate: 'max',
+                field: 'step',
+                type: 'quantitative',
+                title: PLOT_X_LABEL_ANCHOR
+              },
+              y: {
+                aggregate: {
+                  argmax: 'step'
+                },
+                field: 'acc',
+                type: 'quantitative',
+                title: PLOT_Y_LABEL_ANCHOR,
+                scale: {
+                  zero: false
+                }
+              },
+              color: {
+                field: 'rev',
+                type: 'nominal'
+              }
+            }
+          },
+          {
+            transform: [
               {
-                mark: { type: 'rule', color: 'gray' },
-                encoding: { x: { field: 'step', type: 'quantitative' } }
+                calculate: 'datum.rev',
+                as: 'pivot_field'
               },
               {
-                encoding: {
-                  text: { type: 'quantitative', field: 'acc' },
-                  x: { field: 'step', type: 'quantitative' },
-                  y: { field: 'acc', type: 'quantitative' }
+                pivot: 'pivot_field',
+                value: 'acc',
+                groupby: ['step']
+              }
+            ],
+            mark: {
+              type: 'rule',
+              tooltip: {
+                content: 'data'
+              },
+              stroke: 'grey'
+            },
+            encoding: {
+              opacity: {
+                condition: {
+                  value: 0.3,
+                  param: 'hover',
+                  empty: false
                 },
-                layer: [
-                  {
-                    mark: {
-                      type: 'text',
-                      align: 'left',
-                      dx: 5,
-                      dy: -5
-                    },
-                    encoding: {
-                      color: { type: 'nominal', field: 'rev' }
-                    }
-                  }
-                ]
+                value: 0
+              }
+            },
+            params: [
+              {
+                name: 'hover',
+                select: {
+                  type: 'point',
+                  fields: ['step'],
+                  nearest: true,
+                  on: 'mouseover',
+                  clear: 'mouseout'
+                }
               }
             ]
           }
@@ -50374,7 +50487,12 @@ const data = {
           { actual: 4, predicted: 9, rev: 'exp-83425' },
           { actual: 5, predicted: 5, rev: 'exp-83425' },
           { actual: 6, predicted: 6, rev: 'exp-83425' }
-        ]
+        ],
+        [PLOT_HEIGHT_ANCHOR]: 300,
+        [PLOT_TITLE_ANCHOR]: '',
+        [PLOT_WIDTH_ANCHOR]: 300,
+        [PLOT_X_LABEL_ANCHOR]: 'actual',
+        [PLOT_Y_LABEL_ANCHOR]: 'predicted'
       },
       multiView: true,
       type: 'vega',
@@ -50386,16 +50504,35 @@ const data = {
         'exp-e7a67'
       ],
       content: {
-        $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
+        $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
         data: {
           values: PLOT_DATA_ANCHOR
         },
-        title: '',
-        facet: { field: 'rev', type: 'nominal' },
+        title: PLOT_TITLE_ANCHOR,
+        facet: {
+          column: {
+            field: 'rev',
+            sort: []
+          },
+          row: {}
+        },
+        params: [
+          {
+            name: 'showValues',
+            bind: {
+              input: 'checkbox'
+            }
+          }
+        ],
         spec: {
           transform: [
             {
-              aggregate: [{ op: 'count', as: 'xy_count' }],
+              aggregate: [
+                {
+                  op: 'count',
+                  as: 'xy_count'
+                }
+              ],
               groupby: ['predicted', 'actual']
             },
             {
@@ -50412,7 +50549,11 @@ const data = {
             },
             {
               joinaggregate: [
-                { op: 'max', field: 'xy_count', as: 'max_count' }
+                {
+                  op: 'max',
+                  field: 'xy_count',
+                  as: 'max_count'
+                }
               ],
               groupby: []
             },
@@ -50426,33 +50567,94 @@ const data = {
               field: 'actual',
               type: 'nominal',
               sort: 'ascending',
-              title: 'actual'
+              title: PLOT_X_LABEL_ANCHOR
             },
             y: {
               field: 'predicted',
               type: 'nominal',
               sort: 'ascending',
-              title: 'predicted'
+              title: PLOT_Y_LABEL_ANCHOR
             }
           },
           layer: [
             {
               mark: 'rect',
-              width: 300,
-              height: 300,
+              width: PLOT_WIDTH_ANCHOR,
+              height: PLOT_HEIGHT_ANCHOR,
               encoding: {
                 color: {
                   field: 'xy_count',
                   type: 'quantitative',
                   title: '',
-                  scale: { domainMin: 0, nice: true }
+                  scale: {
+                    domainMin: 0,
+                    nice: true
+                  }
                 }
               }
             },
             {
+              selection: {
+                label: {
+                  type: 'single',
+                  on: 'mouseover',
+                  encodings: ['x', 'y'],
+                  empty: 'none',
+                  clear: 'mouseout'
+                }
+              },
+              mark: 'rect',
+              encoding: {
+                tooltip: [
+                  {
+                    field: 'actual',
+                    type: 'nominal'
+                  },
+                  {
+                    field: 'predicted',
+                    type: 'nominal'
+                  },
+                  {
+                    field: 'xy_count',
+                    type: 'quantitative'
+                  }
+                ],
+                opacity: {
+                  condition: {
+                    selection: 'label',
+                    value: 1
+                  },
+                  value: 0
+                }
+              }
+            },
+            {
+              transform: [
+                {
+                  filter: {
+                    selection: 'label'
+                  }
+                }
+              ],
+              layer: [
+                {
+                  mark: {
+                    type: 'rect',
+                    color: 'lightpink'
+                  }
+                }
+              ]
+            },
+            {
               mark: 'text',
               encoding: {
-                text: { field: 'xy_count', type: 'quantitative' },
+                text: {
+                  condition: {
+                    param: 'showValues',
+                    field: 'xy_count',
+                    type: 'quantitative'
+                  }
+                },
                 color: {
                   condition: {
                     test: 'datum.percent_of_max > 0.5',

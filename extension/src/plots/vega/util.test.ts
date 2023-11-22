@@ -8,7 +8,6 @@ import {
 } from './util'
 import confusionTemplate from '../../test/fixtures/plotsDiff/templates/confusion'
 import confusionNormalizedTemplate from '../../test/fixtures/plotsDiff/templates/confusionNormalized'
-import defaultTemplate from '../../test/fixtures/plotsDiff/templates/default'
 import linearTemplate from '../../test/fixtures/plotsDiff/templates/linear'
 import scatterTemplate from '../../test/fixtures/plotsDiff/templates/scatter'
 import smoothTemplate from '../../test/fixtures/plotsDiff/templates/smooth'
@@ -21,9 +20,6 @@ describe('isMultiViewPlot', () => {
   })
   it('should recognize the normalized confusion matrix template as a multi view plot', () => {
     expect(isMultiViewPlot(confusionNormalizedTemplate)).toBe(true)
-  })
-  it('should not recognize the default plot template as a multi view plot', () => {
-    expect(isMultiViewPlot(defaultTemplate)).toBe(false)
   })
   it('should not recognize the linear plot template as a multi view plot', () => {
     expect(isMultiViewPlot(linearTemplate)).toBe(false)

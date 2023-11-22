@@ -11,7 +11,6 @@ import gitLogFixture from '../../fixtures/expShow/base/gitLog'
 import rowOrderFixture from '../../fixtures/expShow/base/rowOrder'
 import customPlotsFixture from '../../fixtures/expShow/base/customPlots'
 import plotsDiffFixture from '../../fixtures/plotsDiff/output'
-import multiSourcePlotsDiffFixture from '../../fixtures/plotsDiff/multiSource'
 import templatePlotsFixture from '../../fixtures/plotsDiff/template'
 import comparisonPlotsFixture from '../../fixtures/plotsDiff/comparison/vscode'
 import plotsRevisionsFixture from '../../fixtures/plotsDiff/revisions'
@@ -29,10 +28,9 @@ import {
   PlotsData as TPlotsData,
   PlotsSection,
   TemplatePlotGroup,
-  TemplatePlotsData,
   ImagePlot
 } from '../../../plots/webview/contract'
-import { FIELD_SEPARATOR, TEMP_PLOTS_DIR } from '../../../cli/dvc/constants'
+import { TEMP_PLOTS_DIR } from '../../../cli/dvc/constants'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
 import { MessageFromWebviewType } from '../../../webview/contract'
 import { reorderObjectList, uniqueValues } from '../../../util/array'
@@ -1056,60 +1054,6 @@ suite('Plots Test Suite', () => {
         'the revision should not exist in the underlying data'
       ).not.to.contain(brokenExp)
     })
-
-    it('should send the correct data to the webview for flexible plots', async () => {
-      const expectedRevisions = [REVISIONS[0], REVISIONS[1]]
-      const { messageSpy, mockPlotsDiff } = await buildPlotsWebview({
-        disposer: disposable,
-        plotsDiff: multiSourcePlotsDiffFixture,
-        selectedExperiments: expectedRevisions
-      })
-
-      expect(mockPlotsDiff).to.be.called
-
-      const { template: templateData } = getFirstArgOfLastCall(messageSpy)
-
-      const [singleViewSection, multiViewSection] = (
-        templateData as TemplatePlotsData
-      ).plots
-
-      expect(
-        singleViewSection.entries.map(({ id }: { id: string }) => id)
-      ).to.deep.equal(['dvc.yaml::ROC', 'dvc.yaml::Precision-Recall'])
-
-      const [roc] = singleViewSection.entries
-      const rocDatapoints =
-        (roc.anchorDefinitions[PLOT_DATA_ANCHOR] as {
-          rev: string
-          filename: string | undefined
-        }[]) || []
-      expect(rocDatapoints.length).to.be.greaterThan(0)
-      for (const entry of rocDatapoints) {
-        expect(entry.rev).not.to.contain(FIELD_SEPARATOR)
-        expect(entry.filename).not.to.be.undefined
-      }
-
-      expect(
-        multiViewSection.entries.map(({ id }: { id: string }) => id)
-      ).to.deep.equal(['dvc.yaml::Confusion-Matrix'])
-
-      const [confusionMatrix] = multiViewSection.entries
-
-      const confusionMatrixDatapoints =
-        (confusionMatrix.anchorDefinitions[PLOT_DATA_ANCHOR] as {
-          rev: string
-          filename: string | undefined
-        }[]) || []
-
-      expect(confusionMatrixDatapoints.length).to.be.greaterThan(0)
-
-      expect(confusionMatrix.revisions?.length).to.equal(2)
-      expect(confusionMatrix.revisions).to.deep.equal(expectedRevisions)
-
-      for (const entry of confusionMatrixDatapoints) {
-        expect(expectedRevisions).to.include(entry.rev)
-      }
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a toggle experiment message from the webview', async () => {
       const { experiments, mockMessageReceived } = await buildPlotsWebview({

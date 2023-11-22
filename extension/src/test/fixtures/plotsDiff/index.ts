@@ -4,11 +4,16 @@ import {
   EXPERIMENT_WORKSPACE_ID,
   PLOT_COLOR_ANCHOR,
   PLOT_DATA_ANCHOR,
+  PLOT_HEIGHT_ANCHOR,
+  PLOT_STROKE_DASH_ANCHOR,
   PLOT_TITLE_ANCHOR,
+  PLOT_WIDTH_ANCHOR,
   PLOT_X_LABEL_ANCHOR,
   PLOT_Y_LABEL_ANCHOR,
+  PLOT_ZOOM_AND_PAN_ANCHOR,
   PlotsOutput,
-  PlotsType
+  PlotsType,
+  ZOOM_AND_PAN_PROP
 } from '../../../cli/dvc/contract'
 import {
   ComparisonRevisionData,
@@ -311,20 +316,92 @@ const basicVega = {
             rev: 'exp-83425'
           }
         ],
-        [PLOT_TITLE_ANCHOR]: '',
+        [PLOT_HEIGHT_ANCHOR]: 300,
+        [PLOT_STROKE_DASH_ANCHOR]: {},
+        [PLOT_TITLE_ANCHOR]: 'dvc.yaml::Loss',
+        [PLOT_WIDTH_ANCHOR]: 300,
         [PLOT_X_LABEL_ANCHOR]: 'step',
-        [PLOT_Y_LABEL_ANCHOR]: 'loss'
+        [PLOT_Y_LABEL_ANCHOR]: 'loss',
+        [PLOT_ZOOM_AND_PAN_ANCHOR]: ZOOM_AND_PAN_PROP
       },
       content: {
-        $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
+        $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
         data: {
           values: PLOT_DATA_ANCHOR
         },
         title: PLOT_TITLE_ANCHOR,
-        width: 300,
-        height: 300,
+        width: PLOT_WIDTH_ANCHOR,
+        height: PLOT_HEIGHT_ANCHOR,
+        params: [
+          {
+            name: 'smooth',
+            value: 0.001,
+            bind: {
+              input: 'range',
+              min: 0.001,
+              max: 1,
+              step: 0.001
+            }
+          }
+        ],
+        encoding: {
+          x: {
+            field: 'step',
+            type: 'quantitative',
+            title: PLOT_X_LABEL_ANCHOR
+          },
+          color: PLOT_COLOR_ANCHOR,
+          strokeDash: PLOT_STROKE_DASH_ANCHOR
+        },
         layer: [
           {
+            layer: [
+              {
+                params: [PLOT_ZOOM_AND_PAN_ANCHOR],
+                mark: 'line'
+              },
+              {
+                transform: [
+                  {
+                    filter: {
+                      param: 'hover',
+                      empty: false
+                    }
+                  }
+                ],
+                mark: 'point'
+              }
+            ],
+            encoding: {
+              y: {
+                field: 'loss',
+                type: 'quantitative',
+                title: PLOT_Y_LABEL_ANCHOR,
+                scale: {
+                  zero: false
+                }
+              },
+              color: {
+                field: 'rev',
+                type: 'nominal'
+              }
+            },
+            transform: [
+              {
+                loess: 'loss',
+                on: 'step',
+                groupby: ['rev'],
+                bandwidth: {
+                  signal: 'smooth'
+                }
+              }
+            ]
+          },
+          {
+            mark: {
+              type: 'line',
+              opacity: 0.2
+            },
             encoding: {
               x: {
                 field: 'step',
@@ -335,64 +412,89 @@ const basicVega = {
                 field: 'loss',
                 type: 'quantitative',
                 title: PLOT_Y_LABEL_ANCHOR,
-                scale: { zero: false }
-              },
-              color: { field: 'rev', type: 'nominal' }
-            },
-            layer: [
-              { mark: 'line' },
-              {
-                selection: {
-                  label: {
-                    type: 'single',
-                    nearest: true,
-                    on: 'mouseover',
-                    encodings: ['x'],
-                    empty: 'none',
-                    clear: 'mouseout'
-                  }
-                },
-                mark: 'point',
-                encoding: {
-                  opacity: {
-                    condition: { selection: 'label', value: 1 },
-                    value: 0
-                  }
+                scale: {
+                  zero: false
                 }
+              },
+              color: {
+                field: 'rev',
+                type: 'nominal'
               }
-            ]
+            }
           },
           {
-            transform: [{ filter: { selection: 'label' } }],
-            layer: [
+            mark: {
+              type: 'circle',
+              size: 10
+            },
+            encoding: {
+              x: {
+                aggregate: 'max',
+                field: 'step',
+                type: 'quantitative',
+                title: PLOT_X_LABEL_ANCHOR
+              },
+              y: {
+                aggregate: {
+                  argmax: 'step'
+                },
+                field: 'loss',
+                type: 'quantitative',
+                title: PLOT_Y_LABEL_ANCHOR,
+                scale: {
+                  zero: false
+                }
+              },
+              color: {
+                field: 'rev',
+                type: 'nominal'
+              }
+            }
+          },
+          {
+            transform: [
               {
-                mark: { type: 'rule', color: 'gray' },
-                encoding: { x: { field: 'step', type: 'quantitative' } }
+                calculate: 'datum.rev',
+                as: 'pivot_field'
               },
               {
-                encoding: {
-                  text: { type: 'quantitative', field: 'loss' },
-                  x: { field: 'step', type: 'quantitative' },
-                  y: { field: 'loss', type: 'quantitative' }
+                pivot: 'pivot_field',
+                value: 'loss',
+                groupby: ['step']
+              }
+            ],
+            mark: {
+              type: 'rule',
+              tooltip: {
+                content: 'data'
+              },
+              stroke: 'grey'
+            },
+            encoding: {
+              opacity: {
+                condition: {
+                  value: 0.3,
+                  param: 'hover',
+                  empty: false
                 },
-                layer: [
-                  {
-                    mark: {
-                      type: 'text',
-                      align: 'left',
-                      dx: 5,
-                      dy: -5
-                    },
-                    encoding: {
-                      color: { type: 'nominal', field: 'rev' }
-                    }
-                  }
-                ]
+                value: 0
+              }
+            },
+            params: [
+              {
+                name: 'hover',
+                select: {
+                  type: 'point',
+                  fields: ['step'],
+                  nearest: true,
+                  on: 'mouseover',
+                  clear: 'mouseout'
+                }
               }
             ]
           }
         ]
-      } as TopLevelSpec,
+      } as unknown as TopLevelSpec,
       multiView: false
     }
   ]
@@ -544,10 +646,6 @@ export const getOutput = (baseUrl: string): PlotsOutput => ({
 })
 
 export const getMinimalOutput = (): PlotsOutput => ({ data: { ...basicVega } })
-
-export const getMultiSourceOutput = (): PlotsOutput => ({
-  ...require('./multiSource').default
-})
 
 export const REVISIONS = [
   EXPERIMENT_WORKSPACE_ID,

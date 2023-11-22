@@ -1,7 +1,9 @@
 import { TopLevelSpec } from 'vega-lite'
 import {
   PLOT_DATA_ANCHOR,
+  PLOT_HEIGHT_ANCHOR,
   PLOT_TITLE_ANCHOR,
+  PLOT_WIDTH_ANCHOR,
   PLOT_X_ANCHOR,
   PLOT_X_LABEL_ANCHOR,
   PLOT_Y_ANCHOR,
@@ -9,15 +11,26 @@ import {
 } from '../../../../cli/dvc/contract'
 
 const data = {
-  $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
+  $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
   data: {
     values: PLOT_DATA_ANCHOR
   },
   title: PLOT_TITLE_ANCHOR,
   facet: {
-    field: 'rev',
-    type: 'nominal'
+    column: {
+      field: 'rev',
+      sort: []
+    },
+    row: '<DVC_METRIC_ROW>'
   },
+  params: [
+    {
+      name: 'showValues',
+      bind: {
+        input: 'checkbox'
+      }
+    }
+  ],
   spec: {
     transform: [
       {
@@ -31,13 +44,13 @@ const data = {
       },
       {
         impute: 'xy_count',
-        groupby: ['rev', PLOT_Y_ANCHOR],
+        groupby: '<DVC_METRIC_GROUP_BY_Y>',
         key: PLOT_X_ANCHOR,
         value: 0
       },
       {
         impute: 'xy_count',
-        groupby: ['rev', PLOT_X_ANCHOR],
+        groupby: '<DVC_METRIC_GROUP_BY_X>',
         key: PLOT_Y_ANCHOR,
         value: 0
       },
@@ -73,8 +86,8 @@ const data = {
     layer: [
       {
         mark: 'rect',
-        width: 300,
-        height: 300,
+        width: PLOT_WIDTH_ANCHOR,
+        height: PLOT_HEIGHT_ANCHOR,
         encoding: {
           color: {
             field: 'xy_count',
@@ -88,11 +101,66 @@ const data = {
         }
       },
       {
+        selection: {
+          label: {
+            type: 'single',
+            on: 'mouseover',
+            encodings: ['x', 'y'],
+            empty: 'none',
+            clear: 'mouseout'
+          }
+        },
+        mark: 'rect',
+        encoding: {
+          tooltip: [
+            {
+              field: PLOT_X_ANCHOR,
+              type: 'nominal'
+            },
+            {
+              field: PLOT_Y_ANCHOR,
+              type: 'nominal'
+            },
+            {
+              field: 'xy_count',
+              type: 'quantitative'
+            }
+          ],
+          opacity: {
+            condition: {
+              selection: 'label',
+              value: 1
+            },
+            value: 0
+          }
+        }
+      },
+      {
+        transform: [
+          {
+            filter: {
+              selection: 'label'
+            }
+          }
+        ],
+        layer: [
+          {
+            mark: {
+              type: 'rect',
+              color: 'lightpink'
+            }
+          }
+        ]
+      },
+      {
         mark: 'text',
         encoding: {
           text: {
-            field: 'xy_count',
-            type: 'quantitative'
+            condition: {
+              param: 'showValues',
+              field: 'xy_count',
+              type: 'quantitative'
+            }
           },
           color: {
             condition: {

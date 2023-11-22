@@ -15,12 +15,10 @@ import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import customPlotsFixture from 'dvc/src/test/fixtures/expShow/base/customPlots'
 import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
 import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template/webview'
-import smoothTemplatePlotContent from 'dvc/src/test/fixtures/plotsDiff/template/smoothTemplatePlot'
 import manyTemplatePlots from 'dvc/src/test/fixtures/plotsDiff/template/virtualization'
 import {
   DEFAULT_SECTION_COLLAPSED,
   PlotsData,
-  PlotsType,
   Revision,
   PlotsSection,
   TemplatePlotGroup,
@@ -35,11 +33,9 @@ import {
 } from 'dvc/src/webview/contract'
 import { act } from 'react-dom/test-utils'
 import {
-  PLOT_DATA_ANCHOR,
   PLOT_TITLE_ANCHOR,
   PLOT_X_LABEL_ANCHOR,
-  PLOT_Y_LABEL_ANCHOR,
-  EXPERIMENT_WORKSPACE_ID
+  PLOT_Y_LABEL_ANCHOR
 } from 'dvc/src/cli/dvc/contract'
 import { App } from './App'
 import { NewSectionBlock } from './templatePlots/TemplatePlots'
@@ -2750,26 +2746,13 @@ describe('App', () => {
   })
 
   describe('Vega panels', () => {
-    const smoothId = join('template', 'smooth.tsv')
+    const smoothPlot = templatePlotsFixture.plots[0].entries[0]
+    const smoothId = smoothPlot.id
     const withVegaPanels = {
       ...templatePlotsFixture,
       plots: [
         {
-          entries: [
-            {
-              anchorDefinitions: {
-                [PLOT_DATA_ANCHOR]: (
-                  smoothTemplatePlotContent as {
-                    data: { values: Record<string, unknown>[] }
-                  }
-                ).data.values.slice(0, 10)
-              },
-              content: smoothTemplatePlotContent,
-              id: smoothId,
-              revisions: [EXPERIMENT_WORKSPACE_ID],
-              type: PlotsType.VEGA
-            }
-          ],
+          entries: [smoothPlot],
           group: TemplatePlotGroup.SINGLE_VIEW
         }
       ]
@@ -3027,7 +3010,7 @@ describe('App', () => {
 
       it('should update a vega panel slider value when given a new value', async () => {
         renderAppWithOptionalData({
-          template: { ...withVegaPanels }
+          template: { ...withVegaPanels, smoothPlotValues: { [smoothId]: 0.2 } }
         })
 
         const smoothPlot = screen.getByTestId(`plot_${smoothId}`)
