@@ -577,6 +577,47 @@ describe('ComparisonTable', () => {
 
       jest.useRealTimers()
     })
+
+    it('should not be possible to drag a plot when the drag and drop mode is set to false', () => {
+      renderTable()
+
+      const [, endingNode, , startingNode] = getHeaders()
+
+      let headers = getHeaders().map(header => header.textContent)
+
+      expect(headers).toStrictEqual(namedRevisions)
+
+      dragAndDrop(startingNode, endingNode)
+
+      headers = getHeaders().map(header => header.textContent)
+
+      expect(headers).toStrictEqual(namedRevisions)
+    })
+
+    it('should toggle from normal to drag and drop mode when the user presses down on a header', () => {
+      const { store } = renderTable()
+
+      expect(store.getState().comparison.isInDragAndDropMode).toBe(false)
+
+      const [header] = screen.getAllByRole('columnheader')
+      fireEvent.mouseDown(header)
+
+      expect(store.getState().comparison.isInDragAndDropMode).toBe(true)
+    })
+
+    it('should toggle from drag and drop to normal mode when dropping a header', () => {
+      const { store } = renderTable()
+
+      const [header] = screen.getAllByRole('columnheader')
+      fireEvent.mouseDown(header)
+
+      expect(store.getState().comparison.isInDragAndDropMode).toBe(true)
+
+      const [, endingNode, , startingNode] = getHeaders()
+      dragAndDrop(startingNode, endingNode)
+
+      expect(store.getState().comparison.isInDragAndDropMode).toBe(false)
+    })
   })
 
   describe('Rows drag and drop', () => {
