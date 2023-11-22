@@ -6,29 +6,43 @@ import {
   reverseOfLegendSuppressionUpdate,
   makePlotZoomOnWheel
 } from './util'
+import barHorizontal from '../../test/fixtures/plotsDiff/templates/barHorizontal'
 import confusionTemplate from '../../test/fixtures/plotsDiff/templates/confusion'
 import confusionNormalizedTemplate from '../../test/fixtures/plotsDiff/templates/confusionNormalized'
 import linearTemplate from '../../test/fixtures/plotsDiff/templates/linear'
 import scatterTemplate from '../../test/fixtures/plotsDiff/templates/scatter'
 import smoothTemplate from '../../test/fixtures/plotsDiff/templates/smooth'
 import { copyOriginalColors } from '../../experiments/model/status/colors'
-import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
+import {
+  EXPERIMENT_WORKSPACE_ID,
+  PLOT_COLUMN_ANCHOR
+} from '../../cli/dvc/contract'
 
 describe('isMultiViewPlot', () => {
   it('should recognize the confusion matrix template as a multi view plot', () => {
-    expect(isMultiViewPlot(confusionTemplate)).toBe(true)
+    expect(isMultiViewPlot(confusionTemplate, {})).toBe(true)
   })
   it('should recognize the normalized confusion matrix template as a multi view plot', () => {
-    expect(isMultiViewPlot(confusionNormalizedTemplate)).toBe(true)
+    expect(isMultiViewPlot(confusionNormalizedTemplate, {})).toBe(true)
   })
   it('should not recognize the linear plot template as a multi view plot', () => {
-    expect(isMultiViewPlot(linearTemplate)).toBe(false)
+    expect(isMultiViewPlot(linearTemplate, {})).toBe(false)
   })
   it('should not recognize the scatter plot template as a multi view plot', () => {
-    expect(isMultiViewPlot(scatterTemplate)).toBe(false)
+    expect(isMultiViewPlot(scatterTemplate, {})).toBe(false)
   })
   it('should not recognize the smooth plot template as a multi view plot', () => {
-    expect(isMultiViewPlot(smoothTemplate)).toBe(false)
+    expect(isMultiViewPlot(smoothTemplate, {})).toBe(false)
+  })
+  it('should not recognize the horizontal bar template as a multi view plot', () => {
+    expect(isMultiViewPlot(barHorizontal, {})).toBe(false)
+  })
+  it('should recognize the horizontal bar template with multiple columns as a multi view plot', () => {
+    expect(
+      isMultiViewPlot(barHorizontal, {
+        [PLOT_COLUMN_ANCHOR]: { field: 'filename', sort: [] }
+      })
+    ).toBe(true)
   })
 })
 

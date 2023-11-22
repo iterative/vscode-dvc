@@ -139,6 +139,7 @@ export const isImagePlotOutput = (plot: {
 
 export const PLOT_REV_FIELD = 'rev' as const
 export const PLOT_COLOR_ANCHOR = '<DVC_METRIC_COLOR>' as const
+export const PLOT_COLUMN_ANCHOR = '<DVC_METRIC_COLUMN>' as const
 export const PLOT_DATA_ANCHOR = '<DVC_METRIC_DATA>' as const
 export const PLOT_SHAPE_ANCHOR = '<DVC_METRIC_SHAPE>' as const
 export const PLOT_STROKE_DASH_ANCHOR = '<DVC_METRIC_STROKE_DASH>' as const
@@ -206,6 +207,7 @@ export type ShapeEncoding = MultiSourceEncoding<ShapeValue>
 
 export type AnchorDefinitions = {
   [PLOT_COLOR_ANCHOR]?: Encoding<string>
+  [PLOT_COLUMN_ANCHOR]?: EmptyObject | { sort: never[]; field: string }
   [PLOT_DATA_ANCHOR]?: Array<Record<string, unknown>>
   [PLOT_HEIGHT_ANCHOR]?: number | 'container'
   [PLOT_METRIC_TYPE_ANCHOR]?: 'quantitative' | 'nominal'

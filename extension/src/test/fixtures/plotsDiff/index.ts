@@ -683,7 +683,9 @@ const extendedSpecs = (plotsOutput: TemplatePlots): TemplatePlotSection[] => {
         revisions: REVISIONS,
         type: PlotsType.VEGA
       }
-      if (isMultiViewPlot(originalPlot.content)) {
+      if (
+        isMultiViewPlot(originalPlot.content, originalPlot.anchor_definitions)
+      ) {
         multiViewPlots.entries.push(plot)
         continue
       }

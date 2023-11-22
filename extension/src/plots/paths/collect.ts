@@ -46,7 +46,7 @@ const collectType = (plots: PlotOutput[]) => {
       continue
     }
 
-    isMultiViewPlot(plot.content)
+    isMultiViewPlot(plot.content, plot.anchor_definitions)
       ? type.add(PathType.TEMPLATE_MULTI)
       : type.add(PathType.TEMPLATE_SINGLE)
   }

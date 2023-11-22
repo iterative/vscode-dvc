@@ -110,7 +110,7 @@ export const fillTemplate = (
     ? ZOOM_AND_PAN_PROP
     : {}
 
-  const isMultiView = isMultiViewPlot(content)
+  const isMultiView = isMultiViewPlot(content, anchorDefinitions)
 
   updatedAnchors[PLOT_HEIGHT_ANCHOR] = isMultiView ? 300 : 'container'
 
