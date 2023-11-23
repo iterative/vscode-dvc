@@ -6,7 +6,7 @@ import {
   reverseOfLegendSuppressionUpdate,
   makePlotZoomOnWheel
 } from './util'
-import barHorizontal from '../../test/fixtures/plotsDiff/templates/barHorizontal'
+import barHorizontalTemplate from '../../test/fixtures/plotsDiff/templates/barHorizontal'
 import confusionTemplate from '../../test/fixtures/plotsDiff/templates/confusion'
 import confusionNormalizedTemplate from '../../test/fixtures/plotsDiff/templates/confusionNormalized'
 import linearTemplate from '../../test/fixtures/plotsDiff/templates/linear'
@@ -35,11 +35,11 @@ describe('isMultiViewPlot', () => {
     expect(isMultiViewPlot(smoothTemplate, {})).toBe(false)
   })
   it('should not recognize the horizontal bar template as a multi view plot', () => {
-    expect(isMultiViewPlot(barHorizontal, {})).toBe(false)
+    expect(isMultiViewPlot(barHorizontalTemplate, {})).toBe(false)
   })
   it('should recognize the horizontal bar template with multiple columns as a multi view plot', () => {
     expect(
-      isMultiViewPlot(barHorizontal, {
+      isMultiViewPlot(barHorizontalTemplate, {
         [PLOT_COLUMN_ANCHOR]: { field: 'filename', sort: [] }
       })
     ).toBe(true)

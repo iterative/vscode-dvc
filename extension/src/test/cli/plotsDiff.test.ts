@@ -51,7 +51,7 @@ suite('plots diff -o <TEMP_DIR> --split --show-json', () => {
         const expectTemplate = (plot: TemplatePlotOutput) => {
           expect(
             plot?.anchor_definitions[PLOT_DATA_ANCHOR],
-            'should have a datapoints anchor definition'
+            'should have a data anchor definition'
           ).to.be.a('string')
 
           expect(plot.revisions, 'should have two revisions').to.have.lengthOf(
