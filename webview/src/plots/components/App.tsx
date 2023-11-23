@@ -17,10 +17,12 @@ import {
 } from './customPlots/customPlotsSlice'
 import {
   setCollapsed as setComparisonTableCollapsed,
+  updateShouldShowTooManyPlotsMessage as updateShouldShowTooManyImagesMessage,
   update as updateComparisonTable
 } from './comparisonTable/comparisonTableSlice'
 import {
   setCollapsed as setTemplatePlotsCollapsed,
+  updateShouldShowTooManyPlotsMessage as updateShouldShowTooManyTemplatesMessage,
   update as updateTemplatePlots
 } from './templatePlots/templatePlotsSlice'
 import {
@@ -28,8 +30,7 @@ import {
   updateCliError,
   updateHasPlots,
   updateHasUnselectedPlots,
-  updateSelectedRevisions,
-  updateShouldShowTooMAnyPlotsMessage
+  updateSelectedRevisions
 } from './webviewSlice'
 import { PlotsDispatch } from '../store'
 import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
@@ -83,9 +84,14 @@ export const feedStore = (
         case PlotsDataKeys.SELECTED_REVISIONS:
           dispatch(updateSelectedRevisions(data.data[key]))
           continue
-        case PlotsDataKeys.SHOW_TOO_MANY_PLOTS:
+        case PlotsDataKeys.SHOW_TOO_MANY_TEMPLATE_PLOTS:
           dispatch(
-            updateShouldShowTooMAnyPlotsMessage(data.data[key] as boolean)
+            updateShouldShowTooManyTemplatesMessage(data.data[key] as boolean)
+          )
+          continue
+        case PlotsDataKeys.SHOW_TOO_MANY_COMPARISON_IMAGES:
+          dispatch(
+            updateShouldShowTooManyImagesMessage(data.data[key] as boolean)
           )
           continue
         default:

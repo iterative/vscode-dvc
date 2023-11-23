@@ -8,7 +8,6 @@ import { TemplatePlotsWrapper } from './templatePlots/TemplatePlotsWrapper'
 import { ComparisonTableWrapper } from './comparisonTable/ComparisonTableWrapper'
 import { Ribbon } from './ribbon/Ribbon'
 import { setMaxNbPlotsPerRow, setZoomedInPlot } from './webviewSlice'
-import { TooManyPlots } from './TooManyPlots'
 import styles from './styles.module.scss'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { Modal } from '../../shared/components/modal/Modal'
@@ -95,7 +94,6 @@ const PlotsContent = () => {
       <TemplatePlotsWrapper />
       <ComparisonTableWrapper />
       <CustomPlotsWrapper />
-      <TooManyPlots />
       {modal}
     </div>
   )

@@ -12,6 +12,7 @@ export interface ComparisonTableState extends PlotsComparisonData {
   hasData: boolean
   rowHeight: number
   disabledDragPlotIds: string[]
+  shouldShowTooManyPlotsMessage: boolean
 }
 
 export const DEFAULT_ROW_HEIGHT = 200
@@ -25,6 +26,7 @@ export const comparisonTableInitialState: ComparisonTableState = {
   plots: [],
   revisions: [],
   rowHeight: DEFAULT_ROW_HEIGHT,
+  shouldShowTooManyPlotsMessage: false,
   width:
     DEFAULT_SECTION_NB_ITEMS_PER_ROW_OR_WIDTH[PlotsSection.COMPARISON_TABLE]
 }
@@ -57,6 +59,12 @@ export const comparisonTableSlice = createSlice({
         ...action.payload,
         hasData: !!action.payload
       }
+    },
+    updateShouldShowTooManyPlotsMessage: (
+      state: { shouldShowTooManyPlotsMessage: boolean },
+      action: PayloadAction<boolean>
+    ) => {
+      state.shouldShowTooManyPlotsMessage = action.payload
     }
   }
 })
@@ -66,7 +74,8 @@ export const {
   setCollapsed,
   changeSize,
   changeDisabledDragIds,
-  changeRowHeight
+  changeRowHeight,
+  updateShouldShowTooManyPlotsMessage
 } = comparisonTableSlice.actions
 
 export default comparisonTableSlice.reducer

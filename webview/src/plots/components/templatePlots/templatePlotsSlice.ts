@@ -17,6 +17,7 @@ export interface TemplatePlotsState extends Omit<TemplatePlotsData, 'plots'> {
   hasItems: boolean
   plotsSnapshots: { [key: string]: string }
   sections: PlotGroup[]
+  shouldShowTooManyPlotsMessage: boolean
   isInDragAndDropMode: boolean
 }
 
@@ -30,6 +31,7 @@ export const templatePlotsInitialState: TemplatePlotsState = {
     DEFAULT_SECTION_NB_ITEMS_PER_ROW_OR_WIDTH[PlotsSection.TEMPLATE_PLOTS],
   plotsSnapshots: {},
   sections: [],
+  shouldShowTooManyPlotsMessage: false,
   smoothPlotValues: {}
 }
 
@@ -89,6 +91,12 @@ export const templatePlotsSlice = createSlice({
         ...state,
         sections: action.payload
       }
+    },
+    updateShouldShowTooManyPlotsMessage: (
+      state: { shouldShowTooManyPlotsMessage: boolean },
+      action: PayloadAction<boolean>
+    ) => {
+      state.shouldShowTooManyPlotsMessage = action.payload
     }
   }
 })
@@ -98,7 +106,8 @@ export const {
   setCollapsed,
   changeSize,
   toggleDragAndDropMode,
-  updateSections
+  updateSections,
+  updateShouldShowTooManyPlotsMessage
 } = templatePlotsSlice.actions
 
 export default templatePlotsSlice.reducer

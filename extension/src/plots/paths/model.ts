@@ -19,6 +19,11 @@ import { PlotsOutputOrError } from '../../cli/dvc/contract'
 import { getErrorTooltip } from '../../tree'
 import { ErrorsModel } from '../errors/model'
 
+const defaultHasCustomSelection = {
+  comparison: undefined,
+  template: undefined
+}
+
 export class PathsModel extends PathSelectionModel<PlotPath> {
   private readonly errors: ErrorsModel
 
@@ -27,7 +32,10 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
 
   private selectedRevisions: string[] = []
 
-  private hasCustomSelection: boolean | undefined = undefined
+  private hasCustomSelection: {
+    comparison: boolean | undefined
+    template: boolean | undefined
+  } = defaultHasCustomSelection
 
   constructor(dvcRoot: string, errors: ErrorsModel, workspaceState: Memento) {
     super(dvcRoot, workspaceState, PersistenceKey.PLOT_PATH_STATUS)
@@ -42,7 +50,7 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
 
     this.hasCustomSelection = this.revive(
       PersistenceKey.PLOTS_HAS_CUSTOM_SELECTION,
-      undefined
+      defaultHasCustomSelection
     )
   }
 
@@ -107,6 +115,16 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
       .map(element => ({ ...element, selected: !!this.status[element.path] }))
   }
 
+  public getTerminalNodesByType(type: PathType) {
+    return this.getTerminalNodes().filter(node => node.type?.has(type))
+  }
+
+  public getTerminalNodeStatusesByType(type: PathType) {
+    return this.getTerminalNodesByType(type).map(
+      ({ path }) => this.status[path]
+    )
+  }
+
   public getHasUnselectedPlots() {
     const revisionPaths = this.data.filter(element =>
       this.hasRevisions(element)
@@ -151,8 +169,12 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
     return this.data.length > 0
   }
 
-  public setHasCustomSelection(hasCustomSelection: boolean) {
-    this.hasCustomSelection = hasCustomSelection
+  public setHasCustomSelection(hasCustomSelection: boolean, type: PathType) {
+    const section = type === PathType.COMPARISON ? 'comparison' : 'template'
+    this.hasCustomSelection = {
+      ...this.hasCustomSelection,
+      [section]: hasCustomSelection
+    }
     this.persist(
       PersistenceKey.PLOTS_HAS_CUSTOM_SELECTION,
       this.hasCustomSelection
@@ -160,60 +182,103 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
   }
 
   public checkIfHasPreviousCustomSelection() {
-    if (this.hasCustomSelection === undefined) {
-      const statuses = this.getTerminalNodeStatuses()
-      const plotsLength = statuses.length
-
-      const hasCustomSelection =
-        plotsLength > 20
-          ? plotsLength -
-              statuses.filter(nodeStatus => nodeStatus !== Status.SELECTED)
-                .length !==
-            20
-          : false
-      this.setHasCustomSelection(hasCustomSelection)
+    if (this.hasCustomSelection.comparison === undefined) {
+      const comparisonStatuses = this.getTerminalNodeStatusesByType(
+        PathType.COMPARISON
+      )
+      this.setPreviousCustomSelection(comparisonStatuses, PathType.COMPARISON)
+    }
+    if (this.hasCustomSelection.template === undefined) {
+      const templateStatuses = [
+        ...this.getTerminalNodeStatusesByType(PathType.TEMPLATE_SINGLE),
+        ...this.getTerminalNodeStatusesByType(PathType.TEMPLATE_MULTI)
+      ]
+      this.setPreviousCustomSelection(templateStatuses, PathType.TEMPLATE_MULTI)
     }
   }
 
-  public getHasTooManyPlots() {
-    return !!(this.getTerminalNodes().length > 20 && !this.hasCustomSelection)
+  public getHasTooManyPlots(types: PathType[]) {
+    const nodes = []
+    for (const type of types) {
+      nodes.push(...this.getTerminalNodesByType(type))
+    }
+    const section = types.includes(PathType.COMPARISON)
+      ? 'comparison'
+      : 'template'
+    return !!(nodes.length > 20 && !this.hasCustomSelection[section])
   }
 
-  // eslint-disable-next-line sonarjs/cognitive-complexity
-  protected setNewStatuses(
-    data: { path: string; hasChildren: boolean; parentPath?: string }[]
-  ) {
-    let selected = Object.values(this.status).filter(
-      status => status === Status.SELECTED
-    ).length
-    const paths = new Set<string>()
+  public getNode(path: string) {
+    return this.data.find(element => element.path === path)
+  }
 
+  protected setNewStatuses(data: PlotPath[]) {
     const sortedData = [...data].sort((a, b) => a.path.localeCompare(b.path))
+    const templatePlots = sortedData.filter(plots => {
+      return (
+        plots.type?.has(PathType.TEMPLATE_SINGLE) ||
+        plots.type?.has(PathType.TEMPLATE_MULTI)
+      )
+    })
+    const images = sortedData.filter(
+      plots => plots.type?.has(PathType.COMPARISON)
+    )
 
-    for (const { path, hasChildren, parentPath } of sortedData) {
-      let status = Status.UNSELECTED
-      if (!hasChildren && this.status[path] === undefined && selected < 20) {
+    this.selectDefaultPlots(templatePlots, sortedData)
+    this.selectDefaultPlots(images, sortedData)
+
+    const allPaths = new Set(data.map(({ path }) => path))
+
+    this.removeMissingSelected(allPaths)
+  }
+
+  private setPreviousCustomSelection(statuses: Status[], type: PathType) {
+    const plotsLength = statuses.length
+
+    const hasCustomSelection =
+      plotsLength > 20
+        ? plotsLength -
+            statuses.filter(nodeStatus => nodeStatus !== Status.SELECTED)
+              .length !==
+          20
+        : false
+    this.setHasCustomSelection(hasCustomSelection, type)
+  }
+
+  private selectDefaultPlots(data: PlotPath[], fullData: PlotPath[]) {
+    let selected = data.filter(
+      ({ path }) => this.status[path] === Status.SELECTED
+    ).length
+    for (const { path, hasChildren, parentPath } of data) {
+      let status = this.status[path]
+      if (!hasChildren && status === undefined && selected < 20) {
         status = Status.SELECTED
         this.status[path] = status
         selected++
       }
 
       if (parentPath) {
-        this.updateParentPathStatus(parentPath, status)
+        this.updateParentPathStatus(parentPath, fullData, status)
       }
-
-      paths.add(path)
     }
-
-    this.removeMissingSelected(paths)
   }
 
-  private updateParentPathStatus(parentPath: string, status: Status) {
+  private updateParentPathStatus(
+    parentPath: string,
+    data: PlotPath[],
+    status: Status = Status.UNSELECTED
+  ) {
+    const parent = data.find(({ path }) => path === parentPath)
     const isIndeterminate =
       (this.status[parentPath] && this.status[parentPath] !== status) ||
       this.status[parentPath] === Status.INDETERMINATE
 
-    this.status[parentPath] = isIndeterminate ? Status.INDETERMINATE : status
+    const parentStatus = isIndeterminate ? Status.INDETERMINATE : status
+
+    this.status[parentPath] = parentStatus
+    if (parent?.parentPath) {
+      this.updateParentPathStatus(parent.parentPath, data, parentStatus)
+    }
   }
 
   private handleCliError() {

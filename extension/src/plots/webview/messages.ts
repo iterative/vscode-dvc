@@ -34,6 +34,7 @@ import { getCustomPlotId } from '../model/collect'
 import { RegisteredCommands } from '../../commands/external'
 import { ErrorsModel } from '../errors/model'
 import { openUrl } from '../../vscode/external'
+import { PathType } from '../paths/collect'
 
 export class WebviewMessages {
   private readonly dvcRoot: string
@@ -44,7 +45,7 @@ export class WebviewMessages {
 
   private readonly getWebview: () => BaseWebview<TPlotsData> | undefined
   private readonly selectPlots: () => Promise<void>
-  private readonly shouldShowTooManyPlotsMessage: () => boolean
+  private readonly shouldShowTooManyPlotsMessage: (types: PathType[]) => boolean
 
   constructor(
     dvcRoot: string,
@@ -54,7 +55,7 @@ export class WebviewMessages {
     experiments: Experiments,
     getWebview: () => BaseWebview<TPlotsData> | undefined,
     selectPlots: () => Promise<void>,
-    shouldShowTooManyPlotsMessage: () => boolean
+    shouldShowTooManyPlotsMessage: (types: PathType[]) => boolean
   ) {
     this.dvcRoot = dvcRoot
     this.paths = paths
@@ -168,7 +169,13 @@ export class WebviewMessages {
       this.plots.getSectionCollapsed(),
       this.getTemplatePlots(selectedRevisions)
     ])
-    const shouldShowTooManyPlotsMessage = this.shouldShowTooManyPlotsMessage()
+    const shouldShowTooManyTemplatePlotsMessage =
+      this.shouldShowTooManyPlotsMessage([
+        PathType.TEMPLATE_SINGLE,
+        PathType.TEMPLATE_MULTI
+      ])
+    const shouldShowTooManyComparisonImagesMessage =
+      this.shouldShowTooManyPlotsMessage([PathType.COMPARISON])
 
     return {
       cliError,
@@ -178,7 +185,8 @@ export class WebviewMessages {
       hasUnselectedPlots,
       sectionCollapsed,
       selectedRevisions,
-      shouldShowTooManyPlotsMessage,
+      shouldShowTooManyComparisonImagesMessage,
+      shouldShowTooManyTemplatePlotsMessage,
       template
     }
   }

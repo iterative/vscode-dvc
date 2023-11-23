@@ -18,7 +18,6 @@ export interface WebviewState {
   selectedRevisions: Revision[]
   zoomedInPlot: ZoomedInPlotState | undefined
   maxNbPlotsPerRow: number
-  shouldShowTooManyPlotsMessage: boolean
 }
 
 export const webviewInitialState: WebviewState = {
@@ -28,7 +27,6 @@ export const webviewInitialState: WebviewState = {
   hasUnselectedPlots: false,
   maxNbPlotsPerRow: 4,
   selectedRevisions: [],
-  shouldShowTooManyPlotsMessage: false,
   zoomedInPlot: {
     id: '',
     isTemplatePlot: false,
@@ -98,12 +96,6 @@ export const webviewSlice = createSlice({
       action: PayloadAction<Revision[] | undefined>
     ) => {
       state.selectedRevisions = action.payload || []
-    },
-    updateShouldShowTooMAnyPlotsMessage: (
-      state: { shouldShowTooManyPlotsMessage: boolean },
-      action: PayloadAction<boolean>
-    ) => {
-      state.shouldShowTooManyPlotsMessage = action.payload
     }
   }
 })
@@ -115,8 +107,7 @@ export const {
   updateHasUnselectedPlots,
   updateSelectedRevisions,
   setZoomedInPlot,
-  setMaxNbPlotsPerRow,
-  updateShouldShowTooMAnyPlotsMessage
+  setMaxNbPlotsPerRow
 } = webviewSlice.actions
 
 export default webviewSlice.reducer

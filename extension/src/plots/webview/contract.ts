@@ -177,7 +177,8 @@ export enum PlotsDataKeys {
   SELECTED_REVISIONS = 'selectedRevisions',
   TEMPLATE = 'template',
   SECTION_COLLAPSED = 'sectionCollapsed',
-  SHOW_TOO_MANY_PLOTS = 'shouldShowTooManyPlotsMessage'
+  SHOW_TOO_MANY_TEMPLATE_PLOTS = 'shouldShowTooManyTemplatePlotsMessage',
+  SHOW_TOO_MANY_COMPARISON_IMAGES = 'shouldShowTooManyComparisonImagesMessage'
 }
 
 export type PlotsData =
@@ -190,6 +191,7 @@ export type PlotsData =
       [PlotsDataKeys.SELECTED_REVISIONS]?: Revision[]
       [PlotsDataKeys.TEMPLATE]?: TemplatePlotsData | null
       [PlotsDataKeys.SECTION_COLLAPSED]?: SectionCollapsed
-      [PlotsDataKeys.SHOW_TOO_MANY_PLOTS]?: boolean
+      [PlotsDataKeys.SHOW_TOO_MANY_TEMPLATE_PLOTS]?: boolean
+      [PlotsDataKeys.SHOW_TOO_MANY_COMPARISON_IMAGES]?: boolean
     }
   | undefined

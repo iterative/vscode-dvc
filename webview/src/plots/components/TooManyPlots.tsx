@@ -1,7 +1,5 @@
 import React, { PropsWithChildren } from 'react'
-import { useSelector } from 'react-redux'
 import styles from './styles.module.scss'
-import { PlotsState } from '../store'
 import { MessageBand } from '../../shared/components/messageBand/MessageBand'
 import { Info } from '../../shared/components/icons'
 
@@ -10,11 +8,7 @@ const PathHighlight: React.FC<PropsWithChildren> = ({ children }) => (
 )
 
 export const TooManyPlots: React.FC = () => {
-  const shouldShow = useSelector(
-    (state: PlotsState) => state.webview.shouldShowTooManyPlotsMessage
-  )
-
-  return shouldShow ? (
+  return (
     <MessageBand icon={Info} id="too-many-plots-message">
       Only 20 plots are shown by default. To view other plots, you can toggle
       their visibility in the sidebar. To toggle multiple plots simultaneously,
@@ -25,5 +19,5 @@ export const TooManyPlots: React.FC = () => {
       shared folder (and updating the path in your{' '}
       <PathHighlight>dvc.yaml</PathHighlight> file).
     </MessageBand>
-  ) : null
+  )
 }
