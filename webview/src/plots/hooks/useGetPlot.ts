@@ -15,7 +15,11 @@ import { fillTemplate } from '../components/vegaLite/util'
 export const useGetPlot = (
   section: PlotsSection,
   id: string
-): [VisualizationSpec | undefined, Partial<AnchorDefinitions> | undefined] => {
+): {
+  isTemplatePlot: boolean
+  spec: VisualizationSpec | undefined
+  titles: Partial<AnchorDefinitions> | undefined
+} => {
   const isTemplatePlot = section === PlotsSection.TEMPLATE_PLOTS
   const storeSection = isTemplatePlot ? 'template' : 'custom'
   const {
@@ -35,13 +39,9 @@ export const useGetPlot = (
     }
     setSpec(spec)
     setTitles({
-      [PLOT_TITLE_ANCHOR]: plot.anchorDefinitions[PLOT_TITLE_ANCHOR] as string,
-      [PLOT_X_LABEL_ANCHOR]: plot.anchorDefinitions[
-        PLOT_X_LABEL_ANCHOR
-      ] as string,
-      [PLOT_Y_LABEL_ANCHOR]: plot.anchorDefinitions[
-        PLOT_Y_LABEL_ANCHOR
-      ] as string
+      [PLOT_TITLE_ANCHOR]: plot.anchorDefinitions[PLOT_TITLE_ANCHOR] || '',
+      [PLOT_X_LABEL_ANCHOR]: plot.anchorDefinitions[PLOT_X_LABEL_ANCHOR] || '',
+      [PLOT_Y_LABEL_ANCHOR]: plot.anchorDefinitions[PLOT_Y_LABEL_ANCHOR] || ''
     })
   }, [section, id, nbItemsPerRow, height])
 
@@ -49,5 +49,5 @@ export const useGetPlot = (
     setPlotData()
   }, [snapshot, setPlotData])
 
-  return [spec, titles]
+  return { isTemplatePlot, spec, titles }
 }

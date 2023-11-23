@@ -25,7 +25,7 @@ export const DragAndDropPlot: React.FC<DragAndDropPlotProps> = ({
 }) => {
   const dispatch = useDispatch()
   const dragAndDropTimeout = useRef(0)
-  const [, titles] = useGetPlot(sectionKey, plot)
+  const { isTemplatePlot, titles } = useGetPlot(sectionKey, plot)
 
   useEffect(() => {
     return () => {
@@ -36,12 +36,13 @@ export const DragAndDropPlot: React.FC<DragAndDropPlotProps> = ({
   let title = titles?.[PLOT_TITLE_ANCHOR]
   let subtitle = ''
 
-  // ONLY FOR CUSTOM PLOTS
-  const yTitle = titles?.[PLOT_Y_LABEL_ANCHOR] as string
-  const xTitle = titles?.[PLOT_X_LABEL_ANCHOR] as string
+  if (!isTemplatePlot) {
+    const yTitle = titles?.[PLOT_Y_LABEL_ANCHOR] as string
+    const xTitle = titles?.[PLOT_X_LABEL_ANCHOR] as string
 
-  title = getMetricVsParamTitle(yTitle, xTitle)
-  subtitle = plot.replace('custom-', '')
+    title = getMetricVsParamTitle(yTitle, xTitle)
+    subtitle = plot.replace('custom-', '')
+  }
 
   const handleEndOfDragAndDrop = () => {
     // This makes sure every onDrop and onDragEnd events have been called before switching to normal mode

@@ -25,7 +25,7 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
   onViewReady,
   section
 }) => {
-  const [spec, titles] = useGetPlot(section, id)
+  const { spec, titles } = useGetPlot(section, id)
   const dispatch = useDispatch()
   const currentPlotProps = useRef<VisualizationSpec>()
 
