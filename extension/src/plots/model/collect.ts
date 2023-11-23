@@ -263,9 +263,9 @@ const collectPlotData = (
 ) => {
   initializeAcc(acc, path, plot.revisions || [])
 
-  for (const data of plot.anchor_definitions[PLOT_DATA_ANCHOR] as {
+  for (const data of (plot.anchor_definitions[PLOT_DATA_ANCHOR] as {
     rev?: string
-  }[]) {
+  }[]) || []) {
     const rev = data.rev
     if (!rev) {
       continue
