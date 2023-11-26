@@ -1,4 +1,4 @@
-import { TopLevelSpec } from 'vega-lite'
+import type { TopLevelSpec } from 'vega-lite'
 import {
   GenericHConcatSpec,
   GenericVConcatSpec,

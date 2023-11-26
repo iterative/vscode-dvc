@@ -1,4 +1,4 @@
-import { TopLevelSpec } from 'vega-lite'
+import type { TopLevelSpec } from 'vega-lite'
 import {
   AnchorDefinitions,
   PLOT_COLOR_ANCHOR,

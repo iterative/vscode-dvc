@@ -19,9 +19,9 @@ const collectFromDatapoint = (
   acc: string[],
   data: Record<string, unknown>
 ): void => {
-  const filename = data.filename as string | undefined
+  const filename = data.filename
 
-  if (!filename || acc.includes(filename)) {
+  if (!filename || typeof filename !== 'string' || acc.includes(filename)) {
     return
   }
   acc.push(filename)

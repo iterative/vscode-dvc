@@ -1,4 +1,4 @@
-import { TopLevelSpec } from 'vega-lite'
+import type { TopLevelSpec } from 'vega-lite'
 import {
   PLOT_COLOR_ANCHOR,
   PLOT_COLUMN_ANCHOR,
