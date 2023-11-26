@@ -5,7 +5,6 @@ import { VisualizationSpec } from 'react-vega'
 import { ExtendedVegaLite } from './vegaLite/ExtendedVegaLite'
 import { setZoomedInPlot } from './webviewSlice'
 import styles from './styles.module.scss'
-import { ZoomablePlotWrapper } from './ZoomablePlotWrapper'
 import { changeDragAndDropMode } from './util'
 import { zoomPlot } from '../util/messages'
 import { useGetPlot } from '../hooks/useGetPlot'
@@ -25,7 +24,7 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
   onViewReady,
   section
 }) => {
-  const { spec, titles } = useGetPlot(section, id)
+  const spec = useGetPlot(section, id)
   const dispatch = useDispatch()
   const currentPlotProps = useRef<VisualizationSpec>()
 
@@ -48,47 +47,45 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
   }
 
   return (
-    <ZoomablePlotWrapper titles={titles}>
-      <button
-        className={styles.zoomablePlot}
-        onClick={() => handleOnClick()}
-        aria-label="Open Plot in Popup"
-      >
-        {
-          // eslint-disable-next-line jsx-a11y/no-static-element-interactions
-          <div
-            data-testid="grip-icon"
-            onMouseDown={() => changeDragAndDropMode(section, dispatch, false)}
-          >
-            <GripIcon className={styles.plotGripIcon} />
-          </div>
-        }
-        <span
-          className={styles.plotActions}
-          onClick={event => {
-            event.stopPropagation()
-            handleOnClick(true)
-          }}
-          onKeyDown={event => {
-            if (event.key === 'Enter') {
-              handleOnClick(true)
-            }
-          }}
-          role="button"
-          tabIndex={0}
-          aria-label="See Plot Export Options"
+    <button
+      className={styles.zoomablePlot}
+      onClick={() => handleOnClick()}
+      aria-label="Open Plot in Popup"
+    >
+      {
+        // eslint-disable-next-line jsx-a11y/no-static-element-interactions
+        <div
+          data-testid="grip-icon"
+          onMouseDown={() => changeDragAndDropMode(section, dispatch, false)}
         >
-          <Ellipsis />
-        </span>
-        {currentPlotProps.current && (
-          <ExtendedVegaLite
-            id={id}
-            onNewView={onNewView}
-            spec={spec}
-            actions={false}
-          />
-        )}
-      </button>
-    </ZoomablePlotWrapper>
+          <GripIcon className={styles.plotGripIcon} />
+        </div>
+      }
+      <span
+        className={styles.plotActions}
+        onClick={event => {
+          event.stopPropagation()
+          handleOnClick(true)
+        }}
+        onKeyDown={event => {
+          if (event.key === 'Enter') {
+            handleOnClick(true)
+          }
+        }}
+        role="button"
+        tabIndex={0}
+        aria-label="See Plot Export Options"
+      >
+        <Ellipsis />
+      </span>
+      {currentPlotProps.current && (
+        <ExtendedVegaLite
+          id={id}
+          onNewView={onNewView}
+          spec={spec}
+          actions={false}
+        />
+      )}
+    </button>
   )
 }

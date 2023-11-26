@@ -2,17 +2,12 @@ import cx from 'classnames'
 import React, { useEffect, useRef } from 'react'
 import { useDispatch } from 'react-redux'
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
-import {
-  PLOT_TITLE_ANCHOR,
-  PLOT_X_LABEL_ANCHOR,
-  PLOT_Y_LABEL_ANCHOR
-} from 'dvc/src/cli/dvc/contract'
 import styles from './styles.module.scss'
-import { changeDragAndDropMode, getMetricVsParamTitle } from './util'
+import { changeDragAndDropMode } from './util'
 import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
 import { Icon } from '../../shared/components/Icon'
 import { GraphLine } from '../../shared/components/icons'
-import { useGetPlot } from '../hooks/useGetPlot'
+import { useGetTitles } from '../hooks/useGetTitles'
 
 interface DragAndDropPlotProps {
   plot: string
@@ -25,24 +20,15 @@ export const DragAndDropPlot: React.FC<DragAndDropPlotProps> = ({
 }) => {
   const dispatch = useDispatch()
   const dragAndDropTimeout = useRef(0)
-  const { isTemplatePlot, titles } = useGetPlot(sectionKey, plot)
+  const titles = useGetTitles(sectionKey, plot)
+  const title = titles?.title || ''
+  const subtitle = titles?.subtitle || ''
 
   useEffect(() => {
     return () => {
       clearTimeout(dragAndDropTimeout.current)
     }
   }, [])
-
-  let title = titles?.[PLOT_TITLE_ANCHOR]
-  let subtitle = ''
-
-  if (!isTemplatePlot) {
-    const yTitle = titles?.[PLOT_Y_LABEL_ANCHOR] as string
-    const xTitle = titles?.[PLOT_X_LABEL_ANCHOR] as string
-
-    title = getMetricVsParamTitle(yTitle, xTitle)
-    subtitle = plot.replace('custom-', '')
-  }
 
   const handleEndOfDragAndDrop = () => {
     // This makes sure every onDrop and onDragEnd events have been called before switching to normal mode

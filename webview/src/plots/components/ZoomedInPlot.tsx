@@ -5,7 +5,6 @@ import { ExtendedVegaLite } from './vegaLite/ExtendedVegaLite'
 import styles from './styles.module.scss'
 import { plotDataStore } from './plotDataStore'
 import { fillTemplate } from './vegaLite/util'
-import { ZoomablePlotWrapper } from './ZoomablePlotWrapper'
 import {
   addExportBackgroundColor,
   preventSvgTruncation,
@@ -98,24 +97,22 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
   }
 
   return (
-    <ZoomablePlotWrapper titles={plot.anchorDefinitions}>
-      <div
-        className={styles.zoomedInPlot}
-        data-testid="zoomed-in-plot"
-        ref={zoomedInPlotRef}
-      >
-        <ExtendedVegaLite
-          actions={{
-            compiled: false,
-            editor: false,
-            export: false,
-            source: false
-          }}
-          id={id}
-          onNewView={onNewView}
-          spec={spec}
-        />
-      </div>
-    </ZoomablePlotWrapper>
+    <div
+      className={styles.zoomedInPlot}
+      data-testid="zoomed-in-plot"
+      ref={zoomedInPlotRef}
+    >
+      <ExtendedVegaLite
+        actions={{
+          compiled: false,
+          editor: false,
+          export: false,
+          source: false
+        }}
+        id={id}
+        onNewView={onNewView}
+        spec={spec}
+      />
+    </div>
   )
 }

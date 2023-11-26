@@ -315,6 +315,18 @@ $gap: 20px;
   }
 }
 
+:global(.vg-tooltip) {
+  font-size: 10px !important;
+
+  table {
+    table-layout: auto !important;
+
+    td {
+      max-width: fit-content !important;
+    }
+  }
+}
+
 .zoomedInPlot :global(.chart-wrapper) {
   width: 100%;
   height: 100%;

@@ -54,7 +54,27 @@ const replaceAnchors = (
   return value
 }
 
-// come back to the width of titles
+const getMaxHorizontalTitleCharacters = (nbItemsPerRow: number): number => {
+  if (nbItemsPerRow === 1) {
+    return 80
+  }
+  if (nbItemsPerRow === DEFAULT_NB_ITEMS_PER_ROW) {
+    return 50
+  }
+  return 30
+}
+
+const getMaxVerticalTitleCharacters = (
+  nbItemsPerRow: number,
+  height: number,
+  plotFocused: boolean
+) => {
+  if (plotFocused) {
+    return 60
+  }
+  return Math.floor((50 - (nbItemsPerRow - height) * 5) * 0.75)
+}
+
 export const fillTemplate = (
   plot:
     | {
@@ -75,22 +95,20 @@ export const fillTemplate = (
 
   const updatedAnchors: Record<string, unknown> = {}
 
-  const width = nbItemsPerRow > DEFAULT_NB_ITEMS_PER_ROW ? 30 : 50
+  const titleWidth = getMaxHorizontalTitleCharacters(nbItemsPerRow)
+  const titleHeight = getMaxVerticalTitleCharacters(
+    nbItemsPerRow,
+    height,
+    plotFocused
+  )
 
   for (const [key, value] of Object.entries(anchorDefinitions)) {
     if (key === PLOT_TITLE_ANCHOR || key === PLOT_X_LABEL_ANCHOR) {
-      const strValue = String(value)
-      updatedAnchors[key] = plotFocused
-        ? strValue
-        : truncate(strValue, width, 'left')
+      updatedAnchors[key] = truncate(value as string, titleWidth, 'left')
     }
 
     if (key === PLOT_Y_LABEL_ANCHOR) {
-      updatedAnchors[key] = truncate(
-        value as string,
-        Math.floor((50 - (nbItemsPerRow - height) * 5) * 0.75),
-        'left'
-      )
+      updatedAnchors[key] = truncate(value as string, titleHeight, 'left')
     }
 
     if (

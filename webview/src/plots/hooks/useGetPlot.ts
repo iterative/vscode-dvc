@@ -1,9 +1,3 @@
-import {
-  AnchorDefinitions,
-  PLOT_TITLE_ANCHOR,
-  PLOT_X_LABEL_ANCHOR,
-  PLOT_Y_LABEL_ANCHOR
-} from 'dvc/src/cli/dvc/contract'
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import { useCallback, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
@@ -15,13 +9,9 @@ import { fillTemplate } from '../components/vegaLite/util'
 export const useGetPlot = (
   section: PlotsSection,
   id: string
-): {
-  isTemplatePlot: boolean
-  spec: VisualizationSpec | undefined
-  titles: Partial<AnchorDefinitions> | undefined
-} => {
-  const isTemplatePlot = section === PlotsSection.TEMPLATE_PLOTS
-  const storeSection = isTemplatePlot ? 'template' : 'custom'
+): VisualizationSpec | undefined => {
+  const storeSection =
+    section === PlotsSection.TEMPLATE_PLOTS ? 'template' : 'custom'
   const {
     plotsSnapshots: snapshot,
     nbItemsPerRow,
@@ -29,7 +19,6 @@ export const useGetPlot = (
   } = useSelector((state: PlotsState) => state[storeSection])
 
   const [spec, setSpec] = useState<VisualizationSpec | undefined>()
-  const [titles, setTitles] = useState<Partial<AnchorDefinitions> | undefined>()
 
   const setPlotData = useCallback(() => {
     const plot = plotDataStore[section][id]
@@ -38,16 +27,11 @@ export const useGetPlot = (
       return
     }
     setSpec(spec)
-    setTitles({
-      [PLOT_TITLE_ANCHOR]: plot.anchorDefinitions[PLOT_TITLE_ANCHOR] || '',
-      [PLOT_X_LABEL_ANCHOR]: plot.anchorDefinitions[PLOT_X_LABEL_ANCHOR] || '',
-      [PLOT_Y_LABEL_ANCHOR]: plot.anchorDefinitions[PLOT_Y_LABEL_ANCHOR] || ''
-    })
   }, [section, id, nbItemsPerRow, height])
 
   useEffect(() => {
     setPlotData()
   }, [snapshot, setPlotData])
 
-  return { isTemplatePlot, spec, titles }
+  return spec
 }
