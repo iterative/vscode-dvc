@@ -631,7 +631,7 @@ describe('App', () => {
   })
 
   describe('Studio not connected', () => {
-    it('should show buttons which request a token from Studio or add an already creatd one', () => {
+    it('should show buttons which request a token from Studio or add an already created one', () => {
       renderApp()
       mockPostMessage.mockClear()
       const getTokenButton = screen.getByText('Get Token')
