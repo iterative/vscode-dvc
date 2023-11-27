@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { DragEnterDirection } from './util'
 
 export type DraggedInfo =
   | {
@@ -19,12 +20,14 @@ export interface DragDropState {
   draggedRef: DraggedInfo
   groups: GroupStates
   draggedOverGroup: string
+  direction: DragEnterDirection | undefined
 }
 
 export const dragDropInitialState: DragDropState = {
   draggedOverGroup: '',
   draggedRef: undefined,
-  groups: {}
+  groups: {},
+  direction: undefined
 }
 
 export const dragDropSlice = createSlice({
@@ -43,6 +46,15 @@ export const dragDropSlice = createSlice({
         draggedOverGroup: action.payload
       }
     },
+    setDirection: (
+      state,
+      action: PayloadAction<DragEnterDirection | undefined>
+    ) => {
+      return {
+        ...state,
+        direction: action.payload
+      }
+    },
     setGroup: (
       state,
       action: PayloadAction<{ id: string; group: DragDropGroupState }>
@@ -55,7 +67,7 @@ export const dragDropSlice = createSlice({
   }
 })
 
-export const { changeRef, setGroup, setDraggedOverGroup } =
+export const { changeRef, setGroup, setDraggedOverGroup, setDirection } =
   dragDropSlice.actions
 
 export default dragDropSlice.reducer

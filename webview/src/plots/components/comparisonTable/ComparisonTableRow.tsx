@@ -13,19 +13,29 @@ import { isSelecting } from '../../../util/strings'
 import Tooltip, {
   NORMAL_TOOLTIP_DELAY
 } from '../../../shared/components/tooltip/Tooltip'
+import { useDragAndDrop } from '../../../shared/hooks/useDragAndDrop'
+import { RowDropTarget } from './RowDropTarget'
 
 export interface ComparisonTableRowProps {
   path: string
   plots: ComparisonPlot[]
   nbColumns: number
   pinnedColumn: string
+  onLayoutChange: () => void
+  setOrder: (order: string[]) => void
+  order: string[]
+  bodyRef?: React.RefObject<HTMLTableSectionElement>
 }
 
 export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
   path,
   plots,
   nbColumns,
-  pinnedColumn
+  pinnedColumn,
+  onLayoutChange,
+  setOrder,
+  order,
+  bodyRef
 }) => {
   const plotsRowRef = useRef<HTMLTableRowElement>(null)
   const draggedId = useSelector(
@@ -34,7 +44,21 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
   const comparisonWidth = useSelector(
     (state: PlotsState) => state.comparison.width
   )
+  const disabledDragPlotIds = useSelector(
+    (state: PlotsState) => state.comparison.disabledDragPlotIds
+  )
   const [isShown, setIsShown] = useState(true)
+  const { target, isAfter, ...dragAndDropProps } = useDragAndDrop({
+    id: path,
+    group: 'comparison-table',
+    dropTarget: <RowDropTarget colSpan={nbColumns} />,
+    order,
+    setOrder,
+    disabledDropIds: disabledDragPlotIds,
+    onDragEnd: () => {},
+    vertical: true,
+    onLayoutChange
+  })
 
   const toggleIsShownState = () => {
     if (isSelecting([path])) {
@@ -75,7 +99,13 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
   }, [comparisonWidth])
 
   return (
-    <>
+    <tbody
+      {...dragAndDropProps}
+      data-testid="comparison-table-body"
+      key={path}
+      id={path}
+      ref={bodyRef}
+    >
       <tr>
         <td
           className={cx({ [styles.pinnedColumnCell]: pinnedColumn })}
@@ -122,6 +152,6 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
           )
         })}
       </tr>
-    </>
+    </tbody>
   )
 }

@@ -24,13 +24,16 @@ const Template: StoryFn<{
   name: string
   onClicked: () => void
   index: number
-  isPinned: boolean
-}> = ({ name, displayColor, onClicked, isPinned }) => (
+  pinnedColumn: string | undefined
+}> = ({ name, displayColor, onClicked, pinnedColumn }) => (
   <WebviewWrapper>
     <ComparisonTableHeader
       displayColor={displayColor}
       onClicked={onClicked}
-      isPinned={isPinned}
+      id={name}
+      order={[]}
+      setOrder={() => {}}
+      pinnedColumn={pinnedColumn}
     >
       {name}
     </ComparisonTableHeader>
@@ -48,5 +51,5 @@ OtherColor.args = {
 export const Pinned = Template.bind({})
 Pinned.args = {
   ...basicArgs,
-  isPinned: true
+  pinnedColumn: basicArgs.name
 }

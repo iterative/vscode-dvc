@@ -4,10 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { ComparisonTableColumn } from './ComparisonTableHead'
 import { ComparisonTableRow } from './ComparisonTableRow'
 import { changeRowHeight, DEFAULT_ROW_HEIGHT } from './comparisonTableSlice'
-import { RowDropTarget } from './RowDropTarget'
-import { DragDropContainer } from '../../../shared/components/dragDrop/DragDropContainer'
 import { reorderComparisonRows } from '../../util/messages'
-import { PlotsState } from '../../store'
 
 interface ComparisonTableRowsProps {
   plots: ComparisonPlots
@@ -23,9 +20,6 @@ export const ComparisionTableRows: React.FC<ComparisonTableRowsProps> = ({
   const [rowsOrder, setRowsOrder] = useState<string[]>([])
   const dispatch = useDispatch()
   const firstRowRef = createRef<HTMLTableSectionElement>()
-  const disabledDragPlotIds = useSelector(
-    (state: PlotsState) => state.comparison.disabledDragPlotIds
-  )
 
   useEffect(() => {
     setRowsOrder(plots.map(({ path }) => path))
@@ -37,6 +31,11 @@ export const ComparisionTableRows: React.FC<ComparisonTableRowsProps> = ({
     dispatch(changeRowHeight(firstRowHeight))
   }
 
+  const changeRowsOrder = (order: string[]) => {
+    setRowsOrder(order)
+    reorderComparisonRows(order)
+  }
+
   const rows = rowsOrder.map((path, i) => {
     const plot = plots.find(p => p.path === path)
     if (!plot) {
@@ -44,40 +43,22 @@ export const ComparisionTableRows: React.FC<ComparisonTableRowsProps> = ({
     }
     const revs = plot.revisions
     return (
-      <tbody
-        data-testid="comparison-table-body"
+      <ComparisonTableRow
         key={path}
-        id={path}
-        ref={i === 0 ? firstRowRef : undefined}
-      >
-        <ComparisonTableRow
-          path={path}
-          plots={columns.map(column => ({
-            id: column.id,
-            imgs: revs[column.id]?.imgs
-          }))}
-          nbColumns={columns.length}
-          pinnedColumn={pinnedColumn}
-        />
-      </tbody>
+        path={path}
+        plots={columns.map(column => ({
+          id: column.id,
+          imgs: revs[column.id]?.imgs
+        }))}
+        nbColumns={columns.length}
+        pinnedColumn={pinnedColumn}
+        onLayoutChange={onLayoutChange}
+        setOrder={changeRowsOrder}
+        order={rowsOrder}
+        bodyRef={i === 0 ? firstRowRef : undefined}
+      />
     )
   })
 
-  const changeRowsOrder = (order: string[]) => {
-    setRowsOrder(order)
-    reorderComparisonRows(order)
-  }
-
-  return (
-    <DragDropContainer
-      items={rows as JSX.Element[]}
-      order={rowsOrder}
-      setOrder={changeRowsOrder}
-      group="comparison-table"
-      dropTarget={<RowDropTarget colSpan={columns.length} />}
-      onLayoutChange={onLayoutChange}
-      disabledDropIds={disabledDragPlotIds}
-      vertical
-    />
-  )
+  return <>{rows}</>
 }

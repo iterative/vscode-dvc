@@ -4,7 +4,7 @@ import { NormalGrid, NormalGridProps } from './NormalGrid'
 import { DragAndDropGrid } from './DragAndDropGrid'
 import { isDragAndDropModeSelector } from './util'
 import { PlotsState } from '../store'
-import { OnDrop } from '../../shared/components/dragDrop/DragDropContainer'
+import { OnDrop } from '../../shared/hooks/useDragAndDrop'
 
 interface GridProps extends NormalGridProps {
   setOrder: (order: string[]) => void

@@ -27,7 +27,10 @@ describe('ComparisonTableRow', () => {
       comparisonPlotsFixture.plots.find(
         ({ path }) => path === join('plots', 'acc.png')
       )?.revisions || {}
-    ).map(revision => ({ ...revision, fetched: true }))
+    ).map(revision => ({ ...revision, fetched: true })),
+    order: ['path/to/the-file/image.png'],
+    setOrder: jest.fn(),
+    onLayoutChange: jest.fn()
   }
 
   const renderRow = (props = basicProps) =>

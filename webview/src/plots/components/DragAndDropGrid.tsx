@@ -1,19 +1,11 @@
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import React from 'react'
-import { useDispatch } from 'react-redux'
 import cx from 'classnames'
-import { DropTarget } from './DropTarget'
-import { changeDragAndDropMode } from './util'
 import styles from './styles.module.scss'
 import { DragAndDropPlot } from './DragAndDropPlot'
 import { plotDataStore } from './plotDataStore'
 import { VirtualizedGrid } from '../../shared/components/virtualizedGrid/VirtualizedGrid'
-import {
-  DragDropContainer,
-  OnDrop,
-  WrapperProps
-} from '../../shared/components/dragDrop/DragDropContainer'
-import { withScale } from '../../util/styles'
+import { OnDrop } from '../../shared/hooks/useDragAndDrop'
 
 interface DragAndDropGridProps {
   order: string[]
@@ -38,7 +30,6 @@ export const DragAndDropGrid: React.FC<DragAndDropGridProps> = ({
   multiView,
   sectionKey
 }) => {
-  const dispatch = useDispatch()
   const plotClassName = cx(styles.plot, styles.dragAndDropPlot, {
     [styles.multiViewPlot]: multiView
   })
@@ -49,50 +40,25 @@ export const DragAndDropGrid: React.FC<DragAndDropGridProps> = ({
       1
 
     return (
-      <div
+      <DragAndDropPlot
         key={plot}
-        id={plot}
-        className={plotClassName}
         data-testid={`plot_${plot}`}
-        style={withScale(colSpan)}
-      >
-        <DragAndDropPlot plot={plot} sectionKey={sectionKey} />
-      </div>
+        plot={plot}
+        sectionKey={sectionKey}
+        className={plotClassName}
+        colSpan={colSpan}
+        onPlotDrop={onDrop}
+        group={groupId}
+        isParentDraggedOver={parentDraggedOver}
+        setOrder={setOrder}
+        order={order}
+      />
     )
   })
 
-  const handleOnDrop = (
-    draggedId: string,
-    draggedGroup: string,
-    groupId: string,
-    position: number
-  ) => {
-    changeDragAndDropMode(sectionKey, dispatch, true)
-    onDrop?.(draggedId, draggedGroup, groupId, position)
-  }
-
-  const handleDragEnd = () => {
-    changeDragAndDropMode(sectionKey, dispatch, true)
-  }
-
-  return (
-    <DragDropContainer
-      order={order}
-      setOrder={setOrder}
-      items={items}
-      group={groupId}
-      onDrop={handleOnDrop}
-      dropTarget={<DropTarget />}
-      wrapperComponent={
-        useVirtualizedGrid
-          ? {
-              component: VirtualizedGrid as React.FC<WrapperProps>,
-              props: { nbItemsPerRow }
-            }
-          : undefined
-      }
-      parentDraggedOver={parentDraggedOver}
-      onDragEnd={handleDragEnd}
-    />
+  return useVirtualizedGrid ? (
+    <VirtualizedGrid nbItemsPerRow={nbItemsPerRow}>{items}</VirtualizedGrid>
+  ) : (
+    <>{items}</>
   )
 }

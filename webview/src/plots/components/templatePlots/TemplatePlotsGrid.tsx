@@ -1,9 +1,9 @@
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { OnDrop } from '../../../shared/components/dragDrop/DragDropContainer'
 import { PlotsState } from '../../store'
 import { Grid } from '../Grid'
+import { OnDrop } from '../../../shared/hooks/useDragAndDrop'
 
 interface TemplatePlotsGridProps {
   groupId: string

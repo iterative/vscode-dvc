@@ -8,7 +8,7 @@ import { PlotsState } from '../../store'
 import { getIDWithoutIndex } from '../../../util/ids'
 import { Icon } from '../../../shared/components/Icon'
 import { GraphLine } from '../../../shared/components/icons'
-import { useDeferedDragLeave } from '../../../shared/hooks/useDeferedDragLeave'
+import { useDeferredDragLeave } from '../../../shared/hooks/useDeferredDragLeave'
 
 interface AddedSectionProps {
   id: string
@@ -28,12 +28,12 @@ export const AddedSection: React.FC<AddedSectionProps> = ({
   acceptedGroups
 }) => {
   const { draggedRef } = useSelector((state: PlotsState) => state.dragAndDrop)
-  const { immediateDragEnter, deferedDragLeave } = useDeferedDragLeave()
+  const { immediateDragEnter, deferredDragLeave } = useDeferredDragLeave()
 
   const isHovered = hoveredSection === id
 
   const handleDragLeave = () => {
-    deferedDragLeave(() => setHoveredSection(''))
+    deferredDragLeave(() => setHoveredSection(''))
   }
 
   const handleDragEnter = () => {

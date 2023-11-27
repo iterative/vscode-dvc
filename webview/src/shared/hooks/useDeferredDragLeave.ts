@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-export const useDeferedDragLeave = () => {
+export const useDeferredDragLeave = () => {
   const [hoveringSomething, setHoveringSomething] = useState(false)
   const isHovering = useRef(false)
   const hoveringTimeout = useRef<number>(0)
@@ -11,7 +11,7 @@ export const useDeferedDragLeave = () => {
     }
   }, [])
 
-  const deferedDragLeave = useCallback(
+  const deferredDragLeave = useCallback(
     (callback?: () => void) => {
       isHovering.current = false
       hoveringTimeout.current = window.setTimeout(() => {
@@ -35,7 +35,7 @@ export const useDeferedDragLeave = () => {
   }, [setHoveringSomething])
 
   return {
-    deferedDragLeave,
+    deferredDragLeave,
     hoveringSomething,
     immediateDragEnter,
     immediateDragLeave

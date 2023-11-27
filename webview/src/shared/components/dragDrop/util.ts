@@ -47,8 +47,8 @@ export const getDragEnterDirection = (
     : DragEnterDirection.BOTTOM
 }
 
-export const isEnteringAfter = (direction: DragEnterDirection) =>
-  AFTER_DIRECTIONS.has(direction)
+export const isEnteringAfter = (direction: DragEnterDirection | undefined) =>
+  direction && AFTER_DIRECTIONS.has(direction)
 
 export const isExactGroup = (
   group1?: string,
