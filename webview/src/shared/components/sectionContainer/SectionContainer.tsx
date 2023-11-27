@@ -106,7 +106,7 @@ export const SectionContainer: React.FC<
             </div>
           )}
         </summary>
-        <div className={styles.insideSection}>{children}</div>
+        {open && <div className={styles.insideSection}>{children}</div>}
       </details>
     </div>
   )

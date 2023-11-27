@@ -700,42 +700,6 @@ describe('App', () => {
     expect(screen.queryByText('Images')).not.toBeInTheDocument()
   })
 
-  it('should hide plots when their section is collapsed (setting to null can break some Vega plots)', async () => {
-    renderAppWithOptionalData({
-      custom: customPlotsFixture
-    })
-
-    const summaryElement = await screen.findByText('Custom')
-    const visiblePlots = await screen.findAllByLabelText('Vega visualization')
-    for (const visiblePlot of visiblePlots) {
-      expect(visiblePlot).toBeInTheDocument()
-      expect(visiblePlot).toBeVisible()
-    }
-
-    fireEvent.click(summaryElement, {
-      bubbles: true,
-      cancelable: true
-    })
-
-    expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: { [PlotsSection.CUSTOM_PLOTS]: true },
-      type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
-    })
-
-    sendSetDataMessage({
-      sectionCollapsed: {
-        ...DEFAULT_SECTION_COLLAPSED,
-        [PlotsSection.CUSTOM_PLOTS]: true
-      }
-    })
-
-    const hiddenPlots = await screen.findAllByLabelText('Vega visualization')
-    for (const hiddenPlot of hiddenPlots) {
-      expect(hiddenPlot).toBeInTheDocument()
-      expect(hiddenPlot).not.toBeVisible()
-    }
-  })
-
   it('should not toggle the custom plots section when its header is clicked and its title is selected', async () => {
     renderAppWithOptionalData({
       custom: customPlotsFixture
