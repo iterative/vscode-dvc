@@ -1,5 +1,5 @@
 import cx from 'classnames'
-import React from 'react'
+import React, { MouseEvent } from 'react'
 import styles from './styles.module.scss'
 import { Pinned } from '../../../shared/components/icons'
 import { GripIcon } from '../../../shared/components/dragDrop/GripIcon'
@@ -29,7 +29,11 @@ export const ComparisonTableHeader: React.FC<ComparisonTableHeaderProps> = ({
       }-header`}
     >
       {!isPinned && <GripIcon className={styles.gripIcon} />}
-      <button className={pinClasses} onClick={onClicked}>
+      <button
+        className={pinClasses}
+        onMouseDown={(e: MouseEvent<HTMLButtonElement>) => e.stopPropagation()}
+        onClick={onClicked}
+      >
         <Pinned />
       </button>
       <span
