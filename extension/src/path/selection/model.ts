@@ -90,7 +90,9 @@ export abstract class PathSelectionModel<
     const statuses = this.getTerminalNodeStatuses(parentPath)
 
     const isAnyChildSelected = statuses.includes(Status.SELECTED)
-    const isAnyChildUnselected = statuses.includes(Status.UNSELECTED)
+    const isAnyChildUnselected =
+      statuses.includes(Status.UNSELECTED) ||
+      statuses.filter(Boolean).length < statuses.length
 
     if (isAnyChildSelected && isAnyChildUnselected) {
       return Status.INDETERMINATE
