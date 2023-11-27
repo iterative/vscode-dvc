@@ -26,9 +26,9 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
 }) => {
   const spec = useGetPlot(section, id)
   const dispatch = useDispatch()
-  const currentPlotProps = useRef<VisualizationSpec>()
+  const currentSpec = useRef<VisualizationSpec>()
 
-  currentPlotProps.current = spec
+  currentSpec.current = spec
 
   const handleOnClick = (openActionsMenu?: boolean) => {
     zoomPlot()
@@ -78,7 +78,7 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
       >
         <Ellipsis />
       </span>
-      {currentPlotProps.current && (
+      {currentSpec.current && (
         <ExtendedVegaLite
           id={id}
           onNewView={onNewView}

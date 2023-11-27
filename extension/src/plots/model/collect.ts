@@ -138,8 +138,6 @@ const getCustomPlotData = (
 
   const [{ param: paramVal, metric: metricVal }] = values
 
-  const content = getContent()
-
   return {
     anchorDefinitions: {
       [PLOT_COLOR_ANCHOR]: {
@@ -157,7 +155,7 @@ const getCustomPlotData = (
         select: 'interval'
       }
     },
-    content,
+    content: getContent(),
     id: getCustomPlotId(metric, param),
     metric,
     param

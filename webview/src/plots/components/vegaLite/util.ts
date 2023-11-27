@@ -75,6 +75,78 @@ const getMaxVerticalTitleCharacters = (
   return Math.floor((50 - (nbItemsPerRow - height) * 5) * 0.75)
 }
 
+const updateTitles = (
+  updatedAnchors: Record<string, unknown>,
+  key: string,
+  value: unknown,
+  titleWidth: number,
+  titleHeight: number
+) => {
+  if (
+    key !== PLOT_TITLE_ANCHOR &&
+    key !== PLOT_X_LABEL_ANCHOR &&
+    key !== PLOT_Y_LABEL_ANCHOR
+  ) {
+    return
+  }
+
+  const length = key === PLOT_Y_LABEL_ANCHOR ? titleHeight : titleWidth
+  updatedAnchors[key] = truncate(value as string, length, 'left')
+}
+const updateLegend = (
+  updatedAnchors: Record<string, unknown>,
+  plotFocused: boolean,
+  key: string,
+  value: unknown
+) => {
+  if (
+    plotFocused ||
+    (key !== PLOT_COLOR_ANCHOR &&
+      key !== PLOT_SHAPE_ANCHOR &&
+      key !== PLOT_STROKE_DASH_ANCHOR)
+  ) {
+    return
+  }
+
+  updatedAnchors[key] = {
+    ...(value as AnchorDefinitions[
+      | typeof PLOT_COLOR_ANCHOR
+      | typeof PLOT_SHAPE_ANCHOR
+      | typeof PLOT_STROKE_DASH_ANCHOR]),
+    legend: null
+  }
+}
+
+const getUpdatedAnchors = (
+  anchorDefinitions: AnchorDefinitions,
+  nbItemsPerRow: number,
+  height: number,
+  plotFocused: boolean,
+  isMultiView: boolean
+): Record<string, unknown> => {
+  const updatedAnchors: Record<string, unknown> = {}
+  const titleWidth = getMaxHorizontalTitleCharacters(nbItemsPerRow)
+  const titleHeight = getMaxVerticalTitleCharacters(
+    nbItemsPerRow,
+    height,
+    plotFocused
+  )
+
+  for (const [key, value] of Object.entries(anchorDefinitions)) {
+    updateTitles(updatedAnchors, key, value, titleWidth, titleHeight)
+    updateLegend(updatedAnchors, plotFocused, key, value)
+  }
+  updatedAnchors[PLOT_ZOOM_AND_PAN_ANCHOR] = plotFocused
+    ? ZOOM_AND_PAN_PROP
+    : {}
+
+  updatedAnchors[PLOT_HEIGHT_ANCHOR] = isMultiView ? 300 : 'container'
+
+  updatedAnchors[PLOT_WIDTH_ANCHOR] = isMultiView ? 300 : 'container'
+
+  return updatedAnchors
+}
+
 export const fillTemplate = (
   plot:
     | {
@@ -85,7 +157,6 @@ export const fillTemplate = (
   nbItemsPerRow: number,
   height: number,
   plotFocused: boolean
-  // eslint-disable-next-line sonarjs/cognitive-complexity
 ): TopLevelSpec | undefined => {
   if (!plot) {
     return
@@ -93,46 +164,15 @@ export const fillTemplate = (
 
   const { content, anchorDefinitions } = plot
 
-  const updatedAnchors: Record<string, unknown> = {}
-
-  const titleWidth = getMaxHorizontalTitleCharacters(nbItemsPerRow)
-  const titleHeight = getMaxVerticalTitleCharacters(
-    nbItemsPerRow,
-    height,
-    plotFocused
-  )
-
-  for (const [key, value] of Object.entries(anchorDefinitions)) {
-    if (key === PLOT_TITLE_ANCHOR || key === PLOT_X_LABEL_ANCHOR) {
-      updatedAnchors[key] = truncate(value as string, titleWidth, 'left')
-    }
-
-    if (key === PLOT_Y_LABEL_ANCHOR) {
-      updatedAnchors[key] = truncate(value as string, titleHeight, 'left')
-    }
-
-    if (
-      !plotFocused &&
-      (key === PLOT_COLOR_ANCHOR ||
-        key === PLOT_SHAPE_ANCHOR ||
-        key === PLOT_STROKE_DASH_ANCHOR)
-    ) {
-      updatedAnchors[key] = {
-        ...(value as AnchorDefinitions[typeof PLOT_COLOR_ANCHOR]),
-        legend: null
-      }
-    }
-  }
-
-  updatedAnchors[PLOT_ZOOM_AND_PAN_ANCHOR] = plotFocused
-    ? ZOOM_AND_PAN_PROP
-    : {}
-
   const isMultiView = isMultiViewPlot(content, anchorDefinitions)
 
-  updatedAnchors[PLOT_HEIGHT_ANCHOR] = isMultiView ? 300 : 'container'
-
-  updatedAnchors[PLOT_WIDTH_ANCHOR] = isMultiView ? 300 : 'container'
+  const updatedAnchors = getUpdatedAnchors(
+    anchorDefinitions,
+    nbItemsPerRow,
+    height,
+    plotFocused,
+    isMultiView
+  )
 
   return replaceAnchors(content, {
     ...anchorDefinitions,
