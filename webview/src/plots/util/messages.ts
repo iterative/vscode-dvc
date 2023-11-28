@@ -134,3 +134,9 @@ export const setSmoothPlotValues = (id: string, value: number) => {
 
 export const zoomPlot = (imagePath?: string) =>
   sendMessage({ payload: imagePath, type: MessageFromWebviewType.ZOOM_PLOT })
+
+export const refreshSection = (section: PlotsSection) =>
+  sendMessage({
+    payload: section,
+    type: MessageFromWebviewType.REFRESH_PLOTS
+  })

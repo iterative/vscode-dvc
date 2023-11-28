@@ -140,8 +140,23 @@ export class WebviewMessages {
           { isImage: !!message.payload },
           undefined
         )
+      case MessageFromWebviewType.REFRESH_PLOTS:
+        return this.sendDataForSection(message.payload)
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
+    }
+  }
+
+  private sendDataForSection(section: PlotsSection) {
+    switch (section) {
+      case PlotsSection.COMPARISON_TABLE:
+        return this.sendComparisonPlots()
+      case PlotsSection.CUSTOM_PLOTS:
+        return this.sendCustomPlots()
+      case PlotsSection.TEMPLATE_PLOTS:
+        return this.sendTemplatePlots()
+      default:
+        return this.sendWebviewMessage()
     }
   }
 

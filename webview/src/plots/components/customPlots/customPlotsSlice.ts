@@ -46,6 +46,10 @@ export const customPlotsSlice = createSlice({
       state.nbItemsPerRow = action.payload.nbItemsPerRowOrWidth
       state.height = action.payload.height
     },
+    clearState: () => {
+      removePlots([], PlotsSection.TEMPLATE_PLOTS)
+      return customPlotsInitialState
+    },
     setCollapsed: (state, action: PayloadAction<boolean>) => {
       state.isCollapsed = action.payload
     },
@@ -75,7 +79,12 @@ export const customPlotsSlice = createSlice({
   }
 })
 
-export const { update, setCollapsed, changeSize, toggleDragAndDropMode } =
-  customPlotsSlice.actions
+export const {
+  update,
+  setCollapsed,
+  changeSize,
+  toggleDragAndDropMode,
+  clearState
+} = customPlotsSlice.actions
 
 export default customPlotsSlice.reducer
