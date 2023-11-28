@@ -8,23 +8,26 @@ export type Param = {
 }
 
 const collectFromParamsFile = (
-  acc: Param[],
+  acc: { path: string; value: Value | undefined }[],
   key: string | undefined,
   value: Value | ValueTree,
   ancestors: string[] = []
 ) => {
   const pathArray = [...ancestors, key].filter(Boolean) as string[]
 
-  if (isValueTree(value)) {
-    for (const [childKey, childValue] of Object.entries(value)) {
-      collectFromParamsFile(acc, childKey, childValue, pathArray)
-    }
-    return
-  }
+  const isLeaf = !isValueTree(value)
 
   const path = appendColumnToPath(...pathArray)
 
-  acc.push({ path, value })
+  if (pathArray.length > 1) {
+    acc.push({ path, value: isLeaf ? value : undefined })
+  }
+
+  if (!isLeaf) {
+    for (const [childKey, childValue] of Object.entries(value)) {
+      collectFromParamsFile(acc, childKey, childValue, pathArray)
+    }
+  }
 }
 
 export const collectFlatExperimentParams = (

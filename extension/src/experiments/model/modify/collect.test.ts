@@ -32,6 +32,10 @@ describe('collectFlatExperimentParams', () => {
         value: 0.124
       },
       {
+        path: appendColumnToPath('params.yaml', 'process'),
+        value: undefined
+      },
+      {
         path: appendColumnToPath('params.yaml', 'process', 'threshold'),
         value: 0.85
       },
@@ -39,6 +43,47 @@ describe('collectFlatExperimentParams', () => {
         path: appendColumnToPath(join('nested', 'params.yaml'), 'test'),
         value: true
       }
+    ])
+  })
+
+  it('should return nested params in the final list', () => {
+    const params = collectFlatExperimentParams({
+      'params.yaml': {
+        data_path: 'fra.txt',
+        model: {
+          batch_size: 512,
+          duration: '00:00:30:00',
+          latent_dim: 8,
+          max_epochs: 2,
+          optim: {
+            lr: 0.01
+          }
+        },
+        num_samples: 10000,
+        seed: 423
+      },
+      'results/params.yaml': {
+        latent_dim: 8,
+        optim_params: {
+          lr: 0.01
+        }
+      }
+    })
+
+    expect(params).toStrictEqual([
+      { path: 'params.yaml:data_path', value: 'fra.txt' },
+      { path: 'params.yaml:model', value: undefined },
+      { path: 'params.yaml:model.batch_size', value: 512 },
+      { path: 'params.yaml:model.duration', value: '00:00:30:00' },
+      { path: 'params.yaml:model.latent_dim', value: 8 },
+      { path: 'params.yaml:model.max_epochs', value: 2 },
+      { path: 'params.yaml:model.optim', value: undefined },
+      { path: 'params.yaml:model.optim.lr', value: 0.01 },
+      { path: 'params.yaml:num_samples', value: 10000 },
+      { path: 'params.yaml:seed', value: 423 },
+      { path: 'results/params.yaml:latent_dim', value: 8 },
+      { path: 'results/params.yaml:optim_params', value: undefined },
+      { path: 'results/params.yaml:optim_params.lr', value: 0.01 }
     ])
   })
 })
