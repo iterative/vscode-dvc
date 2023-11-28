@@ -1,47 +1,14 @@
 @import '../../variables';
 
 .messageBand {
-  position: fixed;
-  bottom: 0;
   width: 100%;
-  z-index: 10;
   background-color: $bg-color;
   height: max-content;
   padding: 20px;
-  border-top: 2px solid $accent-color;
   display: flex;
   justify-content: space-between;
   align-items: center;
   line-height: 1.7;
-}
-
-.messageBandHidden {
-  bottom: auto;
-  top: calc(100% - 10px);
-}
-
-.toggler {
-  position: absolute;
-  top: -40px;
-  right: 0;
-  width: 40px;
-  height: 40px;
-  background-color: $bg-color;
-  border: 2px solid $accent-color;
-  border-bottom: none;
-  border-top-right-radius: 2px;
-  border-top-left-radius: 2px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.toggleIcon {
-  fill: $fg-color;
-}
-
-.toggleIconDown {
-  transform: rotate(180deg);
 }
 
 .messageBandIcon {

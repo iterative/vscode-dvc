@@ -510,7 +510,10 @@ describe('PathsModel', () => {
 
   it('should not change hasCustomSelection when checking for if it is already defined', () => {
     const memento = buildMockMemento({
-      [PersistenceKey.PLOTS_HAS_CUSTOM_SELECTION + mockDvcRoot]: true
+      [PersistenceKey.PLOTS_HAS_CUSTOM_SELECTION + mockDvcRoot]: {
+        comparison: true,
+        template: true
+      }
     })
     const model = new PathsModel(mockDvcRoot, buildMockErrorsModel(), memento)
     const setHasCustomSelectionSpy = jest.spyOn(model, 'setHasCustomSelection')
@@ -519,7 +522,7 @@ describe('PathsModel', () => {
     expect(setHasCustomSelectionSpy).not.toHaveBeenCalled()
   })
 
-  it('should set hasCustomSelection to false if there are less than 20 plots', () => {
+  it('should set hasCustomSelection to false if there are no unselected plots', () => {
     const model = new PathsModel(
       mockDvcRoot,
       buildMockErrorsModel(),
@@ -536,10 +539,17 @@ describe('PathsModel', () => {
       ])
 
     model.checkIfHasPreviousCustomSelection()
-    expect(setHasCustomSelectionSpy).toHaveBeenCalledWith(false)
+    expect(setHasCustomSelectionSpy).toHaveBeenCalledWith(
+      false,
+      PathType.COMPARISON
+    )
+    expect(setHasCustomSelectionSpy).toHaveBeenCalledWith(
+      false,
+      PathType.TEMPLATE_MULTI
+    )
   })
 
-  it('should set hasCustomSelection to false if there are 20 selected plots', () => {
+  it('should set hasCustomSelection to true if there are unselected plots', () => {
     const model = new PathsModel(
       mockDvcRoot,
       buildMockErrorsModel(),
@@ -552,53 +562,48 @@ describe('PathsModel', () => {
     }
     statuses.push(Status.UNSELECTED)
     jest
-      .spyOn(model, 'getTerminalNodeStatuses')
+      .spyOn(model, 'getTerminalNodeStatusesByType')
       .mockImplementation(() => statuses)
 
     model.checkIfHasPreviousCustomSelection()
-    expect(setHasCustomSelectionSpy).toHaveBeenCalledWith(false)
-  })
-
-  it('should set hasCustomSelection to true if there are more than 20 plots and the number of selected plots is not 20', () => {
-    const model = new PathsModel(
-      mockDvcRoot,
-      buildMockErrorsModel(),
-      buildMockMemento()
+    expect(setHasCustomSelectionSpy).toHaveBeenCalledWith(
+      true,
+      PathType.COMPARISON
     )
-    const setHasCustomSelectionSpy = jest.spyOn(model, 'setHasCustomSelection')
-    const statuses = [Status.UNSELECTED]
-    for (let i = 0; i < 19; i++) {
-      statuses.push(Status.SELECTED)
-    }
-    statuses.push(Status.UNSELECTED)
-    jest
-      .spyOn(model, 'getTerminalNodeStatuses')
-      .mockImplementation(() => statuses)
-
-    model.checkIfHasPreviousCustomSelection()
-    expect(setHasCustomSelectionSpy).toHaveBeenCalledWith(true)
   })
 
-  it('should return false when calling getHasTooManyPlots when there is a custom selection', () => {
+  it('should return false when calling getHasTooManyPlots when there is a custom selection for template plots', () => {
     const model = new PathsModel(
       mockDvcRoot,
       buildMockErrorsModel(),
       buildMockMemento()
     )
 
-    model.setHasCustomSelection(true)
+    model.setHasCustomSelection(true, PathType.TEMPLATE_SINGLE)
 
-    expect(model.getHasTooManyPlots()).toBe(false)
+    expect(model.getHasTooManyPlots([PathType.TEMPLATE_SINGLE])).toBe(false)
   })
 
-  it('should return false when calling getHasTooManyPlots when there is no custom selection and there are fewer than 20 plots', () => {
+  it('should return false when calling getHasTooManyPlots when there is a custom selection for the comparison table', () => {
     const model = new PathsModel(
       mockDvcRoot,
       buildMockErrorsModel(),
       buildMockMemento()
     )
 
-    model.setHasCustomSelection(false)
+    model.setHasCustomSelection(true, PathType.COMPARISON)
+
+    expect(model.getHasTooManyPlots([PathType.COMPARISON])).toBe(false)
+  })
+
+  it('should return false when calling getHasTooManyPlots when there is no custom selection and there are fewer than 20 template plots', () => {
+    const model = new PathsModel(
+      mockDvcRoot,
+      buildMockErrorsModel(),
+      buildMockMemento()
+    )
+
+    model.setHasCustomSelection(false, PathType.TEMPLATE_SINGLE)
 
     const nodes = [{}]
     for (let i = 0; i < 19; i++) {
@@ -609,34 +614,81 @@ describe('PathsModel', () => {
       .spyOn(model, 'getTerminalNodes')
       .mockImplementation(() => nodes as (PlotPath & { selected: boolean })[])
 
-    expect(model.getHasTooManyPlots()).toBe(false)
+    expect(model.getHasTooManyPlots([PathType.TEMPLATE_SINGLE])).toBe(false)
   })
 
-  it('should return true when calling getHasTooManyPlots when there is no custom selection and there are more than 20 plots', () => {
+  it('should return false when calling getHasTooManyPlots when there is no custom selection and there are fewer than 20 comparison rows', () => {
     const model = new PathsModel(
       mockDvcRoot,
       buildMockErrorsModel(),
       buildMockMemento()
     )
 
-    model.setHasCustomSelection(false)
+    model.setHasCustomSelection(false, PathType.COMPARISON)
 
     const nodes = [{}]
+    for (let i = 0; i < 19; i++) {
+      nodes.push({})
+    }
+
+    jest
+      .spyOn(model, 'getTerminalNodes')
+      .mockImplementation(() => nodes as (PlotPath & { selected: boolean })[])
+
+    expect(model.getHasTooManyPlots([PathType.COMPARISON])).toBe(false)
+  })
+
+  it('should return true when calling getHasTooManyPlots when there is no custom selection and there are more than 20 template plots', () => {
+    const model = new PathsModel(
+      mockDvcRoot,
+      buildMockErrorsModel(),
+      buildMockMemento()
+    )
+
+    model.setHasCustomSelection(false, PathType.TEMPLATE_SINGLE)
+
+    const nodes = [{ type: new Set([PathType.TEMPLATE_SINGLE]) }]
     for (let i = 0; i < 20; i++) {
-      nodes.push({})
+      nodes.push({ type: new Set([PathType.TEMPLATE_SINGLE]) })
     }
 
     jest
       .spyOn(model, 'getTerminalNodes')
       .mockImplementation(() => nodes as (PlotPath & { selected: boolean })[])
 
-    expect(model.getHasTooManyPlots()).toBe(true)
+    expect(model.getHasTooManyPlots([PathType.TEMPLATE_SINGLE])).toBe(true)
   })
 
-  it('should set the new statuses on plots to selected for the first 20 plots', () => {
-    const paths = [{ path: '0' }]
+  it('should return true when calling getHasTooManyPlots when there is no custom selection and there are more than 20 comparison rows', () => {
+    const model = new PathsModel(
+      mockDvcRoot,
+      buildMockErrorsModel(),
+      buildMockMemento()
+    )
+
+    model.setHasCustomSelection(false, PathType.COMPARISON)
+
+    const nodes = [{ type: new Set([PathType.COMPARISON]) }]
+    for (let i = 0; i < 20; i++) {
+      nodes.push({ type: new Set([PathType.COMPARISON]) })
+    }
+
+    jest
+      .spyOn(model, 'getTerminalNodes')
+      .mockImplementation(() => nodes as (PlotPath & { selected: boolean })[])
+
+    expect(model.getHasTooManyPlots([PathType.COMPARISON])).toBe(true)
+  })
+
+  it('should set the new statuses on plots to selected for the first 20 template plots', () => {
+    const paths = [{ path: '0', type: new Set([PathType.TEMPLATE_SINGLE]) }]
     for (let i = 1; i < 40; i++) {
-      paths.push({ path: i.toString() })
+      paths.push({
+        path: i.toString(),
+        type: new Set(
+          i === 12 ? [PathType.COMPARISON] : [PathType.TEMPLATE_SINGLE]
+        )
+      })
     }
 
     const model = new PathsModel(
@@ -648,16 +700,47 @@ describe('PathsModel', () => {
 
     modelAsAny.setNewStatuses(paths)
 
-    const selected = Object.values(modelAsAny.status).filter(
-      s => s === Status.SELECTED
+    const selected = Object.entries(modelAsAny.status).filter(
+      ([key, value]) => value === Status.SELECTED && key !== '12'
+    )
+    expect(selected).toHaveLength(20)
+  })
+
+  it('should set the new statuses on plots to selected for the first 20 comparison rows', () => {
+    const paths = [{ path: '0', type: new Set([PathType.COMPARISON]) }]
+    for (let i = 1; i < 40; i++) {
+      paths.push({
+        path: i.toString(),
+        type: new Set(
+          i === 4 ? [PathType.TEMPLATE_MULTI] : [PathType.COMPARISON]
+        )
+      })
+    }
+
+    const model = new PathsModel(
+      mockDvcRoot,
+      buildMockErrorsModel(),
+      buildMockMemento()
+    )
+    const modelAsAny = getModelAsAny(model)
+
+    modelAsAny.setNewStatuses(paths)
+
+    const selected = Object.entries(modelAsAny.status).filter(
+      ([key, value]) => value === Status.SELECTED && key !== '4'
     )
     expect(selected).toHaveLength(20)
   })
 
   it('should set the new statuses on plots to selected for up to 20 plots', () => {
-    const paths = [{ path: 'a' }, { path: 'b' }, { path: 'c' }]
+    const type = new Set([PathType.COMPARISON])
+    const paths = [
+      { path: 'a', type },
+      { path: 'b', type },
+      { path: 'c', type }
+    ]
     for (let i = 0; i < 40; i++) {
-      paths.push({ path: i.toString() })
+      paths.push({ path: i.toString(), type })
     }
 
     const model = new PathsModel(
@@ -682,11 +765,13 @@ describe('PathsModel', () => {
   })
 
   it('should not count the parent paths inside the 20 plots limit', () => {
-    const paths = [{ hasChildren: true, path: '0' }]
+    const type = new Set([PathType.COMPARISON])
+    const paths = [{ hasChildren: true, path: '0', type }]
     for (let i = 1; i < 40; i++) {
       paths.push({
         hasChildren: false,
-        path: i.toString()
+        path: i.toString(),
+        type
       })
     }
     const model = new PathsModel(
@@ -702,10 +787,20 @@ describe('PathsModel', () => {
   })
 
   it('should correctly set the status of the parent paths', () => {
-    const paths: { path: string; hasChildren: boolean; parentPath?: string }[] =
-      [{ hasChildren: true, path: '0' }]
+    const type = new Set([PathType.COMPARISON])
+    const paths: {
+      path: string
+      hasChildren: boolean
+      parentPath?: string
+      type: Set<PathType>
+    }[] = [{ hasChildren: true, path: '0', type }]
     for (let i = 1; i < 40; i++) {
-      paths.push({ hasChildren: false, parentPath: '0', path: i.toString() })
+      paths.push({
+        hasChildren: false,
+        parentPath: '0',
+        path: i.toString(),
+        type
+      })
     }
     const model = new PathsModel(
       mockDvcRoot,

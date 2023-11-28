@@ -3087,7 +3087,8 @@ describe('App', () => {
     describe('Too many plots message', () => {
       it('should not display a message that only 20 plots are shown if shouldShowTooManyPlotsMessage is false', () => {
         renderAppWithOptionalData({
-          shouldShowTooManyPlotsMessage: false,
+          shouldShowTooManyComparisonImagesMessage: false,
+          shouldShowTooManyTemplatePlotsMessage: false,
           template: templatePlotsFixture
         })
 
@@ -3096,10 +3097,19 @@ describe('App', () => {
         ).not.toBeInTheDocument()
       })
 
-      it('should display a message that only 20 plots are shown if shouldShowTooManyPlotsMessage is true', () => {
+      it('should display a message that only 20 plots are shown for template plots if shouldShowTooManyTemplatePlotsMessage is true', () => {
         renderAppWithOptionalData({
-          shouldShowTooManyPlotsMessage: true,
+          shouldShowTooManyTemplatePlotsMessage: true,
           template: templatePlotsFixture
+        })
+
+        expect(screen.getByTestId('too-many-plots-message')).toBeInTheDocument()
+      })
+
+      it('should display a message that only 20 plots are shown for the comparison table if shouldShowTooManyComparisonImagesMessage is true', () => {
+        renderAppWithOptionalData({
+          comparison: comparisonTableFixture,
+          shouldShowTooManyComparisonImagesMessage: true
         })
 
         expect(screen.getByTestId('too-many-plots-message')).toBeInTheDocument()

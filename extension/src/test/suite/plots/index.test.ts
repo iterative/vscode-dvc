@@ -60,11 +60,6 @@ import { PlotPath } from '../../../plots/paths/collect'
 suite('Plots Test Suite', () => {
   const disposable = Disposable.fn()
 
-  const createTerminalNodesArray = (length: number) =>
-    Array.from({ length }, i => ({ path: i })) as unknown as (PlotPath & {
-      selected: boolean
-    })[]
-
   beforeEach(() => {
     restore()
   })
@@ -1311,7 +1306,7 @@ suite('Plots Test Suite', () => {
       ).to.deep.equal(new Set([]))
     })
 
-    it('should togglePathStatus to true when calling selectPlots with more than 20 plots', async () => {
+    it('should set has custom selection to true when calling selectPlots', async () => {
       const { plots, pathsModel } = await buildPlotsWebview({
         disposer: disposable,
         plotsDiff: plotsDiffFixture
@@ -1319,26 +1314,16 @@ suite('Plots Test Suite', () => {
       const mockSetCustomSelection = stub(pathsModel, 'setHasCustomSelection')
       stub(pathsModel, 'setTemplateOrder')
       stub(pathsModel, 'toggleStatus')
-      stub(pathsModel, 'getTerminalNodes').returns(createTerminalNodesArray(32))
+      const terminalNodes = Array.from({ length: 32 }, i => ({
+        path: i
+      })) as unknown as (PlotPath & {
+        selected: boolean
+      })[]
+      stub(pathsModel, 'getTerminalNodes').returns(terminalNodes)
 
       plots.togglePathStatus(dvcDemoPath)
 
       expect(mockSetCustomSelection).to.be.calledWith(true)
-    })
-
-    it('should togglePathStatus to false when calling selectPlots with 20 plots or less', async () => {
-      const { plots, pathsModel } = await buildPlotsWebview({
-        disposer: disposable,
-        plotsDiff: plotsDiffFixture
-      })
-      const mockSetCustomSelection = stub(pathsModel, 'setHasCustomSelection')
-      stub(pathsModel, 'setTemplateOrder')
-      stub(pathsModel, 'toggleStatus')
-      stub(pathsModel, 'getTerminalNodes').returns(createTerminalNodesArray(20))
-
-      plots.togglePathStatus(dvcDemoPath)
-
-      expect(mockSetCustomSelection).to.be.calledWith(false)
     })
   })
 })

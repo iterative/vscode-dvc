@@ -6,7 +6,11 @@ import { PlotsData } from './data'
 import { ErrorsModel } from './errors/model'
 import { PlotsModel } from './model'
 import { ensurePlotsDataPathsOsSep } from './util'
-import { collectEncodingElements, collectScale } from './paths/collect'
+import {
+  PathType,
+  collectEncodingElements,
+  collectScale
+} from './paths/collect'
 import { PathsModel } from './paths/model'
 import { pickCustomPlots, pickMetricAndParam } from './model/quickPick'
 import { ViewKey } from '../webview/constants'
@@ -91,7 +95,9 @@ export class Plots extends BaseRepository<TPlotsData> {
     const status = this.paths.toggleStatus(path)
     this.paths.setTemplateOrder()
     this.notifyChanged()
-    this.setHasCustomSelection()
+
+    const type = this.paths.getNode(path)?.type
+    this.setHasCustomSelection(type)
     return status
   }
 
@@ -105,7 +111,7 @@ export class Plots extends BaseRepository<TPlotsData> {
 
     this.paths.setSelected(selected)
     this.paths.setTemplateOrder()
-    this.setHasCustomSelection()
+    this.setHasCustomSelection(undefined)
     return this.notifyChanged()
   }
 
@@ -172,8 +178,18 @@ export class Plots extends BaseRepository<TPlotsData> {
     return this.sendPlots()
   }
 
-  private setHasCustomSelection() {
-    this.paths.setHasCustomSelection(this.paths.getTerminalNodes().length > 20)
+  private setHasCustomSelection(types: Set<PathType> | undefined) {
+    if (!types || types.has(PathType.COMPARISON)) {
+      this.paths.setHasCustomSelection(true, PathType.COMPARISON)
+    }
+
+    if (
+      !types ||
+      types.has(PathType.TEMPLATE_SINGLE) ||
+      types.has(PathType.TEMPLATE_MULTI)
+    ) {
+      this.paths.setHasCustomSelection(true, PathType.TEMPLATE_SINGLE)
+    }
   }
 
   private notifyChanged() {
@@ -230,7 +246,7 @@ export class Plots extends BaseRepository<TPlotsData> {
       experiments,
       () => this.getWebview(),
       () => this.selectPlots(),
-      () => this.paths.getHasTooManyPlots()
+      (types: PathType[]) => this.paths.getHasTooManyPlots(types)
     )
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message =>
