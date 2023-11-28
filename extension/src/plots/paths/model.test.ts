@@ -522,7 +522,7 @@ describe('PathsModel', () => {
     expect(setHasCustomSelectionSpy).not.toHaveBeenCalled()
   })
 
-  it('should set hasCustomSelection to false if there are less than 20 plots', () => {
+  it('should set hasCustomSelection to false if there are no unselected plots', () => {
     const model = new PathsModel(
       mockDvcRoot,
       buildMockErrorsModel(),
@@ -549,7 +549,7 @@ describe('PathsModel', () => {
     )
   })
 
-  it('should set hasCustomSelection to false if there are 20 selected plots', () => {
+  it('should set hasCustomSelection to true if there are unselected plots', () => {
     const model = new PathsModel(
       mockDvcRoot,
       buildMockErrorsModel(),
@@ -567,35 +567,8 @@ describe('PathsModel', () => {
 
     model.checkIfHasPreviousCustomSelection()
     expect(setHasCustomSelectionSpy).toHaveBeenCalledWith(
-      false,
-      PathType.COMPARISON
-    )
-  })
-
-  it('should set hasCustomSelection to true if there are more than 20 plots and the number of selected plots is not 20', () => {
-    const model = new PathsModel(
-      mockDvcRoot,
-      buildMockErrorsModel(),
-      buildMockMemento()
-    )
-    const setHasCustomSelectionSpy = jest.spyOn(model, 'setHasCustomSelection')
-    const statuses = [Status.UNSELECTED]
-    for (let i = 0; i < 19; i++) {
-      statuses.push(Status.SELECTED)
-    }
-    statuses.push(Status.UNSELECTED)
-    jest
-      .spyOn(model, 'getTerminalNodeStatusesByType')
-      .mockImplementation(() => statuses)
-
-    model.checkIfHasPreviousCustomSelection()
-    expect(setHasCustomSelectionSpy).toHaveBeenCalledWith(
       true,
       PathType.COMPARISON
-    )
-    expect(setHasCustomSelectionSpy).toHaveBeenCalledWith(
-      true,
-      PathType.TEMPLATE_MULTI
     )
   })
 

@@ -233,15 +233,10 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
   }
 
   private setPreviousCustomSelection(statuses: Status[], type: PathType) {
-    const plotsLength = statuses.length
+    const hasCustomSelection = statuses.some(
+      nodeStatus => nodeStatus !== Status.UNSELECTED || nodeStatus !== undefined
+    )
 
-    const hasCustomSelection =
-      plotsLength > 20
-        ? plotsLength -
-            statuses.filter(nodeStatus => nodeStatus !== Status.SELECTED)
-              .length !==
-          20
-        : false
     this.setHasCustomSelection(hasCustomSelection, type)
   }
 

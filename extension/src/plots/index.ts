@@ -180,13 +180,7 @@ export class Plots extends BaseRepository<TPlotsData> {
 
   private setHasCustomSelection(types: Set<PathType> | undefined) {
     if (!types || types.has(PathType.COMPARISON)) {
-      const comparisonNodes = this.paths.getTerminalNodesByType(
-        PathType.COMPARISON
-      )
-      this.paths.setHasCustomSelection(
-        comparisonNodes.length > 20,
-        PathType.COMPARISON
-      )
+      this.paths.setHasCustomSelection(true, PathType.COMPARISON)
     }
 
     if (
@@ -194,15 +188,7 @@ export class Plots extends BaseRepository<TPlotsData> {
       types.has(PathType.TEMPLATE_SINGLE) ||
       types.has(PathType.TEMPLATE_MULTI)
     ) {
-      const templateNodes = [
-        ...this.paths.getTerminalNodesByType(PathType.TEMPLATE_SINGLE),
-        ...this.paths.getTerminalNodesByType(PathType.TEMPLATE_MULTI)
-      ]
-
-      this.paths.setHasCustomSelection(
-        templateNodes.length > 20,
-        PathType.TEMPLATE_SINGLE
-      )
+      this.paths.setHasCustomSelection(true, PathType.TEMPLATE_SINGLE)
     }
   }
 
