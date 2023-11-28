@@ -1,12 +1,12 @@
 import cx from 'classnames'
 import React, { useEffect, DetailedHTMLProps, HTMLAttributes } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { PlotHeight, PlotsSection } from 'dvc/src/plots/webview/contract'
 import styles from './styles.module.scss'
 import { SizeSliders } from './SizeSliders'
-import { isDragAndDropModeSelector } from './util'
+import { clearStateActions, isDragAndDropModeSelector } from './util'
 import { PlotsState } from '../store'
-import { togglePlotsSection } from '../util/messages'
+import { refreshSection, togglePlotsSection } from '../util/messages'
 import { IconMenuItemProps } from '../../shared/components/iconMenu/IconMenuItem'
 import { Trash } from '../../shared/components/icons'
 import { SectionContainer } from '../../shared/components/sectionContainer/SectionContainer'
@@ -34,6 +34,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   hasItems,
   noHeight
 }) => {
+  const dispatch = useDispatch()
   const open = !sectionCollapsed
   const maxNbPlotsPerRow = useSelector(
     (state: PlotsState) => state.webview.maxNbPlotsPerRow
@@ -57,7 +58,14 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
     })
   }
 
-  const toggleSection = () => togglePlotsSection(sectionKey, sectionCollapsed)
+  const toggleSection = (open: boolean) => {
+    togglePlotsSection(sectionKey, sectionCollapsed)
+
+    if (!open) {
+      dispatch(clearStateActions[sectionKey]())
+      refreshSection(sectionKey)
+    }
+  }
 
   return (
     <SectionContainer

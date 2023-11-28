@@ -533,6 +533,60 @@ suite('Plots Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
+    it('should handle refresh plots message from the webview for the template plots', async () => {
+      const { mockMessageReceived, messageSpy } = await buildPlotsWebview({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
+
+      messageSpy.resetHistory()
+      mockMessageReceived.fire({
+        payload: PlotsSection.TEMPLATE_PLOTS,
+        type: MessageFromWebviewType.REFRESH_PLOTS
+      })
+
+      expect(messageSpy).to.be.calledOnce
+      expect(messageSpy).to.be.calledWithExactly({
+        template: templatePlotsFixture
+      })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle refresh plots message from the webview for the custom plots', async () => {
+      const { mockMessageReceived, messageSpy } = await buildPlotsWebview({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
+
+      messageSpy.resetHistory()
+      mockMessageReceived.fire({
+        payload: PlotsSection.CUSTOM_PLOTS,
+        type: MessageFromWebviewType.REFRESH_PLOTS
+      })
+
+      expect(messageSpy).to.be.calledOnce
+      expect(messageSpy).to.be.calledWithExactly({
+        custom: customPlotsFixture
+      })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle refresh plots message from the webview for the comparison table', async () => {
+      const { mockMessageReceived, messageSpy } = await buildPlotsWebview({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
+
+      messageSpy.resetHistory()
+      mockMessageReceived.fire({
+        payload: PlotsSection.COMPARISON_TABLE,
+        type: MessageFromWebviewType.REFRESH_PLOTS
+      })
+
+      expect(messageSpy).to.be.calledOnce
+      expect(messageSpy).to.be.calledWithExactly({
+        comparison: comparisonPlotsFixture
+      })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
     it('should open an image when receiving a plot zoomed message from the webview with a payload', async () => {
       const { webview, mockMessageReceived } = await buildPlotsWebview({
         disposer: disposable,

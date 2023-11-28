@@ -47,6 +47,9 @@ export const comparisonTableSlice = createSlice({
     ) => {
       state.width = action.payload.nbItemsPerRowOrWidth
     },
+    clearState: () => {
+      return comparisonTableInitialState
+    },
     setCollapsed: (state, action: PayloadAction<boolean>) => {
       state.isCollapsed = action.payload
     },
@@ -72,7 +75,8 @@ export const {
   changeSize,
   changeDisabledDragIds,
   changeRowHeight,
-  toggleDragAndDropMode
+  toggleDragAndDropMode,
+  clearState
 } = comparisonTableSlice.actions
 
 export default comparisonTableSlice.reducer
