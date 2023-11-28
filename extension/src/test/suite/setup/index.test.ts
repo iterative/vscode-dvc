@@ -17,7 +17,8 @@ import {
   closeAllEditors,
   getMessageReceivedEmitter,
   quickPickInitialized,
-  selectQuickPickItem
+  selectQuickPickItem,
+  waitForSpyCall
 } from '../util'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
 import { MessageFromWebviewType } from '../../../webview/contract'
@@ -53,6 +54,7 @@ import { DvcConfig } from '../../../cli/dvc/config'
 import * as QuickPickUtil from '../../../setup/quickPick'
 import { EventName } from '../../../telemetry/constants'
 import { Modal } from '../../../vscode/modal'
+import { Toast } from '../../../vscode/toast'
 
 suite('Setup Test Suite', () => {
   const disposable = Disposable.fn()
@@ -923,22 +925,18 @@ suite('Setup Test Suite', () => {
         `${mockStudioRes.verification_uri}?redirect_uri=${mockCallbackUrl}&code=${mockStudioRes.user_code}`
       )
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const mockGetCwd = stub(studio as any, 'getCwd')
       const mockModalShowError = stub(Modal, 'errorWithOptions')
       const mockSaveStudioToken = stub(studio, 'saveStudioAccessTokenInConfig')
+      const showProgressSpy = spy(Toast, 'showProgress')
+      const reportProgressErrorSpy = spy(Toast, 'reportProgressError')
+      const delayProgressClosingSpy = spy(Toast, 'delayProgressClosing')
       mockFetch.onSecondCall().resolves({
         json: () =>
           Promise.resolve({ detail: 'Request failed for some reason.' }),
         status: 500
       } as Fetch.Response)
 
-      const failedTokenEvent = new Promise(resolve =>
-        mockGetCwd.onFirstCall().callsFake(() => {
-          resolve(undefined)
-          return dvcDemoPath
-        })
-      )
+      const failedTokenEvent = waitForSpyCall(delayProgressClosingSpy, 0)
 
       mockOnStudioResponse()
 
@@ -958,6 +956,8 @@ suite('Setup Test Suite', () => {
       expect(mockModalShowError).to.be.calledWithExactly(
         'Unable to get token. Failed with "Request failed for some reason."'
       )
+      expect(showProgressSpy).to.be.calledOnce
+      expect(reportProgressErrorSpy).to.be.calledOnce
       expect(mockSaveStudioToken).not.to.be.called
 
       const mockToken = 'isat_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
@@ -965,12 +965,7 @@ suite('Setup Test Suite', () => {
         json: () => Promise.resolve({ access_token: mockToken }),
         status: 200
       } as Fetch.Response)
-      const tokenEvent = new Promise(resolve =>
-        mockGetCwd.onSecondCall().callsFake(() => {
-          resolve(undefined)
-          return dvcDemoPath
-        })
-      )
+      const tokenEvent = waitForSpyCall(delayProgressClosingSpy, 1)
 
       mockOnStudioResponse()
 
@@ -982,6 +977,9 @@ suite('Setup Test Suite', () => {
         dvcDemoPath,
         mockToken
       )
+      expect(showProgressSpy).to.be.calledTwice
+      expect(reportProgressErrorSpy).not.to.be.calledTwice
+      expect(delayProgressClosingSpy).to.be.calledTwice
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it("should handle a message from the webview to manually save the user's Studio access token", async () => {

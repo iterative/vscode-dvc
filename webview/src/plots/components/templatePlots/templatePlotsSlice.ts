@@ -49,6 +49,10 @@ export const templatePlotsSlice = createSlice({
       state.nbItemsPerRow = action.payload.nbItemsPerRowOrWidth
       state.height = action.payload.height
     },
+    clearState: () => {
+      removePlots([], PlotsSection.TEMPLATE_PLOTS)
+      return templatePlotsInitialState
+    },
     setCollapsed: (state, action: PayloadAction<boolean>) => {
       state.isCollapsed = action.payload
     },
@@ -108,6 +112,7 @@ export const {
   toggleDragAndDropMode,
   updateSections,
   updateShouldShowTooManyPlotsMessage
+  clearState
 } = templatePlotsSlice.actions
 
 export default templatePlotsSlice.reducer
