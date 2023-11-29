@@ -191,6 +191,7 @@ describe('Plots Webview', function () {
 describe('Source Control View', function () {
   // eslint-disable-next-line sonarjs/cognitive-complexity
   it('should show the expected changes after running an experiment', async function () {
+    this.timeout(80000)
     const expectedScmItemLabels = [
       'hist.csv',
       'model.pt',
@@ -236,7 +237,7 @@ describe('Source Control View', function () {
       },
       {
         interval: 5000,
-        timeout: 80000
+        timeout: 60000
       }
     )
 
