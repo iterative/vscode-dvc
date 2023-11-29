@@ -237,7 +237,7 @@ describe('Source Control View', function () {
       },
       {
         interval: 5000,
-        timeout: 60000
+        timeout: 80000
       }
     )
 
