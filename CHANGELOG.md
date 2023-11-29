@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.16] - 2023-11-29
+
+### 🚀 New Features and Enhancements
+
+- Add drag and drop mode to comparison table headers [#5017](https://github.com/iterative/vscode-dvc/pull/5017) by [@sroy3](https://github.com/sroy3)
+- Add progress indicator when fetching a studio token [#5000](https://github.com/iterative/vscode-dvc/pull/5000) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Update latest tested cli version [#5016](https://github.com/iterative/vscode-dvc/pull/5016) by [@sroy3](https://github.com/sroy3)
+- Do not render section if it is not open [#5025](https://github.com/iterative/vscode-dvc/pull/5025) by [@sroy3](https://github.com/sroy3)
+
 ## [1.1.15] - 2023-11-20
 
 ### 🚀 New Features and Enhancements
