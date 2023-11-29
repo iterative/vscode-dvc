@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.17] - 2023-11-29
+
+### 🐛 Bug Fixes
+
+- Collect columns from experiments under baseline with error [#5041](https://github.com/iterative/vscode-dvc/pull/5041) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.1.16] - 2023-11-29
 
 ### 🚀 New Features and Enhancements
