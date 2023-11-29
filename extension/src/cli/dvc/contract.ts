@@ -84,7 +84,7 @@ export type ExpData = {
   metrics: MetricsOrParams | null
   deps: Deps | null
   outs: Outs | null
-  meta: { has_checkpoints: boolean }
+  meta: { has_checkpoints?: boolean }
 }
 
 export enum Executor {
