@@ -83,7 +83,7 @@ export const {
   changeSize,
   changeDisabledDragIds,
   changeRowHeight,
-  updateShouldShowTooManyPlotsMessage
+  updateShouldShowTooManyPlotsMessage,
   toggleDragAndDropMode,
   clearState
 } = comparisonTableSlice.actions

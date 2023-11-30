@@ -111,7 +111,7 @@ export const {
   changeSize,
   toggleDragAndDropMode,
   updateSections,
-  updateShouldShowTooManyPlotsMessage
+  updateShouldShowTooManyPlotsMessage,
   clearState
 } = templatePlotsSlice.actions
 
