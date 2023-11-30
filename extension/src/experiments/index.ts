@@ -481,10 +481,7 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public getWorkspaceAndCommits() {
-    if (
-      !this.experiments.getCliError() &&
-      !this.columns.hasNonDefaultColumns()
-    ) {
+    if (!this.experiments.hasData(this.columns.hasNonDefaultColumns())) {
       return []
     }
 
@@ -496,7 +493,7 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public getSelectedRevisions() {
-    if (!this.columns.hasNonDefaultColumns()) {
+    if (!this.experiments.hasData(this.columns.hasNonDefaultColumns())) {
       return []
     }
 
@@ -603,7 +600,7 @@ export class Experiments extends BaseRepository<TableData> {
     if (this.deferred.state === 'none') {
       return
     }
-    return this.columns.hasNonDefaultColumns()
+    return this.experiments.hasData(this.columns.hasNonDefaultColumns())
   }
 
   public getRelativeMetricsFiles() {

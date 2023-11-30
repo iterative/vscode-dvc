@@ -73,9 +73,9 @@ describe('collectColumns', () => {
     expect(metrics).toBeDefined()
   })
 
-  it('should return an empty array if no params and metrics are provided', async () => {
+  it('should return the timestamp column if no params, metrics or deps are provided', async () => {
     const columns = await collectColumns(generateTestExpShowOutput({}))
-    expect(columns).toStrictEqual([])
+    expect(columns).toStrictEqual([timestampColumn])
   })
 
   it('should aggregate multiple different field names', async () => {
