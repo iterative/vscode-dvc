@@ -873,6 +873,7 @@ suite('Setup Test Suite', () => {
       const mockGetCallbackUrl = stub(ExternalUtil, 'getCallBackUrl')
       const mockOpenUrl = stub(ExternalUtil, 'openUrl')
       const mockWaitForUriRes = stub(ExternalUtil, 'waitForUriResponse')
+      const mockUriHandlerDispose = stub()
       const mockStudioRes = {
         device_code: 'Yi-NPd9ggvNUDBcam5bP8iivbtLhnqVgM_lSSbilqNw',
         token_uri: 'https://studio.iterative.ai/api/device-login/token',
@@ -890,6 +891,7 @@ suite('Setup Test Suite', () => {
         resolve =>
           mockWaitForUriRes.onFirstCall().callsFake((_, onResponse) => {
             resolve(onResponse)
+            return { dispose: mockUriHandlerDispose }
           })
       )
 
@@ -942,6 +944,7 @@ suite('Setup Test Suite', () => {
 
       await failedTokenEvent
 
+      expect(mockUriHandlerDispose).to.be.calledOnce
       expect(mockFetch).to.be.calledTwice
       expect(mockFetch).to.be.calledWithExactly(mockStudioRes.token_uri, {
         body: JSON.stringify({
@@ -971,6 +974,7 @@ suite('Setup Test Suite', () => {
 
       await tokenEvent
 
+      expect(mockUriHandlerDispose).to.be.calledTwice
       expect(mockFetch).to.be.calledThrice
       expect(mockSaveStudioToken).to.be.calledOnce
       expect(mockSaveStudioToken).to.be.calledWithExactly(
