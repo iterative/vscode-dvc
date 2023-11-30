@@ -40,8 +40,15 @@ import {
   TemplatePlotsById
 } from './plotDataStore'
 import { setMaxNbPlotsPerRow } from './webviewSlice'
-import { toggleDragAndDropMode as toggleTemplatePlotsDragAndDropMode } from './templatePlots/templatePlotsSlice'
-import { toggleDragAndDropMode as toggleCustomPlotsDragAndDropMode } from './customPlots/customPlotsSlice'
+import {
+  templatePlotsInitialState,
+  toggleDragAndDropMode as toggleTemplatePlotsDragAndDropMode
+} from './templatePlots/templatePlotsSlice'
+import {
+  customPlotsInitialState,
+  toggleDragAndDropMode as toggleCustomPlotsDragAndDropMode
+} from './customPlots/customPlotsSlice'
+import { comparisonTableInitialState } from './comparisonTable/comparisonTableSlice'
 import { plotsReducers, plotsStore } from '../store'
 import { vsCodeApi } from '../../shared/api'
 import {
@@ -695,42 +702,6 @@ describe('App', () => {
     expect(screen.queryByText('Images')).not.toBeInTheDocument()
   })
 
-  it('should hide plots when their section is collapsed (setting to null can break some Vega plots)', async () => {
-    renderAppWithOptionalData({
-      custom: customPlotsFixture
-    })
-
-    const summaryElement = await screen.findByText('Custom')
-    const visiblePlots = await screen.findAllByLabelText('Vega visualization')
-    for (const visiblePlot of visiblePlots) {
-      expect(visiblePlot).toBeInTheDocument()
-      expect(visiblePlot).toBeVisible()
-    }
-
-    fireEvent.click(summaryElement, {
-      bubbles: true,
-      cancelable: true
-    })
-
-    expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: { [PlotsSection.CUSTOM_PLOTS]: true },
-      type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
-    })
-
-    sendSetDataMessage({
-      sectionCollapsed: {
-        ...DEFAULT_SECTION_COLLAPSED,
-        [PlotsSection.CUSTOM_PLOTS]: true
-      }
-    })
-
-    const hiddenPlots = await screen.findAllByLabelText('Vega visualization')
-    for (const hiddenPlot of hiddenPlots) {
-      expect(hiddenPlot).toBeInTheDocument()
-      expect(hiddenPlot).not.toBeVisible()
-    }
-  })
-
   it('should not toggle the custom plots section when its header is clicked and its title is selected', async () => {
     renderAppWithOptionalData({
       custom: customPlotsFixture
@@ -843,6 +814,95 @@ describe('App', () => {
     expect(mockPostMessage).toHaveBeenCalledWith({
       payload: { [PlotsSection.CUSTOM_PLOTS]: true },
       type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
+    })
+  })
+
+  it('should clear the template plots state when closing the section', () => {
+    const store = renderAppWithOptionalData({
+      template: templatePlotsFixture
+    })
+
+    const toggle = within(
+      screen.getByTestId(`${PlotsSection.TEMPLATE_PLOTS}-section-details`)
+    ).getAllByRole('button')[0]
+    fireEvent.click(toggle)
+
+    expect(store.getState().template).toMatchObject(templatePlotsInitialState)
+  })
+
+  it('should clear the custom plots state when closing the section', () => {
+    const store = renderAppWithOptionalData({
+      custom: customPlotsFixture
+    })
+
+    const toggle = within(
+      screen.getByTestId(`${PlotsSection.CUSTOM_PLOTS}-section-details`)
+    ).getAllByRole('button')[0]
+    fireEvent.click(toggle)
+
+    expect(store.getState().custom).toMatchObject(customPlotsInitialState)
+  })
+
+  it('should clear the comparison table state when closing the section', () => {
+    const store = renderAppWithOptionalData({
+      comparison: comparisonTableFixture
+    })
+
+    const toggle = within(
+      screen.getByTestId(`${PlotsSection.COMPARISON_TABLE}-section-details`)
+    ).getAllByRole('button')[0]
+    fireEvent.click(toggle)
+
+    expect(store.getState().comparison).toMatchObject(
+      comparisonTableInitialState
+    )
+  })
+
+  it('should send a message to refresh the template plots when closing the section', () => {
+    renderAppWithOptionalData({
+      template: templatePlotsFixture
+    })
+
+    const toggle = within(
+      screen.getByTestId(`${PlotsSection.TEMPLATE_PLOTS}-section-details`)
+    ).getAllByRole('button')[0]
+    fireEvent.click(toggle)
+
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      payload: PlotsSection.TEMPLATE_PLOTS,
+      type: MessageFromWebviewType.REFRESH_PLOTS
+    })
+  })
+
+  it('should send a message to refresh the custom plots when closing the section', () => {
+    renderAppWithOptionalData({
+      custom: customPlotsFixture
+    })
+
+    const toggle = within(
+      screen.getByTestId(`${PlotsSection.CUSTOM_PLOTS}-section-details`)
+    ).getAllByRole('button')[0]
+    fireEvent.click(toggle)
+
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      payload: PlotsSection.CUSTOM_PLOTS,
+      type: MessageFromWebviewType.REFRESH_PLOTS
+    })
+  })
+
+  it('should send a message to refresh the comparison table when closing the section', () => {
+    renderAppWithOptionalData({
+      comparison: comparisonTableFixture
+    })
+
+    const toggle = within(
+      screen.getByTestId(`${PlotsSection.COMPARISON_TABLE}-section-details`)
+    ).getAllByRole('button')[0]
+    fireEvent.click(toggle)
+
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      payload: PlotsSection.COMPARISON_TABLE,
+      type: MessageFromWebviewType.REFRESH_PLOTS
     })
   })
 

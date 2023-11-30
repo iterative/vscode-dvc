@@ -8,6 +8,7 @@ import { ContextKey, setContextValue } from '../vscode/context'
 import { Disposable } from '../class/dispose'
 import { getCallBackUrl, openUrl, waitForUriResponse } from '../vscode/external'
 import { Modal } from '../vscode/modal'
+import { Toast } from '../vscode/toast'
 
 export const isStudioAccessToken = (text?: string): boolean => {
   if (!text) {
@@ -86,7 +87,7 @@ export class Studio extends Disposable {
     const storedToken = this.getStudioAccessToken()
     const isConnected = isStudioAccessToken(storedToken)
     this.studioIsConnected = isConnected
-    return setContextValue(ContextKey.STUDIO_CONNECTED, isConnected)
+    await setContextValue(ContextKey.STUDIO_CONNECTED, isConnected)
   }
 
   public async updateStudioOffline(shareLive: boolean) {
@@ -169,15 +170,27 @@ export class Studio extends Disposable {
     return accessToken
   }
 
-  private async requestStudioToken(deviceCode: string, tokenUri: string) {
-    const token = await this.fetchStudioToken(deviceCode, tokenUri)
-    const cwd = this.getCwd()
+  private requestStudioToken(deviceCode: string, tokenUri: string) {
+    return Toast.showProgress('Connecting to Studio', async progress => {
+      progress.report({ increment: 0 })
+      progress.report({ increment: 25, message: 'Fetching token...' })
+      const token = await this.fetchStudioToken(deviceCode, tokenUri)
+      const cwd = this.getCwd()
 
-    if (!token || !cwd) {
-      return
-    }
+      if (!token || !cwd) {
+        const error = new Error('Connection failed')
+        return Toast.reportProgressError(error, progress)
+      }
 
-    return this.saveStudioAccessTokenInConfig(cwd, token)
+      await this.saveStudioAccessTokenInConfig(cwd, token)
+
+      progress.report({
+        increment: 75,
+        message: 'Token saved'
+      })
+
+      return Toast.delayProgressClosing(15000)
+    })
   }
 
   private async setStudioValues() {

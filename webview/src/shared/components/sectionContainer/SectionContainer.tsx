@@ -16,7 +16,7 @@ interface SectionContainerProps<T extends PlotsSection | SetupSection> {
   children: ReactNode
   menuItems?: IconMenuItemProps[]
   headerChildren?: ReactNode
-  onToggleSection: () => void
+  onToggleSection: (open: boolean) => void
   sectionCollapsed: boolean
   sectionKey: T
   title: string
@@ -57,7 +57,7 @@ export const SectionContainer: React.FC<
       !isSelecting(tooltipTexts) &&
       !isTooltip(e.target as Element, ['SUMMARY', 'BODY'])
     ) {
-      onToggleSection()
+      onToggleSection(!open)
     }
   }
 
@@ -75,7 +75,7 @@ export const SectionContainer: React.FC<
           onClick={toggleSection}
           onKeyDown={event => {
             if (event.key === 'Enter') {
-              onToggleSection()
+              onToggleSection(!open)
             }
           }}
           tabIndex={0}
@@ -106,7 +106,7 @@ export const SectionContainer: React.FC<
             </div>
           )}
         </summary>
-        <div className={styles.insideSection}>{children}</div>
+        {open && <div className={styles.insideSection}>{children}</div>}
       </details>
     </div>
   )
