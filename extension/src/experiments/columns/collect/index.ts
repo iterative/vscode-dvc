@@ -63,14 +63,11 @@ export const collectColumns = async (
 
   const promises = []
   for (const expState of output) {
-    if (experimentHasError(expState)) {
-      continue
+    if (!experimentHasError(expState)) {
+      promises.push(collectFromExperiment(acc, expState))
     }
 
-    promises.push(
-      collectFromExperiment(acc, expState),
-      collectFromExperiments(acc, expState.experiments)
-    )
+    promises.push(collectFromExperiments(acc, expState.experiments))
   }
   await Promise.all(promises)
 
