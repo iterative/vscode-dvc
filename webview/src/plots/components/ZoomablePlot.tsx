@@ -1,13 +1,11 @@
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import React, { useRef } from 'react'
 import { useDispatch } from 'react-redux'
-import { VisualizationSpec } from 'react-vega'
 import { ExtendedVegaLite } from './vegaLite/ExtendedVegaLite'
 import { setZoomedInPlot } from './webviewSlice'
 import styles from './styles.module.scss'
 import { changeDragAndDropMode } from './util'
 import { zoomPlot } from '../util/messages'
-import { useGetPlot } from '../hooks/useGetPlot'
 import { Ellipsis } from '../../shared/components/icons'
 import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
 
@@ -24,20 +22,14 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
   onViewReady,
   section
 }) => {
-  const spec = useGetPlot(section, id)
-  const dispatch = useDispatch()
-  const currentSpec = useRef<VisualizationSpec>()
+  const plotRef = useRef<HTMLButtonElement>(null)
 
-  currentSpec.current = spec
+  const dispatch = useDispatch()
 
   const handleOnClick = (openActionsMenu?: boolean) => {
     zoomPlot()
 
     return dispatch(setZoomedInPlot({ id, openActionsMenu, section }))
-  }
-
-  if (!spec) {
-    return null
   }
 
   const onNewView = () => {
@@ -48,6 +40,7 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
 
   return (
     <button
+      ref={plotRef}
       className={styles.zoomablePlot}
       onClick={() => handleOnClick()}
       aria-label="Open Plot in Popup"
@@ -78,14 +71,13 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
       >
         <Ellipsis />
       </span>
-      {currentSpec.current && (
-        <ExtendedVegaLite
-          id={id}
-          onNewView={onNewView}
-          spec={spec}
-          actions={false}
-        />
-      )}
+      <ExtendedVegaLite
+        actions={false}
+        id={id}
+        parentRef={plotRef}
+        onNewView={onNewView}
+        section={section}
+      />
     </button>
   )
 }
