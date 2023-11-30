@@ -86,4 +86,29 @@ describe('collectFlatExperimentParams', () => {
       { path: 'results/params.yaml:optim_params.lr', value: 0.01 }
     ])
   })
+
+  it('should omit the file from the param paths when only params.yaml is present', () => {
+    const params = collectFlatExperimentParams({
+      'params.yaml': {
+        model: {
+          batch_size: 512,
+          duration: '00:00:30:00',
+          optim: {
+            lr: 0.01
+          }
+        },
+        num_samples: 10000,
+        seed: 423
+      }
+    })
+    expect(params).toStrictEqual([
+      { path: 'model', value: undefined },
+      { path: 'model.batch_size', value: 512 },
+      { path: 'model.duration', value: '00:00:30:00' },
+      { path: 'model.optim', value: undefined },
+      { path: 'model.optim.lr', value: 0.01 },
+      { path: 'num_samples', value: 10000 },
+      { path: 'seed', value: 423 }
+    ])
+  })
 })

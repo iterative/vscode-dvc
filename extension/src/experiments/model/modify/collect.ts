@@ -1,4 +1,5 @@
 import { isValueTree, Value, ValueTree } from '../../../cli/dvc/contract'
+import { FILE_SEPARATOR } from '../../columns/constants'
 import { appendColumnToPath } from '../../columns/paths'
 import { MetricOrParamColumns } from '../../webview/contract'
 
@@ -30,13 +31,31 @@ const collectFromParamsFile = (
   }
 }
 
+const removeFilePrefixIfOnlyDefault = (
+  acc: Param[],
+  paramsFiles: string[]
+): Param[] => {
+  const defaultParamsFile = 'params.yaml'
+  if (paramsFiles.length === 1 && paramsFiles[0] === defaultParamsFile) {
+    const prefixToRemoveLength = (defaultParamsFile + FILE_SEPARATOR).length
+    return acc.map(({ path, value }) => ({
+      path: path.slice(prefixToRemoveLength),
+      value
+    }))
+  }
+
+  return acc
+}
+
 export const collectFlatExperimentParams = (
   params: MetricOrParamColumns = {}
 ) => {
   const acc: Param[] = []
-  for (const file of Object.keys(params)) {
+  const paramsFiles = Object.keys(params)
+
+  for (const file of paramsFiles) {
     collectFromParamsFile(acc, undefined, params[file], [file])
   }
 
-  return acc
+  return removeFilePrefixIfOnlyDefault(acc, paramsFiles)
 }
