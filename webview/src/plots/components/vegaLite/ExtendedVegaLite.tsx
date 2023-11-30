@@ -1,10 +1,12 @@
 import React, { useEffect, useRef } from 'react'
 import VegaLite, { VegaLiteProps } from 'react-vega/lib/VegaLite'
 import { useSelector } from 'react-redux'
-import { View, VisualizationSpec } from 'react-vega'
+import { View } from 'react-vega'
+import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import { PlotsState } from '../../store'
 import { setSmoothPlotValues } from '../../util/messages'
 import { config } from '../constants'
+import { useGetPlot } from '../../hooks/useGetPlot'
 
 interface VegaState {
   signals?: { [name: string]: number | undefined }
@@ -14,8 +16,9 @@ interface VegaState {
 export const ExtendedVegaLite = ({
   actions,
   id,
+  parentRef,
   onNewView,
-  spec
+  section
 }: {
   actions:
     | false
@@ -26,9 +29,12 @@ export const ExtendedVegaLite = ({
         source: false
       }
   id: string
+  parentRef: React.RefObject<HTMLDivElement | HTMLButtonElement>
   onNewView: (view: View) => void
-  spec: VisualizationSpec
+  section: PlotsSection
 }) => {
+  const spec = useGetPlot(section, id, parentRef)
+
   const vegaLiteProps: VegaLiteProps = {
     actions,
     config,

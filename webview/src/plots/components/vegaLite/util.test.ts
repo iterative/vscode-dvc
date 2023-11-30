@@ -22,7 +22,6 @@ import confusionTemplate from 'dvc/src//test/fixtures/plotsDiff/templates/confus
 import scatterTemplate from 'dvc/src/test/fixtures/plotsDiff/templates/scatter'
 import smoothTemplate from 'dvc/src/test/fixtures/plotsDiff/templates/smooth'
 
-import { DEFAULT_NB_ITEMS_PER_ROW } from 'dvc/src/plots/webview/contract'
 import { fillTemplate } from './util'
 
 describe('fillTemplate', () => {
@@ -64,7 +63,7 @@ describe('fillTemplate', () => {
     [PLOT_X_ANCHOR]: X,
     [PLOT_X_LABEL_ANCHOR]: X,
     [PLOT_Y_ANCHOR]: Y,
-    [PLOT_Y_LABEL_ANCHOR]: Y,
+    [PLOT_Y_LABEL_ANCHOR]: 'vertical y',
     [PLOT_ZOOM_AND_PAN_ANCHOR]: ZOOM_AND_PAN_PROP
   }
 
@@ -74,8 +73,8 @@ describe('fillTemplate', () => {
     const content = smoothTemplate
     const filledTemplate = fillTemplate(
       { anchorDefinitions, content },
-      DEFAULT_NB_ITEMS_PER_ROW,
-      1,
+      100,
+      100,
       false
     )
 
@@ -252,8 +251,8 @@ describe('fillTemplate', () => {
     const content = scatterTemplate as unknown as TopLevelSpec
     const filledTemplate = fillTemplate(
       { anchorDefinitions, content },
-      DEFAULT_NB_ITEMS_PER_ROW,
-      2,
+      100,
+      20,
       false
     )
 
@@ -271,7 +270,7 @@ describe('fillTemplate', () => {
         },
         y: {
           field: expectedAnchorDefinitions[PLOT_Y_ANCHOR],
-          title: expectedAnchorDefinitions[PLOT_Y_LABEL_ANCHOR],
+          title: '…y',
           type: 'quantitative'
         }
       },
@@ -292,8 +291,8 @@ describe('fillTemplate', () => {
     const content = confusionTemplate as unknown as TopLevelSpec
     const filledTemplate = fillTemplate(
       { anchorDefinitions, content },
-      DEFAULT_NB_ITEMS_PER_ROW,
-      1,
+      100,
+      100,
       false
     )
 
@@ -430,8 +429,8 @@ describe('fillTemplate', () => {
     const content = barHorizontalTemplate as unknown as TopLevelSpec
     const filledTemplate = fillTemplate(
       { anchorDefinitions, content },
-      DEFAULT_NB_ITEMS_PER_ROW,
-      1,
+      100,
+      100,
       false
     )
 

@@ -1,10 +1,8 @@
 import React, { useEffect, useRef } from 'react'
-import { PlotHeight, PlotsSection } from 'dvc/src/plots/webview/contract'
+import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import { View } from 'react-vega'
 import { ExtendedVegaLite } from './vegaLite/ExtendedVegaLite'
 import styles from './styles.module.scss'
-import { plotDataStore } from './plotDataStore'
-import { fillTemplate } from './vegaLite/util'
 import {
   addExportBackgroundColor,
   preventSvgTruncation,
@@ -90,12 +88,6 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
     }
   }
 
-  const plot = plotDataStore[section][id]
-  const spec = fillTemplate(plot, 1, PlotHeight.VERTICAL_NORMAL, true)
-  if (!spec) {
-    return
-  }
-
   return (
     <div
       className={styles.zoomedInPlot}
@@ -111,7 +103,8 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
         }}
         id={id}
         onNewView={onNewView}
-        spec={spec}
+        parentRef={zoomedInPlotRef}
+        section={section}
       />
     </div>
   )

@@ -12,7 +12,6 @@ import {
   PLOT_ZOOM_AND_PAN_ANCHOR,
   ZOOM_AND_PAN_PROP
 } from 'dvc/src/cli/dvc/contract'
-import { DEFAULT_NB_ITEMS_PER_ROW } from 'dvc/src/plots/webview/contract'
 import { isMultiViewPlot } from 'dvc/src/plots/vega/util'
 import { truncate } from 'vega-util'
 
@@ -27,10 +26,6 @@ const replaceAnchors = (
   anchorDefinitions: AnchorDefinitions
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ): unknown => {
-  if (!value) {
-    return value
-  }
-
   if (isAnchor(value, anchorDefinitions)) {
     return anchorDefinitions[value]
   }
@@ -54,27 +49,6 @@ const replaceAnchors = (
   return value
 }
 
-const getMaxHorizontalTitleCharacters = (nbItemsPerRow: number): number => {
-  if (nbItemsPerRow === 1) {
-    return 80
-  }
-  if (nbItemsPerRow === DEFAULT_NB_ITEMS_PER_ROW) {
-    return 50
-  }
-  return 30
-}
-
-const getMaxVerticalTitleCharacters = (
-  nbItemsPerRow: number,
-  height: number,
-  plotFocused: boolean
-) => {
-  if (plotFocused) {
-    return 60
-  }
-  return Math.floor((50 - (nbItemsPerRow - height) * 5) * 0.75)
-}
-
 const updateTitles = (
   updatedAnchors: Record<string, unknown>,
   key: string,
@@ -93,6 +67,7 @@ const updateTitles = (
   const length = key === PLOT_Y_LABEL_ANCHOR ? titleHeight : titleWidth
   updatedAnchors[key] = truncate(value as string, length, 'left')
 }
+
 const updateLegend = (
   updatedAnchors: Record<string, unknown>,
   plotFocused: boolean,
@@ -119,21 +94,23 @@ const updateLegend = (
 
 const getUpdatedAnchors = (
   anchorDefinitions: AnchorDefinitions,
-  nbItemsPerRow: number,
+  width: number,
   height: number,
   plotFocused: boolean,
   isMultiView: boolean
 ): Record<string, unknown> => {
   const updatedAnchors: Record<string, unknown> = {}
-  const titleWidth = getMaxHorizontalTitleCharacters(nbItemsPerRow)
-  const titleHeight = getMaxVerticalTitleCharacters(
-    nbItemsPerRow,
-    height,
-    plotFocused
-  )
+  const maxHorizontalTitleChars = width / 10
+  const maxVerticalTitleChars = height / 10
 
   for (const [key, value] of Object.entries(anchorDefinitions)) {
-    updateTitles(updatedAnchors, key, value, titleWidth, titleHeight)
+    updateTitles(
+      updatedAnchors,
+      key,
+      value,
+      maxHorizontalTitleChars,
+      maxVerticalTitleChars
+    )
     updateLegend(updatedAnchors, plotFocused, key, value)
   }
   updatedAnchors[PLOT_ZOOM_AND_PAN_ANCHOR] = plotFocused
@@ -154,7 +131,7 @@ export const fillTemplate = (
         anchorDefinitions: AnchorDefinitions
       }
     | undefined,
-  nbItemsPerRow: number,
+  width: number,
   height: number,
   plotFocused: boolean
 ): TopLevelSpec | undefined => {
@@ -168,7 +145,7 @@ export const fillTemplate = (
 
   const updatedAnchors = getUpdatedAnchors(
     anchorDefinitions,
-    nbItemsPerRow,
+    width,
     height,
     plotFocused,
     isMultiView
