@@ -109,7 +109,7 @@ export class Studio extends Disposable {
   }
 
   public async requestStudioTokenAuthentication() {
-    this.studioAccessTokenUriHandler?.dispose()
+    this.resetAccessTokenUriHandler()
 
     const response = await this.fetchFromStudio(
       `${STUDIO_URL}/api/device-login`,
@@ -145,6 +145,11 @@ export class Studio extends Disposable {
     )
   }
 
+  private resetAccessTokenUriHandler() {
+    this.studioAccessTokenUriHandler?.dispose()
+    this.studioAccessTokenUriHandler = undefined
+  }
+
   private fetchFromStudio(reqUri: string, body: Record<string, unknown>) {
     return fetch(reqUri, {
       body: JSON.stringify(body),
@@ -177,7 +182,7 @@ export class Studio extends Disposable {
   }
 
   private requestStudioToken(deviceCode: string, tokenUri: string) {
-    this.studioAccessTokenUriHandler?.dispose()
+    this.resetAccessTokenUriHandler()
     return Toast.showProgress('Connecting to Studio', async progress => {
       progress.report({ increment: 0 })
       progress.report({ increment: 25, message: 'Fetching token...' })
