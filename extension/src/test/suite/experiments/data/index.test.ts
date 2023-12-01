@@ -1,6 +1,6 @@
 import { join } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
-import { RelativePattern } from 'vscode'
+import { RelativePattern, commands } from 'vscode'
 import { expect } from 'chai'
 import { stub, restore, spy } from 'sinon'
 import { ensureFileSync, removeSync } from 'fs-extra'
@@ -35,6 +35,7 @@ import {
 } from '../../../../data'
 import { Studio } from '../../../../experiments/studio'
 import { DEFAULT_STUDIO_URL } from '../../../../setup/webview/contract'
+import { RegisteredCommands } from '../../../../commands/external'
 
 const MOCK_WORKSPACE_GIT_FOLDER = join(dvcDemoPath, '.mock-git')
 
@@ -332,6 +333,7 @@ suite('Experiments Data Test Suite', () => {
         gitLogFixture,
         mockStudioToken
       )
+      const executeCommandSpy = spy(commands, 'executeCommand')
       const requestSent = new Promise(resolve =>
         data.onDidUpdate(data => {
           if (isStudioExperimentsOutput(data)) {
@@ -349,6 +351,9 @@ suite('Experiments Data Test Suite', () => {
 
       await requestSent
 
+      expect(executeCommandSpy).to.be.calledOnceWithExactly(
+        RegisteredCommands.GET_STUDIO_URL
+      )
       expect(mockFetch).to.be.calledOnce
       expect(mockFetch).to.be.calledWithExactly(
         DEFAULT_STUDIO_URL +

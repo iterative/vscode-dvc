@@ -47,10 +47,7 @@ import * as Python from '../../../extensions/python'
 import { ContextKey } from '../../../vscode/context'
 import * as ExternalUtil from '../../../vscode/external'
 import { Setup } from '../../../setup'
-import {
-  DEFAULT_STUDIO_URL,
-  SetupSection
-} from '../../../setup/webview/contract'
+import { SetupSection } from '../../../setup/webview/contract'
 import { getFirstWorkspaceFolder } from '../../../vscode/workspaceFolders'
 import { Response } from '../../../vscode/response'
 import { DvcConfig } from '../../../cli/dvc/config'
@@ -884,7 +881,11 @@ suite('Setup Test Suite', () => {
         verification_uri: 'https://studio.iterative.ai/auth/device-login'
       }
       const mockCallbackUrl = 'url-to-vscode'
+      const mockSelfHostedStudioUrl = 'https://studio.example.com'
 
+      stub(studio, 'getStudioUrl')
+        .onFirstCall()
+        .returns(mockSelfHostedStudioUrl)
       mockFetch.onFirstCall().resolves({
         json: () => Promise.resolve(mockStudioRes)
       } as Fetch.Response)
@@ -912,7 +913,7 @@ suite('Setup Test Suite', () => {
       )
       expect(mockFetch).to.be.calledOnce
       expect(mockFetch).to.be.calledOnceWithExactly(
-        `${DEFAULT_STUDIO_URL}/api/device-login`,
+        `${mockSelfHostedStudioUrl}/api/device-login`,
         {
           body: JSON.stringify({
             client_name: 'VS Code'
