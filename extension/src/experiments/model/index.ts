@@ -524,6 +524,16 @@ export class ExperimentsModel extends ModelWithPersistence {
     }))
   }
 
+  public hasData(hasNonDefaultColumns: boolean) {
+    if (this.getCliError()) {
+      return true
+    }
+
+    const hasRows = this.getWorkspaceAndCommits().length > 0
+    const hasExperiments = this.getExperimentsAndQueued().length > 0
+    return (hasNonDefaultColumns || hasExperiments) && hasRows
+  }
+
   public setNbfCommitsToShow(numberOfCommitsToShow: number, branch: string) {
     this.numberOfCommitsToShow[branch] = numberOfCommitsToShow
     this.persistNbOfCommitsToShow()

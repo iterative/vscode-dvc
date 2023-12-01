@@ -71,10 +71,7 @@ export const collectColumns = async (
   }
   await Promise.all(promises)
 
-  const columns = Object.values(acc.columns)
-  const hasNoData = isEqual(columns, [timestampColumn])
-
-  return hasNoData ? [] : columns
+  return Object.values(acc.columns)
 }
 
 export const getExpData = (expState: ExpState): ExpData | undefined => {
