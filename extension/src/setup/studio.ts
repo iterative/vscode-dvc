@@ -1,6 +1,6 @@
 import { Event, EventEmitter, Disposable as VSCodeDisposable } from 'vscode'
 import fetch from 'node-fetch'
-import { STUDIO_URL } from './webview/contract'
+import { DEFAULT_STUDIO_URL } from './webview/contract'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
 import { Args, ConfigKey, Flag } from '../cli/dvc/constants'
@@ -28,6 +28,7 @@ export class Studio extends Disposable {
   private studioIsConnected = false
   private shareLiveToStudio: boolean | undefined = undefined
   private studioAccessTokenUriHandler: VSCodeDisposable | undefined = undefined
+  private studioUrl: string = DEFAULT_STUDIO_URL
 
   constructor(
     internalCommands: InternalCommands,
@@ -50,6 +51,10 @@ export class Studio extends Disposable {
 
   public getShareLiveToStudio() {
     return this.shareLiveToStudio
+  }
+
+  public getStudioUrl() {
+    return this.studioUrl
   }
 
   public async removeStudioAccessToken(dvcRoots: string[]) {
@@ -112,7 +117,7 @@ export class Studio extends Disposable {
     this.resetAccessTokenUriHandler()
 
     const response = await this.fetchFromStudio(
-      `${STUDIO_URL}/api/device-login`,
+      `${this.getStudioUrl()}/api/device-login`,
       {
         client_name: 'VS Code'
       }

@@ -34,7 +34,7 @@ import {
   isStudioExperimentsOutput
 } from '../../../../data'
 import { Studio } from '../../../../experiments/studio'
-import { STUDIO_URL } from '../../../../setup/webview/contract'
+import { DEFAULT_STUDIO_URL } from '../../../../setup/webview/contract'
 
 const MOCK_WORKSPACE_GIT_FOLDER = join(dvcDemoPath, '.mock-git')
 
@@ -351,7 +351,7 @@ suite('Experiments Data Test Suite', () => {
 
       expect(mockFetch).to.be.calledOnce
       expect(mockFetch).to.be.calledWithExactly(
-        STUDIO_URL +
+        DEFAULT_STUDIO_URL +
           '/api/view-links?' +
           'commits=53c3851f46955fa3e2b8f6e1c52999acc8c9ea77' +
           '&commits=fe2919bb4394b30494bea905c253e10077b9a1bd' +

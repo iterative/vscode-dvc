@@ -47,7 +47,10 @@ import * as Python from '../../../extensions/python'
 import { ContextKey } from '../../../vscode/context'
 import * as ExternalUtil from '../../../vscode/external'
 import { Setup } from '../../../setup'
-import { STUDIO_URL, SetupSection } from '../../../setup/webview/contract'
+import {
+  DEFAULT_STUDIO_URL,
+  SetupSection
+} from '../../../setup/webview/contract'
 import { getFirstWorkspaceFolder } from '../../../vscode/workspaceFolders'
 import { Response } from '../../../vscode/response'
 import { DvcConfig } from '../../../cli/dvc/config'
@@ -909,7 +912,7 @@ suite('Setup Test Suite', () => {
       )
       expect(mockFetch).to.be.calledOnce
       expect(mockFetch).to.be.calledOnceWithExactly(
-        `${STUDIO_URL}/api/device-login`,
+        `${DEFAULT_STUDIO_URL}/api/device-login`,
         {
           body: JSON.stringify({
             client_name: 'VS Code'

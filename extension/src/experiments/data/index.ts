@@ -1,4 +1,5 @@
 import querystring from 'querystring'
+import { commands } from 'vscode'
 import fetch from 'node-fetch'
 import { collectBranches, collectFiles } from './collect'
 import {
@@ -26,7 +27,7 @@ import { COMMITS_SEPARATOR, gitPath } from '../../cli/git/constants'
 import { getGitPath } from '../../fileSystem'
 import { ExperimentsModel } from '../model'
 import { Studio } from '../studio'
-import { STUDIO_URL } from '../../setup/webview/contract'
+import { RegisteredCommands } from '../../commands/external'
 
 export class ExperimentsData extends BaseData<ExperimentsOutput> {
   private readonly experiments: ExperimentsModel
@@ -117,6 +118,10 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
   private async requestStudioData(shas: string[]) {
     await this.studio.isReady()
 
+    const studioUrl = await commands.executeCommand<string>(
+      RegisteredCommands.GET_STUDIO_URL
+    )
+
     const defaultData = { baseUrl: undefined, live: [], pushed: [] }
 
     const studioAccessToken = this.studio.getAccessToken()
@@ -132,7 +137,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
     })
 
     try {
-      const response = await fetch(`${STUDIO_URL}/api/view-links?${params}`, {
+      const response = await fetch(`${studioUrl}/api/view-links?${params}`, {
         headers: {
           Authorization: `token ${studioAccessToken}`
         },
