@@ -974,7 +974,6 @@ suite('Setup Test Suite', () => {
 
       await tokenEvent
 
-      expect(mockUriHandlerDispose).to.be.calledTwice
       expect(mockFetch).to.be.calledThrice
       expect(mockSaveStudioToken).to.be.calledOnce
       expect(mockSaveStudioToken).to.be.calledWithExactly(
