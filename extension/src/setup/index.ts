@@ -92,8 +92,6 @@ export class Setup
     new EventEmitter<void>()
   )
 
-  private readonly onDidRunSetup: Event<void> = this.setupRun.event
-
   private readonly workspaceChanged: EventEmitter<void> = this.dispose.track(
     new EventEmitter()
   )
