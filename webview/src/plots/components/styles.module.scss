@@ -320,6 +320,14 @@ $gap: 20px;
   height: 100%;
 }
 
+.plotsContent {
+  position: relative;
+}
+
+.pathHighlight {
+  background-color: $fg-transparency-3;
+}
+
 :global(.ReactVirtualized__Grid__innerScrollContainer),
 .noBigGrid {
   width: calc(100% - $gap * 2) !important;

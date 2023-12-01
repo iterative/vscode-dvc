@@ -1,0 +1,18 @@
+@import '../../variables';
+
+.messageBand {
+  width: 100%;
+  background-color: $bg-color;
+  height: max-content;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  line-height: 1.7;
+}
+
+.messageBandIcon {
+  min-width: 50px;
+  fill: $accent-color;
+  margin-right: 20px;
+}

@@ -15,7 +15,7 @@ interface ComparisonTableRowsProps {
   pinnedColumn: string
 }
 
-export const ComparisionTableRows: React.FC<ComparisonTableRowsProps> = ({
+export const ComparisonTableRows: React.FC<ComparisonTableRowsProps> = ({
   plots,
   columns,
   pinnedColumn
@@ -37,31 +37,33 @@ export const ComparisionTableRows: React.FC<ComparisonTableRowsProps> = ({
     dispatch(changeRowHeight(firstRowHeight))
   }
 
-  const rows = rowsOrder.map((path, i) => {
-    const plot = plots.find(p => p.path === path)
-    if (!plot) {
-      return
-    }
-    const revs = plot.revisions
-    return (
-      <tbody
-        data-testid="comparison-table-body"
-        key={path}
-        id={path}
-        ref={i === 0 ? firstRowRef : undefined}
-      >
-        <ComparisonTableRow
-          path={path}
-          plots={columns.map(column => ({
-            id: column.id,
-            imgs: revs[column.id]?.imgs
-          }))}
-          nbColumns={columns.length}
-          pinnedColumn={pinnedColumn}
-        />
-      </tbody>
-    )
-  })
+  const rows = rowsOrder
+    .map((path, i) => {
+      const plot = plots.find(p => p.path === path)
+      if (!plot) {
+        return
+      }
+      const revs = plot.revisions
+      return (
+        <tbody
+          data-testid="comparison-table-body"
+          key={path}
+          id={path}
+          ref={i === 0 ? firstRowRef : undefined}
+        >
+          <ComparisonTableRow
+            path={path}
+            plots={columns.map(column => ({
+              id: column.id,
+              imgs: revs[column.id]?.imgs
+            }))}
+            nbColumns={columns.length}
+            pinnedColumn={pinnedColumn}
+          />
+        </tbody>
+      )
+    })
+    .filter(Boolean) as JSX.Element[]
 
   const changeRowsOrder = (order: string[]) => {
     setRowsOrder(order)
@@ -70,7 +72,7 @@ export const ComparisionTableRows: React.FC<ComparisonTableRowsProps> = ({
 
   return (
     <DragDropContainer
-      items={rows as JSX.Element[]}
+      items={rows}
       order={rowsOrder}
       setOrder={changeRowsOrder}
       group="comparison-table"

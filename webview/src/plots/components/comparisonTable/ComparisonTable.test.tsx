@@ -388,6 +388,25 @@ describe('ComparisonTable', () => {
     expect(aHeader.style.top).not.toBe('')
   })
 
+  it('should not throw an error when an image is removed from the data', () => {
+    const { rerender } = renderTable()
+
+    const plotsWithMissingImage = comparisonTableFixture.plots.slice(1)
+    expect(plotsWithMissingImage.length).toStrictEqual(
+      comparisonTableFixture.plots.length - 1
+    )
+
+    expect(() =>
+      renderTable(
+        {
+          ...comparisonTableFixture,
+          plots: plotsWithMissingImage
+        },
+        rerender
+      )
+    ).not.toThrow()
+  })
+
   describe('Columns drag and drop', () => {
     const pinSecondColumn = () => {
       const secondColumn = getPin(screen.getByText(revisions[1]))
