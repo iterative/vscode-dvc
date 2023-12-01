@@ -297,6 +297,9 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
 
   const wrappedItems = items
     .map(draggable => {
+      if (!draggable) {
+        return
+      }
       const id = draggable.props.id
       const isDraggedOver =
         id === draggedOverId && (hoveringSomething || !parentDraggedOver)

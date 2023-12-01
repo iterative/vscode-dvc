@@ -1,4 +1,4 @@
-import { Event, EventEmitter } from 'vscode'
+import { Event, EventEmitter, Disposable as VSCodeDisposable } from 'vscode'
 import fetch from 'node-fetch'
 import { STUDIO_URL } from './webview/contract'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
@@ -27,6 +27,7 @@ export class Studio extends Disposable {
   private studioAccessToken: string | undefined = undefined
   private studioIsConnected = false
   private shareLiveToStudio: boolean | undefined = undefined
+  private studioAccessTokenUriHandler: VSCodeDisposable | undefined = undefined
 
   constructor(
     internalCommands: InternalCommands,
@@ -108,6 +109,8 @@ export class Studio extends Disposable {
   }
 
   public async requestStudioTokenAuthentication() {
+    this.resetAccessTokenUriHandler()
+
     const response = await this.fetchFromStudio(
       `${STUDIO_URL}/api/device-login`,
       {
@@ -134,9 +137,17 @@ export class Studio extends Disposable {
     verificationUrlWithParams.searchParams.append('code', userCode)
 
     await openUrl(verificationUrlWithParams.toString())
-    void waitForUriResponse('/studio-complete-auth', () => {
-      void this.requestStudioToken(deviceCode, tokenUri)
-    })
+    this.studioAccessTokenUriHandler = waitForUriResponse(
+      '/studio-complete-auth',
+      () => {
+        void this.requestStudioToken(deviceCode, tokenUri)
+      }
+    )
+  }
+
+  private resetAccessTokenUriHandler() {
+    this.studioAccessTokenUriHandler?.dispose()
+    this.studioAccessTokenUriHandler = undefined
   }
 
   private fetchFromStudio(reqUri: string, body: Record<string, unknown>) {
@@ -171,6 +182,7 @@ export class Studio extends Disposable {
   }
 
   private requestStudioToken(deviceCode: string, tokenUri: string) {
+    this.resetAccessTokenUriHandler()
     return Toast.showProgress('Connecting to Studio', async progress => {
       progress.report({ increment: 0 })
       progress.report({ increment: 25, message: 'Fetching token...' })
