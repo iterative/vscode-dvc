@@ -93,10 +93,6 @@ const registerSetupStudioCommands = (
     RegisteredCommands.REMOVE_STUDIO_ACCESS_TOKEN,
     () => setup.removeStudioAccessToken()
   )
-  internalCommands.registerExternalCommand(
-    RegisteredCommands.GET_STUDIO_URL,
-    () => setup.getStudioUrl()
-  )
 }
 
 export const registerSetupCommands = (

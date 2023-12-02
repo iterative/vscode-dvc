@@ -1,12 +1,14 @@
 import { StudioLinkType } from './webview/contract'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { DeferredDisposable } from '../class/deferred'
+import { DEFAULT_STUDIO_URL } from '../setup/webview/contract'
 
 export class Studio extends DeferredDisposable {
   private readonly dvcRoot: string
   private readonly internalCommands: InternalCommands
 
-  private baseUrl: string | undefined = undefined
+  private baseUrl: string = DEFAULT_STUDIO_URL
+  private baseViewUrl: string | undefined = undefined
   private studioAccessToken: string | undefined
   private gitRemoteUrl?: string
 
@@ -26,6 +28,10 @@ export class Studio extends DeferredDisposable {
     return this.gitRemoteUrl
   }
 
+  public getUrl() {
+    return this.baseUrl
+  }
+
   public setAccessToken(studioAccessToken: string | undefined) {
     this.studioAccessToken = studioAccessToken
     this.accessTokenSet = true
@@ -37,14 +43,18 @@ export class Studio extends DeferredDisposable {
   }
 
   public isConnected() {
-    return !!this.baseUrl
+    return !!this.baseViewUrl
   }
 
   public getAccessToken() {
     return this.studioAccessToken
   }
 
-  public setBaseUrl(baseUrl: string | undefined) {
+  public setBaseViewUrl(baseUrl: string | undefined) {
+    this.baseViewUrl = baseUrl
+  }
+
+  public setBaseUrl(baseUrl: string) {
     this.baseUrl = baseUrl
   }
 
@@ -54,11 +64,11 @@ export class Studio extends DeferredDisposable {
     name: string,
     baselineSha: string
   ) {
-    if (!this.baseUrl) {
+    if (!this.baseViewUrl) {
       return ''
     }
     return (
-      `${this.baseUrl}?showOnlySelected=1&` +
+      `${this.baseViewUrl}?showOnlySelected=1&` +
       (studioLinkType === StudioLinkType.PUSHED
         ? `experimentReferences=${sha}`
         : `liveExperiments=${baselineSha}%3A${name}`)

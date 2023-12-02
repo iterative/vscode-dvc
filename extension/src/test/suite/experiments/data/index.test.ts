@@ -1,6 +1,6 @@
 import { join } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
-import { RelativePattern, commands } from 'vscode'
+import { RelativePattern } from 'vscode'
 import { expect } from 'chai'
 import { stub, restore, spy } from 'sinon'
 import { ensureFileSync, removeSync } from 'fs-extra'
@@ -333,7 +333,6 @@ suite('Experiments Data Test Suite', () => {
         gitLogFixture,
         mockStudioToken
       )
-      const executeCommandSpy = spy(commands, 'executeCommand')
       const requestSent = new Promise(resolve =>
         data.onDidUpdate(data => {
           if (isStudioExperimentsOutput(data)) {
@@ -351,9 +350,6 @@ suite('Experiments Data Test Suite', () => {
 
       await requestSent
 
-      expect(executeCommandSpy).to.be.calledOnceWithExactly(
-        RegisteredCommands.GET_STUDIO_URL
-      )
       expect(mockFetch).to.be.calledOnce
       expect(mockFetch).to.be.calledWithExactly(
         DEFAULT_STUDIO_URL +

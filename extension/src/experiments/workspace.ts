@@ -304,6 +304,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
 
     experiments.dispose.track(
       setup.onDidChangeStudioConnection(() => {
+        void experiments.setStudioUrl(setup.getStudioUrl())
         void experiments.setStudioAccessToken(setup.getStudioAccessToken())
       })
     )

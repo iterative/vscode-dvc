@@ -202,7 +202,7 @@ export class Experiments extends BaseRepository<TableData> {
 
     if (isStudioExperimentsOutput(data)) {
       const { live, pushed, baseUrl } = data
-      this.studio.setBaseUrl(baseUrl)
+      this.studio.setBaseViewUrl(baseUrl)
       this.experiments.setStudioData(live, pushed)
       return this.webviewMessages.sendWebviewMessage()
     }
@@ -622,6 +622,16 @@ export class Experiments extends BaseRepository<TableData> {
 
   public refresh() {
     return this.data.update()
+  }
+
+  public setStudioUrl(url: string) {
+    const oldUrl = this.studio.getUrl()
+    this.studio.setBaseUrl(url)
+
+    if (oldUrl === url) {
+      return
+    }
+    return this.data.managedUpdate()
   }
 
   public setStudioAccessToken(studioAccessToken: string | undefined) {

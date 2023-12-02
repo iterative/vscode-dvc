@@ -215,6 +215,8 @@ export class Studio extends Disposable {
 
     const previousStudioAccessToken = this.studioAccessToken
 
+    // get url from config and update
+    // probably in here or separate function
     if (!cwd) {
       this.studioAccessToken = undefined
       this.shareLiveToStudio = undefined
