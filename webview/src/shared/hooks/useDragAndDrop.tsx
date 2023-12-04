@@ -236,7 +236,6 @@ export const useDragAndDrop = ({
   const hasTarget =
     isBeingDraggedOver &&
     isExactGroup(draggedOverGroup, draggedRef?.group, group)
-  console.log(isDraggedOver)
   const isAfter = isEnteringAfter(direction)
 
   const dropTargetClassNames = shouldShowOnDrag
@@ -259,7 +258,6 @@ export const useDragAndDrop = ({
       {dropTarget}
     </DropTarget>
   )
-  hasTarget && console.log(id)
 
   return {
     onDragStart: handleDragStart,

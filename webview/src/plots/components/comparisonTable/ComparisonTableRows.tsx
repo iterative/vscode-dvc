@@ -1,6 +1,6 @@
 import { ComparisonPlots } from 'dvc/src/plots/webview/contract'
 import React, { createRef, useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { ComparisonTableColumn } from './ComparisonTableHead'
 import { ComparisonTableRow } from './ComparisonTableRow'
 import { changeRowHeight, DEFAULT_ROW_HEIGHT } from './comparisonTableSlice'
