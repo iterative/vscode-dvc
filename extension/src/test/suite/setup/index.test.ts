@@ -47,7 +47,10 @@ import * as Python from '../../../extensions/python'
 import { ContextKey } from '../../../vscode/context'
 import * as ExternalUtil from '../../../vscode/external'
 import { Setup } from '../../../setup'
-import { SetupSection } from '../../../setup/webview/contract'
+import {
+  DEFAULT_STUDIO_URL,
+  SetupSection
+} from '../../../setup/webview/contract'
 import { getFirstWorkspaceFolder } from '../../../vscode/workspaceFolders'
 import { Response } from '../../../vscode/response'
 import { DvcConfig } from '../../../cli/dvc/config'
@@ -881,11 +884,7 @@ suite('Setup Test Suite', () => {
         verification_uri: 'https://studio.iterative.ai/auth/device-login'
       }
       const mockCallbackUrl = 'url-to-vscode'
-      const mockSelfHostedStudioUrl = 'https://studio.example.com'
 
-      stub(studio, 'getStudioUrl')
-        .onFirstCall()
-        .returns(mockSelfHostedStudioUrl)
       mockFetch.onFirstCall().resolves({
         json: () => Promise.resolve(mockStudioRes)
       } as Fetch.Response)
@@ -913,7 +912,7 @@ suite('Setup Test Suite', () => {
       )
       expect(mockFetch).to.be.calledOnce
       expect(mockFetch).to.be.calledOnceWithExactly(
-        `${mockSelfHostedStudioUrl}/api/device-login`,
+        `${DEFAULT_STUDIO_URL}/api/device-login`,
         {
           body: JSON.stringify({
             client_name: 'VS Code'
@@ -989,6 +988,58 @@ suite('Setup Test Suite', () => {
       expect(delayProgressClosingSpy).to.be.calledTwice
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
+    it('should handle a message from the webview to request a token from a self hosted studio', async () => {
+      const { setup, mockFetch, studio } = buildSetup({
+        disposer: disposable
+      })
+
+      const webview = await setup.showWebview()
+      await webview.isReady()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub(Setup.prototype as any, 'getCliCompatible').returns(true)
+
+      const mockSelfHostedStudioUrl = 'https://studio.example.com'
+      const mockOpenUrl = stub(ExternalUtil, 'openUrl')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      stub(studio, 'getStudioUrl').returns(mockSelfHostedStudioUrl)
+      mockFetch.onFirstCall().resolves({
+        json: () =>
+          Promise.resolve({
+            device_code: 'Yi-NPd9ggvNUDBcam5bP8iivbtLhnqVgM_lSSbilqNw',
+            token_uri: 'https://studio.iterative.ai/api/device-login/token',
+            user_code: '40DWMKNA',
+            verification_uri: 'https://studio.iterative.ai/auth/device-login'
+          })
+      } as Fetch.Response)
+      const openUrlEvent = new Promise(resolve =>
+        mockOpenUrl.onFirstCall().callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(true)
+        })
+      )
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.REQUEST_STUDIO_TOKEN
+      })
+
+      await openUrlEvent
+
+      expect(mockFetch).to.be.calledOnce
+      expect(mockFetch).to.be.calledOnceWithExactly(
+        `${mockSelfHostedStudioUrl}/api/device-login`,
+        {
+          body: JSON.stringify({
+            client_name: 'VS Code'
+          }),
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          method: 'POST'
+        }
+      )
+    })
+
     it("should handle a message from the webview to manually save the user's Studio access token", async () => {
       const mockToken = 'isat_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
 
@@ -1039,6 +1090,10 @@ suite('Setup Test Suite', () => {
       expect(mockConfig).to.be.calledWithExactly(
         getFirstWorkspaceFolder(),
         ConfigKey.STUDIO_TOKEN
+      )
+      expect(mockConfig).to.be.calledWithExactly(
+        getFirstWorkspaceFolder(),
+        ConfigKey.STUDIO_URL
       )
       expect(executeCommandSpy).to.be.calledWithExactly(
         'setContext',

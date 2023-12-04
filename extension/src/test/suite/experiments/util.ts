@@ -275,7 +275,8 @@ export const buildExperimentsData = (
   disposer: SafeWatcherDisposer,
   currentBranch = '* main',
   commitOutput = gitLogFixture,
-  studioAccessToken = ''
+  studioAccessToken = '',
+  studioUrl = DEFAULT_STUDIO_URL
 ) => {
   const {
     internalCommands,
@@ -313,7 +314,7 @@ export const buildExperimentsData = (
       {
         getAccessToken: () => studioAccessToken,
         getGitRemoteUrl: () => 'git@github.com:iterative/vscode-dvc-demo.git',
-        getUrl: () => DEFAULT_STUDIO_URL,
+        getUrl: () => studioUrl,
         isReady: () => Promise.resolve(undefined)
       } as Studio,
       []
