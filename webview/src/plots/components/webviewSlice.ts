@@ -1,14 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { Revision } from 'dvc/src/plots/webview/contract'
-import { VegaProps } from 'react-vega/lib/Vega'
 
 type ZoomedInPlotState = {
-  plot: VegaProps | undefined
   id: string
   isTemplatePlot: boolean
   openActionsMenu?: boolean
-  refresh?: boolean
 }
 export interface WebviewState {
   cliError: string | undefined
@@ -27,11 +24,7 @@ export const webviewInitialState: WebviewState = {
   hasUnselectedPlots: false,
   maxNbPlotsPerRow: 4,
   selectedRevisions: [],
-  zoomedInPlot: {
-    id: '',
-    isTemplatePlot: false,
-    plot: undefined
-  }
+  zoomedInPlot: undefined
 }
 
 export const webviewSlice = createSlice({
@@ -50,21 +43,10 @@ export const webviewSlice = createSlice({
       state.maxNbPlotsPerRow = Math.floor(maxWidth / 300)
     },
     setZoomedInPlot: (
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      state: any,
+      state: { zoomedInPlot: ZoomedInPlotState | undefined },
       action: PayloadAction<ZoomedInPlotState | undefined>
     ) => {
-      if (!action.payload) {
-        Object.assign(state.zoomedInPlot, webviewInitialState.zoomedInPlot)
-        return
-      }
-
-      if (
-        action.payload.id === state.zoomedInPlot?.id ||
-        !action.payload.refresh
-      ) {
-        Object.assign(state.zoomedInPlot, action.payload)
-      }
+      state.zoomedInPlot = action.payload
     },
     updateCliError: (
       state: { cliError: string | undefined },

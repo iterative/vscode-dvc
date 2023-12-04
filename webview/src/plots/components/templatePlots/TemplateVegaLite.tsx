@@ -5,11 +5,6 @@ import { View } from 'react-vega'
 import { PlotsState } from '../../store'
 import { setSmoothPlotValues } from '../../util/messages'
 
-interface VegaState {
-  signals?: { [name: string]: number | undefined }
-  data?: unknown
-}
-
 export const TemplateVegaLite = ({
   id,
   onNewView,
@@ -20,68 +15,47 @@ export const TemplateVegaLite = ({
   vegaLiteProps: VegaLiteProps
 }) => {
   const vegaView = useRef<View>()
-  const plotWrapperEl = useRef<HTMLSpanElement>(null)
   const smoothPlotValues = useSelector(
     (state: PlotsState) => state.template.smoothPlotValues
   )
-  const changeDebounceTimer = useRef(0)
+  const currentValue = smoothPlotValues[id]
 
   useEffect(() => {
-    const newValue = smoothPlotValues[id]
-    if (!newValue || !vegaView.current) {
+    return () => {
+      vegaView.current?.finalize()
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!currentValue || !vegaView.current) {
       return
     }
-
-    const currentState: VegaState = vegaView.current.getState()
-    const currentValue: number | undefined = currentState?.signals?.smooth
-    if (newValue !== currentValue) {
-      vegaView.current.setState({
-        ...currentState,
-        signals: { ...currentState.signals, smooth: newValue }
-      })
+    if (vegaView.current.signal('smooth') !== currentValue) {
+      vegaView.current.signal('smooth', currentValue)
+      vegaView.current.run()
     }
-  }, [smoothPlotValues, id])
-
-  const addRangeEventListener = () => {
-    const smoothRange = plotWrapperEl.current?.querySelector(
-      'input[name="smooth"]'
-    )
-
-    smoothRange?.addEventListener('change', (event: Event) => {
-      if (event.target) {
-        window.clearTimeout(changeDebounceTimer.current)
-        changeDebounceTimer.current = window.setTimeout(() => {
-          setSmoothPlotValues(
-            id,
-            Number((event.target as HTMLInputElement).value)
-          )
-        }, 500)
-      }
-    })
-  }
+  }, [currentValue])
 
   return (
-    <span ref={plotWrapperEl}>
+    <span>
       <VegaLite
         {...vegaLiteProps}
         onNewView={view => {
           onNewView(view)
           vegaView.current = view
-          const defaultValue = smoothPlotValues[id]
-          const state = view.getState() as VegaState
 
-          if (!state?.signals?.smooth) {
+          if (!view.signal('smooth')) {
             return
           }
 
-          if (defaultValue) {
-            view.setState({
-              ...state,
-              signals: { ...state.signals, smooth: defaultValue }
-            })
+          if (currentValue) {
+            view.signal('smooth', currentValue)
+            view.run()
           }
 
-          addRangeEventListener()
+          view.addSignalListener('smooth', (_, value) => {
+            setSmoothPlotValues(id, Number(value))
+          })
         }}
       />
     </span>

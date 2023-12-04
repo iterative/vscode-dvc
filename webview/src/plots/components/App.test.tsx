@@ -3040,10 +3040,7 @@ describe('App', () => {
         const smoothPlot = screen.getByTestId(`plot_${smoothId}`)
         await waitForVega(smoothPlot)
 
-        // eslint-disable-next-line testing-library/no-node-access
-        const slider = smoothPlot.querySelector(
-          '.vega-bindings input[name="smooth"]'
-        )
+        const slider = within(smoothPlot).getByRole('slider')
         expect(slider).toBeInTheDocument()
 
         fireEvent.change(slider as HTMLInputElement, { target: { value: 0.4 } })
@@ -3063,10 +3060,7 @@ describe('App', () => {
         const popup = screen.getByTestId('zoomed-in-plot')
         await waitForVega(popup)
 
-        // eslint-disable-next-line testing-library/no-node-access
-        const slider = popup.querySelector(
-          '.vega-bindings input[name="smooth"]'
-        )
+        const slider = within(popup).getByRole('slider')
         expect(slider).toBeInTheDocument()
 
         fireEvent.change(slider as HTMLInputElement, { target: { value: 0.4 } })
@@ -3082,10 +3076,7 @@ describe('App', () => {
         const smoothPlot = screen.getByTestId(`plot_${smoothId}`)
         await waitForVega(smoothPlot)
 
-        // eslint-disable-next-line testing-library/no-node-access
-        const slider = smoothPlot.querySelector(
-          '.vega-bindings input[name="smooth"]'
-        )
+        const slider = within(smoothPlot).getByRole('slider')
         expect(slider).toBeInTheDocument()
 
         expect(slider).toHaveValue('0.6')
@@ -3105,10 +3096,8 @@ describe('App', () => {
         const popup = screen.getByTestId('zoomed-in-plot')
         await waitForVega(popup)
 
-        // eslint-disable-next-line testing-library/no-node-access
-        const slider = popup.querySelector(
-          '.vega-bindings input[name="smooth"]'
-        )
+        const slider = within(popup).getByRole('slider')
+
         expect(slider).toBeInTheDocument()
 
         expect(slider).toHaveValue('0.6')
@@ -3123,10 +3112,7 @@ describe('App', () => {
 
         await waitForVega(smoothPlot)
 
-        // eslint-disable-next-line testing-library/no-node-access
-        const slider = smoothPlot.querySelector(
-          '.vega-bindings input[name="smooth"]'
-        )
+        const slider = within(smoothPlot).getByRole('slider')
 
         expect(slider).toBeInTheDocument()
         expect(slider).toHaveValue('0.2')
@@ -3138,9 +3124,7 @@ describe('App', () => {
           }
         })
 
-        await waitFor(() => expect(slider).toHaveValue('0.7'), {
-          timeout: 5000
-        })
+        expect(slider).toHaveValue('0.7')
       })
     })
 

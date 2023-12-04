@@ -1,5 +1,6 @@
+import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import React, { useEffect, useRef } from 'react'
-import VegaLite, { VegaLiteProps } from 'react-vega/lib/VegaLite'
+import VegaLite from 'react-vega/lib/VegaLite'
 import { Config } from 'vega-lite'
 import merge from 'lodash.merge'
 import cloneDeep from 'lodash.clonedeep'
@@ -9,6 +10,7 @@ import {
   reverseOfLegendSuppressionUpdate
 } from 'dvc/src/plots/vega/util'
 import { View } from 'react-vega'
+import { createPlotProps } from './constants'
 import { TemplateVegaLite } from './templatePlots/TemplateVegaLite'
 import styles from './styles.module.scss'
 import { ZoomablePlotWrapper } from './ZoomablePlotWrapper'
@@ -24,10 +26,10 @@ import {
   exportPlotDataAsJson,
   exportPlotDataAsTsv
 } from '../util/messages'
+import { useGetPlot } from '../hooks/useGetPlot'
 
 type ZoomedInPlotProps = {
   id: string
-  props: VegaLiteProps
   isTemplatePlot: boolean
   openActionsMenu?: boolean
 }
@@ -49,16 +51,13 @@ const appendActionToVega = (
 
 export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
   id,
-  props,
   isTemplatePlot,
   openActionsMenu
 }: ZoomedInPlotProps) => {
-  const isCustomPlot = !isTemplatePlot
-  const hasSmoothing =
-    isTemplatePlot &&
-    (props.spec as { params?: { name: string }[] }).params?.[0]?.name ===
-      'smooth'
-
+  const { data, spec } = useGetPlot(
+    isTemplatePlot ? PlotsSection.TEMPLATE_PLOTS : PlotsSection.CUSTOM_PLOTS,
+    id
+  )
   const zoomedInPlotRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -69,6 +68,16 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
       document.body.classList.remove(modalOpenClass)
     }
   }, [])
+
+  if (!spec) {
+    return
+  }
+
+  const props = createPlotProps(data, id, spec)
+  const isCustomPlot = !isTemplatePlot
+  const hasSmoothing =
+    isTemplatePlot &&
+    (spec as { params?: { name: string }[] }).params?.[0]?.name === 'smooth'
 
   const onNewView = (view: View) => {
     const actions: HTMLDivElement | null | undefined =

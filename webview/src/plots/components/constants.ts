@@ -1,4 +1,6 @@
 import { Config } from 'vega-lite'
+import { PlainObject, VisualizationSpec } from 'react-vega'
+import { VegaLiteProps } from 'react-vega/lib/VegaLite'
 import { ThemeProperty } from '../../util/styles'
 
 export const PlOT_FOREGROUND_COLOR = `var(${ThemeProperty.FOREGROUND_COLOR})`
@@ -13,7 +15,7 @@ const title = {
   fontWeight: PLOT_FONT_WEIGHT
 }
 
-export const config: Config = {
+const config: Config = {
   axis: {
     domain: false,
     gridColor: PlOT_FOREGROUND_COLOR,
@@ -42,3 +44,17 @@ export const config: Config = {
     subtitleColor: PlOT_FOREGROUND_COLOR
   }
 }
+
+export const createPlotProps = (
+  data: PlainObject | undefined,
+  id: string,
+  spec: VisualizationSpec | undefined
+) =>
+  ({
+    actions: false,
+    config,
+    data,
+    'data-testid': `${id}-vega`,
+    renderer: 'svg',
+    spec
+  }) as VegaLiteProps

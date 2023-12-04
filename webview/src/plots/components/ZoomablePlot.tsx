@@ -1,13 +1,13 @@
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import { SpecWithTitles } from 'dvc/src/plots/vega/util'
-import React, { useEffect, useRef } from 'react'
+import React from 'react'
 import { useDispatch } from 'react-redux'
-import VegaLite, { VegaLiteProps } from 'react-vega/lib/VegaLite'
+import VegaLite from 'react-vega/lib/VegaLite'
 import { ZoomablePlotWrapper } from './ZoomablePlotWrapper'
 import { TemplateVegaLite } from './templatePlots/TemplateVegaLite'
 import { setZoomedInPlot } from './webviewSlice'
 import styles from './styles.module.scss'
-import { config } from './constants'
+import { createPlotProps } from './constants'
 import { changeDragAndDropMode } from './util'
 import { zoomPlot } from '../util/messages'
 import { useGetPlot } from '../hooks/useGetPlot'
@@ -29,35 +29,13 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
 }) => {
   const { data, spec, isTemplatePlot } = useGetPlot(section, id)
   const dispatch = useDispatch()
-  const currentPlotProps = useRef<VegaLiteProps>()
 
-  const plotProps: VegaLiteProps = {
-    actions: false,
-    config,
-    data,
-    'data-testid': `${id}-vega`,
-    renderer: 'svg',
-    spec
-  } as VegaLiteProps
-  currentPlotProps.current = plotProps
-
-  useEffect(() => {
-    dispatch(
-      setZoomedInPlot({
-        id,
-        isTemplatePlot,
-        plot: currentPlotProps.current,
-        refresh: true
-      })
-    )
-  }, [data, spec, dispatch, id, isTemplatePlot])
+  const plotProps = createPlotProps(data, id, spec)
 
   const handleOnClick = (openActionsMenu?: boolean) => {
     zoomPlot()
 
-    return dispatch(
-      setZoomedInPlot({ id, isTemplatePlot, openActionsMenu, plot: plotProps })
-    )
+    return dispatch(setZoomedInPlot({ id, isTemplatePlot, openActionsMenu }))
   }
 
   if (!data && !spec) {
@@ -103,16 +81,15 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
         >
           <Ellipsis />
         </span>
-        {currentPlotProps.current &&
-          (isTemplatePlot ? (
-            <TemplateVegaLite
-              vegaLiteProps={plotProps}
-              id={id}
-              onNewView={onNewView}
-            />
-          ) : (
-            <VegaLite {...plotProps} onNewView={onNewView} />
-          ))}
+        {isTemplatePlot ? (
+          <TemplateVegaLite
+            vegaLiteProps={plotProps}
+            id={id}
+            onNewView={onNewView}
+          />
+        ) : (
+          <VegaLite {...plotProps} onNewView={onNewView} />
+        )}
       </button>
     </ZoomablePlotWrapper>
   )
