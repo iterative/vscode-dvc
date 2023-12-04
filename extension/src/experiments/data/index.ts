@@ -118,10 +118,6 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
   private async requestStudioData(shas: string[]) {
     await this.studio.isReady()
 
-    const studioUrl = await commands.executeCommand<string>(
-      RegisteredCommands.GET_STUDIO_URL
-    )
-
     const defaultData = { baseUrl: undefined, live: [], pushed: [] }
 
     const studioAccessToken = this.studio.getAccessToken()
@@ -137,12 +133,15 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
     })
 
     try {
-      const response = await fetch(`${studioUrl}/api/view-links?${params}`, {
-        headers: {
-          Authorization: `token ${studioAccessToken}`
-        },
-        method: 'GET'
-      })
+      const response = await fetch(
+        `${this.studio.getUrl()}/api/view-links?${params}`,
+        {
+          headers: {
+            Authorization: `token ${studioAccessToken}`
+          },
+          method: 'GET'
+        }
+      )
 
       const { live, pushed, view_url } = (await response.json()) as {
         live: { baseline_sha: string; name: string }[]
