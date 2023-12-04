@@ -689,7 +689,6 @@ export class Setup
           if (
             path.endsWith(join('dvc', 'config')) ||
             path.endsWith(join('dvc', 'config.local'))
-            // check for studio url update as well
           ) {
             void this.updateStudioAndSend()
           }

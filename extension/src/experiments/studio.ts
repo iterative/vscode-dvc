@@ -7,7 +7,7 @@ export class Studio extends DeferredDisposable {
   private readonly dvcRoot: string
   private readonly internalCommands: InternalCommands
 
-  private baseUrl: string = DEFAULT_STUDIO_URL
+  private url: string = DEFAULT_STUDIO_URL
   private baseViewUrl: string | undefined = undefined
   private studioAccessToken: string | undefined
   private gitRemoteUrl?: string
@@ -29,7 +29,7 @@ export class Studio extends DeferredDisposable {
   }
 
   public getUrl() {
-    return this.baseUrl
+    return this.url
   }
 
   public setAccessToken(studioAccessToken: string | undefined) {
@@ -54,8 +54,8 @@ export class Studio extends DeferredDisposable {
     this.baseViewUrl = baseUrl
   }
 
-  public setBaseUrl(baseUrl: string) {
-    this.baseUrl = baseUrl
+  public setUrl(url: string) {
+    this.url = url
   }
 
   public getLink(

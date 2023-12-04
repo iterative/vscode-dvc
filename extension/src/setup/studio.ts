@@ -210,32 +210,47 @@ export class Studio extends Disposable {
     })
   }
 
+  private resetStudioValues(
+    previousStudioUrl: string,
+    previousStudioAccessToken: string | undefined
+  ) {
+    this.studioAccessToken = undefined
+    this.shareLiveToStudio = undefined
+    this.studioUrl = DEFAULT_STUDIO_URL
+
+    if (previousStudioAccessToken || previousStudioUrl !== DEFAULT_STUDIO_URL) {
+      this.studioConnectionChanged.fire()
+    }
+  }
+
   private async setStudioValues() {
     const cwd = this.getCwd()
 
     const previousStudioAccessToken = this.studioAccessToken
+    const previousStudioUrl = this.studioUrl
 
-    // get url from config and update
-    // probably in here or separate function
     if (!cwd) {
-      this.studioAccessToken = undefined
-      this.shareLiveToStudio = undefined
-
-      if (previousStudioAccessToken) {
-        this.studioConnectionChanged.fire()
-      }
+      this.resetStudioValues(previousStudioUrl, previousStudioAccessToken)
       return
     }
 
-    const [studioAccessToken, shareLiveToStudio] = await Promise.all([
-      this.accessConfig(cwd, ConfigKey.STUDIO_TOKEN),
-      (await this.accessConfig(cwd, ConfigKey.STUDIO_OFFLINE)) !== 'true'
-    ])
+    const [studioAccessToken, shareLiveToStudio, studioUrl] = await Promise.all(
+      [
+        this.accessConfig(cwd, ConfigKey.STUDIO_TOKEN),
+        (await this.accessConfig(cwd, ConfigKey.STUDIO_OFFLINE)) !== 'true',
+        (await this.accessConfig(cwd, ConfigKey.STUDIO_URL)) ||
+          DEFAULT_STUDIO_URL
+      ]
+    )
 
     this.studioAccessToken = studioAccessToken
     this.shareLiveToStudio = shareLiveToStudio
+    this.studioUrl = studioUrl
 
-    if (previousStudioAccessToken !== this.studioAccessToken) {
+    if (
+      previousStudioAccessToken !== this.studioAccessToken ||
+      previousStudioUrl !== this.studioUrl
+    ) {
       this.studioConnectionChanged.fire()
     }
   }

@@ -35,7 +35,6 @@ import {
 } from '../../../../data'
 import { Studio } from '../../../../experiments/studio'
 import { DEFAULT_STUDIO_URL } from '../../../../setup/webview/contract'
-import { RegisteredCommands } from '../../../../commands/external'
 
 const MOCK_WORKSPACE_GIT_FOLDER = join(dvcDemoPath, '.mock-git')
 

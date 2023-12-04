@@ -624,22 +624,20 @@ export class Experiments extends BaseRepository<TableData> {
     return this.data.update()
   }
 
-  public setStudioUrl(url: string) {
-    const oldUrl = this.studio.getUrl()
-    this.studio.setBaseUrl(url)
-
-    if (oldUrl === url) {
-      return
-    }
-    return this.data.managedUpdate()
-  }
-
-  public setStudioAccessToken(studioAccessToken: string | undefined) {
+  public setStudioValues(
+    studioUrl: string,
+    studioAccessToken: string | undefined
+  ) {
     const oldAccessToken = this.studio.getAccessToken()
+    const oldUrl = this.studio.getUrl()
     const accessTokenInitialized = this.studio.isAccessTokenSet()
+    this.studio.setUrl(studioUrl)
     this.studio.setAccessToken(studioAccessToken)
 
-    if (!accessTokenInitialized || oldAccessToken === studioAccessToken) {
+    const valuesAreSame =
+      oldAccessToken === studioAccessToken && oldUrl === studioUrl
+
+    if (!accessTokenInitialized || valuesAreSame) {
       return
     }
     return this.data.managedUpdate()

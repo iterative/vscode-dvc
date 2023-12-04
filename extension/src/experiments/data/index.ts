@@ -1,5 +1,4 @@
 import querystring from 'querystring'
-import { commands } from 'vscode'
 import fetch from 'node-fetch'
 import { collectBranches, collectFiles } from './collect'
 import {
@@ -27,7 +26,6 @@ import { COMMITS_SEPARATOR, gitPath } from '../../cli/git/constants'
 import { getGitPath } from '../../fileSystem'
 import { ExperimentsModel } from '../model'
 import { Studio } from '../studio'
-import { RegisteredCommands } from '../../commands/external'
 
 export class ExperimentsData extends BaseData<ExperimentsOutput> {
   private readonly experiments: ExperimentsModel
