@@ -26,6 +26,7 @@ import { ExpShowOutput } from '../../../cli/dvc/contract'
 import { buildExperimentsPipeline } from '../pipeline/util'
 import { Setup } from '../../../setup'
 import { Studio } from '../../../experiments/studio'
+import { DEFAULT_STUDIO_URL } from '../../../setup/webview/contract'
 
 export const DEFAULT_EXPERIMENTS_OUTPUT = {
   availableNbCommits: { main: 5 },
@@ -148,6 +149,7 @@ const buildMockSetup = (disposer: Disposer): Setup => {
   const studioConnectionChanged = disposer.track(new EventEmitter())
   return {
     getStudioAccessToken: () => Promise.resolve(undefined),
+    getStudioUrl: () => DEFAULT_STUDIO_URL,
     onDidChangeStudioConnection: studioConnectionChanged.event
   } as unknown as Setup
 }
@@ -311,6 +313,7 @@ export const buildExperimentsData = (
       {
         getAccessToken: () => studioAccessToken,
         getGitRemoteUrl: () => 'git@github.com:iterative/vscode-dvc-demo.git',
+        getUrl: () => DEFAULT_STUDIO_URL,
         isReady: () => Promise.resolve(undefined)
       } as Studio,
       []
