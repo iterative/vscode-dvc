@@ -130,6 +130,11 @@
         "category": "DVC"
       },
       {
+        "title": "Update Studio URL",
+        "command": "dvc.updateStudioUrl",
+        "category": "DVC"
+      },
+      {
         "title": "Add",
         "command": "dvc.addTarget",
         "category": "DVC",
@@ -711,6 +716,10 @@
         {
           "command": "dvc.updateStudioAccessToken",
           "when": "dvc.commands.available && dvc.project.available && dvc.studio.connected"
+        },
+        {
+          "command": "dvc.updateStudioUrl",
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.addTarget",

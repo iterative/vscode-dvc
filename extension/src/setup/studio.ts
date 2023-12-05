@@ -88,6 +88,10 @@ export class Studio extends Disposable {
     return this.accessConfig(cwd, Flag.GLOBAL, ConfigKey.STUDIO_TOKEN, token)
   }
 
+  public saveStudioUrlInConfig(cwd: string, url: string) {
+    return this.accessConfig(cwd, Flag.GLOBAL, ConfigKey.STUDIO_URL, url)
+  }
+
   public async updateIsStudioConnected() {
     await this.setStudioValues()
     const storedToken = this.getStudioAccessToken()

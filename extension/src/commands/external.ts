@@ -111,6 +111,7 @@ export enum RegisteredCommands {
   ADD_STUDIO_ACCESS_TOKEN = 'dvc.addStudioAccessToken',
   UPDATE_STUDIO_ACCESS_TOKEN = 'dvc.updateStudioAccessToken',
   REMOVE_STUDIO_ACCESS_TOKEN = 'dvc.removeStudioAccessToken',
+  UPDATE_STUDIO_URL = 'dvc.updateStudioUrl',
   SETUP_SHOW_STUDIO_CONNECT = 'dvc.showStudioConnect',
   SETUP_SHOW_STUDIO_SETTINGS = 'dvc.showStudioSettings',
 
