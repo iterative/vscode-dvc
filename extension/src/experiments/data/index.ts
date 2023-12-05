@@ -26,7 +26,6 @@ import { COMMITS_SEPARATOR, gitPath } from '../../cli/git/constants'
 import { getGitPath } from '../../fileSystem'
 import { ExperimentsModel } from '../model'
 import { Studio } from '../studio'
-import { STUDIO_URL } from '../../setup/webview/contract'
 
 export class ExperimentsData extends BaseData<ExperimentsOutput> {
   private readonly experiments: ExperimentsModel
@@ -117,7 +116,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
   private async requestStudioData(shas: string[]) {
     await this.studio.isReady()
 
-    const defaultData = { baseUrl: undefined, live: [], pushed: [] }
+    const defaultData = { live: [], pushed: [], viewUrl: undefined }
 
     const studioAccessToken = this.studio.getAccessToken()
 
@@ -132,12 +131,15 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
     })
 
     try {
-      const response = await fetch(`${STUDIO_URL}/api/view-links?${params}`, {
-        headers: {
-          Authorization: `token ${studioAccessToken}`
-        },
-        method: 'GET'
-      })
+      const response = await fetch(
+        `${this.studio.getInstanceUrl()}/api/view-links?${params}`,
+        {
+          headers: {
+            Authorization: `token ${studioAccessToken}`
+          },
+          method: 'GET'
+        }
+      )
 
       const { live, pushed, view_url } = (await response.json()) as {
         live: { baseline_sha: string; name: string }[]
@@ -145,12 +147,12 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
         view_url: string
       }
       this.notifyChanged({
-        baseUrl: view_url,
         live: live.map(({ baseline_sha, name }) => ({
           baselineSha: baseline_sha,
           name
         })),
-        pushed
+        pushed,
+        viewUrl: view_url
       })
     } catch {
       this.notifyChanged(defaultData)

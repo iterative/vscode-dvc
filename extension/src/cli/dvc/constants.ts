@@ -113,7 +113,8 @@ export enum ExperimentFlag {
 
 export enum ConfigKey {
   STUDIO_TOKEN = 'studio.token',
-  STUDIO_OFFLINE = 'studio.offline'
+  STUDIO_OFFLINE = 'studio.offline',
+  STUDIO_URL = 'studio.url'
 }
 
 type Target = string

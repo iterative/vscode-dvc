@@ -19,7 +19,7 @@ type LocalExperimentsOutput = {
 type RemoteExperimentsOutput = { lsRemoteOutput: string }
 
 type StudioExperimentsOutput = {
-  baseUrl: string | undefined
+  viewUrl: string | undefined
   live: { baselineSha: string; name: string }[]
   pushed: string[]
 }

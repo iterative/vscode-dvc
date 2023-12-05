@@ -201,8 +201,8 @@ export class Experiments extends BaseRepository<TableData> {
     }
 
     if (isStudioExperimentsOutput(data)) {
-      const { live, pushed, baseUrl } = data
-      this.studio.setBaseUrl(baseUrl)
+      const { live, pushed, viewUrl } = data
+      this.studio.setViewUrl(viewUrl)
       this.experiments.setStudioData(live, pushed)
       return this.webviewMessages.sendWebviewMessage()
     }
@@ -624,12 +624,20 @@ export class Experiments extends BaseRepository<TableData> {
     return this.data.update()
   }
 
-  public setStudioAccessToken(studioAccessToken: string | undefined) {
+  public setStudioValues(
+    studioUrl: string,
+    studioAccessToken: string | undefined
+  ) {
     const oldAccessToken = this.studio.getAccessToken()
+    const oldInstanceUrl = this.studio.getInstanceUrl()
     const accessTokenInitialized = this.studio.isAccessTokenSet()
+    this.studio.setInstanceUrl(studioUrl)
     this.studio.setAccessToken(studioAccessToken)
 
-    if (!accessTokenInitialized || oldAccessToken === studioAccessToken) {
+    const valuesAreSame =
+      oldAccessToken === studioAccessToken && oldInstanceUrl === studioUrl
+
+    if (!accessTokenInitialized || valuesAreSame) {
       return
     }
     return this.data.managedUpdate()

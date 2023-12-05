@@ -9,7 +9,7 @@ import {
   getConfigValue,
   setUserConfigValue
 } from '../../vscode/config'
-import { STUDIO_URL } from '../../setup/webview/contract'
+import { DEFAULT_STUDIO_URL } from '../../setup/webview/contract'
 import { RegisteredCommands } from '../../commands/external'
 
 export const getBranchExperimentCommand =
@@ -48,7 +48,7 @@ export const getRenameExperimentCommand =
 
 const promptToAddStudioToken = async () => {
   const response = await Toast.askShowOrCloseOrNever(
-    `Experiments can be automatically shared to [Studio](${STUDIO_URL}) by setting the studio.token in your config.`
+    `Experiments can be automatically shared to [Studio](${DEFAULT_STUDIO_URL}) by setting the studio.token in your config.`
   )
 
   if (!response || response === Response.CLOSE) {

@@ -1,5 +1,8 @@
 import React from 'react'
-import { STUDIO_URL, SetupSection } from 'dvc/src/setup/webview/contract'
+import {
+  DEFAULT_STUDIO_URL,
+  SetupSection
+} from 'dvc/src/setup/webview/contract'
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import styles from './styles.module.scss'
 
@@ -81,7 +84,7 @@ export const SectionDescriptionMainText = {
   [SetupSection.STUDIO]: (
     <>
       {"Configure the extension's connection to "}
-      <a href={STUDIO_URL}>Studio</a>.<br />
+      <a href={DEFAULT_STUDIO_URL}>Studio</a>.<br />
       Studio provides a collaboration platform for Machine Learning and is free
       for small teams and individual contributors.
     </>

@@ -42,4 +42,4 @@ export const DEFAULT_SECTION_COLLAPSED = {
 
 export type SectionCollapsed = typeof DEFAULT_SECTION_COLLAPSED
 
-export const STUDIO_URL = 'https://studio.iterative.ai'
+export const DEFAULT_STUDIO_URL = 'https://studio.iterative.ai'

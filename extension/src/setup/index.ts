@@ -329,6 +329,10 @@ export class Setup
     return this.studio.getStudioAccessToken()
   }
 
+  public getStudioUrl() {
+    return this.studio.getStudioUrl()
+  }
+
   public sendInitialWebviewData() {
     return this.sendDataToWebview()
   }
