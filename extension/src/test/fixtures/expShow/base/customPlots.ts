@@ -6,16 +6,7 @@ import {
   DEFAULT_PLOT_HEIGHT
 } from '../../../../plots/webview/contract'
 import { Experiment } from '../../../../experiments/webview/contract'
-import {
-  PLOT_COLOR_ANCHOR,
-  PLOT_DATA_ANCHOR,
-  PLOT_METRIC_TYPE_ANCHOR,
-  PLOT_X_LABEL_ANCHOR,
-  PLOT_Y_LABEL_ANCHOR,
-  PLOT_ZOOM_AND_PAN_ANCHOR,
-  PLOT_PARAM_TYPE_ANCHOR,
-  ZOOM_AND_PAN_PROP
-} from '../../../../cli/dvc/contract'
+import { PLOT_ANCHORS, ZOOM_AND_PAN_PROP } from '../../../../cli/dvc/contract'
 
 export const customPlotsOrderFixture: CustomPlotsOrderValue[] = [
   {
@@ -111,9 +102,9 @@ const data: CustomPlotsData = {
       param: 'params.yaml:log_file',
       content: {
         $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-        data: { values: PLOT_DATA_ANCHOR },
+        data: { values: PLOT_ANCHORS.DATA },
         encoding: {
-          color: PLOT_COLOR_ANCHOR,
+          color: PLOT_ANCHORS.COLOR,
           x: {
             axis: {
               labelLimit: 75,
@@ -123,8 +114,8 @@ const data: CustomPlotsData = {
             scale: {
               zero: false
             },
-            title: PLOT_X_LABEL_ANCHOR,
-            type: PLOT_PARAM_TYPE_ANCHOR
+            title: PLOT_ANCHORS.X_LABEL,
+            type: PLOT_ANCHORS.PARAM_TYPE
           },
           y: {
             axis: {
@@ -135,8 +126,8 @@ const data: CustomPlotsData = {
             scale: {
               zero: false
             },
-            title: PLOT_Y_LABEL_ANCHOR,
-            type: PLOT_METRIC_TYPE_ANCHOR
+            title: PLOT_ANCHORS.Y_LABEL,
+            type: PLOT_ANCHORS.METRIC_TYPE
           }
         },
         height: 'container',
@@ -150,11 +141,11 @@ const data: CustomPlotsData = {
                 },
                 {
                   field: 'metric',
-                  title: PLOT_Y_LABEL_ANCHOR
+                  title: PLOT_ANCHORS.Y_LABEL
                 },
                 {
                   field: 'param',
-                  title: PLOT_X_LABEL_ANCHOR
+                  title: PLOT_ANCHORS.X_LABEL
                 }
               ]
             },
@@ -163,14 +154,14 @@ const data: CustomPlotsData = {
               size: 60,
               type: 'point'
             },
-            params: [PLOT_ZOOM_AND_PAN_ANCHOR]
+            params: [PLOT_ANCHORS.ZOOM_AND_PAN]
           }
         ],
         width: 'container'
       } as unknown as TopLevelSpec,
       anchorDefinitions: {
-        [PLOT_PARAM_TYPE_ANCHOR]: 'nominal',
-        [PLOT_COLOR_ANCHOR]: {
+        [PLOT_ANCHORS.PARAM_TYPE]: 'nominal',
+        [PLOT_ANCHORS.COLOR]: {
           field: 'id',
           scale: {
             domain: [
@@ -191,7 +182,7 @@ const data: CustomPlotsData = {
             ]
           }
         },
-        [PLOT_DATA_ANCHOR]: [
+        [PLOT_ANCHORS.DATA]: [
           { id: '7df876c', metric: 2.048856019973755, param: 'logs.csv' },
           {
             id: 'fe2919b',
@@ -207,10 +198,10 @@ const data: CustomPlotsData = {
             param: 'logs.csv'
           }
         ],
-        [PLOT_METRIC_TYPE_ANCHOR]: 'quantitative',
-        [PLOT_X_LABEL_ANCHOR]: 'params.yaml:log_file',
-        [PLOT_Y_LABEL_ANCHOR]: 'summary.json:loss',
-        [PLOT_ZOOM_AND_PAN_ANCHOR]: ZOOM_AND_PAN_PROP
+        [PLOT_ANCHORS.METRIC_TYPE]: 'quantitative',
+        [PLOT_ANCHORS.X_LABEL]: 'params.yaml:log_file',
+        [PLOT_ANCHORS.Y_LABEL]: 'summary.json:loss',
+        [PLOT_ANCHORS.ZOOM_AND_PAN]: ZOOM_AND_PAN_PROP
       }
     },
     {
@@ -218,8 +209,8 @@ const data: CustomPlotsData = {
       metric: 'summary.json:accuracy',
       param: 'params.yaml:epochs',
       anchorDefinitions: {
-        [PLOT_PARAM_TYPE_ANCHOR]: 'quantitative',
-        [PLOT_COLOR_ANCHOR]: {
+        [PLOT_ANCHORS.PARAM_TYPE]: 'quantitative',
+        [PLOT_ANCHORS.COLOR]: {
           field: 'id',
           scale: {
             domain: [
@@ -240,7 +231,7 @@ const data: CustomPlotsData = {
             ]
           }
         },
-        [PLOT_DATA_ANCHOR]: [
+        [PLOT_ANCHORS.DATA]: [
           {
             id: '7df876c',
             metric: 0.3484833240509033,
@@ -272,16 +263,16 @@ const data: CustomPlotsData = {
             param: 5
           }
         ],
-        [PLOT_METRIC_TYPE_ANCHOR]: 'quantitative',
-        [PLOT_X_LABEL_ANCHOR]: 'params.yaml:epochs',
-        [PLOT_Y_LABEL_ANCHOR]: 'summary.json:accuracy',
-        [PLOT_ZOOM_AND_PAN_ANCHOR]: ZOOM_AND_PAN_PROP
+        [PLOT_ANCHORS.METRIC_TYPE]: 'quantitative',
+        [PLOT_ANCHORS.X_LABEL]: 'params.yaml:epochs',
+        [PLOT_ANCHORS.Y_LABEL]: 'summary.json:accuracy',
+        [PLOT_ANCHORS.ZOOM_AND_PAN]: ZOOM_AND_PAN_PROP
       },
       content: {
         $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-        data: { values: PLOT_DATA_ANCHOR },
+        data: { values: PLOT_ANCHORS.DATA },
         encoding: {
-          color: PLOT_COLOR_ANCHOR,
+          color: PLOT_ANCHORS.COLOR,
           x: {
             axis: {
               labelLimit: 75,
@@ -291,8 +282,8 @@ const data: CustomPlotsData = {
             scale: {
               zero: false
             },
-            title: PLOT_X_LABEL_ANCHOR,
-            type: PLOT_PARAM_TYPE_ANCHOR
+            title: PLOT_ANCHORS.X_LABEL,
+            type: PLOT_ANCHORS.PARAM_TYPE
           },
           y: {
             axis: {
@@ -303,8 +294,8 @@ const data: CustomPlotsData = {
             scale: {
               zero: false
             },
-            title: PLOT_Y_LABEL_ANCHOR,
-            type: PLOT_METRIC_TYPE_ANCHOR
+            title: PLOT_ANCHORS.Y_LABEL,
+            type: PLOT_ANCHORS.METRIC_TYPE
           }
         },
         height: 'container',
@@ -318,11 +309,11 @@ const data: CustomPlotsData = {
                 },
                 {
                   field: 'metric',
-                  title: PLOT_Y_LABEL_ANCHOR
+                  title: PLOT_ANCHORS.Y_LABEL
                 },
                 {
                   field: 'param',
-                  title: PLOT_X_LABEL_ANCHOR
+                  title: PLOT_ANCHORS.X_LABEL
                 }
               ]
             },
@@ -331,7 +322,7 @@ const data: CustomPlotsData = {
               size: 60,
               type: 'point'
             },
-            params: [PLOT_ZOOM_AND_PAN_ANCHOR]
+            params: [PLOT_ANCHORS.ZOOM_AND_PAN]
           }
         ],
         width: 'container'

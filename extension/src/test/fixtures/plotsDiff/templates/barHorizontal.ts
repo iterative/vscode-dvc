@@ -1,50 +1,38 @@
 import type { TopLevelSpec } from 'vega-lite'
-import {
-  PLOT_COLOR_ANCHOR,
-  PLOT_COLUMN_ANCHOR,
-  PLOT_DATA_ANCHOR,
-  PLOT_HEIGHT_ANCHOR,
-  PLOT_TITLE_ANCHOR,
-  PLOT_WIDTH_ANCHOR,
-  PLOT_X_ANCHOR,
-  PLOT_X_LABEL_ANCHOR,
-  PLOT_Y_ANCHOR,
-  PLOT_Y_LABEL_ANCHOR,
-  PLOT_ZOOM_AND_PAN_ANCHOR
-} from '../../../../cli/dvc/contract'
+import { PLOT_ANCHORS } from '../../../../cli/dvc/contract'
 
 const data = {
   $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
   data: {
-    values: PLOT_DATA_ANCHOR
+    values: PLOT_ANCHORS.DATA
   },
-  title: PLOT_TITLE_ANCHOR,
-  width: PLOT_WIDTH_ANCHOR,
-  height: PLOT_HEIGHT_ANCHOR,
+  title: PLOT_ANCHORS.TITLE,
+  width: PLOT_ANCHORS.WIDTH,
+  height: PLOT_ANCHORS.HEIGHT,
   mark: {
     type: 'bar'
   },
-  params: [PLOT_ZOOM_AND_PAN_ANCHOR],
+  params: [PLOT_ANCHORS.ZOOM_AND_PAN],
   encoding: {
     x: {
-      field: PLOT_X_ANCHOR,
+      field: PLOT_ANCHORS.X,
       type: 'quantitative',
-      title: PLOT_X_LABEL_ANCHOR,
+      title: PLOT_ANCHORS.X_LABEL,
       scale: {
         zero: false
       }
     },
     y: {
-      field: PLOT_Y_ANCHOR,
+      field: PLOT_ANCHORS.Y,
       type: 'nominal',
-      title: PLOT_Y_LABEL_ANCHOR
+      title: PLOT_ANCHORS.Y_LABEL
     },
     yOffset: {
       field: 'rev',
       sort: []
     },
-    color: PLOT_COLOR_ANCHOR,
-    column: PLOT_COLUMN_ANCHOR
+    color: PLOT_ANCHORS.COLOR,
+    column: PLOT_ANCHORS.COLUMN
   }
 } as unknown as TopLevelSpec
 

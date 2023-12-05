@@ -2,15 +2,7 @@ import type { TopLevelSpec } from 'vega-lite'
 import { isMultiViewPlot } from '../../../plots/vega/util'
 import {
   EXPERIMENT_WORKSPACE_ID,
-  PLOT_COLOR_ANCHOR,
-  PLOT_DATA_ANCHOR,
-  PLOT_HEIGHT_ANCHOR,
-  PLOT_STROKE_DASH_ANCHOR,
-  PLOT_TITLE_ANCHOR,
-  PLOT_WIDTH_ANCHOR,
-  PLOT_X_LABEL_ANCHOR,
-  PLOT_Y_LABEL_ANCHOR,
-  PLOT_ZOOM_AND_PAN_ANCHOR,
+  PLOT_ANCHORS,
   PlotsOutput,
   PlotsType,
   ZOOM_AND_PAN_PROP
@@ -44,7 +36,7 @@ const basicVega = {
         'exp-e7a67'
       ],
       anchor_definitions: {
-        [PLOT_DATA_ANCHOR]: [
+        [PLOT_ANCHORS.DATA]: [
           {
             loss: '2.298783302307129',
             step: '0',
@@ -316,22 +308,22 @@ const basicVega = {
             rev: 'exp-83425'
           }
         ],
-        [PLOT_HEIGHT_ANCHOR]: 300,
-        [PLOT_STROKE_DASH_ANCHOR]: {},
-        [PLOT_TITLE_ANCHOR]: 'dvc.yaml::Loss',
-        [PLOT_WIDTH_ANCHOR]: 300,
-        [PLOT_X_LABEL_ANCHOR]: 'step',
-        [PLOT_Y_LABEL_ANCHOR]: 'loss',
-        [PLOT_ZOOM_AND_PAN_ANCHOR]: ZOOM_AND_PAN_PROP
+        [PLOT_ANCHORS.HEIGHT]: 300,
+        [PLOT_ANCHORS.STROKE_DASH]: {},
+        [PLOT_ANCHORS.TITLE]: 'dvc.yaml::Loss',
+        [PLOT_ANCHORS.WIDTH]: 300,
+        [PLOT_ANCHORS.X_LABEL]: 'step',
+        [PLOT_ANCHORS.Y_LABEL]: 'loss',
+        [PLOT_ANCHORS.ZOOM_AND_PAN]: ZOOM_AND_PAN_PROP
       },
       content: {
         $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
         data: {
-          values: PLOT_DATA_ANCHOR
+          values: PLOT_ANCHORS.DATA
         },
-        title: PLOT_TITLE_ANCHOR,
-        width: PLOT_WIDTH_ANCHOR,
-        height: PLOT_HEIGHT_ANCHOR,
+        title: PLOT_ANCHORS.TITLE,
+        width: PLOT_ANCHORS.WIDTH,
+        height: PLOT_ANCHORS.HEIGHT,
         params: [
           {
             name: 'smooth',
@@ -348,16 +340,16 @@ const basicVega = {
           x: {
             field: 'step',
             type: 'quantitative',
-            title: PLOT_X_LABEL_ANCHOR
+            title: PLOT_ANCHORS.X_LABEL
           },
-          color: PLOT_COLOR_ANCHOR,
-          strokeDash: PLOT_STROKE_DASH_ANCHOR
+          color: PLOT_ANCHORS.COLOR,
+          strokeDash: PLOT_ANCHORS.STROKE_DASH
         },
         layer: [
           {
             layer: [
               {
-                params: [PLOT_ZOOM_AND_PAN_ANCHOR],
+                params: [PLOT_ANCHORS.ZOOM_AND_PAN],
                 mark: 'line'
               },
               {
@@ -376,7 +368,7 @@ const basicVega = {
               y: {
                 field: 'loss',
                 type: 'quantitative',
-                title: PLOT_Y_LABEL_ANCHOR,
+                title: PLOT_ANCHORS.Y_LABEL,
                 scale: {
                   zero: false
                 }
@@ -406,12 +398,12 @@ const basicVega = {
               x: {
                 field: 'step',
                 type: 'quantitative',
-                title: PLOT_X_LABEL_ANCHOR
+                title: PLOT_ANCHORS.X_LABEL
               },
               y: {
                 field: 'loss',
                 type: 'quantitative',
-                title: PLOT_Y_LABEL_ANCHOR,
+                title: PLOT_ANCHORS.Y_LABEL,
                 scale: {
                   zero: false
                 }
@@ -432,7 +424,7 @@ const basicVega = {
                 aggregate: 'max',
                 field: 'step',
                 type: 'quantitative',
-                title: PLOT_X_LABEL_ANCHOR
+                title: PLOT_ANCHORS.X_LABEL
               },
               y: {
                 aggregate: {
@@ -440,7 +432,7 @@ const basicVega = {
                 },
                 field: 'loss',
                 type: 'quantitative',
-                title: PLOT_Y_LABEL_ANCHOR,
+                title: PLOT_ANCHORS.Y_LABEL,
                 scale: {
                   zero: false
                 }
@@ -670,7 +662,7 @@ const extendedSpecs = (plotsOutput: TemplatePlots): TemplatePlotSection[] => {
       const plot = {
         anchorDefinitions: {
           ...originalPlot.anchor_definitions,
-          [PLOT_COLOR_ANCHOR]: {
+          [PLOT_ANCHORS.COLOR]: {
             field: 'rev',
             scale: {
               domain: REVISIONS,

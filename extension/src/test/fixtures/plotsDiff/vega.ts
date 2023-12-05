@@ -1,14 +1,6 @@
 import {
-  PLOT_DATA_ANCHOR,
   EXPERIMENT_WORKSPACE_ID,
-  PLOT_Y_LABEL_ANCHOR,
-  PLOT_X_LABEL_ANCHOR,
-  PLOT_ZOOM_AND_PAN_ANCHOR,
-  PLOT_COLOR_ANCHOR,
-  PLOT_STROKE_DASH_ANCHOR,
-  PLOT_TITLE_ANCHOR,
-  PLOT_WIDTH_ANCHOR,
-  PLOT_HEIGHT_ANCHOR,
+  PLOT_ANCHORS,
   ZOOM_AND_PAN_PROP
 } from '../../../cli/dvc/contract'
 import { join } from '../../util/path'
@@ -17,7 +9,7 @@ const data = {
   [join('logs', 'acc.tsv')]: [
     {
       anchor_definitions: {
-        [PLOT_DATA_ANCHOR]: [
+        [PLOT_ANCHORS.DATA]: [
           {
             acc: '0.123',
             rev: EXPERIMENT_WORKSPACE_ID,
@@ -290,13 +282,13 @@ const data = {
             timestamp: '1642041648863'
           }
         ],
-        [PLOT_HEIGHT_ANCHOR]: 300,
-        [PLOT_STROKE_DASH_ANCHOR]: {},
-        [PLOT_TITLE_ANCHOR]: 'dvc.yaml::Accuracy',
-        [PLOT_WIDTH_ANCHOR]: 300,
-        [PLOT_X_LABEL_ANCHOR]: 'step',
-        [PLOT_Y_LABEL_ANCHOR]: 'accuracy',
-        [PLOT_ZOOM_AND_PAN_ANCHOR]: ZOOM_AND_PAN_PROP
+        [PLOT_ANCHORS.HEIGHT]: 300,
+        [PLOT_ANCHORS.STROKE_DASH]: {},
+        [PLOT_ANCHORS.TITLE]: 'dvc.yaml::Accuracy',
+        [PLOT_ANCHORS.WIDTH]: 300,
+        [PLOT_ANCHORS.X_LABEL]: 'step',
+        [PLOT_ANCHORS.Y_LABEL]: 'accuracy',
+        [PLOT_ANCHORS.ZOOM_AND_PAN]: ZOOM_AND_PAN_PROP
       },
       multiView: false,
       type: 'vega',
@@ -310,11 +302,11 @@ const data = {
       content: {
         $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
         data: {
-          values: PLOT_DATA_ANCHOR
+          values: PLOT_ANCHORS.DATA
         },
-        title: PLOT_TITLE_ANCHOR,
-        width: PLOT_WIDTH_ANCHOR,
-        height: PLOT_HEIGHT_ANCHOR,
+        title: PLOT_ANCHORS.TITLE,
+        width: PLOT_ANCHORS.WIDTH,
+        height: PLOT_ANCHORS.HEIGHT,
         params: [
           {
             name: 'smooth',
@@ -331,16 +323,16 @@ const data = {
           x: {
             field: 'step',
             type: 'quantitative',
-            title: PLOT_X_LABEL_ANCHOR
+            title: PLOT_ANCHORS.X_LABEL
           },
-          color: PLOT_COLOR_ANCHOR,
-          strokeDash: PLOT_STROKE_DASH_ANCHOR
+          color: PLOT_ANCHORS.COLOR,
+          strokeDash: PLOT_ANCHORS.STROKE_DASH
         },
         layer: [
           {
             layer: [
               {
-                params: [PLOT_ZOOM_AND_PAN_ANCHOR],
+                params: [PLOT_ANCHORS.ZOOM_AND_PAN],
                 mark: 'line'
               },
               {
@@ -359,7 +351,7 @@ const data = {
               y: {
                 field: 'acc',
                 type: 'quantitative',
-                title: PLOT_Y_LABEL_ANCHOR,
+                title: PLOT_ANCHORS.Y_LABEL,
                 scale: {
                   zero: false
                 }
@@ -389,12 +381,12 @@ const data = {
               x: {
                 field: 'step',
                 type: 'quantitative',
-                title: PLOT_X_LABEL_ANCHOR
+                title: PLOT_ANCHORS.X_LABEL
               },
               y: {
                 field: 'acc',
                 type: 'quantitative',
-                title: PLOT_Y_LABEL_ANCHOR,
+                title: PLOT_ANCHORS.Y_LABEL,
                 scale: {
                   zero: false
                 }
@@ -415,7 +407,7 @@ const data = {
                 aggregate: 'max',
                 field: 'step',
                 type: 'quantitative',
-                title: PLOT_X_LABEL_ANCHOR
+                title: PLOT_ANCHORS.X_LABEL
               },
               y: {
                 aggregate: {
@@ -423,7 +415,7 @@ const data = {
                 },
                 field: 'acc',
                 type: 'quantitative',
-                title: PLOT_Y_LABEL_ANCHOR,
+                title: PLOT_ANCHORS.Y_LABEL,
                 scale: {
                   zero: false
                 }
@@ -484,7 +476,7 @@ const data = {
     {
       anchor_definitions: {
         // @ts-expect-error Expression produces a union type that is too complex to represent.
-        [PLOT_DATA_ANCHOR]: [
+        [PLOT_ANCHORS.DATA]: [
           { actual: 7, predicted: 7, rev: EXPERIMENT_WORKSPACE_ID },
           { actual: 2, predicted: 0, rev: EXPERIMENT_WORKSPACE_ID },
           { actual: 1, predicted: 1, rev: EXPERIMENT_WORKSPACE_ID },
@@ -50488,11 +50480,11 @@ const data = {
           { actual: 5, predicted: 5, rev: 'exp-83425' },
           { actual: 6, predicted: 6, rev: 'exp-83425' }
         ],
-        [PLOT_HEIGHT_ANCHOR]: 300,
-        [PLOT_TITLE_ANCHOR]: '',
-        [PLOT_WIDTH_ANCHOR]: 300,
-        [PLOT_X_LABEL_ANCHOR]: 'actual',
-        [PLOT_Y_LABEL_ANCHOR]: 'predicted'
+        [PLOT_ANCHORS.HEIGHT]: 300,
+        [PLOT_ANCHORS.TITLE]: '',
+        [PLOT_ANCHORS.WIDTH]: 300,
+        [PLOT_ANCHORS.X_LABEL]: 'actual',
+        [PLOT_ANCHORS.Y_LABEL]: 'predicted'
       },
       multiView: true,
       type: 'vega',
@@ -50506,9 +50498,9 @@ const data = {
       content: {
         $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
         data: {
-          values: PLOT_DATA_ANCHOR
+          values: PLOT_ANCHORS.DATA
         },
-        title: PLOT_TITLE_ANCHOR,
+        title: PLOT_ANCHORS.TITLE,
         facet: {
           column: {
             field: 'rev',
@@ -50567,20 +50559,20 @@ const data = {
               field: 'actual',
               type: 'nominal',
               sort: 'ascending',
-              title: PLOT_X_LABEL_ANCHOR
+              title: PLOT_ANCHORS.X_LABEL
             },
             y: {
               field: 'predicted',
               type: 'nominal',
               sort: 'ascending',
-              title: PLOT_Y_LABEL_ANCHOR
+              title: PLOT_ANCHORS.Y_LABEL
             }
           },
           layer: [
             {
               mark: 'rect',
-              width: PLOT_WIDTH_ANCHOR,
-              height: PLOT_HEIGHT_ANCHOR,
+              width: PLOT_ANCHORS.WIDTH,
+              height: PLOT_ANCHORS.HEIGHT,
               encoding: {
                 color: {
                   field: 'xy_count',

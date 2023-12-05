@@ -1,46 +1,34 @@
 import type { TopLevelSpec } from 'vega-lite'
-import {
-  PLOT_COLOR_ANCHOR,
-  PLOT_DATA_ANCHOR,
-  PLOT_HEIGHT_ANCHOR,
-  PLOT_SHAPE_ANCHOR,
-  PLOT_TITLE_ANCHOR,
-  PLOT_WIDTH_ANCHOR,
-  PLOT_X_ANCHOR,
-  PLOT_X_LABEL_ANCHOR,
-  PLOT_Y_ANCHOR,
-  PLOT_Y_LABEL_ANCHOR,
-  PLOT_ZOOM_AND_PAN_ANCHOR
-} from '../../../../cli/dvc/contract'
+import { PLOT_ANCHORS } from '../../../../cli/dvc/contract'
 
 const data = {
   $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
   data: {
-    values: PLOT_DATA_ANCHOR
+    values: PLOT_ANCHORS.DATA
   },
-  title: PLOT_TITLE_ANCHOR,
-  width: PLOT_WIDTH_ANCHOR,
-  height: PLOT_HEIGHT_ANCHOR,
+  title: PLOT_ANCHORS.TITLE,
+  width: PLOT_ANCHORS.WIDTH,
+  height: PLOT_ANCHORS.HEIGHT,
   mark: {
     type: 'point',
     tooltip: {
       content: 'data'
     }
   },
-  params: [PLOT_ZOOM_AND_PAN_ANCHOR],
+  params: [PLOT_ANCHORS.ZOOM_AND_PAN],
   encoding: {
     x: {
-      field: PLOT_X_ANCHOR,
+      field: PLOT_ANCHORS.X,
       type: 'quantitative',
-      title: PLOT_X_LABEL_ANCHOR
+      title: PLOT_ANCHORS.X_LABEL
     },
     y: {
-      field: PLOT_Y_ANCHOR,
+      field: PLOT_ANCHORS.Y,
       type: 'quantitative',
-      title: PLOT_Y_LABEL_ANCHOR
+      title: PLOT_ANCHORS.Y_LABEL
     },
-    color: PLOT_COLOR_ANCHOR,
-    shape: PLOT_SHAPE_ANCHOR,
+    color: PLOT_ANCHORS.COLOR,
+    shape: PLOT_ANCHORS.SHAPE,
     tooltip: '<DVC_METRIC_TOOLTIP>'
   }
 } as unknown as TopLevelSpec

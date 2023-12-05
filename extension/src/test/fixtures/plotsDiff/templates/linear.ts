@@ -1,26 +1,14 @@
 import type { TopLevelSpec } from 'vega-lite'
-import {
-  PLOT_COLOR_ANCHOR,
-  PLOT_DATA_ANCHOR,
-  PLOT_HEIGHT_ANCHOR,
-  PLOT_STROKE_DASH_ANCHOR,
-  PLOT_TITLE_ANCHOR,
-  PLOT_WIDTH_ANCHOR,
-  PLOT_X_ANCHOR,
-  PLOT_X_LABEL_ANCHOR,
-  PLOT_Y_ANCHOR,
-  PLOT_Y_LABEL_ANCHOR,
-  PLOT_ZOOM_AND_PAN_ANCHOR
-} from '../../../../cli/dvc/contract'
+import { PLOT_ANCHORS } from '../../../../cli/dvc/contract'
 
 const data = {
   $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
   data: {
-    values: PLOT_DATA_ANCHOR
+    values: PLOT_ANCHORS.DATA
   },
-  title: PLOT_TITLE_ANCHOR,
-  width: PLOT_WIDTH_ANCHOR,
-  height: PLOT_HEIGHT_ANCHOR,
+  title: PLOT_ANCHORS.TITLE,
+  width: PLOT_ANCHORS.WIDTH,
+  height: PLOT_ANCHORS.HEIGHT,
   params: [
     {
       name: 'smooth',
@@ -35,18 +23,18 @@ const data = {
   ],
   encoding: {
     x: {
-      field: PLOT_X_ANCHOR,
+      field: PLOT_ANCHORS.X,
       type: 'quantitative',
-      title: PLOT_X_LABEL_ANCHOR
+      title: PLOT_ANCHORS.X_LABEL
     },
-    color: PLOT_COLOR_ANCHOR,
-    strokeDash: PLOT_STROKE_DASH_ANCHOR
+    color: PLOT_ANCHORS.COLOR,
+    strokeDash: PLOT_ANCHORS.STROKE_DASH
   },
   layer: [
     {
       layer: [
         {
-          params: [PLOT_ZOOM_AND_PAN_ANCHOR],
+          params: [PLOT_ANCHORS.ZOOM_AND_PAN],
           mark: 'line'
         },
         {
@@ -63,9 +51,9 @@ const data = {
       ],
       encoding: {
         y: {
-          field: PLOT_Y_ANCHOR,
+          field: PLOT_ANCHORS.Y,
           type: 'quantitative',
-          title: PLOT_Y_LABEL_ANCHOR,
+          title: PLOT_ANCHORS.Y_LABEL,
           scale: {
             zero: false
           }
@@ -77,8 +65,8 @@ const data = {
       },
       transform: [
         {
-          loess: PLOT_Y_ANCHOR,
-          on: PLOT_X_ANCHOR,
+          loess: PLOT_ANCHORS.Y,
+          on: PLOT_ANCHORS.X,
           groupby: '<DVC_METRIC_GROUP_BY>',
           bandwidth: {
             signal: 'smooth'
@@ -93,14 +81,14 @@ const data = {
       },
       encoding: {
         x: {
-          field: PLOT_X_ANCHOR,
+          field: PLOT_ANCHORS.X,
           type: 'quantitative',
-          title: PLOT_X_LABEL_ANCHOR
+          title: PLOT_ANCHORS.X_LABEL
         },
         y: {
-          field: PLOT_Y_ANCHOR,
+          field: PLOT_ANCHORS.Y,
           type: 'quantitative',
-          title: PLOT_Y_LABEL_ANCHOR,
+          title: PLOT_ANCHORS.Y_LABEL,
           scale: {
             zero: false
           }
@@ -119,17 +107,17 @@ const data = {
       encoding: {
         x: {
           aggregate: 'max',
-          field: PLOT_X_ANCHOR,
+          field: PLOT_ANCHORS.X,
           type: 'quantitative',
-          title: PLOT_X_LABEL_ANCHOR
+          title: PLOT_ANCHORS.X_LABEL
         },
         y: {
           aggregate: {
-            argmax: PLOT_X_ANCHOR
+            argmax: PLOT_ANCHORS.X
           },
-          field: PLOT_Y_ANCHOR,
+          field: PLOT_ANCHORS.Y,
           type: 'quantitative',
-          title: PLOT_Y_LABEL_ANCHOR,
+          title: PLOT_ANCHORS.Y_LABEL,
           scale: {
             zero: false
           }
@@ -148,8 +136,8 @@ const data = {
         },
         {
           pivot: 'pivot_field',
-          value: PLOT_Y_ANCHOR,
-          groupby: [PLOT_X_ANCHOR]
+          value: PLOT_ANCHORS.Y,
+          groupby: [PLOT_ANCHORS.X]
         }
       ],
       mark: {
@@ -174,7 +162,7 @@ const data = {
           name: 'hover',
           select: {
             type: 'point',
-            fields: [PLOT_X_ANCHOR],
+            fields: [PLOT_ANCHORS.X],
             nearest: true,
             on: 'mouseover',
             clear: 'mouseout'

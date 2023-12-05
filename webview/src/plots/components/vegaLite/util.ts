@@ -1,15 +1,7 @@
 import type { TopLevelSpec } from 'vega-lite'
 import {
   AnchorDefinitions,
-  PLOT_COLOR_ANCHOR,
-  PLOT_HEIGHT_ANCHOR,
-  PLOT_WIDTH_ANCHOR,
-  PLOT_SHAPE_ANCHOR,
-  PLOT_STROKE_DASH_ANCHOR,
-  PLOT_TITLE_ANCHOR,
-  PLOT_X_LABEL_ANCHOR,
-  PLOT_Y_LABEL_ANCHOR,
-  PLOT_ZOOM_AND_PAN_ANCHOR,
+  PLOT_ANCHORS,
   ZOOM_AND_PAN_PROP
 } from 'dvc/src/cli/dvc/contract'
 import { isMultiViewPlot } from 'dvc/src/plots/vega/util'
@@ -51,43 +43,43 @@ const replaceAnchors = (
 
 const updateTitles = (
   updatedAnchors: Record<string, unknown>,
-  key: string,
+  key: keyof AnchorDefinitions,
   value: unknown,
   titleWidth: number,
   titleHeight: number
 ) => {
   if (
-    key !== PLOT_TITLE_ANCHOR &&
-    key !== PLOT_X_LABEL_ANCHOR &&
-    key !== PLOT_Y_LABEL_ANCHOR
+    key !== PLOT_ANCHORS.TITLE &&
+    key !== PLOT_ANCHORS.X_LABEL &&
+    key !== PLOT_ANCHORS.Y_LABEL
   ) {
     return
   }
 
-  const length = key === PLOT_Y_LABEL_ANCHOR ? titleHeight : titleWidth
+  const length = key === PLOT_ANCHORS.Y_LABEL ? titleHeight : titleWidth
   updatedAnchors[key] = truncate(value as string, length, 'left')
 }
 
 const updateLegend = (
   updatedAnchors: Record<string, unknown>,
   plotFocused: boolean,
-  key: string,
+  key: PLOT_ANCHORS,
   value: unknown
 ) => {
   if (
     plotFocused ||
-    (key !== PLOT_COLOR_ANCHOR &&
-      key !== PLOT_SHAPE_ANCHOR &&
-      key !== PLOT_STROKE_DASH_ANCHOR)
+    (key !== PLOT_ANCHORS.COLOR &&
+      key !== PLOT_ANCHORS.SHAPE &&
+      key !== PLOT_ANCHORS.STROKE_DASH)
   ) {
     return
   }
 
   updatedAnchors[key] = {
     ...(value as AnchorDefinitions[
-      | typeof PLOT_COLOR_ANCHOR
-      | typeof PLOT_SHAPE_ANCHOR
-      | typeof PLOT_STROKE_DASH_ANCHOR]),
+      | typeof PLOT_ANCHORS.COLOR
+      | typeof PLOT_ANCHORS.SHAPE
+      | typeof PLOT_ANCHORS.STROKE_DASH]),
     legend: null
   }
 }
@@ -104,22 +96,23 @@ const getUpdatedAnchors = (
   const maxVerticalTitleChars = height / 10
 
   for (const [key, value] of Object.entries(anchorDefinitions)) {
+    const tKey = key as keyof AnchorDefinitions
     updateTitles(
       updatedAnchors,
-      key,
+      tKey,
       value,
       maxHorizontalTitleChars,
       maxVerticalTitleChars
     )
-    updateLegend(updatedAnchors, plotFocused, key, value)
+    updateLegend(updatedAnchors, plotFocused, tKey, value)
   }
-  updatedAnchors[PLOT_ZOOM_AND_PAN_ANCHOR] = plotFocused
+  updatedAnchors[PLOT_ANCHORS.ZOOM_AND_PAN] = plotFocused
     ? ZOOM_AND_PAN_PROP
     : {}
 
-  updatedAnchors[PLOT_HEIGHT_ANCHOR] = isMultiView ? 300 : 'container'
+  updatedAnchors[PLOT_ANCHORS.HEIGHT] = isMultiView ? 300 : 'container'
 
-  updatedAnchors[PLOT_WIDTH_ANCHOR] = isMultiView ? 300 : 'container'
+  updatedAnchors[PLOT_ANCHORS.WIDTH] = isMultiView ? 300 : 'container'
 
   return updatedAnchors
 }

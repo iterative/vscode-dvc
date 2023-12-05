@@ -18,13 +18,7 @@ import {
 } from '../webview/contract'
 import {
   AnchorDefinitions,
-  PLOT_COLOR_ANCHOR,
-  PLOT_DATA_ANCHOR,
-  PLOT_METRIC_TYPE_ANCHOR,
-  PLOT_X_LABEL_ANCHOR,
-  PLOT_Y_LABEL_ANCHOR,
-  PLOT_ZOOM_AND_PAN_ANCHOR,
-  PLOT_PARAM_TYPE_ANCHOR,
+  PLOT_ANCHORS,
   isImagePlotOutput,
   PlotOutput,
   PlotsOutput,
@@ -140,16 +134,16 @@ const getCustomPlotData = (
 
   return {
     anchorDefinitions: {
-      [PLOT_COLOR_ANCHOR]: {
+      [PLOT_ANCHORS.COLOR]: {
         field: 'id',
         scale: completeColorScale
       },
-      [PLOT_DATA_ANCHOR]: values,
-      [PLOT_METRIC_TYPE_ANCHOR]: getDataType(typeof metricVal),
-      [PLOT_PARAM_TYPE_ANCHOR]: getDataType(typeof paramVal),
-      [PLOT_X_LABEL_ANCHOR]: param,
-      [PLOT_Y_LABEL_ANCHOR]: metric,
-      [PLOT_ZOOM_AND_PAN_ANCHOR]: {
+      [PLOT_ANCHORS.DATA]: values,
+      [PLOT_ANCHORS.METRIC_TYPE]: getDataType(typeof metricVal),
+      [PLOT_ANCHORS.PARAM_TYPE]: getDataType(typeof paramVal),
+      [PLOT_ANCHORS.X_LABEL]: param,
+      [PLOT_ANCHORS.Y_LABEL]: metric,
+      [PLOT_ANCHORS.ZOOM_AND_PAN]: {
         bind: 'scales',
         name: 'grid',
         select: 'interval'
@@ -261,7 +255,7 @@ const collectPlotData = (
 ) => {
   initializeAcc(acc, path, plot.revisions || [])
 
-  for (const data of (plot.anchor_definitions[PLOT_DATA_ANCHOR] as {
+  for (const data of (plot.anchor_definitions[PLOT_ANCHORS.DATA] as {
     rev?: string
   }[]) || []) {
     const rev = data.rev
@@ -398,7 +392,7 @@ const collectTemplateDetails = (
     return
   }
   const { anchor_definitions, content } = plot
-  delete anchor_definitions[PLOT_COLOR_ANCHOR]
+  delete anchor_definitions[PLOT_ANCHORS.COLOR]
   acc[path] = { anchorDefinitions: anchor_definitions, content }
 }
 
@@ -437,8 +431,8 @@ const collectTemplatePlot = (
   acc.push({
     anchorDefinitions: {
       ...anchorDefinitions,
-      [PLOT_COLOR_ANCHOR]: { field: 'rev', scale: colorScale },
-      [PLOT_DATA_ANCHOR]: datapoints
+      [PLOT_ANCHORS.COLOR]: { field: 'rev', scale: colorScale },
+      [PLOT_ANCHORS.DATA]: datapoints
     },
     content,
     id: path,

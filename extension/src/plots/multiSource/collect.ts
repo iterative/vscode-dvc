@@ -1,7 +1,6 @@
 import {
   isImagePlotOutput,
-  PLOT_SHAPE_ANCHOR,
-  PLOT_STROKE_DASH_ANCHOR,
+  PLOT_ANCHORS,
   PlotsOutput,
   ShapeEncoding,
   StrokeDashEncoding,
@@ -18,14 +17,14 @@ const collectEncoding = (
   id: string,
   plot: TemplatePlotOutput
 ): void => {
-  const strokeDashEncoding = plot.anchor_definitions[PLOT_STROKE_DASH_ANCHOR]
+  const strokeDashEncoding = plot.anchor_definitions[PLOT_ANCHORS.STROKE_DASH]
   if (strokeDashEncoding) {
     acc[id] = {
       strokeDash: strokeDashEncoding
     }
     return
   }
-  const shapeEncoding = plot.anchor_definitions[PLOT_SHAPE_ANCHOR]
+  const shapeEncoding = plot.anchor_definitions[PLOT_ANCHORS.SHAPE]
   if (shapeEncoding) {
     acc[id] = {
       shape: shapeEncoding

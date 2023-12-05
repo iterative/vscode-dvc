@@ -1,8 +1,4 @@
-import {
-  PLOT_TITLE_ANCHOR,
-  PLOT_X_LABEL_ANCHOR,
-  PLOT_Y_LABEL_ANCHOR
-} from 'dvc/src/cli/dvc/contract'
+import { PLOT_ANCHORS } from 'dvc/src/cli/dvc/contract'
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import { useCallback, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
@@ -28,12 +24,12 @@ export const useGetTitles = (
     const plot = plotDataStore[section][id]
     const { anchorDefinitions } = plot
 
-    let title = anchorDefinitions?.[PLOT_TITLE_ANCHOR] || ''
+    let title = anchorDefinitions?.[PLOT_ANCHORS.TITLE] || ''
     let subtitle = ''
 
     if (!isTemplatePlot) {
-      const yTitle = anchorDefinitions?.[PLOT_Y_LABEL_ANCHOR] || ''
-      const xTitle = anchorDefinitions?.[PLOT_X_LABEL_ANCHOR] || ''
+      const yTitle = anchorDefinitions?.[PLOT_ANCHORS.Y_LABEL] || ''
+      const xTitle = anchorDefinitions?.[PLOT_ANCHORS.X_LABEL] || ''
 
       title = getMetricVsParamTitle(yTitle, xTitle)
       subtitle = id.replace('custom-', '')

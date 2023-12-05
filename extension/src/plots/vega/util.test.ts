@@ -13,10 +13,7 @@ import linearTemplate from '../../test/fixtures/plotsDiff/templates/linear'
 import scatterTemplate from '../../test/fixtures/plotsDiff/templates/scatter'
 import smoothTemplate from '../../test/fixtures/plotsDiff/templates/smooth'
 import { copyOriginalColors } from '../../experiments/model/status/colors'
-import {
-  EXPERIMENT_WORKSPACE_ID,
-  PLOT_COLUMN_ANCHOR
-} from '../../cli/dvc/contract'
+import { EXPERIMENT_WORKSPACE_ID, PLOT_ANCHORS } from '../../cli/dvc/contract'
 
 describe('isMultiViewPlot', () => {
   it('should recognize the confusion matrix template as a multi view plot', () => {
@@ -40,7 +37,7 @@ describe('isMultiViewPlot', () => {
   it('should recognize the horizontal bar template with multiple columns as a multi view plot', () => {
     expect(
       isMultiViewPlot(barHorizontalTemplate, {
-        [PLOT_COLUMN_ANCHOR]: { field: 'filename', sort: [] }
+        [PLOT_ANCHORS.COLUMN]: { field: 'filename', sort: [] }
       })
     ).toBe(true)
   })

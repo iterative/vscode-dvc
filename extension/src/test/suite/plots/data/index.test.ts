@@ -21,7 +21,7 @@ import { getProcessPlatform } from '../../../../env'
 import { removeDir } from '../../../../fileSystem'
 import {
   EXPERIMENT_WORKSPACE_ID,
-  PLOT_DATA_ANCHOR
+  PLOT_ANCHORS
 } from '../../../../cli/dvc/contract'
 
 suite('Plots Data Test Suite', () => {
@@ -86,7 +86,7 @@ suite('Plots Data Test Suite', () => {
               'dvc.yaml::Accuracy': [
                 {
                   anchor_definitions: {
-                    [PLOT_DATA_ANCHOR]: [
+                    [PLOT_ANCHORS.DATA]: [
                       {
                         dvc_inferred_y_value: '0.2707333333333333',
                         field: join('train', 'acc'),

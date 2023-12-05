@@ -138,21 +138,24 @@ export const isImagePlotOutput = (plot: {
 }): plot is ImagePlotOutput => plot.type === PlotsType.IMAGE
 
 export const PLOT_REV_FIELD = 'rev' as const
-export const PLOT_COLOR_ANCHOR = '<DVC_METRIC_COLOR>' as const
-export const PLOT_COLUMN_ANCHOR = '<DVC_METRIC_COLUMN>' as const
-export const PLOT_DATA_ANCHOR = '<DVC_METRIC_DATA>' as const
-export const PLOT_SHAPE_ANCHOR = '<DVC_METRIC_SHAPE>' as const
-export const PLOT_STROKE_DASH_ANCHOR = '<DVC_METRIC_STROKE_DASH>' as const
-export const PLOT_METRIC_TYPE_ANCHOR = '<DVC_METRIC_TYPE>' as const
-export const PLOT_TITLE_ANCHOR = '<DVC_METRIC_TITLE>' as const
-export const PLOT_X_ANCHOR = '<DVC_METRIC_X>' as const
-export const PLOT_X_LABEL_ANCHOR = '<DVC_METRIC_X_LABEL>' as const
-export const PLOT_Y_ANCHOR = '<DVC_METRIC_Y>' as const
-export const PLOT_Y_LABEL_ANCHOR = '<DVC_METRIC_Y_LABEL>' as const
-export const PLOT_ZOOM_AND_PAN_ANCHOR = '<DVC_METRIC_ZOOM_AND_PAN>' as const
-export const PLOT_PARAM_TYPE_ANCHOR = '<DVC_PARAM_TYPE>' as const
-export const PLOT_HEIGHT_ANCHOR = '<DVC_METRIC_PLOT_HEIGHT>' as const
-export const PLOT_WIDTH_ANCHOR = '<DVC_METRIC_PLOT_WIDTH>' as const
+
+export enum PLOT_ANCHORS {
+  COLOR = '<DVC_METRIC_COLOR>',
+  COLUMN = '<DVC_METRIC_COLUMN>',
+  DATA = '<DVC_METRIC_DATA>',
+  HEIGHT = '<DVC_METRIC_PLOT_HEIGHT>',
+  METRIC_TYPE = '<DVC_METRIC_TYPE>',
+  PARAM_TYPE = '<DVC_PARAM_TYPE>',
+  SHAPE = '<DVC_METRIC_SHAPE>',
+  STROKE_DASH = '<DVC_METRIC_STROKE_DASH>',
+  TITLE = '<DVC_METRIC_TITLE>',
+  WIDTH = '<DVC_METRIC_PLOT_WIDTH>',
+  X = '<DVC_METRIC_X>',
+  X_LABEL = '<DVC_METRIC_X_LABEL>',
+  Y = '<DVC_METRIC_Y>',
+  Y_LABEL = '<DVC_METRIC_Y_LABEL>',
+  ZOOM_AND_PAN = '<DVC_METRIC_ZOOM_AND_PAN>'
+}
 
 export const ZOOM_AND_PAN_PROP = {
   bind: 'scales',
@@ -206,21 +209,21 @@ export type StrokeDashEncoding = MultiSourceEncoding<StrokeDashValue>
 export type ShapeEncoding = MultiSourceEncoding<ShapeValue>
 
 export type AnchorDefinitions = {
-  [PLOT_COLOR_ANCHOR]?: Encoding<string>
-  [PLOT_COLUMN_ANCHOR]?: EmptyObject | { sort: never[]; field: string }
-  [PLOT_DATA_ANCHOR]?: Array<Record<string, unknown>>
-  [PLOT_HEIGHT_ANCHOR]?: number | 'container'
-  [PLOT_METRIC_TYPE_ANCHOR]?: 'quantitative' | 'nominal'
-  [PLOT_PARAM_TYPE_ANCHOR]?: 'quantitative' | 'nominal'
-  [PLOT_SHAPE_ANCHOR]?: MultiSourceEncoding<ShapeValue>
-  [PLOT_STROKE_DASH_ANCHOR]?: MultiSourceEncoding<StrokeDashValue>
-  [PLOT_TITLE_ANCHOR]?: string
-  [PLOT_WIDTH_ANCHOR]?: number | 'container'
-  [PLOT_X_ANCHOR]?: string
-  [PLOT_X_LABEL_ANCHOR]?: string
-  [PLOT_Y_ANCHOR]?: string
-  [PLOT_Y_LABEL_ANCHOR]?: string
-  [PLOT_ZOOM_AND_PAN_ANCHOR]?: typeof ZOOM_AND_PAN_PROP
+  [PLOT_ANCHORS.COLOR]?: Encoding<string>
+  [PLOT_ANCHORS.COLUMN]?: EmptyObject | { sort: never[]; field: string }
+  [PLOT_ANCHORS.DATA]?: Array<Record<string, unknown>>
+  [PLOT_ANCHORS.HEIGHT]?: number | 'container'
+  [PLOT_ANCHORS.METRIC_TYPE]?: 'quantitative' | 'nominal'
+  [PLOT_ANCHORS.PARAM_TYPE]?: 'quantitative' | 'nominal'
+  [PLOT_ANCHORS.SHAPE]?: MultiSourceEncoding<ShapeValue>
+  [PLOT_ANCHORS.STROKE_DASH]?: MultiSourceEncoding<StrokeDashValue>
+  [PLOT_ANCHORS.TITLE]?: string
+  [PLOT_ANCHORS.WIDTH]?: number | 'container'
+  [PLOT_ANCHORS.X]?: string
+  [PLOT_ANCHORS.X_LABEL]?: string
+  [PLOT_ANCHORS.Y]?: string
+  [PLOT_ANCHORS.Y_LABEL]?: string
+  [PLOT_ANCHORS.ZOOM_AND_PAN]?: typeof ZOOM_AND_PAN_PROP
 }
 
 export type TemplatePlotOutput = {

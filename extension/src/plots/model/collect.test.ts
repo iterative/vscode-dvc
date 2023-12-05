@@ -13,7 +13,7 @@ import customPlotsFixture, {
   experimentsWithCommits
 } from '../../test/fixtures/expShow/base/customPlots'
 import {
-  PLOT_DATA_ANCHOR,
+  PLOT_ANCHORS,
   EXPERIMENT_WORKSPACE_ID,
   TemplatePlotOutput
 } from '../../cli/dvc/contract'
@@ -59,7 +59,7 @@ describe('collectCustomPlots', () => {
       plotsOrderValues: customPlotsOrderFixture
     })
     expect(
-      (data[0].anchorDefinitions[PLOT_DATA_ANCHOR] || []).slice(-1)[0].id
+      (data[0].anchorDefinitions[PLOT_ANCHORS.DATA] || []).slice(-1)[0].id
     ).toStrictEqual('main')
   })
 
@@ -94,7 +94,7 @@ describe('collectData', () => {
   it('should return the expected output from the test fixture', () => {
     const { revisionData, comparisonData } = collectData(plotsDiffFixture)
 
-    const values = logsLossPlot?.anchor_definitions?.[PLOT_DATA_ANCHOR] || []
+    const values = logsLossPlot?.anchor_definitions?.[PLOT_ANCHORS.DATA] || []
 
     expect(isEmpty(values)).toBeFalsy()
 

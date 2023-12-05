@@ -1,15 +1,7 @@
 import type { TopLevelSpec } from 'vega-lite'
 import { getCustomPlotId } from './collect'
 import { Column, ColumnType } from '../../experiments/webview/contract'
-import {
-  PLOT_COLOR_ANCHOR,
-  PLOT_DATA_ANCHOR,
-  PLOT_METRIC_TYPE_ANCHOR,
-  PLOT_X_LABEL_ANCHOR,
-  PLOT_Y_LABEL_ANCHOR,
-  PLOT_ZOOM_AND_PAN_ANCHOR,
-  PLOT_PARAM_TYPE_ANCHOR
-} from '../../cli/dvc/contract'
+import { PLOT_ANCHORS } from '../../cli/dvc/contract'
 import { FILE_SEPARATOR } from '../../experiments/columns/constants'
 
 export type CustomPlotsOrderValue = {
@@ -66,9 +58,9 @@ export const getDataType = (type: string) =>
 export const getContent = (): TopLevelSpec =>
   ({
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-    data: { values: PLOT_DATA_ANCHOR },
+    data: { values: PLOT_ANCHORS.DATA },
     encoding: {
-      color: PLOT_COLOR_ANCHOR,
+      color: PLOT_ANCHORS.COLOR,
       x: {
         axis: {
           labelLimit: 75,
@@ -78,8 +70,8 @@ export const getContent = (): TopLevelSpec =>
         scale: {
           zero: false
         },
-        title: PLOT_X_LABEL_ANCHOR,
-        type: PLOT_PARAM_TYPE_ANCHOR
+        title: PLOT_ANCHORS.X_LABEL,
+        type: PLOT_ANCHORS.PARAM_TYPE
       },
       y: {
         axis: {
@@ -90,8 +82,8 @@ export const getContent = (): TopLevelSpec =>
         scale: {
           zero: false
         },
-        title: PLOT_Y_LABEL_ANCHOR,
-        type: PLOT_METRIC_TYPE_ANCHOR
+        title: PLOT_ANCHORS.Y_LABEL,
+        type: PLOT_ANCHORS.METRIC_TYPE
       }
     },
     height: 'container',
@@ -105,11 +97,11 @@ export const getContent = (): TopLevelSpec =>
             },
             {
               field: 'metric',
-              title: PLOT_Y_LABEL_ANCHOR
+              title: PLOT_ANCHORS.Y_LABEL
             },
             {
               field: 'param',
-              title: PLOT_X_LABEL_ANCHOR
+              title: PLOT_ANCHORS.X_LABEL
             }
           ]
         },
@@ -118,7 +110,7 @@ export const getContent = (): TopLevelSpec =>
           size: 60,
           type: 'point'
         },
-        params: [PLOT_ZOOM_AND_PAN_ANCHOR]
+        params: [PLOT_ANCHORS.ZOOM_AND_PAN]
       }
     ],
     width: 'container'

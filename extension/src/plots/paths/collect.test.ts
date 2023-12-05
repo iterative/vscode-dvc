@@ -13,7 +13,7 @@ import {
 import { TemplatePlotGroup } from '../webview/contract'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import {
-  PLOT_DATA_ANCHOR,
+  PLOT_ANCHORS,
   EXPERIMENT_WORKSPACE_ID,
   PlotsOutput,
   PlotsType,
@@ -120,7 +120,7 @@ describe('collectPaths', () => {
           [remainingPath]: [
             {
               anchor_definitions: {
-                [PLOT_DATA_ANCHOR]: [
+                [PLOT_ANCHORS.DATA]: [
                   {
                     loss: '2.43323',
                     rev: fetchedRevs[0],
@@ -218,7 +218,7 @@ describe('collectPaths', () => {
       data: {
         [join('logs', 'scalars', 'acc.tsv')]: [
           {
-            anchor_definitions: { [PLOT_DATA_ANCHOR]: [] },
+            anchor_definitions: { [PLOT_ANCHORS.DATA]: [] },
             content: mockTopLevelSpec,
             revisions,
             type: PlotsType.VEGA
@@ -226,7 +226,7 @@ describe('collectPaths', () => {
         ],
         [join('logs', 'scalars', 'loss.tsv')]: [
           {
-            anchor_definitions: { [PLOT_DATA_ANCHOR]: [] },
+            anchor_definitions: { [PLOT_ANCHORS.DATA]: [] },
             content: mockTopLevelSpec,
             revisions,
             type: PlotsType.VEGA
@@ -241,7 +241,7 @@ describe('collectPaths', () => {
         ],
         'predictions.json': [
           {
-            anchor_definitions: { [PLOT_DATA_ANCHOR]: [] },
+            anchor_definitions: { [PLOT_ANCHORS.DATA]: [] },
             content: {
               facet: { field: 'rev', type: 'nominal' }
             } as TopLevelSpec,
@@ -251,7 +251,7 @@ describe('collectPaths', () => {
         ],
         [join(`dvc.yaml${FIELD_SEPARATOR}logs`, 'acc.tsv')]: [
           {
-            anchor_definitions: { [PLOT_DATA_ANCHOR]: [] },
+            anchor_definitions: { [PLOT_ANCHORS.DATA]: [] },
             content: mockTopLevelSpec,
             revisions,
             type: PlotsType.VEGA
@@ -264,7 +264,7 @@ describe('collectPaths', () => {
           'acc.tsv'
         )]: [
           {
-            anchor_definitions: { [PLOT_DATA_ANCHOR]: [] },
+            anchor_definitions: { [PLOT_ANCHORS.DATA]: [] },
             content: mockTopLevelSpec,
             revisions,
             type: PlotsType.VEGA

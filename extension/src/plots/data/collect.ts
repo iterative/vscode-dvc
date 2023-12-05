@@ -1,5 +1,5 @@
 import {
-  PLOT_DATA_ANCHOR,
+  PLOT_ANCHORS,
   isImagePlotOutput,
   PlotOutput,
   PlotsOutputOrError,
@@ -31,7 +31,7 @@ const collectTemplateFiles = (
   acc: string[],
   plot: TemplatePlotOutput
 ): void => {
-  for (const datapoint of plot.anchor_definitions[PLOT_DATA_ANCHOR] || []) {
+  for (const datapoint of plot.anchor_definitions[PLOT_ANCHORS.DATA] || []) {
     collectFromDatapoint(acc, datapoint)
   }
 }

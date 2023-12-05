@@ -1,20 +1,8 @@
 import type { TopLevelSpec } from 'vega-lite'
 import {
   AnchorDefinitions,
-  PLOT_COLOR_ANCHOR,
-  PLOT_COLUMN_ANCHOR,
-  PLOT_DATA_ANCHOR,
-  PLOT_HEIGHT_ANCHOR,
+  PLOT_ANCHORS,
   PLOT_REV_FIELD,
-  PLOT_SHAPE_ANCHOR,
-  PLOT_STROKE_DASH_ANCHOR,
-  PLOT_TITLE_ANCHOR,
-  PLOT_WIDTH_ANCHOR,
-  PLOT_X_ANCHOR,
-  PLOT_X_LABEL_ANCHOR,
-  PLOT_Y_ANCHOR,
-  PLOT_Y_LABEL_ANCHOR,
-  PLOT_ZOOM_AND_PAN_ANCHOR,
   ZOOM_AND_PAN_PROP
 } from 'dvc/src/cli/dvc/contract'
 import barHorizontalTemplate from 'dvc/src/test/fixtures/plotsDiff/templates/barHorizontal'
@@ -39,7 +27,7 @@ describe('fillTemplate', () => {
   const MULTI_VIEW_WIDTH = 300
 
   const expectedAnchorDefinitions = {
-    [PLOT_COLOR_ANCHOR]: {
+    [PLOT_ANCHORS.COLOR]: {
       field: 'rev',
       legend: null,
       scale: {
@@ -47,24 +35,24 @@ describe('fillTemplate', () => {
         range: ['#945dd6', '#13adc7']
       }
     },
-    [PLOT_COLUMN_ANCHOR]: {},
-    [PLOT_DATA_ANCHOR]: [],
+    [PLOT_ANCHORS.COLUMN]: {},
+    [PLOT_ANCHORS.DATA]: [],
     [PLOT_GROUP_BY_ANCHOR]: [PLOT_REV_FIELD],
     [PLOT_GROUP_BY_X_ANCHOR]: [PLOT_REV_FIELD, X],
     [PLOT_GROUP_BY_Y_ANCHOR]: [PLOT_REV_FIELD, Y],
-    [PLOT_HEIGHT_ANCHOR]: 'container',
+    [PLOT_ANCHORS.HEIGHT]: 'container',
     [PLOT_PIVOT_FIELD_ANCHOR]: 'datum.rev',
     [PLOT_ROW_ANCHOR]: {},
-    [PLOT_SHAPE_ANCHOR]: {},
-    [PLOT_STROKE_DASH_ANCHOR]: {},
-    [PLOT_TITLE_ANCHOR]: 'PLERT',
+    [PLOT_ANCHORS.SHAPE]: {},
+    [PLOT_ANCHORS.STROKE_DASH]: {},
+    [PLOT_ANCHORS.TITLE]: 'PLERT',
     [PLOT_TOOLTIP_ANCHOR]: [{ field: 'x' }, { field: 'y' }, { field: 'rev' }],
-    [PLOT_WIDTH_ANCHOR]: 'container',
-    [PLOT_X_ANCHOR]: X,
-    [PLOT_X_LABEL_ANCHOR]: X,
-    [PLOT_Y_ANCHOR]: Y,
-    [PLOT_Y_LABEL_ANCHOR]: 'vertical y',
-    [PLOT_ZOOM_AND_PAN_ANCHOR]: ZOOM_AND_PAN_PROP
+    [PLOT_ANCHORS.WIDTH]: 'container',
+    [PLOT_ANCHORS.X]: X,
+    [PLOT_ANCHORS.X_LABEL]: X,
+    [PLOT_ANCHORS.Y]: Y,
+    [PLOT_ANCHORS.Y_LABEL]: 'vertical y',
+    [PLOT_ANCHORS.ZOOM_AND_PAN]: ZOOM_AND_PAN_PROP
   }
 
   const anchorDefinitions = expectedAnchorDefinitions as AnchorDefinitions
@@ -80,17 +68,17 @@ describe('fillTemplate', () => {
 
     expect(filledTemplate).toStrictEqual({
       $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-      data: { values: expectedAnchorDefinitions[PLOT_DATA_ANCHOR] },
+      data: { values: expectedAnchorDefinitions[PLOT_ANCHORS.DATA] },
       encoding: {
-        color: expectedAnchorDefinitions[PLOT_COLOR_ANCHOR],
+        color: expectedAnchorDefinitions[PLOT_ANCHORS.COLOR],
         strokeDash: { legend: null },
         x: {
-          field: expectedAnchorDefinitions[PLOT_X_ANCHOR],
-          title: expectedAnchorDefinitions[PLOT_X_LABEL_ANCHOR],
+          field: expectedAnchorDefinitions[PLOT_ANCHORS.X],
+          title: expectedAnchorDefinitions[PLOT_ANCHORS.X_LABEL],
           type: 'quantitative'
         }
       },
-      height: expectedAnchorDefinitions[PLOT_HEIGHT_ANCHOR],
+      height: expectedAnchorDefinitions[PLOT_ANCHORS.HEIGHT],
       layer: [
         {
           encoding: {
@@ -99,11 +87,11 @@ describe('fillTemplate', () => {
               type: 'nominal'
             },
             y: {
-              field: expectedAnchorDefinitions[PLOT_Y_ANCHOR],
+              field: expectedAnchorDefinitions[PLOT_ANCHORS.Y],
               scale: {
                 zero: false
               },
-              title: expectedAnchorDefinitions[PLOT_Y_LABEL_ANCHOR],
+              title: expectedAnchorDefinitions[PLOT_ANCHORS.Y_LABEL],
               type: 'quantitative'
             }
           },
@@ -130,8 +118,8 @@ describe('fillTemplate', () => {
                 signal: 'smooth'
               },
               groupby: expectedAnchorDefinitions[PLOT_GROUP_BY_ANCHOR],
-              loess: expectedAnchorDefinitions[PLOT_Y_ANCHOR],
-              on: expectedAnchorDefinitions[PLOT_X_ANCHOR]
+              loess: expectedAnchorDefinitions[PLOT_ANCHORS.Y],
+              on: expectedAnchorDefinitions[PLOT_ANCHORS.X]
             }
           ]
         },
@@ -142,14 +130,14 @@ describe('fillTemplate', () => {
               type: 'nominal'
             },
             x: {
-              field: expectedAnchorDefinitions[PLOT_X_ANCHOR],
-              title: expectedAnchorDefinitions[PLOT_X_LABEL_ANCHOR],
+              field: expectedAnchorDefinitions[PLOT_ANCHORS.X],
+              title: expectedAnchorDefinitions[PLOT_ANCHORS.X_LABEL],
               type: 'quantitative'
             },
             y: {
-              field: expectedAnchorDefinitions[PLOT_Y_ANCHOR],
+              field: expectedAnchorDefinitions[PLOT_ANCHORS.Y],
               scale: { zero: false },
-              title: expectedAnchorDefinitions[PLOT_Y_LABEL_ANCHOR],
+              title: expectedAnchorDefinitions[PLOT_ANCHORS.Y_LABEL],
               type: 'quantitative'
             }
           },
@@ -166,19 +154,19 @@ describe('fillTemplate', () => {
             },
             x: {
               aggregate: 'max',
-              field: expectedAnchorDefinitions[PLOT_X_ANCHOR],
-              title: expectedAnchorDefinitions[PLOT_X_LABEL_ANCHOR],
+              field: expectedAnchorDefinitions[PLOT_ANCHORS.X],
+              title: expectedAnchorDefinitions[PLOT_ANCHORS.X_LABEL],
               type: 'quantitative'
             },
             y: {
               aggregate: {
-                argmax: expectedAnchorDefinitions[PLOT_X_ANCHOR]
+                argmax: expectedAnchorDefinitions[PLOT_ANCHORS.X]
               },
-              field: expectedAnchorDefinitions[PLOT_Y_ANCHOR],
+              field: expectedAnchorDefinitions[PLOT_ANCHORS.Y],
               scale: {
                 zero: false
               },
-              title: expectedAnchorDefinitions[PLOT_Y_LABEL_ANCHOR],
+              title: expectedAnchorDefinitions[PLOT_ANCHORS.Y_LABEL],
               type: 'quantitative'
             }
           },
@@ -210,7 +198,7 @@ describe('fillTemplate', () => {
               name: 'hover',
               select: {
                 clear: 'mouseout',
-                fields: [expectedAnchorDefinitions[PLOT_X_ANCHOR]],
+                fields: [expectedAnchorDefinitions[PLOT_ANCHORS.X]],
                 nearest: true,
                 on: 'mouseover',
                 type: 'point'
@@ -223,9 +211,9 @@ describe('fillTemplate', () => {
               calculate: expectedAnchorDefinitions[PLOT_PIVOT_FIELD_ANCHOR]
             },
             {
-              groupby: [expectedAnchorDefinitions[PLOT_X_ANCHOR]],
+              groupby: [expectedAnchorDefinitions[PLOT_ANCHORS.X]],
               pivot: 'pivot_field',
-              value: expectedAnchorDefinitions[PLOT_Y_ANCHOR]
+              value: expectedAnchorDefinitions[PLOT_ANCHORS.Y]
             }
           ]
         }
@@ -242,8 +230,8 @@ describe('fillTemplate', () => {
           value: 0.001
         }
       ],
-      title: expectedAnchorDefinitions[PLOT_TITLE_ANCHOR],
-      width: expectedAnchorDefinitions[PLOT_WIDTH_ANCHOR]
+      title: expectedAnchorDefinitions[PLOT_ANCHORS.TITLE],
+      width: expectedAnchorDefinitions[PLOT_ANCHORS.WIDTH]
     })
   })
 
@@ -258,23 +246,23 @@ describe('fillTemplate', () => {
 
     expect(filledTemplate).toStrictEqual({
       $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-      data: { values: expectedAnchorDefinitions[PLOT_DATA_ANCHOR] },
+      data: { values: expectedAnchorDefinitions[PLOT_ANCHORS.DATA] },
       encoding: {
-        color: expectedAnchorDefinitions[PLOT_COLOR_ANCHOR],
+        color: expectedAnchorDefinitions[PLOT_ANCHORS.COLOR],
         shape: { legend: null },
         tooltip: expectedAnchorDefinitions[PLOT_TOOLTIP_ANCHOR],
         x: {
-          field: expectedAnchorDefinitions[PLOT_X_ANCHOR],
-          title: expectedAnchorDefinitions[PLOT_X_LABEL_ANCHOR],
+          field: expectedAnchorDefinitions[PLOT_ANCHORS.X],
+          title: expectedAnchorDefinitions[PLOT_ANCHORS.X_LABEL],
           type: 'quantitative'
         },
         y: {
-          field: expectedAnchorDefinitions[PLOT_Y_ANCHOR],
+          field: expectedAnchorDefinitions[PLOT_ANCHORS.Y],
           title: '…y',
           type: 'quantitative'
         }
       },
-      height: expectedAnchorDefinitions[PLOT_HEIGHT_ANCHOR],
+      height: expectedAnchorDefinitions[PLOT_ANCHORS.HEIGHT],
       mark: {
         tooltip: {
           content: 'data'
@@ -282,8 +270,8 @@ describe('fillTemplate', () => {
         type: 'point'
       },
       params: [{}],
-      title: expectedAnchorDefinitions[PLOT_TITLE_ANCHOR],
-      width: expectedAnchorDefinitions[PLOT_WIDTH_ANCHOR]
+      title: expectedAnchorDefinitions[PLOT_ANCHORS.TITLE],
+      width: expectedAnchorDefinitions[PLOT_ANCHORS.WIDTH]
     })
   })
 
@@ -298,7 +286,7 @@ describe('fillTemplate', () => {
 
     expect(filledTemplate).toStrictEqual({
       $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-      data: { values: expectedAnchorDefinitions[PLOT_DATA_ANCHOR] },
+      data: { values: expectedAnchorDefinitions[PLOT_ANCHORS.DATA] },
       facet: {
         column: { field: 'rev', sort: [] },
         row: expectedAnchorDefinitions[PLOT_ROW_ANCHOR]
@@ -312,15 +300,15 @@ describe('fillTemplate', () => {
       spec: {
         encoding: {
           x: {
-            field: expectedAnchorDefinitions[PLOT_X_ANCHOR],
+            field: expectedAnchorDefinitions[PLOT_ANCHORS.X],
             sort: 'ascending',
-            title: expectedAnchorDefinitions[PLOT_X_LABEL_ANCHOR],
+            title: expectedAnchorDefinitions[PLOT_ANCHORS.X_LABEL],
             type: 'nominal'
           },
           y: {
-            field: expectedAnchorDefinitions[PLOT_Y_ANCHOR],
+            field: expectedAnchorDefinitions[PLOT_ANCHORS.Y],
             sort: 'ascending',
-            title: expectedAnchorDefinitions[PLOT_Y_LABEL_ANCHOR],
+            title: expectedAnchorDefinitions[PLOT_ANCHORS.Y_LABEL],
             type: 'nominal'
           }
         },
@@ -346,11 +334,11 @@ describe('fillTemplate', () => {
               },
               tooltip: [
                 {
-                  field: expectedAnchorDefinitions[PLOT_X_ANCHOR],
+                  field: expectedAnchorDefinitions[PLOT_ANCHORS.X],
                   type: 'nominal'
                 },
                 {
-                  field: expectedAnchorDefinitions[PLOT_Y_ANCHOR],
+                  field: expectedAnchorDefinitions[PLOT_ANCHORS.Y],
                   type: 'nominal'
                 },
                 { field: 'xy_count', type: 'quantitative' }
@@ -395,20 +383,20 @@ describe('fillTemplate', () => {
           {
             aggregate: [{ as: 'xy_count', op: 'count' }],
             groupby: [
-              expectedAnchorDefinitions[PLOT_Y_ANCHOR],
-              expectedAnchorDefinitions[PLOT_X_ANCHOR]
+              expectedAnchorDefinitions[PLOT_ANCHORS.Y],
+              expectedAnchorDefinitions[PLOT_ANCHORS.X]
             ]
           },
           {
             groupby: expectedAnchorDefinitions[PLOT_GROUP_BY_Y_ANCHOR],
             impute: 'xy_count',
-            key: expectedAnchorDefinitions[PLOT_X_ANCHOR],
+            key: expectedAnchorDefinitions[PLOT_ANCHORS.X],
             value: 0
           },
           {
             groupby: expectedAnchorDefinitions[PLOT_GROUP_BY_X_ANCHOR],
             impute: 'xy_count',
-            key: expectedAnchorDefinitions[PLOT_Y_ANCHOR],
+            key: expectedAnchorDefinitions[PLOT_ANCHORS.Y],
             value: 0
           },
           {
@@ -421,7 +409,7 @@ describe('fillTemplate', () => {
           }
         ]
       },
-      title: expectedAnchorDefinitions[PLOT_TITLE_ANCHOR]
+      title: expectedAnchorDefinitions[PLOT_ANCHORS.TITLE]
     })
   })
 
@@ -436,28 +424,28 @@ describe('fillTemplate', () => {
 
     expect(filledTemplate).toStrictEqual({
       $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-      data: { values: expectedAnchorDefinitions[PLOT_DATA_ANCHOR] },
+      data: { values: expectedAnchorDefinitions[PLOT_ANCHORS.DATA] },
       encoding: {
-        color: expectedAnchorDefinitions[PLOT_COLOR_ANCHOR],
-        column: expectedAnchorDefinitions[PLOT_COLUMN_ANCHOR],
+        color: expectedAnchorDefinitions[PLOT_ANCHORS.COLOR],
+        column: expectedAnchorDefinitions[PLOT_ANCHORS.COLUMN],
         x: {
-          field: expectedAnchorDefinitions[PLOT_X_ANCHOR],
+          field: expectedAnchorDefinitions[PLOT_ANCHORS.X],
           scale: { zero: false },
-          title: expectedAnchorDefinitions[PLOT_X_LABEL_ANCHOR],
+          title: expectedAnchorDefinitions[PLOT_ANCHORS.X_LABEL],
           type: 'quantitative'
         },
         y: {
-          field: expectedAnchorDefinitions[PLOT_Y_ANCHOR],
-          title: expectedAnchorDefinitions[PLOT_Y_LABEL_ANCHOR],
+          field: expectedAnchorDefinitions[PLOT_ANCHORS.Y],
+          title: expectedAnchorDefinitions[PLOT_ANCHORS.Y_LABEL],
           type: 'nominal'
         },
         yOffset: { field: 'rev', sort: [] }
       },
-      height: expectedAnchorDefinitions[PLOT_HEIGHT_ANCHOR],
+      height: expectedAnchorDefinitions[PLOT_ANCHORS.HEIGHT],
       mark: { type: 'bar' },
       params: [{}],
-      title: expectedAnchorDefinitions[PLOT_TITLE_ANCHOR],
-      width: expectedAnchorDefinitions[PLOT_WIDTH_ANCHOR]
+      title: expectedAnchorDefinitions[PLOT_ANCHORS.TITLE],
+      width: expectedAnchorDefinitions[PLOT_ANCHORS.WIDTH]
     })
   })
 })

@@ -17,7 +17,7 @@ import { ColorScale } from '../webview/contract'
 import { Color } from '../../experiments/model/status/colors'
 import {
   AnchorDefinitions,
-  PLOT_COLUMN_ANCHOR,
+  PLOT_ANCHORS,
   ShapeEncoding,
   StrokeDashEncoding
 } from '../../cli/dvc/contract'
@@ -73,7 +73,7 @@ const isVegaRepeatPlot = (template: TopLevelSpec): boolean => {
 }
 
 const isMultiViewHorizontalBar = (anchorDefinitions?: AnchorDefinitions) =>
-  !!anchorDefinitions?.[PLOT_COLUMN_ANCHOR]?.field
+  !!anchorDefinitions?.[PLOT_ANCHORS.COLUMN]?.field
 
 export const isMultiViewPlot = (
   template: TopLevelSpec | undefined,

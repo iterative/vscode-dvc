@@ -1,21 +1,12 @@
 import type { TopLevelSpec } from 'vega-lite'
-import {
-  PLOT_DATA_ANCHOR,
-  PLOT_HEIGHT_ANCHOR,
-  PLOT_TITLE_ANCHOR,
-  PLOT_WIDTH_ANCHOR,
-  PLOT_X_ANCHOR,
-  PLOT_X_LABEL_ANCHOR,
-  PLOT_Y_ANCHOR,
-  PLOT_Y_LABEL_ANCHOR
-} from '../../../../cli/dvc/contract'
+import { PLOT_ANCHORS } from '../../../../cli/dvc/contract'
 
 const data = {
   $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
   data: {
-    values: PLOT_DATA_ANCHOR
+    values: PLOT_ANCHORS.DATA
   },
-  title: PLOT_TITLE_ANCHOR,
+  title: PLOT_ANCHORS.TITLE,
   facet: {
     column: {
       field: 'rev',
@@ -32,18 +23,18 @@ const data = {
             as: 'xy_count'
           }
         ],
-        groupby: [PLOT_Y_ANCHOR, PLOT_X_ANCHOR]
+        groupby: [PLOT_ANCHORS.Y, PLOT_ANCHORS.X]
       },
       {
         impute: 'xy_count',
-        groupby: ['rev', PLOT_Y_ANCHOR],
-        key: PLOT_X_ANCHOR,
+        groupby: ['rev', PLOT_ANCHORS.Y],
+        key: PLOT_ANCHORS.X,
         value: 0
       },
       {
         impute: 'xy_count',
         groupby: '<DVC_METRIC_GROUP_BY_X>',
-        key: PLOT_Y_ANCHOR,
+        key: PLOT_ANCHORS.Y,
         value: 0
       },
       {
@@ -54,7 +45,7 @@ const data = {
             as: 'sum_y'
           }
         ],
-        groupby: [PLOT_Y_ANCHOR]
+        groupby: [PLOT_ANCHORS.Y]
       },
       {
         calculate: 'datum.xy_count / datum.sum_y',
@@ -63,23 +54,23 @@ const data = {
     ],
     encoding: {
       x: {
-        field: PLOT_X_ANCHOR,
+        field: PLOT_ANCHORS.X,
         type: 'nominal',
         sort: 'ascending',
-        title: PLOT_X_LABEL_ANCHOR
+        title: PLOT_ANCHORS.X_LABEL
       },
       y: {
-        field: PLOT_Y_ANCHOR,
+        field: PLOT_ANCHORS.Y,
         type: 'nominal',
         sort: 'ascending',
-        title: PLOT_Y_LABEL_ANCHOR
+        title: PLOT_ANCHORS.Y_LABEL
       }
     },
     layer: [
       {
         mark: 'rect',
-        width: PLOT_WIDTH_ANCHOR,
-        height: PLOT_HEIGHT_ANCHOR,
+        width: PLOT_ANCHORS.WIDTH,
+        height: PLOT_ANCHORS.HEIGHT,
         encoding: {
           color: {
             field: 'percent_of_y',
@@ -105,11 +96,11 @@ const data = {
         encoding: {
           tooltip: [
             {
-              field: PLOT_X_ANCHOR,
+              field: PLOT_ANCHORS.X,
               type: 'nominal'
             },
             {
-              field: PLOT_Y_ANCHOR,
+              field: PLOT_ANCHORS.Y,
               type: 'nominal'
             },
             {

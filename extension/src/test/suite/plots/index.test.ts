@@ -42,7 +42,7 @@ import { RegisteredCommands } from '../../../commands/external'
 import { REVISIONS } from '../../fixtures/plotsDiff'
 import * as FileSystem from '../../../fileSystem'
 import {
-  PLOT_DATA_ANCHOR,
+  PLOT_ANCHORS,
   EXPERIMENT_WORKSPACE_ID,
   ExpShowOutput,
   TemplatePlotOutput,
@@ -645,7 +645,7 @@ suite('Plots Test Suite', () => {
       expect(mockWriteJson).to.be.calledWithExactly(
         exportFile.path,
         [
-          ...(customPlot.anchorDefinitions[PLOT_DATA_ANCHOR] as {
+          ...(customPlot.anchorDefinitions[PLOT_ANCHORS.DATA] as {
             id: string
           }[])
         ].sort(
@@ -735,7 +735,7 @@ suite('Plots Test Suite', () => {
       expect(mockWriteCsv).to.be.calledOnce
       expect(mockWriteCsv).to.be.calledWithExactly(
         exportFile.path,
-        templatePlot.anchorDefinitions[PLOT_DATA_ANCHOR]
+        templatePlot.anchorDefinitions[PLOT_ANCHORS.DATA]
       )
       expect(mockOpenFile).to.calledWithExactly(exportFile.path)
       expect(mockSendTelemetryEvent).to.be.calledOnce
@@ -788,7 +788,7 @@ suite('Plots Test Suite', () => {
       expect(mockWriteTsv).to.be.calledWithExactly(
         exportFile.path,
         [
-          ...(customPlot.anchorDefinitions[PLOT_DATA_ANCHOR] as {
+          ...(customPlot.anchorDefinitions[PLOT_ANCHORS.DATA] as {
             id: string
           }[])
         ].sort(
@@ -1058,8 +1058,8 @@ suite('Plots Test Suite', () => {
           ),
           [lossTsvPath]: lossTsv.map((plot, i) => {
             const anchor_definitions = { ...lossTsv[i].anchor_definitions }
-            anchor_definitions[PLOT_DATA_ANCHOR] =
-              anchor_definitions[PLOT_DATA_ANCHOR]?.filter(
+            anchor_definitions[PLOT_ANCHORS.DATA] =
+              anchor_definitions[PLOT_ANCHORS.DATA]?.filter(
                 ({ rev }) => rev !== brokenExp
               ) || []
 
