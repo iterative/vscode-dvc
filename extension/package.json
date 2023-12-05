@@ -130,7 +130,7 @@
         "category": "DVC"
       },
       {
-        "title": "Update Studio URL",
+        "title": "Set Self-Hosted Studio URL",
         "command": "dvc.updateStudioUrl",
         "category": "DVC"
       },
