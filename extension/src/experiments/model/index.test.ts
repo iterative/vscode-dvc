@@ -611,4 +611,38 @@ describe('ExperimentsModel', () => {
 
     expect(model.getCliError()).toBe(undefined)
   })
+
+  it('should return the correct values for hasData', () => {
+    const model = new ExperimentsModel('', buildMockMemento())
+
+    expect(model.hasData(false)).toBe(false)
+    expect(model.hasData(true)).toBe(true)
+
+    model.transformAndSetLocal(
+      outputFixture,
+      gitLogFixture,
+      { running: false },
+      rowOrderFixture,
+      { main: 6 }
+    )
+
+    expect(model.hasData(false)).toBe(true)
+    expect(model.hasData(true)).toBe(true)
+
+    model.transformAndSetLocal(
+      [
+        {
+          error: { msg: 'CLI is broken', type: 'CLI ERROR' },
+          rev: EXPERIMENT_WORKSPACE_ID
+        }
+      ],
+      gitLogFixture,
+      { running: false },
+      rowOrderFixture,
+      { main: 6 }
+    )
+
+    expect(model.hasData(false)).toBe(true)
+    expect(model.hasData(true)).toBe(true)
+  })
 })

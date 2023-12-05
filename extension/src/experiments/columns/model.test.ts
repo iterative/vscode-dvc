@@ -46,7 +46,7 @@ describe('ColumnsModel', () => {
   const exampleDvcRoot = 'test'
   const mockedColumnsOrderOrStatusChanged = buildMockedEventEmitter<void>()
 
-  it('should return no columns when given an output with no data', async () => {
+  it('should return the timestamp column when given output with no params, metrics or deps', async () => {
     const model = new ColumnsModel(
       '',
       buildMockMemento(),
@@ -54,7 +54,7 @@ describe('ColumnsModel', () => {
     )
     await model.transformAndSet(generateTestExpShowOutput({}))
 
-    expect(model.getSelected()).toStrictEqual([])
+    expect(model.getSelected()).toStrictEqual([timestampColumn])
   })
 
   it('should return the expected columns when given the default output fixture', async () => {

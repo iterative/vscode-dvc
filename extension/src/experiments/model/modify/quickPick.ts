@@ -6,7 +6,10 @@ import { definedAndNonEmpty } from '../../../util/array'
 import { getEnterValueTitle, Title } from '../../../vscode/title'
 import { Value } from '../../../cli/dvc/contract'
 
-const standardizeValue = (value: Value): string => {
+const standardizeValue = (value: Value | undefined): string => {
+  if (value === undefined) {
+    return ''
+  }
   return typeof value === 'object' ? JSON.stringify(value) : String(value)
 }
 

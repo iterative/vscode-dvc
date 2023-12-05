@@ -26,14 +26,12 @@ export const TEMP_DIR = join(dvcDemoPath, 'temp-empty-watcher-dir')
 
 export const buildSetup = ({
   disposer,
-  cliError = undefined,
   gitVersion,
   hasData = false,
   noDvcRoot = true,
   noGitCommits = true,
   noGitRoot = true
 }: {
-  cliError?: undefined
   disposer: Disposer
   gitVersion?: string | null
   hasData?: boolean
@@ -107,7 +105,6 @@ export const buildSetup = ({
       internalCommands,
       {
         columnsChanged: mockEmitter,
-        getCliError: () => cliError,
         getHasData: () => hasData,
         isReady: () => Promise.resolve(),
         showWebview: mockShowWebview

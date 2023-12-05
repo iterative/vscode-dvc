@@ -6,18 +6,18 @@ import {
   ComparisonTableColumn,
   ComparisonTableHead
 } from './ComparisonTableHead'
-import { ComparisionTableRows } from './ComparisonTableRows'
+import { ComparisonTableRows } from './ComparisonTableRows'
 import plotsStyles from '../styles.module.scss'
 import { withScale, withVariant } from '../../../util/styles'
 import { PlotsState } from '../../store'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { reorderComparisonPlots } from '../../util/messages'
 import { WaitForPlotsInfo } from '../emptyState/WaitForPlotsInfo'
+import { TooManyPlots } from '../TooManyPlots'
 
 export const ComparisonTable: React.FC = () => {
-  const { revisions, plots, width } = useSelector(
-    (state: PlotsState) => state.comparison
-  )
+  const { revisions, plots, width, shouldShowTooManyPlotsMessage } =
+    useSelector((state: PlotsState) => state.comparison)
 
   const pinnedColumn = useRef('')
   const [columns, setColumns] = useState<ComparisonTableColumn[]>([])
@@ -83,21 +83,24 @@ export const ComparisonTable: React.FC = () => {
   }
 
   return (
-    <table
-      className={plotsStyles.comparisonTable}
-      style={{ ...withScale(columns.length), ...withVariant(width) }}
-    >
-      <ComparisonTableHead
-        columns={columns}
-        pinnedColumn={pinnedColumn.current}
-        setColumnsOrder={setColumnsOrder}
-        setPinnedColumn={changePinnedColumn}
-      />
-      <ComparisionTableRows
-        plots={comparisonPlots}
-        columns={columns}
-        pinnedColumn={pinnedColumn.current}
-      />
-    </table>
+    <>
+      <table
+        className={plotsStyles.comparisonTable}
+        style={{ ...withScale(columns.length), ...withVariant(width) }}
+      >
+        <ComparisonTableHead
+          columns={columns}
+          pinnedColumn={pinnedColumn.current}
+          setColumnsOrder={setColumnsOrder}
+          setPinnedColumn={changePinnedColumn}
+        />
+        <ComparisonTableRows
+          plots={comparisonPlots}
+          columns={columns}
+          pinnedColumn={pinnedColumn.current}
+        />
+      </table>
+      {shouldShowTooManyPlotsMessage && <TooManyPlots />}
+    </>
   )
 }
