@@ -824,7 +824,7 @@ suite('Experiments Test Suite', () => {
           return Promise.resolve(true)
         })
       )
-      dataUpdated.fire({ live: [], pushed: [], baseUrl: '' })
+      dataUpdated.fire({ live: [], pushed: [], viewUrl: '' })
       dataUpdated.fire({
         lsRemoteOutput: `42b8736b08170529903cd203a1f40382a4b4a8cd        refs/exps/a9/b32d14966b9be1396f2211d9eb743359708a07/test-branch
         4fb124aebddb2adf1545030907687fa9a4c80e70        refs/exps/a9/53c3851f46955fa3e2b8f6e1c52999acc8c9ea77/${mockExpId}`

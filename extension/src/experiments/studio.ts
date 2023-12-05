@@ -7,8 +7,8 @@ export class Studio extends DeferredDisposable {
   private readonly dvcRoot: string
   private readonly internalCommands: InternalCommands
 
-  private url: string = DEFAULT_STUDIO_URL
-  private baseViewUrl: string | undefined = undefined
+  private instanceUrl: string = DEFAULT_STUDIO_URL
+  private viewUrl: string | undefined = undefined
   private studioAccessToken: string | undefined
   private gitRemoteUrl?: string
 
@@ -28,8 +28,8 @@ export class Studio extends DeferredDisposable {
     return this.gitRemoteUrl
   }
 
-  public getUrl() {
-    return this.url
+  public getInstanceUrl() {
+    return this.instanceUrl
   }
 
   public setAccessToken(studioAccessToken: string | undefined) {
@@ -43,19 +43,19 @@ export class Studio extends DeferredDisposable {
   }
 
   public isConnected() {
-    return !!this.baseViewUrl
+    return !!this.viewUrl
   }
 
   public getAccessToken() {
     return this.studioAccessToken
   }
 
-  public setBaseViewUrl(baseUrl: string | undefined) {
-    this.baseViewUrl = baseUrl
+  public setViewUrl(viewUrl: string | undefined) {
+    this.viewUrl = viewUrl
   }
 
-  public setUrl(url: string) {
-    this.url = url
+  public setInstanceUrl(instanceUrl: string) {
+    this.instanceUrl = instanceUrl
   }
 
   public getLink(
@@ -64,11 +64,11 @@ export class Studio extends DeferredDisposable {
     name: string,
     baselineSha: string
   ) {
-    if (!this.baseViewUrl) {
+    if (!this.viewUrl) {
       return ''
     }
     return (
-      `${this.baseViewUrl}?showOnlySelected=1&` +
+      `${this.viewUrl}?showOnlySelected=1&` +
       (studioLinkType === StudioLinkType.PUSHED
         ? `experimentReferences=${sha}`
         : `liveExperiments=${baselineSha}%3A${name}`)

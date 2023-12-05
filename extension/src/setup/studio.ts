@@ -212,13 +212,18 @@ export class Studio extends Disposable {
 
   private resetStudioValues(
     previousStudioUrl: string,
-    previousStudioAccessToken: string | undefined
+    previousStudioAccessToken: string | undefined,
+    previousShareLiveToStudio: boolean | undefined
   ) {
     this.studioAccessToken = undefined
     this.shareLiveToStudio = undefined
     this.studioUrl = DEFAULT_STUDIO_URL
 
-    if (previousStudioAccessToken || previousStudioUrl !== DEFAULT_STUDIO_URL) {
+    if (
+      previousStudioAccessToken ||
+      previousStudioUrl !== DEFAULT_STUDIO_URL ||
+      previousShareLiveToStudio
+    ) {
       this.studioConnectionChanged.fire()
     }
   }
@@ -228,9 +233,14 @@ export class Studio extends Disposable {
 
     const previousStudioAccessToken = this.studioAccessToken
     const previousStudioUrl = this.studioUrl
+    const previousShareLiveToStudio = this.shareLiveToStudio
 
     if (!cwd) {
-      this.resetStudioValues(previousStudioUrl, previousStudioAccessToken)
+      this.resetStudioValues(
+        previousStudioUrl,
+        previousStudioAccessToken,
+        previousShareLiveToStudio
+      )
       return
     }
 

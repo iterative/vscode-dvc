@@ -40,7 +40,7 @@ export const mockBaseStudioUrl =
 
 export const buildExperiments = ({
   availableNbCommits = { main: 5 },
-  baseUrl = mockBaseStudioUrl,
+  viewUrl = mockBaseStudioUrl,
   disposer,
   dvcRoot = dvcDemoPath,
   expShow = expShowFixture,
@@ -53,7 +53,7 @@ export const buildExperiments = ({
 }: {
   availableNbCommits?: { [branch: string]: number }
   disposer: Disposer
-  baseUrl?: string
+  viewUrl?: string
   dvcRoot?: string
   expShow?: ExpShowOutput
   gitLog?: string
@@ -117,7 +117,7 @@ export const buildExperiments = ({
       rowOrder
     }),
     experiments.setState({ lsRemoteOutput }),
-    experiments.setState({ baseUrl, live, pushed })
+    experiments.setState({ live, pushed, viewUrl })
   ])
 
   return {
@@ -314,7 +314,7 @@ export const buildExperimentsData = (
       {
         getAccessToken: () => studioAccessToken,
         getGitRemoteUrl: () => 'git@github.com:iterative/vscode-dvc-demo.git',
-        getUrl: () => studioUrl,
+        getInstanceUrl: () => studioUrl,
         isReady: () => Promise.resolve(undefined)
       } as Studio,
       []

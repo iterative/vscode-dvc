@@ -366,7 +366,7 @@ suite('Experiments Data Test Suite', () => {
       )
     })
 
-    it('should send the expected request to a Studio if the user has a token and self hosted url set', async () => {
+    it('should send the expected request to Studio if the user has a token and self hosted instance url set', async () => {
       const mockStudioToken = 'isat_BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
       const mockSelfHostedStudioUrl = 'https://studio.example.com'
       const { data, mockFetch } = buildExperimentsData(

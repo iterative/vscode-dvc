@@ -116,7 +116,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
   private async requestStudioData(shas: string[]) {
     await this.studio.isReady()
 
-    const defaultData = { baseUrl: undefined, live: [], pushed: [] }
+    const defaultData = { live: [], pushed: [], viewUrl: undefined }
 
     const studioAccessToken = this.studio.getAccessToken()
 
@@ -132,7 +132,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
 
     try {
       const response = await fetch(
-        `${this.studio.getUrl()}/api/view-links?${params}`,
+        `${this.studio.getInstanceUrl()}/api/view-links?${params}`,
         {
           headers: {
             Authorization: `token ${studioAccessToken}`
@@ -147,12 +147,12 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
         view_url: string
       }
       this.notifyChanged({
-        baseUrl: view_url,
         live: live.map(({ baseline_sha, name }) => ({
           baselineSha: baseline_sha,
           name
         })),
-        pushed
+        pushed,
+        viewUrl: view_url
       })
     } catch {
       this.notifyChanged(defaultData)

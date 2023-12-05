@@ -988,7 +988,7 @@ suite('Setup Test Suite', () => {
       expect(delayProgressClosingSpy).to.be.calledTwice
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should handle a message from the webview to request a token from a self hosted studio', async () => {
+    it('should handle a message from the webview to request a token from a self hosted Studio instance', async () => {
       const { setup, mockFetch, studio } = buildSetup({
         disposer: disposable
       })
