@@ -26,6 +26,7 @@ import { ExpShowOutput } from '../../../cli/dvc/contract'
 import { buildExperimentsPipeline } from '../pipeline/util'
 import { Setup } from '../../../setup'
 import { Studio } from '../../../experiments/studio'
+import { DEFAULT_STUDIO_URL } from '../../../setup/webview/contract'
 
 export const DEFAULT_EXPERIMENTS_OUTPUT = {
   availableNbCommits: { main: 5 },
@@ -39,7 +40,7 @@ export const mockBaseStudioUrl =
 
 export const buildExperiments = ({
   availableNbCommits = { main: 5 },
-  baseUrl = mockBaseStudioUrl,
+  viewUrl = mockBaseStudioUrl,
   disposer,
   dvcRoot = dvcDemoPath,
   expShow = expShowFixture,
@@ -52,7 +53,7 @@ export const buildExperiments = ({
 }: {
   availableNbCommits?: { [branch: string]: number }
   disposer: Disposer
-  baseUrl?: string
+  viewUrl?: string
   dvcRoot?: string
   expShow?: ExpShowOutput
   gitLog?: string
@@ -116,7 +117,7 @@ export const buildExperiments = ({
       rowOrder
     }),
     experiments.setState({ lsRemoteOutput }),
-    experiments.setState({ baseUrl, live, pushed })
+    experiments.setState({ live, pushed, viewUrl })
   ])
 
   return {
@@ -148,6 +149,7 @@ const buildMockSetup = (disposer: Disposer): Setup => {
   const studioConnectionChanged = disposer.track(new EventEmitter())
   return {
     getStudioAccessToken: () => Promise.resolve(undefined),
+    getStudioUrl: () => DEFAULT_STUDIO_URL,
     onDidChangeStudioConnection: studioConnectionChanged.event
   } as unknown as Setup
 }
@@ -273,7 +275,8 @@ export const buildExperimentsData = (
   disposer: SafeWatcherDisposer,
   currentBranch = '* main',
   commitOutput = gitLogFixture,
-  studioAccessToken = ''
+  studioAccessToken = '',
+  studioUrl = DEFAULT_STUDIO_URL
 ) => {
   const {
     internalCommands,
@@ -311,6 +314,7 @@ export const buildExperimentsData = (
       {
         getAccessToken: () => studioAccessToken,
         getGitRemoteUrl: () => 'git@github.com:iterative/vscode-dvc-demo.git',
+        getInstanceUrl: () => studioUrl,
         isReady: () => Promise.resolve(undefined)
       } as Studio,
       []
