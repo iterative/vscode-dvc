@@ -46,6 +46,12 @@ export const ExtendedVegaLite = ({
   const currentValue = smoothPlotValues[id]
 
   useEffect(() => {
+    return () => {
+      vegaView.current?.finalize()
+    }
+  }, [])
+
+  useEffect(() => {
     if (!currentValue || !vegaView.current) {
       return
     }
