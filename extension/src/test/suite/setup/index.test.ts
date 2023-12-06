@@ -1059,7 +1059,7 @@ suite('Setup Test Suite', () => {
       const mockMessageReceived = getMessageReceivedEmitter(webview)
       const mockWaitForUriRes = stub(ExternalUtil, 'waitForUriResponse')
       const mockUriHandlerDispose = stub()
-      const waitTime = 900000
+      const waitTime = 300000
 
       mockFetch.onFirstCall().resolves({
         json: () =>

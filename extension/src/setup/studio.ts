@@ -163,7 +163,7 @@ export class Studio extends Disposable {
   }
 
   private cancelUriHandlerAfterTimeout() {
-    const waitTime = 15 * 60000
+    const waitTime = 5 * 60000
     this.accessTokenUriHandlerTimeout = setTimeout(
       () => this.resetAccessTokenUriHandler(),
       waitTime
