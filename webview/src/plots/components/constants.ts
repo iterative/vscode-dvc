@@ -1,4 +1,4 @@
-import { Config } from 'vega-lite'
+import type { Config } from 'vega-lite'
 import { ThemeProperty } from '../../util/styles'
 
 export const PlOT_FOREGROUND_COLOR = `var(${ThemeProperty.FOREGROUND_COLOR})`

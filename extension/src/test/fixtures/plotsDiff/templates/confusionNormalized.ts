@@ -1,14 +1,18 @@
-import { TopLevelSpec } from 'vega-lite'
+import type { TopLevelSpec } from 'vega-lite'
+import { PLOT_ANCHORS } from '../../../../cli/dvc/contract'
 
 const data = {
-  $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
+  $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
   data: {
-    values: '<DVC_METRIC_DATA>'
+    values: PLOT_ANCHORS.DATA
   },
-  title: '<DVC_METRIC_TITLE>',
+  title: PLOT_ANCHORS.TITLE,
   facet: {
-    field: 'rev',
-    type: 'nominal'
+    column: {
+      field: 'rev',
+      sort: []
+    },
+    row: '<DVC_METRIC_ROW>'
   },
   spec: {
     transform: [
@@ -19,18 +23,18 @@ const data = {
             as: 'xy_count'
           }
         ],
-        groupby: ['<DVC_METRIC_Y>', '<DVC_METRIC_X>']
+        groupby: [PLOT_ANCHORS.Y, PLOT_ANCHORS.X]
       },
       {
         impute: 'xy_count',
-        groupby: ['rev', '<DVC_METRIC_Y>'],
-        key: '<DVC_METRIC_X>',
+        groupby: ['rev', PLOT_ANCHORS.Y],
+        key: PLOT_ANCHORS.X,
         value: 0
       },
       {
         impute: 'xy_count',
-        groupby: ['rev', '<DVC_METRIC_X>'],
-        key: '<DVC_METRIC_Y>',
+        groupby: '<DVC_METRIC_GROUP_BY_X>',
+        key: PLOT_ANCHORS.Y,
         value: 0
       },
       {
@@ -41,7 +45,7 @@ const data = {
             as: 'sum_y'
           }
         ],
-        groupby: ['<DVC_METRIC_Y>']
+        groupby: [PLOT_ANCHORS.Y]
       },
       {
         calculate: 'datum.xy_count / datum.sum_y',
@@ -50,23 +54,23 @@ const data = {
     ],
     encoding: {
       x: {
-        field: '<DVC_METRIC_X>',
+        field: PLOT_ANCHORS.X,
         type: 'nominal',
         sort: 'ascending',
-        title: '<DVC_METRIC_X_LABEL>'
+        title: PLOT_ANCHORS.X_LABEL
       },
       y: {
-        field: '<DVC_METRIC_Y>',
+        field: PLOT_ANCHORS.Y,
         type: 'nominal',
         sort: 'ascending',
-        title: '<DVC_METRIC_Y_LABEL>'
+        title: PLOT_ANCHORS.Y_LABEL
       }
     },
     layer: [
       {
         mark: 'rect',
-        width: 300,
-        height: 300,
+        width: PLOT_ANCHORS.WIDTH,
+        height: PLOT_ANCHORS.HEIGHT,
         encoding: {
           color: {
             field: 'percent_of_y',
@@ -79,13 +83,61 @@ const data = {
         }
       },
       {
+        selection: {
+          label: {
+            type: 'single',
+            on: 'mouseover',
+            encodings: ['x', 'y'],
+            empty: 'none',
+            clear: 'mouseout'
+          }
+        },
+        mark: 'rect',
+        encoding: {
+          tooltip: [
+            {
+              field: PLOT_ANCHORS.X,
+              type: 'nominal'
+            },
+            {
+              field: PLOT_ANCHORS.Y,
+              type: 'nominal'
+            },
+            {
+              field: 'percent_of_y',
+              type: 'quantitative',
+              format: '.2f'
+            }
+          ],
+          opacity: {
+            condition: {
+              selection: 'label',
+              value: 1
+            },
+            value: 0
+          }
+        }
+      },
+      {
+        transform: [
+          {
+            filter: {
+              selection: 'label'
+            }
+          }
+        ],
+        layer: [
+          {
+            mark: {
+              type: 'rect',
+              color: 'lightpink'
+            }
+          }
+        ]
+      },
+      {
         mark: 'text',
         encoding: {
-          text: {
-            field: 'percent_of_y',
-            type: 'quantitative',
-            format: '.2f'
-          },
           color: {
             condition: {
               test: 'datum.percent_of_y > 0.5',

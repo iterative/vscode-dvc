@@ -1,41 +1,35 @@
 import get from 'lodash.get'
-import { TopLevelSpec } from 'vega-lite'
-import { createSpec, CustomPlotsOrderValue, getFullValuePath } from './custom'
+import type { TopLevelSpec } from 'vega-lite'
+import {
+  getContent,
+  CustomPlotsOrderValue,
+  getFullValuePath,
+  getDataType
+} from './custom'
 import {
   ColorScale,
-  isImagePlot,
   ImagePlot,
-  TemplatePlot,
-  Plot,
   TemplatePlotEntry,
   TemplatePlotSection,
-  PlotsType,
   CustomPlotData,
   CustomPlotValues,
   ComparisonRevisionData,
   ComparisonPlotImg
 } from '../webview/contract'
-import { PlotsOutput } from '../../cli/dvc/contract'
+import {
+  AnchorDefinitions,
+  PLOT_ANCHORS,
+  isImagePlotOutput,
+  PlotOutput,
+  PlotsOutput,
+  PlotsType,
+  TemplatePlotOutput
+} from '../../cli/dvc/contract'
 import { splitColumnPath } from '../../experiments/columns/paths'
 import { ColumnType, Experiment } from '../../experiments/webview/contract'
 import { TemplateOrder } from '../paths/collect'
-import {
-  extendVegaSpec,
-  isMultiViewPlot,
-  SpecWithTitles,
-  truncateVegaSpecTitles
-} from '../vega/util'
 import { definedAndNonEmpty } from '../../util/array'
-import {
-  getDvcDataVersionInfo,
-  isConcatenatedField,
-  mergeFields,
-  MultiSourceEncoding,
-  unmergeConcatenatedFields
-} from '../multiSource/collect'
-import { StrokeDashEncoding } from '../multiSource/constants'
 import { exists } from '../../fileSystem'
-import { hasKey } from '../../util/object'
 import { MULTI_IMAGE_PATH_REG } from '../../cli/dvc/constants'
 import {
   getFileNameWithoutExt,
@@ -125,8 +119,6 @@ const fillColorScale = (
 const getCustomPlotData = (
   orderValue: CustomPlotsOrderValue,
   experiments: Experiment[],
-  height: number,
-  nbItemsPerRow: number,
   colorScale: ColorScale | undefined
 ): CustomPlotData => {
   const { metric, param } = orderValue
@@ -140,44 +132,43 @@ const getCustomPlotData = (
 
   const [{ param: paramVal, metric: metricVal }] = values
 
-  const spec = createSpec(
-    metric,
-    param,
-    typeof metricVal,
-    typeof paramVal,
-    completeColorScale
-  )
-
-  const updatedSpec = truncateVegaSpecTitles(spec, nbItemsPerRow, height)
-
   return {
-    content: updatedSpec,
+    anchorDefinitions: {
+      [PLOT_ANCHORS.COLOR]: {
+        field: 'id',
+        scale: completeColorScale
+      },
+      [PLOT_ANCHORS.DATA]: values,
+      [PLOT_ANCHORS.METRIC_TYPE]: getDataType(typeof metricVal),
+      [PLOT_ANCHORS.PARAM_TYPE]: getDataType(typeof paramVal),
+      [PLOT_ANCHORS.X_LABEL]: param,
+      [PLOT_ANCHORS.Y_LABEL]: metric,
+      [PLOT_ANCHORS.ZOOM_AND_PAN]: {
+        bind: 'scales',
+        name: 'grid',
+        select: 'interval'
+      }
+    },
+    content: getContent(),
     id: getCustomPlotId(metric, param),
     metric,
-    param,
-    values
-  } as CustomPlotData
+    param
+  }
 }
 
 export const collectCustomPlots = ({
   colorScale,
   plotsOrderValues,
-  experiments,
-  height,
-  nbItemsPerRow
+  experiments
 }: {
   colorScale: ColorScale | undefined
   plotsOrderValues: CustomPlotsOrderValue[]
   experiments: Experiment[]
-  height: number
-  nbItemsPerRow: number
 }): CustomPlotData[] => {
   const plots = []
 
   for (const value of plotsOrderValues) {
-    plots.push(
-      getCustomPlotData(value, experiments, height, nbItemsPerRow, colorScale)
-    )
+    plots.push(getCustomPlotData(value, experiments, colorScale))
   }
 
   return plots
@@ -244,40 +235,34 @@ const collectImageData = (
   acc[id][pathLabel].push(imgPlot)
 }
 
-const collectDatapoints = (
+const initializeAcc = (
   acc: RevisionData,
   path: string,
-  rev: string,
-  values: Record<string, unknown>[] = []
+  revisions: string[]
 ) => {
-  for (const value of values) {
-    const dvc_data_version_info = getDvcDataVersionInfo(value)
-    const data: { rev: string; dvc_data_version_info?: unknown } = {
-      ...value,
-      ...dvc_data_version_info,
-      rev
+  for (const id of revisions || []) {
+    if (!acc[id]) {
+      acc[id] = {}
     }
-
-    if (hasKey(data, 'dvc_data_version_info')) {
-      delete data.dvc_data_version_info
-    }
-
-    ;(acc[rev][path] as unknown[]).push(data)
+    acc[id][path] = []
   }
 }
 
 const collectPlotData = (
   acc: RevisionData,
   path: string,
-  plot: TemplatePlot
+  plot: TemplatePlotOutput
 ) => {
-  for (const id of plot.revisions || []) {
-    if (!acc[id]) {
-      acc[id] = {}
-    }
-    acc[id][path] = []
+  initializeAcc(acc, path, plot.revisions || [])
 
-    collectDatapoints(acc, path, id, plot.datapoints?.[id])
+  for (const data of (plot.anchor_definitions[PLOT_ANCHORS.DATA] as {
+    rev?: string
+  }[]) || []) {
+    const rev = data.rev
+    if (!rev) {
+      continue
+    }
+    acc[rev][path].push(data)
   }
 }
 
@@ -286,9 +271,13 @@ type DataAccumulator = {
   comparisonData: ComparisonData
 }
 
-const collectPathData = (acc: DataAccumulator, path: string, plots: Plot[]) => {
+const collectPathData = (
+  acc: DataAccumulator,
+  path: string,
+  plots: PlotOutput[]
+) => {
   for (const plot of plots) {
-    if (isImagePlot(plot)) {
+    if (isImagePlotOutput(plot)) {
       collectImageData(acc.comparisonData, path, plot)
       continue
     }
@@ -387,171 +376,67 @@ export const collectSelectedComparisonPlots = ({
   return acc
 }
 
-export type TemplateAccumulator = { [path: string]: string }
-
-const collectTemplate = (
-  acc: TemplateAccumulator,
-  path: string,
-  plot: Plot
-) => {
-  if (isImagePlot(plot) || acc[path]) {
-    return
+export type TemplateDetailsAccumulator = {
+  [path: string]: {
+    content: TopLevelSpec
+    anchorDefinitions: AnchorDefinitions
   }
-  const template = JSON.stringify(plot.content)
-  acc[path] = template
 }
 
-export const collectTemplates = (output: PlotsOutput): TemplateAccumulator => {
+const collectTemplateDetails = (
+  acc: TemplateDetailsAccumulator,
+  path: string,
+  plot: PlotOutput
+) => {
+  if (isImagePlotOutput(plot) || acc[path]) {
+    return
+  }
+  const { anchor_definitions, content } = plot
+  delete anchor_definitions[PLOT_ANCHORS.COLOR]
+  acc[path] = { anchorDefinitions: anchor_definitions, content }
+}
+
+export const collectTemplatesDetails = (
+  output: PlotsOutput
+): TemplateDetailsAccumulator => {
   const { data } = output
-  const acc: TemplateAccumulator = {}
+  const acc: TemplateDetailsAccumulator = {}
 
   for (const [path, plots] of Object.entries(data)) {
     for (const plot of plots) {
-      collectTemplate(acc, path, plot)
+      collectTemplateDetails(acc, path, plot)
     }
   }
 
   return acc
 }
 
-const updateDatapoints = (
-  path: string,
-  revisionData: RevisionData,
-  selectedRevisions: string[],
-  key: string,
-  fields: string[]
-): unknown[] =>
-  selectedRevisions
-    .flatMap(revision => {
-      const datapoints = revisionData?.[revision]?.[path] || []
-      return datapoints.map(data => {
-        const obj = data
-        return {
-          ...obj,
-          [key]: mergeFields(fields.map(field => obj[field] as string))
-        }
-      })
-    })
-    .filter(Boolean)
-
-const updateRevisions = (
-  selectedRevisions: string[],
-  domain: string[]
-): string[] => {
-  const revisions: string[] = []
-  for (const revision of selectedRevisions) {
-    for (const entry of domain) {
-      revisions.push(mergeFields([revision, entry]))
-    }
-  }
-  return revisions
-}
-
-const transformRevisionData = (
-  path: string,
-  selectedRevisions: string[],
-  revisionData: RevisionData,
-  isMultiView: boolean,
-  multiSourceEncodingUpdate: { strokeDash: StrokeDashEncoding }
-): { revisions: string[]; datapoints: unknown[] } => {
-  const field = multiSourceEncodingUpdate.strokeDash?.field
-  const isMultiSource = !!field
-  const availableRevisions = selectedRevisions.filter(
-    rev => revisionData[rev]?.[path]
-  )
-  const transformNeeded =
-    isMultiSource && (isMultiView || isConcatenatedField(field))
-
-  if (!transformNeeded) {
-    return {
-      datapoints: selectedRevisions
-        .flatMap(revision => revisionData[revision]?.[path])
-        .filter(Boolean),
-      revisions: availableRevisions
-    }
-  }
-
-  const fields = unmergeConcatenatedFields(field)
-  if (isMultiView) {
-    fields.unshift('rev')
-    return {
-      datapoints: updateDatapoints(
-        path,
-        revisionData,
-        availableRevisions,
-        'rev',
-        fields
-      ),
-      revisions: updateRevisions(
-        availableRevisions,
-        multiSourceEncodingUpdate.strokeDash.scale.domain
-      )
-    }
-  }
-
-  return {
-    datapoints: updateDatapoints(
-      path,
-      revisionData,
-      availableRevisions,
-      field,
-      fields
-    ),
-    revisions: availableRevisions
-  }
-}
-
-const fillTemplate = (
-  template: string,
-  datapoints: unknown[]
-): TopLevelSpec => {
-  return JSON.parse(
-    template.replace('"<DVC_METRIC_DATA>"', JSON.stringify(datapoints))
-  ) as TopLevelSpec
-}
-
 const collectTemplatePlot = (
   acc: TemplatePlotEntry[],
   selectedRevisions: string[],
   path: string,
-  template: string,
+  content: TopLevelSpec,
+  anchorDefinitions: AnchorDefinitions,
   revisionData: RevisionData,
-  nbItemsPerRow: number,
-  height: number,
-  revisionColors: ColorScale | undefined,
-  multiSourceEncoding: MultiSourceEncoding
+  colorScale: ColorScale
 ) => {
-  const isMultiView = isMultiViewPlot(
-    JSON.parse(template) as TopLevelSpec | SpecWithTitles
-  )
-  const multiSourceEncodingUpdate = multiSourceEncoding[path] || {}
-  const { datapoints, revisions } = transformRevisionData(
-    path,
-    selectedRevisions,
-    revisionData,
-    isMultiView,
-    multiSourceEncodingUpdate
-  )
+  const datapoints = selectedRevisions
+    .flatMap(revision => revisionData[revision]?.[path])
+    .filter(Boolean)
 
   if (datapoints.length === 0) {
     return
   }
 
-  const content = extendVegaSpec(
-    fillTemplate(template, datapoints),
-    nbItemsPerRow,
-    height,
-    {
-      ...multiSourceEncodingUpdate,
-      color: revisionColors
-    }
-  ) as SpecWithTitles
-
   acc.push({
+    anchorDefinitions: {
+      ...anchorDefinitions,
+      [PLOT_ANCHORS.COLOR]: { field: 'rev', scale: colorScale },
+      [PLOT_ANCHORS.DATA]: datapoints
+    },
     content,
     id: path,
-    multiView: isMultiViewPlot(content),
-    revisions,
+    revisions: selectedRevisions,
     type: PlotsType.VEGA
   })
 }
@@ -559,31 +444,28 @@ const collectTemplatePlot = (
 const collectTemplateGroup = (
   paths: string[],
   selectedRevisions: string[],
-  templates: TemplateAccumulator,
+  templates: TemplateDetailsAccumulator,
   revisionData: RevisionData,
-  nbItemsPerRow: number,
-  height: number,
-  revisionColors: ColorScale | undefined,
-  multiSourceEncoding: MultiSourceEncoding
+  colorScale: ColorScale
 ): TemplatePlotEntry[] => {
   const acc: TemplatePlotEntry[] = []
   for (const path of paths) {
-    const template = templates[path]
+    const templateDetails = templates[path]
 
-    if (!template) {
+    if (!templateDetails) {
       continue
     }
+
+    const { content, anchorDefinitions } = templateDetails
 
     collectTemplatePlot(
       acc,
       selectedRevisions,
       path,
-      template,
+      content,
+      anchorDefinitions,
       revisionData,
-      nbItemsPerRow,
-      height,
-      revisionColors,
-      multiSourceEncoding
+      colorScale
     )
   }
   return acc
@@ -592,14 +474,14 @@ const collectTemplateGroup = (
 export const collectSelectedTemplatePlots = (
   order: TemplateOrder,
   selectedRevisions: string[],
-  templates: TemplateAccumulator,
+  templates: TemplateDetailsAccumulator,
   revisionData: RevisionData,
-  nbItemsPerRow: number,
-  height: number,
-  revisionColors: ColorScale | undefined,
-  multiSourceEncoding: MultiSourceEncoding
+  colorScale: ColorScale | undefined
 ): TemplatePlotSection[] | undefined => {
   const acc: TemplatePlotSection[] = []
+  if (!colorScale) {
+    return acc
+  }
   for (const templateGroup of order) {
     const { paths, group } = templateGroup
     const entries = collectTemplateGroup(
@@ -607,10 +489,7 @@ export const collectSelectedTemplatePlots = (
       selectedRevisions,
       templates,
       revisionData,
-      nbItemsPerRow,
-      height,
-      revisionColors,
-      multiSourceEncoding
+      colorScale
     )
     if (!definedAndNonEmpty(entries)) {
       continue
@@ -627,28 +506,15 @@ export const collectSelectedTemplatePlots = (
 export const collectSelectedTemplatePlotRawData = ({
   selectedRevisions,
   path,
-  template,
-  revisionData,
-  multiSourceEncodingUpdate
+  revisionData
 }: {
   selectedRevisions: string[]
   path: string
-  template: string
   revisionData: RevisionData
-  multiSourceEncodingUpdate: { strokeDash: StrokeDashEncoding }
 }) => {
-  const isMultiView = isMultiViewPlot(
-    JSON.parse(template) as TopLevelSpec | SpecWithTitles
-  )
-  const { datapoints } = transformRevisionData(
-    path,
-    selectedRevisions,
-    revisionData,
-    isMultiView,
-    multiSourceEncodingUpdate
-  )
-
-  return datapoints as unknown as Array<Record<string, unknown>>
+  return selectedRevisions
+    .flatMap(revision => revisionData[revision]?.[path])
+    .filter(Boolean)
 }
 
 export const collectOrderedRevisions = (

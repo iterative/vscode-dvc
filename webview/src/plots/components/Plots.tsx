@@ -50,17 +50,16 @@ const PlotsContent = () => {
     return <EmptyState>Loading Plots...</EmptyState>
   }
 
-  const modal = zoomedInPlot?.plot && (
+  const modal = zoomedInPlot?.id && (
     <Modal
       onClose={() => {
         dispatch(setZoomedInPlot(undefined))
       }}
     >
       <ZoomedInPlot
-        isTemplatePlot={zoomedInPlot.isTemplatePlot}
         id={zoomedInPlot.id}
-        props={zoomedInPlot.plot}
         openActionsMenu={zoomedInPlot.openActionsMenu}
+        section={zoomedInPlot.section}
       />
     </Modal>
   )

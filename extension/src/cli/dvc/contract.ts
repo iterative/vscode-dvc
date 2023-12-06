@@ -1,7 +1,7 @@
-import { Plot } from '../../plots/webview/contract'
+import type { TopLevelSpec } from 'vega-lite'
 
-export const MIN_CLI_VERSION = '2.58.1'
-export const LATEST_TESTED_CLI_VERSION = '3.32.0'
+export const MIN_CLI_VERSION = '3.33.0'
+export const LATEST_TESTED_CLI_VERSION = '3.33.0'
 
 export const PLOT_TEMPLATES = [
   'simple',
@@ -129,8 +129,120 @@ export const experimentHasError = (
 
 export type ExpShowOutput = (ExpState & { experiments?: ExpRange[] | null })[]
 
+export enum PlotsType {
+  VEGA = 'vega',
+  IMAGE = 'image'
+}
+export const isImagePlotOutput = (plot: {
+  type: PlotsType
+}): plot is ImagePlotOutput => plot.type === PlotsType.IMAGE
+
+export const PLOT_REV_FIELD = 'rev' as const
+
+export enum PLOT_ANCHORS {
+  COLOR = '<DVC_METRIC_COLOR>',
+  COLUMN = '<DVC_METRIC_COLUMN>',
+  DATA = '<DVC_METRIC_DATA>',
+  HEIGHT = '<DVC_METRIC_PLOT_HEIGHT>',
+  METRIC_TYPE = '<DVC_METRIC_TYPE>',
+  PARAM_TYPE = '<DVC_PARAM_TYPE>',
+  SHAPE = '<DVC_METRIC_SHAPE>',
+  STROKE_DASH = '<DVC_METRIC_STROKE_DASH>',
+  TITLE = '<DVC_METRIC_TITLE>',
+  WIDTH = '<DVC_METRIC_PLOT_WIDTH>',
+  X = '<DVC_METRIC_X>',
+  X_LABEL = '<DVC_METRIC_X_LABEL>',
+  Y = '<DVC_METRIC_Y>',
+  Y_LABEL = '<DVC_METRIC_Y_LABEL>',
+  ZOOM_AND_PAN = '<DVC_METRIC_ZOOM_AND_PAN>'
+}
+
+export const ZOOM_AND_PAN_PROP = {
+  bind: 'scales',
+  name: 'grid',
+  select: 'interval'
+} as const
+
+type FieldDef = { field: string }
+
+type EmptyObject = Record<string, never>
+
+export const PLOT_STROKE_DASH = [
+  [1, 0],
+  [8, 8],
+  [8, 4],
+  [4, 4],
+  [4, 2],
+  [2, 1],
+  [1, 1]
+] as const
+export type StrokeDashValue = (typeof PLOT_STROKE_DASH)[number]
+
+export const PLOT_SHAPE = ['square', 'circle', 'triangle', 'diamond'] as const
+
+export type ShapeValue = (typeof PLOT_SHAPE)[number]
+
+type Scale<T extends StrokeDashValue | string> = {
+  domain: string[]
+  range: T[]
+}
+
+export type StrokeDashScale = Scale<StrokeDashValue>
+
+export type ShapeScale = Scale<ShapeValue>
+
+type Encoding<T extends StrokeDashValue | string> = FieldDef & {
+  scale: Scale<T>
+  legend?: null | {
+    symbolType?: string
+    symbolFillColor?: string
+    symbolStrokeColor?: string
+  }
+}
+
+type MultiSourceEncoding<T extends StrokeDashValue | ShapeValue> =
+  | Encoding<T>
+  | EmptyObject
+
+export type StrokeDashEncoding = MultiSourceEncoding<StrokeDashValue>
+
+export type ShapeEncoding = MultiSourceEncoding<ShapeValue>
+
+export type AnchorDefinitions = {
+  [PLOT_ANCHORS.COLOR]?: Encoding<string>
+  [PLOT_ANCHORS.COLUMN]?: EmptyObject | { sort: never[]; field: string }
+  [PLOT_ANCHORS.DATA]?: Array<Record<string, unknown>>
+  [PLOT_ANCHORS.HEIGHT]?: number | 'container'
+  [PLOT_ANCHORS.METRIC_TYPE]?: 'quantitative' | 'nominal'
+  [PLOT_ANCHORS.PARAM_TYPE]?: 'quantitative' | 'nominal'
+  [PLOT_ANCHORS.SHAPE]?: MultiSourceEncoding<ShapeValue>
+  [PLOT_ANCHORS.STROKE_DASH]?: MultiSourceEncoding<StrokeDashValue>
+  [PLOT_ANCHORS.TITLE]?: string
+  [PLOT_ANCHORS.WIDTH]?: number | 'container'
+  [PLOT_ANCHORS.X]?: string
+  [PLOT_ANCHORS.X_LABEL]?: string
+  [PLOT_ANCHORS.Y]?: string
+  [PLOT_ANCHORS.Y_LABEL]?: string
+  [PLOT_ANCHORS.ZOOM_AND_PAN]?: typeof ZOOM_AND_PAN_PROP
+}
+
+export type TemplatePlotOutput = {
+  anchor_definitions: AnchorDefinitions
+  content: TopLevelSpec
+  revisions: string[]
+  type: PlotsType
+}
+
+export type ImagePlotOutput = {
+  revisions: string[]
+  type: PlotsType
+  url: string
+}
+
+export type PlotOutput = TemplatePlotOutput | ImagePlotOutput
+
 export interface PlotsData {
-  [path: string]: Plot[]
+  [path: string]: PlotOutput[]
 }
 
 export type PlotError = {
@@ -140,12 +252,12 @@ export type PlotError = {
 } & ErrorContents
 
 export type RawPlotsOutput = {
-  data?: { [path: string]: Plot[] }
+  data?: { [path: string]: PlotOutput[] }
   errors?: PlotError[]
 }
 
 export type PlotsOutput = RawPlotsOutput & {
-  data: { [path: string]: Plot[] }
+  data: { [path: string]: PlotOutput[] }
 }
 
 export type PlotsOutputOrError = PlotsOutput | DvcError

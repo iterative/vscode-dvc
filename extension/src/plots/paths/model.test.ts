@@ -1,13 +1,17 @@
 import { join } from 'path'
+import type { TopLevelSpec } from 'vega-lite'
 import { PathsModel } from './model'
 import { PathType, PlotPath } from './collect'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import { buildMockMemento } from '../../test/util'
-import { PlotsType, TemplatePlotGroup } from '../webview/contract'
-import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
+import { TemplatePlotGroup } from '../webview/contract'
+import {
+  PLOT_ANCHORS,
+  EXPERIMENT_WORKSPACE_ID,
+  PlotsType
+} from '../../cli/dvc/contract'
 import { ErrorsModel } from '../errors/model'
 import { REVISIONS } from '../../test/fixtures/plotsDiff'
-import { SpecWithTitles } from '../vega/util'
 import { PersistenceKey } from '../../persistence/constants'
 import { Status } from '../../path/selection/model'
 
@@ -113,23 +117,26 @@ describe('PathsModel', () => {
     data: {
       [previousPlotPath]: [
         {
-          content: {} as SpecWithTitles,
-          datapoints: {
-            [commitBeforePlots]: [
+          anchor_definitions: {
+            [PLOT_ANCHORS.DATA]: [
               {
                 loss: '2.29',
+                rev: commitBeforePlots,
                 step: '0'
               },
               {
                 loss: '2.27',
+                rev: commitBeforePlots,
                 step: '1'
               },
               {
                 loss: '2.25',
+                rev: commitBeforePlots,
                 step: '2'
               }
             ]
           },
+          content: {} as TopLevelSpec,
           revisions: [commitBeforePlots],
           type: PlotsType.VEGA
         }

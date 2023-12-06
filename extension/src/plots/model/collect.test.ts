@@ -2,7 +2,7 @@ import { join } from 'path'
 import isEmpty from 'lodash.isempty'
 import {
   collectData,
-  collectTemplates,
+  collectTemplatesDetails,
   collectCustomPlots,
   collectOrderedRevisions,
   collectImageUrl
@@ -12,15 +12,13 @@ import customPlotsFixture, {
   customPlotsOrderFixture,
   experimentsWithCommits
 } from '../../test/fixtures/expShow/base/customPlots'
-import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
-import { sameContents } from '../../util/array'
 import {
-  CustomPlotData,
-  DEFAULT_NB_ITEMS_PER_ROW,
-  DEFAULT_PLOT_HEIGHT,
-  ImagePlot,
-  TemplatePlot
-} from '../webview/contract'
+  PLOT_ANCHORS,
+  EXPERIMENT_WORKSPACE_ID,
+  TemplatePlotOutput
+} from '../../cli/dvc/contract'
+import { sameContents } from '../../util/array'
+import { CustomPlotData, ImagePlot } from '../webview/contract'
 import { exists } from '../../fileSystem'
 import { REVISIONS } from '../../test/fixtures/plotsDiff'
 
@@ -35,7 +33,7 @@ beforeEach(() => {
 const logsLossPath = join('logs', 'loss.tsv')
 
 const logsLossPlot = (plotsDiffFixture.data[logsLossPath][0] ||
-  {}) as TemplatePlot
+  {}) as TemplatePlotOutput
 
 describe('collectCustomPlots', () => {
   it('should return the expected data from the test fixture', () => {
@@ -46,8 +44,6 @@ describe('collectCustomPlots', () => {
         range: ['#13adc7', '#f46837', '#48bb78', '#4299e1']
       },
       experiments: experimentsWithCommits,
-      height: DEFAULT_PLOT_HEIGHT,
-      nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,
       plotsOrderValues: customPlotsOrderFixture
     })
     expect(data).toStrictEqual(expectedOutput)
@@ -60,11 +56,11 @@ describe('collectCustomPlots', () => {
         range: ['#13adc7']
       },
       experiments: experimentsWithCommits,
-      height: DEFAULT_PLOT_HEIGHT,
-      nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,
       plotsOrderValues: customPlotsOrderFixture
     })
-    expect(data[0].values.slice(-1)[0].id).toStrictEqual('main')
+    expect(
+      (data[0].anchorDefinitions[PLOT_ANCHORS.DATA] || []).slice(-1)[0].id
+    ).toStrictEqual('main')
   })
 
   it('should create custom plot scales that match the collected values', () => {
@@ -88,8 +84,6 @@ describe('collectCustomPlots', () => {
           label: '123'
         }
       ],
-      height: DEFAULT_PLOT_HEIGHT,
-      nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,
       plotsOrderValues: customPlotsOrderFixture
     })
     expect(data).toStrictEqual(expectedOutput)
@@ -100,18 +94,12 @@ describe('collectData', () => {
   it('should return the expected output from the test fixture', () => {
     const { revisionData, comparisonData } = collectData(plotsDiffFixture)
 
-    const values =
-      (logsLossPlot?.datapoints as {
-        [revision: string]: Record<string, unknown>[]
-      }) || {}
+    const values = logsLossPlot?.anchor_definitions?.[PLOT_ANCHORS.DATA] || []
 
     expect(isEmpty(values)).toBeFalsy()
 
     for (const revision of REVISIONS) {
-      const expectedValues = values[revision]?.map(value => ({
-        ...value,
-        rev: revision
-      }))
+      const expectedValues = values.filter(({ rev }) => rev === revision)
       expect(revisionData[revision][logsLossPath]).toStrictEqual(expectedValues)
     }
 
@@ -139,7 +127,7 @@ describe('collectData', () => {
     expect(testBranchHeatmap).toBeDefined()
     expect(testBranchHeatmap).toStrictEqual([
       plotsDiffFixture.data[heatmapPlot].find(({ revisions }) =>
-        sameContents(revisions as string[], ['test-branch'])
+        sameContents(revisions, ['test-branch'])
       )
     ])
   })
@@ -147,16 +135,19 @@ describe('collectData', () => {
 
 describe('collectTemplates', () => {
   it('should return the expected output from the test fixture', () => {
-    const { content } = logsLossPlot
+    const { content, anchor_definitions } = logsLossPlot
 
-    const templates = collectTemplates(plotsDiffFixture)
+    const templates = collectTemplatesDetails(plotsDiffFixture)
     expect(Object.keys(templates)).toStrictEqual([
       logsLossPath,
       join('logs', 'acc.tsv'),
       'predictions.json'
     ])
 
-    expect(JSON.parse(templates[logsLossPath])).toStrictEqual(content)
+    expect(templates[logsLossPath]).toStrictEqual({
+      anchorDefinitions: anchor_definitions,
+      content
+    })
   })
 })
 
