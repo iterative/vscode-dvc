@@ -52,7 +52,7 @@ suite('plots diff -o <TEMP_DIR> --split --show-json', () => {
           expect(
             plot?.anchor_definitions[PLOT_ANCHORS.DATA],
             'should have a data anchor definition'
-          ).to.be.a('string')
+          ).to.be.an('array')
 
           expect(plot.revisions, 'should have two revisions').to.have.lengthOf(
             2
