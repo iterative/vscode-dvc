@@ -1,3 +1,4 @@
+import type { TopLevelSpec } from 'vega-lite'
 import type { CustomPlotsOrderValue } from '../../../../plots/model/custom'
 import {
   CustomPlotsData,
@@ -5,7 +6,7 @@ import {
   DEFAULT_PLOT_HEIGHT
 } from '../../../../plots/webview/contract'
 import { Experiment } from '../../../../experiments/webview/contract'
-import { Title } from 'vega'
+import { PLOT_ANCHORS, ZOOM_AND_PAN_PROP } from '../../../../cli/dvc/contract'
 
 export const customPlotsOrderFixture: CustomPlotsOrderValue[] = [
   {
@@ -101,30 +102,9 @@ const data: CustomPlotsData = {
       param: 'params.yaml:log_file',
       content: {
         $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-        data: { name: 'values' },
+        data: { values: PLOT_ANCHORS.DATA },
         encoding: {
-          color: {
-            field: 'id',
-            legend: null,
-            scale: {
-              domain: [
-                'main',
-                'exp-e7a67',
-                'test-branch',
-                'exp-83425',
-                'fe2919b',
-                '7df876c'
-              ],
-              range: [
-                '#13adc7',
-                '#f46837',
-                '#48bb78',
-                '#4299e1',
-                '#4c78a8',
-                '#4c78a8'
-              ]
-            }
-          },
+          color: PLOT_ANCHORS.COLOR,
           x: {
             axis: {
               labelLimit: 75,
@@ -134,8 +114,8 @@ const data: CustomPlotsData = {
             scale: {
               zero: false
             },
-            title: 'params.yaml:log_file',
-            type: 'nominal'
+            title: PLOT_ANCHORS.X_LABEL,
+            type: PLOT_ANCHORS.PARAM_TYPE
           },
           y: {
             axis: {
@@ -146,8 +126,8 @@ const data: CustomPlotsData = {
             scale: {
               zero: false
             },
-            title: 'summary.json:loss',
-            type: 'quantitative'
+            title: PLOT_ANCHORS.Y_LABEL,
+            type: PLOT_ANCHORS.METRIC_TYPE
           }
         },
         height: 'container',
@@ -161,11 +141,11 @@ const data: CustomPlotsData = {
                 },
                 {
                   field: 'metric',
-                  title: 'summary.json:loss'
+                  title: PLOT_ANCHORS.Y_LABEL
                 },
                 {
                   field: 'param',
-                  title: 'params.yaml:log_file'
+                  title: PLOT_ANCHORS.X_LABEL
                 }
               ]
             },
@@ -173,104 +153,126 @@ const data: CustomPlotsData = {
               filled: true,
               size: 60,
               type: 'point'
-            }
+            },
+            params: [PLOT_ANCHORS.ZOOM_AND_PAN]
           }
         ],
-        width: 'container',
-        titles: {
-          main: {
-            normal: 'params.yaml:log_file' as unknown as Title,
-            truncated: 'params.yaml:log_file'
-          },
-          x: {
-            normal: 'params.yaml:log_file' as unknown as Title,
-            truncated: 'params.yaml:log_file'
-          },
-          y: {
-            normal: 'summary.json:loss' as unknown as Title,
-            truncated: 'summary.json:loss'
+        width: 'container'
+      } as unknown as TopLevelSpec,
+      anchorDefinitions: {
+        [PLOT_ANCHORS.PARAM_TYPE]: 'nominal',
+        [PLOT_ANCHORS.COLOR]: {
+          field: 'id',
+          scale: {
+            domain: [
+              'main',
+              'exp-e7a67',
+              'test-branch',
+              'exp-83425',
+              'fe2919b',
+              '7df876c'
+            ],
+            range: [
+              '#13adc7',
+              '#f46837',
+              '#48bb78',
+              '#4299e1',
+              '#4c78a8',
+              '#4c78a8'
+            ]
           }
-        }
-      },
-      values: [
-        { id: '7df876c', metric: 2.048856019973755, param: 'logs.csv' },
-        {
-          id: 'fe2919b',
-          metric: 2.048856019973755,
-          param: 'logs.csv'
         },
-        { id: 'main', metric: 2.048856019973755, param: 'logs.csv' },
-        { id: 'exp-e7a67', metric: 2.0205044746398926, param: 'logs.csv' },
-        { id: 'test-branch', metric: 1.9293040037155151, param: 'logs.csv' },
-        {
-          id: 'exp-83425',
-          metric: 1.775016188621521,
-          param: 'logs.csv'
-        }
-      ]
+        [PLOT_ANCHORS.DATA]: [
+          { id: '7df876c', metric: 2.048856019973755, param: 'logs.csv' },
+          {
+            id: 'fe2919b',
+            metric: 2.048856019973755,
+            param: 'logs.csv'
+          },
+          { id: 'main', metric: 2.048856019973755, param: 'logs.csv' },
+          { id: 'exp-e7a67', metric: 2.0205044746398926, param: 'logs.csv' },
+          { id: 'test-branch', metric: 1.9293040037155151, param: 'logs.csv' },
+          {
+            id: 'exp-83425',
+            metric: 1.775016188621521,
+            param: 'logs.csv'
+          }
+        ],
+        [PLOT_ANCHORS.METRIC_TYPE]: 'quantitative',
+        [PLOT_ANCHORS.X_LABEL]: 'params.yaml:log_file',
+        [PLOT_ANCHORS.Y_LABEL]: 'summary.json:loss',
+        [PLOT_ANCHORS.ZOOM_AND_PAN]: ZOOM_AND_PAN_PROP
+      }
     },
     {
       id: 'custom-summary.json:accuracy-params.yaml:epochs',
       metric: 'summary.json:accuracy',
       param: 'params.yaml:epochs',
-      values: [
-        {
-          id: '7df876c',
-          metric: 0.3484833240509033,
-          param: 5
+      anchorDefinitions: {
+        [PLOT_ANCHORS.PARAM_TYPE]: 'quantitative',
+        [PLOT_ANCHORS.COLOR]: {
+          field: 'id',
+          scale: {
+            domain: [
+              'main',
+              'exp-e7a67',
+              'test-branch',
+              'exp-83425',
+              'fe2919b',
+              '7df876c'
+            ],
+            range: [
+              '#13adc7',
+              '#f46837',
+              '#48bb78',
+              '#4299e1',
+              '#4c78a8',
+              '#4c78a8'
+            ]
+          }
         },
-        {
-          id: 'fe2919b',
-          metric: 0.3484833240509033,
-          param: 5
-        },
-        {
-          id: 'main',
-          metric: 0.3484833240509033,
-          param: 5
-        },
-        {
-          id: 'exp-e7a67',
-          metric: 0.3724166750907898,
-          param: 2
-        },
-        {
-          id: 'test-branch',
-          metric: 0.4668000042438507,
-          param: 2
-        },
-        {
-          id: 'exp-83425',
-          metric: 0.5926499962806702,
-          param: 5
-        }
-      ],
+        [PLOT_ANCHORS.DATA]: [
+          {
+            id: '7df876c',
+            metric: 0.3484833240509033,
+            param: 5
+          },
+          {
+            id: 'fe2919b',
+            metric: 0.3484833240509033,
+            param: 5
+          },
+          {
+            id: 'main',
+            metric: 0.3484833240509033,
+            param: 5
+          },
+          {
+            id: 'exp-e7a67',
+            metric: 0.3724166750907898,
+            param: 2
+          },
+          {
+            id: 'test-branch',
+            metric: 0.4668000042438507,
+            param: 2
+          },
+          {
+            id: 'exp-83425',
+            metric: 0.5926499962806702,
+            param: 5
+          }
+        ],
+        [PLOT_ANCHORS.METRIC_TYPE]: 'quantitative',
+        [PLOT_ANCHORS.X_LABEL]: 'params.yaml:epochs',
+        [PLOT_ANCHORS.Y_LABEL]: 'summary.json:accuracy',
+        [PLOT_ANCHORS.ZOOM_AND_PAN]: ZOOM_AND_PAN_PROP
+      },
       content: {
         $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-        data: { name: 'values' },
+        data: { values: PLOT_ANCHORS.DATA },
         encoding: {
-          color: {
-            field: 'id',
-            legend: null,
-            scale: {
-              domain: [
-                'main',
-                'exp-e7a67',
-                'test-branch',
-                'exp-83425',
-                'fe2919b',
-                '7df876c'
-              ],
-              range: [
-                '#13adc7',
-                '#f46837',
-                '#48bb78',
-                '#4299e1',
-                '#4c78a8',
-                '#4c78a8'
-              ]
-            }
-          },
+          color: PLOT_ANCHORS.COLOR,
           x: {
             axis: {
               labelLimit: 75,
@@ -280,8 +282,8 @@ const data: CustomPlotsData = {
             scale: {
               zero: false
             },
-            title: 'params.yaml:epochs',
-            type: 'quantitative'
+            title: PLOT_ANCHORS.X_LABEL,
+            type: PLOT_ANCHORS.PARAM_TYPE
           },
           y: {
             axis: {
@@ -292,8 +294,8 @@ const data: CustomPlotsData = {
             scale: {
               zero: false
             },
-            title: 'summary.json:accuracy',
-            type: 'quantitative'
+            title: PLOT_ANCHORS.Y_LABEL,
+            type: PLOT_ANCHORS.METRIC_TYPE
           }
         },
         height: 'container',
@@ -307,11 +309,11 @@ const data: CustomPlotsData = {
                 },
                 {
                   field: 'metric',
-                  title: 'summary.json:accuracy'
+                  title: PLOT_ANCHORS.Y_LABEL
                 },
                 {
                   field: 'param',
-                  title: 'params.yaml:epochs'
+                  title: PLOT_ANCHORS.X_LABEL
                 }
               ]
             },
@@ -319,25 +321,12 @@ const data: CustomPlotsData = {
               filled: true,
               size: 60,
               type: 'point'
-            }
+            },
+            params: [PLOT_ANCHORS.ZOOM_AND_PAN]
           }
         ],
-        width: 'container',
-        titles: {
-          main: {
-            normal: 'params.yaml:epochs' as unknown as Title,
-            truncated: 'params.yaml:epochs'
-          },
-          x: {
-            normal: 'params.yaml:epochs' as unknown as Title,
-            truncated: 'params.yaml:epochs'
-          },
-          y: {
-            normal: 'summary.json:accuracy' as unknown as Title,
-            truncated: 'summary.json:accuracy'
-          }
-        }
-      }
+        width: 'container'
+      } as unknown as TopLevelSpec
     }
   ],
   nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,

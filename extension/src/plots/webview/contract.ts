@@ -1,5 +1,11 @@
+import type { TopLevelSpec } from 'vega-lite'
 import { Color } from '../../experiments/model/status/colors'
-import { SpecWithTitles } from '../vega/util'
+import {
+  AnchorDefinitions,
+  ImagePlotOutput,
+  PlotsType,
+  TemplatePlotOutput
+} from '../../cli/dvc/contract'
 
 export const DEFAULT_NB_ITEMS_PER_ROW = 2
 
@@ -90,11 +96,11 @@ export type CustomPlot = {
   id: string
   metric: string
   param: string
-  values: CustomPlotValues
 }
 
 export type CustomPlotData = CustomPlot & {
-  content: SpecWithTitles
+  content: TopLevelSpec
+  anchorDefinitions: AnchorDefinitions
 }
 
 export type CustomPlotsData = {
@@ -105,42 +111,31 @@ export type CustomPlotsData = {
   hasAddedPlots: boolean
 }
 
-export enum PlotsType {
-  VEGA = 'vega',
-  IMAGE = 'image'
-}
-
 export const isVegaPlot = (plot: Plot): plot is TemplatePlot =>
   plot.type === PlotsType.VEGA
 
-export type TemplatePlot = {
-  content: SpecWithTitles
-  datapoints?: { [revision: string]: Record<string, unknown>[] }
-  revisions?: string[]
-  type: PlotsType
-  multiView?: boolean
-}
-
-export type ImagePlot = {
-  revisions?: string[]
-  type: PlotsType
-  url: string
+export type ImagePlot = ImagePlotOutput & {
   ind?: number
 }
 
-export const isImagePlot = (plot: Plot): plot is ImagePlot =>
+export const isImagePlot = (plot: { type: PlotsType }): plot is ImagePlot =>
   plot.type === PlotsType.IMAGE
+
+export type TemplatePlot = Omit<TemplatePlotOutput, 'anchor_definitions'> & {
+  anchorDefinitions: AnchorDefinitions
+  id: string
+}
 
 export type Plot = TemplatePlot | ImagePlot
 
-export type TemplatePlots = { [path: string]: TemplatePlot[] }
+export type TemplatePlots = { [path: string]: TemplatePlotOutput[] }
 
 export enum TemplatePlotGroup {
   MULTI_VIEW = 'template-multi',
   SINGLE_VIEW = 'template-single'
 }
 
-export type TemplatePlotEntry = TemplatePlot & { id: string }
+export type TemplatePlotEntry = TemplatePlot
 
 export type TemplatePlotSection = {
   group: TemplatePlotGroup
@@ -195,3 +190,5 @@ export type PlotsData =
       [PlotsDataKeys.SHOW_TOO_MANY_COMPARISON_IMAGES]?: boolean
     }
   | undefined
+
+export { PlotsType } from '../../cli/dvc/contract'

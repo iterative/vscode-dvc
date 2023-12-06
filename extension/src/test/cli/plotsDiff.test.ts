@@ -3,13 +3,15 @@ import { expect } from 'chai'
 import { TEMP_DIR } from './constants'
 import { dvcReader, initializeDemoRepo, initializeEmptyRepo } from './util'
 import { dvcDemoPath } from '../util'
+import { ImagePlot } from '../../plots/webview/contract'
 import {
-  ImagePlot,
-  isImagePlot,
+  PLOT_ANCHORS,
+  EXPERIMENT_WORKSPACE_ID,
+  PlotsOutput,
   PlotsType,
-  TemplatePlot
-} from '../../plots/webview/contract'
-import { EXPERIMENT_WORKSPACE_ID, PlotsOutput } from '../../cli/dvc/contract'
+  TemplatePlotOutput,
+  isImagePlotOutput
+} from '../../cli/dvc/contract'
 import { isDvcError } from '../../cli/dvc/reader'
 
 suite('plots diff -o <TEMP_DIR> --split --show-json', () => {
@@ -46,30 +48,29 @@ suite('plots diff -o <TEMP_DIR> --split --show-json', () => {
           expect(plot.revisions, 'should have one revision').to.have.lengthOf(1)
         }
 
-        const expectTemplate = (plot: TemplatePlot) => {
-          expect(plot?.datapoints, 'should have a datapoints object').to.be.an(
-            'object'
-          )
+        const expectTemplate = (plot: TemplatePlotOutput) => {
+          expect(
+            plot?.anchor_definitions[PLOT_ANCHORS.DATA],
+            'should have a data anchor definition'
+          ).to.be.a('string')
 
           expect(plot.revisions, 'should have two revisions').to.have.lengthOf(
             2
           )
 
-          const datapoints = plot?.datapoints || {}
+          const datapoints = plot?.anchor_definitions[PLOT_ANCHORS.DATA] || []
+          const revisions = new Set()
+          for (const datapoint of datapoints) {
+            revisions.add(datapoint.rev)
+            expect(
+              datapoint,
+              'should have an object of unknown type for each datapoint'
+            ).to.be.an('object')
+          }
           expect(
-            Object.keys(datapoints),
+            [...revisions],
             'should have the HEAD and workspace revisions'
           ).to.have.lengthOf(2)
-
-          for (const revisionDatapoints of Object.values(datapoints)) {
-            expect(revisionDatapoints).to.be.an('array')
-            for (const datapoint of revisionDatapoints) {
-              expect(
-                datapoint,
-                'should have an object of unknown type for each datapoint'
-              ).to.be.an('object')
-            }
-          }
         }
 
         for (const plot of plots) {
@@ -82,7 +83,7 @@ suite('plots diff -o <TEMP_DIR> --split --show-json', () => {
             'array'
           )
 
-          if (isImagePlot(plot)) {
+          if (isImagePlotOutput(plot)) {
             expectImage(plot)
           } else {
             expectTemplate(plot)

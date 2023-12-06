@@ -1,12 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { Revision } from 'dvc/src/plots/webview/contract'
-import { VegaProps } from 'react-vega/lib/Vega'
+import { PlotsSection, Revision } from 'dvc/src/plots/webview/contract'
 
 type ZoomedInPlotState = {
-  plot: VegaProps | undefined
+  section: PlotsSection
   id: string
-  isTemplatePlot: boolean
   openActionsMenu?: boolean
   refresh?: boolean
 }
@@ -29,8 +27,7 @@ export const webviewInitialState: WebviewState = {
   selectedRevisions: [],
   zoomedInPlot: {
     id: '',
-    isTemplatePlot: false,
-    plot: undefined
+    section: PlotsSection.TEMPLATE_PLOTS
   }
 }
 

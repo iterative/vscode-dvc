@@ -1,14 +1,15 @@
-import { TopLevelSpec } from 'vega-lite'
+import type { TopLevelSpec } from 'vega-lite'
+import { isMultiViewPlot } from '../../../plots/vega/util'
 import {
-  SpecWithTitles,
-  extendVegaSpec,
-  isMultiViewPlot
-} from '../../../plots/vega/util'
-import { EXPERIMENT_WORKSPACE_ID, PlotsOutput } from '../../../cli/dvc/contract'
+  EXPERIMENT_WORKSPACE_ID,
+  PLOT_ANCHORS,
+  PlotsOutput,
+  PlotsType,
+  ZOOM_AND_PAN_PROP
+} from '../../../cli/dvc/contract'
 import {
   ComparisonRevisionData,
   TemplatePlotSection,
-  PlotsType,
   TemplatePlotGroup,
   TemplatePlotsData,
   TemplatePlots,
@@ -22,7 +23,6 @@ import {
 import { join } from '../../util/path'
 import { copyOriginalColors } from '../../../experiments/model/status/colors'
 import { ColumnType } from '../../../experiments/webview/contract'
-import { Title } from 'vega'
 
 const basicVega = {
   [join('logs', 'loss.tsv')]: [
@@ -35,323 +35,458 @@ const basicVega = {
         'exp-83425',
         'exp-e7a67'
       ],
-      datapoints: {
-        [EXPERIMENT_WORKSPACE_ID]: [
+      anchor_definitions: {
+        [PLOT_ANCHORS.DATA]: [
           {
             loss: '2.298783302307129',
             step: '0',
-            timestamp: '1641966224600'
+            timestamp: '1641966224600',
+            rev: 'workspace'
           },
           {
             loss: '2.2779736518859863',
             step: '1',
-            timestamp: '1641966239108'
+            timestamp: '1641966239108',
+            rev: 'workspace'
           },
           {
             loss: '2.2572131156921387',
             step: '2',
-            timestamp: '1641966253176'
+            timestamp: '1641966253176',
+            rev: 'workspace'
           },
           {
             loss: '2.238112688064575',
             step: '3',
-            timestamp: '1641966267354'
+            timestamp: '1641966267354',
+            rev: 'workspace'
           },
           {
             loss: '2.212251901626587',
             step: '4',
-            timestamp: '1641966285745'
+            timestamp: '1641966285745',
+            rev: 'workspace'
           },
           {
             loss: '2.1894900798797607',
             step: '5',
-            timestamp: '1641966303339'
+            timestamp: '1641966303339',
+            rev: 'workspace'
           },
           {
             loss: '2.165510654449463',
             step: '6',
-            timestamp: '1641966320693'
+            timestamp: '1641966320693',
+            rev: 'workspace'
           },
           {
             loss: '2.135964870452881',
             step: '7',
-            timestamp: '1641966335781'
+            timestamp: '1641966335781',
+            rev: 'workspace'
           },
           {
             loss: '2.114135265350342',
             step: '8',
-            timestamp: '1641966351758'
-          }
-        ],
-        main: [
+            timestamp: '1641966351758',
+            rev: 'workspace'
+          },
           {
             loss: '2.298783302307129',
             step: '0',
-            timestamp: '1641966224600'
+            timestamp: '1641966224600',
+            rev: 'main'
           },
           {
             loss: '2.2779736518859863',
             step: '1',
-            timestamp: '1641966239108'
+            timestamp: '1641966239108',
+            rev: 'main'
           },
           {
             loss: '2.2572131156921387',
             step: '2',
-            timestamp: '1641966253176'
+            timestamp: '1641966253176',
+            rev: 'main'
           },
           {
             loss: '2.238112688064575',
             step: '3',
-            timestamp: '1641966267354'
+            timestamp: '1641966267354',
+            rev: 'main'
           },
           {
             loss: '2.212251901626587',
             step: '4',
-            timestamp: '1641966285745'
+            timestamp: '1641966285745',
+            rev: 'main'
           },
           {
             loss: '2.1894900798797607',
             step: '5',
-            timestamp: '1641966303339'
+            timestamp: '1641966303339',
+            rev: 'main'
           },
           {
             loss: '2.165510654449463',
             step: '6',
-            timestamp: '1641966320693'
+            timestamp: '1641966320693',
+            rev: 'main'
           },
           {
             loss: '2.135964870452881',
             step: '7',
-            timestamp: '1641966335781'
+            timestamp: '1641966335781',
+            rev: 'main'
           },
           {
             loss: '2.114135265350342',
             step: '8',
-            timestamp: '1641966351758'
-          }
-        ],
-        'test-branch': [
-          {
-            loss: '1.6454246044158936',
-            step: '0',
-            timestamp: '1642041785966'
+            timestamp: '1641966351758',
+            rev: 'main'
           },
-          {
-            loss: '1.6063436269760132',
-            step: '1',
-            timestamp: '1642041804111'
-          },
-          {
-            loss: '1.5570942163467407',
-            step: '2',
-            timestamp: '1642041820386'
-          },
-          {
-            loss: '1.5230435132980347',
-            step: '3',
-            timestamp: '1642041836358'
-          },
-          {
-            loss: '1.473145842552185',
-            step: '4',
-            timestamp: '1642041851764'
-          },
-          {
-            loss: '1.444159984588623',
-            step: '5',
-            timestamp: '1642041866838'
-          },
-          {
-            loss: '1.3941730260849',
-            step: '6',
-            timestamp: '1642041881837'
-          },
-          {
-            loss: '1.370380163192749',
-            step: '7',
-            timestamp: '1642041897483'
-          },
-          {
-            loss: '1.3217320442199707',
-            step: '8',
-            timestamp: '1642041912764'
-          }
-        ],
-        'exp-83425': [
-          {
-            loss: '2.273470401763916',
-            step: '0',
-            timestamp: '1642041482186'
-          },
-          {
-            loss: '2.20936918258667',
-            step: '1',
-            timestamp: '1642041500577'
-          },
-          {
-            loss: '2.153379201889038',
-
-            step: '2',
-            timestamp: '1642041519065'
-          },
-          {
-            loss: '2.0221104621887207',
-            step: '3',
-            timestamp: '1642041543481'
-          },
-          {
-            loss: '2.024623155593872',
-            step: '4',
-            timestamp: '1642041565772'
-          },
-          {
-            loss: '1.8110722303390503',
-            step: '5',
-            timestamp: '1642041586986'
-          },
-          {
-            loss: '1.7324824333190918',
-            step: '6',
-            timestamp: '1642041609569'
-          },
-          {
-            loss: '1.6054636240005493',
-            step: '7',
-            timestamp: '1642041631783'
-          },
-          {
-            loss: '1.5145071744918823',
-            step: '8',
-            timestamp: '1642041648829'
-          }
-        ],
-        'exp-e7a67': [
           {
             loss: '2.0380799770355225',
             step: '0',
-            timestamp: '1642041230991'
+            timestamp: '1642041230991',
+            rev: 'exp-e7a67'
           },
           {
             loss: '2.0002100467681885',
             step: '1',
-            timestamp: '1642041244696'
+            timestamp: '1642041244696',
+            rev: 'exp-e7a67'
           },
           {
             loss: '1.9573605060577393',
             step: '2',
-            timestamp: '1642041257185'
+            timestamp: '1642041257185',
+            rev: 'exp-e7a67'
           },
           {
             loss: '1.91573965549469',
             step: '3',
-            timestamp: '1642041270652'
+            timestamp: '1642041270652',
+            rev: 'exp-e7a67'
           },
           {
             loss: '1.8714964389801025',
             step: '4',
-            timestamp: '1642041284801'
+            timestamp: '1642041284801',
+            rev: 'exp-e7a67'
           },
           {
             loss: '1.8267308473587036',
             step: '5',
-            timestamp: '1642041301919'
+            timestamp: '1642041301919',
+            rev: 'exp-e7a67'
           },
           {
             loss: '1.7825157642364502',
             step: '6',
-            timestamp: '1642041318814'
+            timestamp: '1642041318814',
+            rev: 'exp-e7a67'
           },
           {
             loss: '1.7360031604766846',
             step: '7',
-            timestamp: '1642041335775'
+            timestamp: '1642041335775',
+            rev: 'exp-e7a67'
           },
           {
             loss: '1.6929490566253662',
             step: '8',
-            timestamp: '1642041350855'
+            timestamp: '1642041350855',
+            rev: 'exp-e7a67'
+          },
+          {
+            loss: '1.6454246044158936',
+            step: '0',
+            timestamp: '1642041785966',
+            rev: 'test-branch'
+          },
+          {
+            loss: '1.6063436269760132',
+            step: '1',
+            timestamp: '1642041804111',
+            rev: 'test-branch'
+          },
+          {
+            loss: '1.5570942163467407',
+            step: '2',
+            timestamp: '1642041820386',
+            rev: 'test-branch'
+          },
+          {
+            loss: '1.5230435132980347',
+            step: '3',
+            timestamp: '1642041836358',
+            rev: 'test-branch'
+          },
+          {
+            loss: '1.473145842552185',
+            step: '4',
+            timestamp: '1642041851764',
+            rev: 'test-branch'
+          },
+          {
+            loss: '1.444159984588623',
+            step: '5',
+            timestamp: '1642041866838',
+            rev: 'test-branch'
+          },
+          {
+            loss: '1.3941730260849',
+            step: '6',
+            timestamp: '1642041881837',
+            rev: 'test-branch'
+          },
+          {
+            loss: '1.370380163192749',
+            step: '7',
+            timestamp: '1642041897483',
+            rev: 'test-branch'
+          },
+          {
+            loss: '1.3217320442199707',
+            step: '8',
+            timestamp: '1642041912764',
+            rev: 'test-branch'
+          },
+          {
+            loss: '2.273470401763916',
+            step: '0',
+            timestamp: '1642041482186',
+            rev: 'exp-83425'
+          },
+          {
+            loss: '2.20936918258667',
+            step: '1',
+            timestamp: '1642041500577',
+            rev: 'exp-83425'
+          },
+          {
+            loss: '2.153379201889038',
+            step: '2',
+            timestamp: '1642041519065',
+            rev: 'exp-83425'
+          },
+          {
+            loss: '2.0221104621887207',
+            step: '3',
+            timestamp: '1642041543481',
+            rev: 'exp-83425'
+          },
+          {
+            loss: '2.024623155593872',
+            step: '4',
+            timestamp: '1642041565772',
+            rev: 'exp-83425'
+          },
+          {
+            loss: '1.8110722303390503',
+            step: '5',
+            timestamp: '1642041586986',
+            rev: 'exp-83425'
+          },
+          {
+            loss: '1.7324824333190918',
+            step: '6',
+            timestamp: '1642041609569',
+            rev: 'exp-83425'
+          },
+          {
+            loss: '1.6054636240005493',
+            step: '7',
+            timestamp: '1642041631783',
+            rev: 'exp-83425'
+          },
+          {
+            loss: '1.5145071744918823',
+            step: '8',
+            timestamp: '1642041648829',
+            rev: 'exp-83425'
           }
-        ]
+        ],
+        [PLOT_ANCHORS.HEIGHT]: 300,
+        [PLOT_ANCHORS.STROKE_DASH]: {},
+        [PLOT_ANCHORS.TITLE]: 'dvc.yaml::Loss',
+        [PLOT_ANCHORS.WIDTH]: 300,
+        [PLOT_ANCHORS.X_LABEL]: 'step',
+        [PLOT_ANCHORS.Y_LABEL]: 'loss',
+        [PLOT_ANCHORS.ZOOM_AND_PAN]: ZOOM_AND_PAN_PROP
       },
       content: {
-        $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
+        $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
         data: {
-          values: '<DVC_METRIC_DATA>'
+          values: PLOT_ANCHORS.DATA
         },
-        title: '',
-        width: 300,
-        height: 300,
+        title: PLOT_ANCHORS.TITLE,
+        width: PLOT_ANCHORS.WIDTH,
+        height: PLOT_ANCHORS.HEIGHT,
+        params: [
+          {
+            name: 'smooth',
+            value: 0.001,
+            bind: {
+              input: 'range',
+              min: 0.001,
+              max: 1,
+              step: 0.001
+            }
+          }
+        ],
+        encoding: {
+          x: {
+            field: 'step',
+            type: 'quantitative',
+            title: PLOT_ANCHORS.X_LABEL
+          },
+          color: PLOT_ANCHORS.COLOR,
+          strokeDash: PLOT_ANCHORS.STROKE_DASH
+        },
         layer: [
           {
+            layer: [
+              {
+                params: [PLOT_ANCHORS.ZOOM_AND_PAN],
+                mark: 'line'
+              },
+              {
+                transform: [
+                  {
+                    filter: {
+                      param: 'hover',
+                      empty: false
+                    }
+                  }
+                ],
+                mark: 'point'
+              }
+            ],
             encoding: {
-              x: { field: 'step', type: 'quantitative', title: 'step' },
               y: {
                 field: 'loss',
                 type: 'quantitative',
-                title: 'loss',
-                scale: { zero: false }
+                title: PLOT_ANCHORS.Y_LABEL,
+                scale: {
+                  zero: false
+                }
               },
-              color: { field: 'rev', type: 'nominal' }
+              color: {
+                field: 'rev',
+                type: 'nominal'
+              }
             },
-            layer: [
-              { mark: 'line' },
+            transform: [
               {
-                selection: {
-                  label: {
-                    type: 'single',
-                    nearest: true,
-                    on: 'mouseover',
-                    encodings: ['x'],
-                    empty: 'none',
-                    clear: 'mouseout'
-                  }
-                },
-                mark: 'point',
-                encoding: {
-                  opacity: {
-                    condition: { selection: 'label', value: 1 },
-                    value: 0
-                  }
+                loess: 'loss',
+                on: 'step',
+                groupby: ['rev'],
+                bandwidth: {
+                  signal: 'smooth'
                 }
               }
             ]
           },
           {
-            transform: [{ filter: { selection: 'label' } }],
-            layer: [
+            mark: {
+              type: 'line',
+              opacity: 0.2
+            },
+            encoding: {
+              x: {
+                field: 'step',
+                type: 'quantitative',
+                title: PLOT_ANCHORS.X_LABEL
+              },
+              y: {
+                field: 'loss',
+                type: 'quantitative',
+                title: PLOT_ANCHORS.Y_LABEL,
+                scale: {
+                  zero: false
+                }
+              },
+              color: {
+                field: 'rev',
+                type: 'nominal'
+              }
+            }
+          },
+          {
+            mark: {
+              type: 'circle',
+              size: 10
+            },
+            encoding: {
+              x: {
+                aggregate: 'max',
+                field: 'step',
+                type: 'quantitative',
+                title: PLOT_ANCHORS.X_LABEL
+              },
+              y: {
+                aggregate: {
+                  argmax: 'step'
+                },
+                field: 'loss',
+                type: 'quantitative',
+                title: PLOT_ANCHORS.Y_LABEL,
+                scale: {
+                  zero: false
+                }
+              },
+              color: {
+                field: 'rev',
+                type: 'nominal'
+              }
+            }
+          },
+          {
+            transform: [
               {
-                mark: { type: 'rule', color: 'gray' },
-                encoding: { x: { field: 'step', type: 'quantitative' } }
+                calculate: 'datum.rev',
+                as: 'pivot_field'
               },
               {
-                encoding: {
-                  text: { type: 'quantitative', field: 'loss' },
-                  x: { field: 'step', type: 'quantitative' },
-                  y: { field: 'loss', type: 'quantitative' }
+                pivot: 'pivot_field',
+                value: 'loss',
+                groupby: ['step']
+              }
+            ],
+            mark: {
+              type: 'rule',
+              tooltip: {
+                content: 'data'
+              },
+              stroke: 'grey'
+            },
+            encoding: {
+              opacity: {
+                condition: {
+                  value: 0.3,
+                  param: 'hover',
+                  empty: false
                 },
-                layer: [
-                  {
-                    mark: {
-                      type: 'text',
-                      align: 'left',
-                      dx: 5,
-                      dy: -5
-                    },
-                    encoding: {
-                      color: { type: 'nominal', field: 'rev' }
-                    }
-                  }
-                ]
+                value: 0
+              }
+            },
+            params: [
+              {
+                name: 'hover',
+                select: {
+                  type: 'point',
+                  fields: ['step'],
+                  nearest: true,
+                  on: 'mouseover',
+                  clear: 'mouseout'
+                }
               }
             ]
           }
-        ],
-        titles: {
-          main: { normal: '' as unknown as Title, truncated: '' },
-          x: { normal: '' as unknown as Title, truncated: '' },
-          y: { normal: '' as unknown as Title, truncated: '' }
-        }
-      } as SpecWithTitles,
+        ]
+      } as unknown as TopLevelSpec,
       multiView: false
     }
   ]
@@ -504,10 +639,6 @@ export const getOutput = (baseUrl: string): PlotsOutput => ({
 
 export const getMinimalOutput = (): PlotsOutput => ({ data: { ...basicVega } })
 
-export const getMultiSourceOutput = (): PlotsOutput => ({
-  ...require('./multiSource').default
-})
-
 export const REVISIONS = [
   EXPERIMENT_WORKSPACE_ID,
   'main',
@@ -529,35 +660,24 @@ const extendedSpecs = (plotsOutput: TemplatePlots): TemplatePlotSection[] => {
   for (const [path, plots] of Object.entries(plotsOutput)) {
     for (const originalPlot of plots) {
       const plot = {
-        content: extendVegaSpec(
-          {
-            ...originalPlot.content,
-            data: {
-              values:
-                REVISIONS.flatMap(
-                  revision =>
-                    originalPlot.datapoints?.[revision].map(values => ({
-                      ...values,
-                      rev: revision
-                    }))
-                ) || []
-            }
-          } as TopLevelSpec,
-          DEFAULT_NB_ITEMS_PER_ROW,
-          DEFAULT_PLOT_HEIGHT,
-          {
-            color: {
+        anchorDefinitions: {
+          ...originalPlot.anchor_definitions,
+          [PLOT_ANCHORS.COLOR]: {
+            field: 'rev',
+            scale: {
               domain: REVISIONS,
               range: copyOriginalColors().slice(0, 5)
             }
           }
-        ) as SpecWithTitles,
+        },
+        content: originalPlot.content,
         id: path,
-        multiView: isMultiViewPlot(originalPlot.content as TopLevelSpec),
         revisions: REVISIONS,
         type: PlotsType.VEGA
       }
-      if (plot.multiView) {
+      if (
+        isMultiViewPlot(originalPlot.content, originalPlot.anchor_definitions)
+      ) {
         multiViewPlots.entries.push(plot)
         continue
       }

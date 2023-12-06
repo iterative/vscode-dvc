@@ -1727,7 +1727,7 @@
     "process-exists": "4.1.0",
     "tree-kill": "1.2.2",
     "uuid": "9.0.1",
-    "vega-util": "1.17.2",
+    "vega-lite": "5.14.1",
     "vscode-languageclient": "9.0.1",
     "yaml": "2.3.4"
   },
@@ -1748,7 +1748,6 @@
     "@types/mocha": "10.0.6",
     "@types/mock-require": "2.0.3",
     "@types/node": "16.x",
-    "@types/react-vega": "7.0.0",
     "@types/sinon-chai": "3.2.12",
     "@types/uuid": "9.0.7",
     "@types/vega": "3.2.0",

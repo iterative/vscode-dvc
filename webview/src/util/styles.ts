@@ -37,24 +37,31 @@ export const replaceThemeValuesForExport = (
   return themedSvg
 }
 
-const replaceFirstTwoInstances = (
+const replaceFirstHeightOrWidth = (
   svg: string,
   heightOrWidth: 'height' | 'width'
 ): string => {
-  let counter = 0
-  return svg.replace(new RegExp(`${heightOrWidth}="\\d+"`, 'g'), match => {
-    counter = counter + 1
-    return counter <= 2 ? `${heightOrWidth}="100%"` : match
-  })
+  return svg.replace(
+    new RegExp(` ${heightOrWidth}="\\d+"`),
+    ` ${heightOrWidth}="100%"`
+  )
 }
 
 export const preventSvgTruncation = (svg: string): string => {
-  const heightTruncationRemoved = replaceFirstTwoInstances(svg, 'height')
-  const widthTruncationRemoved = replaceFirstTwoInstances(
+  const heightTruncationRemoved = replaceFirstHeightOrWidth(svg, 'height')
+  const widthTruncationRemoved = replaceFirstHeightOrWidth(
     heightTruncationRemoved,
     'width'
   )
   return widthTruncationRemoved.replace(/viewBox=".*?"/, '')
+}
+
+export const addExportBackgroundColor = (svg: string) => {
+  const exportBackgroundColor = getThemeValue(ThemeProperty.MENU_BACKGROUND)
+  return svg.replace(
+    '<svg ',
+    `<svg style="background-color: ${exportBackgroundColor}" `
+  )
 }
 
 export const alphaToHex = (color: string, alpha: number): string => {

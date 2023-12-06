@@ -11,7 +11,6 @@ import gitLogFixture from '../../fixtures/expShow/base/gitLog'
 import rowOrderFixture from '../../fixtures/expShow/base/rowOrder'
 import customPlotsFixture from '../../fixtures/expShow/base/customPlots'
 import plotsDiffFixture from '../../fixtures/plotsDiff/output'
-import multiSourcePlotsDiffFixture from '../../fixtures/plotsDiff/multiSource'
 import templatePlotsFixture from '../../fixtures/plotsDiff/template'
 import comparisonPlotsFixture from '../../fixtures/plotsDiff/comparison/vscode'
 import plotsRevisionsFixture from '../../fixtures/plotsDiff/revisions'
@@ -29,11 +28,9 @@ import {
   PlotsData as TPlotsData,
   PlotsSection,
   TemplatePlotGroup,
-  TemplatePlotsData,
-  TemplatePlot,
   ImagePlot
 } from '../../../plots/webview/contract'
-import { FIELD_SEPARATOR, TEMP_PLOTS_DIR } from '../../../cli/dvc/constants'
+import { TEMP_PLOTS_DIR } from '../../../cli/dvc/constants'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
 import { MessageFromWebviewType } from '../../../webview/contract'
 import { reorderObjectList, uniqueValues } from '../../../util/array'
@@ -45,8 +42,10 @@ import { RegisteredCommands } from '../../../commands/external'
 import { REVISIONS } from '../../fixtures/plotsDiff'
 import * as FileSystem from '../../../fileSystem'
 import {
+  PLOT_ANCHORS,
   EXPERIMENT_WORKSPACE_ID,
   ExpShowOutput,
+  TemplatePlotOutput,
   experimentHasError
 } from '../../../cli/dvc/contract'
 import { Experiment } from '../../../experiments/webview/contract'
@@ -645,7 +644,11 @@ suite('Plots Test Suite', () => {
       expect(mockWriteJson).to.be.calledOnce
       expect(mockWriteJson).to.be.calledWithExactly(
         exportFile.path,
-        [...customPlot.values].sort(
+        [
+          ...(customPlot.anchorDefinitions[PLOT_ANCHORS.DATA] as {
+            id: string
+          }[])
+        ].sort(
           (a, b) => expectedOrder.indexOf(a.id) - expectedOrder.indexOf(b.id)
         ),
         true
@@ -732,7 +735,7 @@ suite('Plots Test Suite', () => {
       expect(mockWriteCsv).to.be.calledOnce
       expect(mockWriteCsv).to.be.calledWithExactly(
         exportFile.path,
-        (templatePlot.content.data as { values: unknown[] }).values
+        templatePlot.anchorDefinitions[PLOT_ANCHORS.DATA]
       )
       expect(mockOpenFile).to.calledWithExactly(exportFile.path)
       expect(mockSendTelemetryEvent).to.be.calledOnce
@@ -784,7 +787,11 @@ suite('Plots Test Suite', () => {
       expect(mockWriteTsv).to.be.calledOnce
       expect(mockWriteTsv).to.be.calledWithExactly(
         exportFile.path,
-        [...customPlot.values].sort(
+        [
+          ...(customPlot.anchorDefinitions[PLOT_ANCHORS.DATA] as {
+            id: string
+          }[])
+        ].sort(
           (a, b) => expectedOrder.indexOf(a.id) - expectedOrder.indexOf(b.id)
         )
       )
@@ -1031,7 +1038,9 @@ suite('Plots Test Suite', () => {
         ...plotsDiffFixture.data[join('plots', 'acc.png')]
       ] as ImagePlot[]
       const lossTsvPath = join('logs', 'loss.tsv')
-      const lossTsv = [...plotsDiffFixture.data[lossTsvPath]] as TemplatePlot[]
+      const lossTsv = [
+        ...plotsDiffFixture.data[lossTsvPath]
+      ] as TemplatePlotOutput[]
 
       const plotsDiffOutput = {
         data: {
@@ -1048,12 +1057,15 @@ suite('Plots Test Suite', () => {
             ({ revisions }) => !isEqual(revisions, [brokenExp])
           ),
           [lossTsvPath]: lossTsv.map((plot, i) => {
-            const datapoints = { ...lossTsv[i].datapoints }
-            delete datapoints[brokenExp]
+            const anchor_definitions = { ...lossTsv[i].anchor_definitions }
+            anchor_definitions[PLOT_ANCHORS.DATA] =
+              anchor_definitions[PLOT_ANCHORS.DATA]?.filter(
+                ({ rev }) => rev !== brokenExp
+              ) || []
 
             return {
               ...plot,
-              datapoints,
+              anchor_definitions,
               revisions: lossTsv[i].revisions?.filter(rev => rev !== brokenExp)
             }
           })
@@ -1091,90 +1103,6 @@ suite('Plots Test Suite', () => {
         'the revision should not exist in the underlying data'
       ).not.to.contain(brokenExp)
     })
-
-    it('should send the correct data to the webview for flexible plots', async () => {
-      const { messageSpy, mockPlotsDiff } = await buildPlotsWebview({
-        disposer: disposable,
-        plotsDiff: multiSourcePlotsDiffFixture,
-        selectedExperiments: [REVISIONS[0], REVISIONS[1]]
-      })
-
-      expect(mockPlotsDiff).to.be.called
-
-      const { template: templateData } = getFirstArgOfLastCall(messageSpy)
-
-      const [singleViewSection, multiViewSection] = (
-        templateData as TemplatePlotsData
-      ).plots
-
-      expect(
-        singleViewSection.entries.map(({ id }: { id: string }) => id)
-      ).to.deep.equal(['dvc.yaml::ROC', 'dvc.yaml::Precision-Recall'])
-
-      const [roc] = singleViewSection.entries
-      const rocDatapoints =
-        (
-          roc.content.data as {
-            values: { rev: string; filename: string | undefined }[]
-          }
-        )?.values || []
-      expect(rocDatapoints.length).to.be.greaterThan(0)
-      for (const entry of rocDatapoints) {
-        expect(entry.rev).not.to.contain(FIELD_SEPARATOR)
-        expect(entry.filename).not.to.be.undefined
-      }
-
-      expect(
-        multiViewSection.entries.map(({ id }: { id: string }) => id)
-      ).to.deep.equal(['dvc.yaml::Confusion-Matrix'])
-
-      const expectedRevisions = [
-        `${REVISIONS[1]}::${join(
-          'evaluation',
-          'test',
-          'plots',
-          'confusion_matrix.json'
-        )}`,
-        `${REVISIONS[0]}::${join(
-          'evaluation',
-          'test',
-          'plots',
-          'confusion_matrix.json'
-        )}`,
-        `${REVISIONS[1]}::${join(
-          'evaluation',
-          'train',
-          'plots',
-          'confusion_matrix.json'
-        )}`,
-        `${REVISIONS[0]}::${join(
-          'evaluation',
-          'train',
-          'plots',
-          'confusion_matrix.json'
-        )}`
-      ].sort()
-
-      const [confusionMatrix] = multiViewSection.entries
-
-      const confusionMatrixDatapoints =
-        (
-          confusionMatrix.content.data as {
-            values: { rev: string }[]
-          }
-        )?.values || []
-
-      expect(confusionMatrixDatapoints.length).to.be.greaterThan(0)
-
-      expect(confusionMatrix.revisions?.length).to.equal(4)
-      expect([...(confusionMatrix.revisions || [])].sort()).to.deep.equal(
-        expectedRevisions
-      )
-
-      for (const entry of confusionMatrixDatapoints) {
-        expect(expectedRevisions).to.include(entry.rev)
-      }
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a toggle experiment message from the webview', async () => {
       const { experiments, mockMessageReceived } = await buildPlotsWebview({
