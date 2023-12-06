@@ -27,7 +27,8 @@ export class Studio extends Disposable {
   private studioAccessToken: string | undefined = undefined
   private studioIsConnected = false
   private shareLiveToStudio: boolean | undefined = undefined
-  private studioAccessTokenUriHandler: VSCodeDisposable | undefined = undefined
+  private accessTokenUriHandler: VSCodeDisposable | undefined = undefined
+  private accessTokenUriHandlerTimeout: NodeJS.Timeout | undefined = undefined
   private studioUrl: string = DEFAULT_STUDIO_URL
 
   constructor(
@@ -142,17 +143,31 @@ export class Studio extends Disposable {
     verificationUrlWithParams.searchParams.append('code', userCode)
 
     await openUrl(verificationUrlWithParams.toString())
-    this.studioAccessTokenUriHandler = waitForUriResponse(
+    this.accessTokenUriHandler = waitForUriResponse(
       '/studio-complete-auth',
       () => {
         void this.requestStudioToken(deviceCode, tokenUri)
       }
     )
+    this.cancelUriHandlerAfterTimeout()
   }
 
   private resetAccessTokenUriHandler() {
-    this.studioAccessTokenUriHandler?.dispose()
-    this.studioAccessTokenUriHandler = undefined
+    if (this.accessTokenUriHandlerTimeout) {
+      clearTimeout(this.accessTokenUriHandlerTimeout)
+    }
+    this.accessTokenUriHandlerTimeout = undefined
+
+    this.accessTokenUriHandler?.dispose()
+    this.accessTokenUriHandler = undefined
+  }
+
+  private cancelUriHandlerAfterTimeout() {
+    const waitTime = 5 * 60000
+    this.accessTokenUriHandlerTimeout = setTimeout(
+      () => this.resetAccessTokenUriHandler(),
+      waitTime
+    )
   }
 
   private fetchFromStudio(reqUri: string, body: Record<string, unknown>) {
