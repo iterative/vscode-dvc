@@ -2,7 +2,7 @@ import { resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { ensureFileSync, remove } from 'fs-extra'
 import { expect } from 'chai'
-import { SinonStub, restore, spy, stub } from 'sinon'
+import { SinonStub, restore, spy, stub, useFakeTimers, match } from 'sinon'
 import * as Fetch from 'node-fetch'
 import {
   MessageItem,
@@ -859,7 +859,7 @@ suite('Setup Test Suite', () => {
       ).to.be.calledWithExactly('setContext', 'dvc.cli.incompatible', false)
     })
 
-    it('should handle a message from the webview to request a token from studio', async () => {
+    it('should handle a message from the webview to request a token from Studio', async () => {
       const { setup, mockFetch, studio } = buildSetup({
         disposer: disposable
       })
@@ -1039,6 +1039,60 @@ suite('Setup Test Suite', () => {
         }
       )
     })
+
+    it('cancel a token request to Studio after 15 minutes', async () => {
+      const { setup, mockFetch } = buildSetup({
+        disposer: disposable
+      })
+
+      const mockConfig = stub(DvcConfig.prototype, 'config')
+      mockConfig.resolves('')
+      const webview = await setup.showWebview()
+      await webview.isReady()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub(Setup.prototype as any, 'getCliCompatible').returns(true)
+
+      stub(ExternalUtil, 'openUrl')
+      const clock = useFakeTimers()
+      const setTimeoutSpy = spy(clock, 'setTimeout')
+      const clearTimeoutSpy = spy(clock, 'clearTimeout')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const mockWaitForUriRes = stub(ExternalUtil, 'waitForUriResponse')
+      const mockUriHandlerDispose = stub()
+      const waitTime = 300000
+
+      mockFetch.onFirstCall().resolves({
+        json: () =>
+          Promise.resolve({
+            device_code: 'Yi-NPd9ggvNUDBcam5bP8iivbtLhnqVgM_lSSbilqNw',
+            token_uri: 'https://studio.iterative.ai/api/device-login/token',
+            user_code: '40DWMKNA',
+            verification_uri: 'https://studio.iterative.ai/auth/device-login'
+          })
+      } as Fetch.Response)
+
+      const callbackUriHandlerEvent = new Promise(resolve =>
+        mockWaitForUriRes.onFirstCall().callsFake((_, onResponse) => {
+          resolve(onResponse)
+          return { dispose: mockUriHandlerDispose }
+        })
+      )
+
+      setTimeoutSpy.resetHistory()
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.REQUEST_STUDIO_TOKEN
+      })
+
+      await callbackUriHandlerEvent
+
+      expect(setTimeoutSpy).to.be.calledWithExactly(match.func, waitTime)
+
+      clock.tick(waitTime)
+
+      expect(clearTimeoutSpy).to.be.calledOnce
+      expect(mockUriHandlerDispose).to.be.calledOnce
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it("should handle a message from the webview to manually save the user's Studio access token", async () => {
       const mockToken = 'isat_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
