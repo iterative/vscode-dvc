@@ -35,6 +35,7 @@ import {
 } from '../../../../data'
 import { Studio } from '../../../../experiments/studio'
 import { DEFAULT_STUDIO_URL } from '../../../../setup/webview/contract'
+import { Toast } from '../../../../vscode/toast'
 
 const MOCK_WORKSPACE_GIT_FOLDER = join(dvcDemoPath, '.mock-git')
 
@@ -407,6 +408,44 @@ suite('Experiments Data Test Suite', () => {
           },
           method: 'GET'
         }
+      )
+    })
+
+    it('should show a toast if the request to Studio fails', async () => {
+      const mockStudioToken = 'isat_BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
+      const mockSelfHostedStudioUrl = 'https://studio.example.com'
+      const { data, mockFetch } = buildExperimentsData(
+        disposable,
+        '* main',
+        gitLogFixture,
+        mockStudioToken,
+        mockSelfHostedStudioUrl
+      )
+      const mockToast = stub(Toast, 'showError')
+
+      mockFetch.onFirstCall().callsFake(() => {
+        throw new Error('request failed')
+      })
+
+      const requestSent = new Promise(resolve =>
+        data.onDidUpdate(data => {
+          if (isStudioExperimentsOutput(data)) {
+            resolve(undefined)
+            expect(data).to.deep.equal({
+              live: [],
+              pushed: [],
+              view_url: mockBaseStudioUrl
+            })
+          }
+        })
+      )
+
+      await data.isReady()
+
+      await requestSent
+
+      expect(mockToast).to.be.calledWithExactly(
+        `Unable to fetch data from [Studio](${mockSelfHostedStudioUrl}).`
       )
     })
   })

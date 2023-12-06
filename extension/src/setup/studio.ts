@@ -57,35 +57,16 @@ export class Studio extends Disposable {
     return this.studioUrl
   }
 
-  public async removeStudioAccessToken(dvcRoots: string[]) {
-    if (dvcRoots.length !== 1) {
-      const cwd = getFirstWorkspaceFolder()
-      if (!cwd) {
-        return
-      }
-
-      return await this.accessConfig(
-        cwd,
-        Flag.GLOBAL,
-        Flag.UNSET,
-        ConfigKey.STUDIO_TOKEN
-      )
-    }
-
-    const cwd = dvcRoots[0]
-
-    await this.accessConfig(cwd, Flag.LOCAL, Flag.UNSET, ConfigKey.STUDIO_TOKEN)
-
-    return await this.accessConfig(
-      cwd,
-      Flag.GLOBAL,
-      Flag.UNSET,
-      ConfigKey.STUDIO_TOKEN
-    )
+  public removeStudioAccessToken(dvcRoots: string[]) {
+    return this.removeKeyFromConfig(dvcRoots, ConfigKey.STUDIO_TOKEN)
   }
 
   public saveStudioAccessTokenInConfig(cwd: string, token: string) {
     return this.accessConfig(cwd, Flag.GLOBAL, ConfigKey.STUDIO_TOKEN, token)
+  }
+
+  public removeStudioUrl(dvcRoots: string[]) {
+    return this.removeKeyFromConfig(dvcRoots, ConfigKey.STUDIO_URL)
   }
 
   public saveStudioUrlInConfig(cwd: string, url: string) {
@@ -96,8 +77,10 @@ export class Studio extends Disposable {
     await this.setStudioValues()
     const storedToken = this.getStudioAccessToken()
     const isConnected = isStudioAccessToken(storedToken)
+    const isSelfHosted = this.getStudioUrl() !== DEFAULT_STUDIO_URL
     this.studioIsConnected = isConnected
     await setContextValue(ContextKey.STUDIO_CONNECTED, isConnected)
+    await setContextValue(ContextKey.STUDIO_SELFHOSTED, isSelfHosted)
   }
 
   public async updateStudioOffline(shareLive: boolean) {
@@ -267,6 +250,23 @@ export class Studio extends Disposable {
     ) {
       this.studioConnectionChanged.fire()
     }
+  }
+
+  private async removeKeyFromConfig(dvcRoots: string[], key: ConfigKey) {
+    if (dvcRoots.length !== 1) {
+      const cwd = getFirstWorkspaceFolder()
+      if (!cwd) {
+        return
+      }
+
+      return await this.accessConfig(cwd, Flag.GLOBAL, Flag.UNSET, key)
+    }
+
+    const cwd = dvcRoots[0]
+
+    await this.accessConfig(cwd, Flag.LOCAL, Flag.UNSET, key)
+
+    return await this.accessConfig(cwd, Flag.GLOBAL, Flag.UNSET, key)
   }
 
   private accessConfig(cwd: string, ...args: Args) {

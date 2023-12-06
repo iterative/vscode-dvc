@@ -97,6 +97,14 @@ const registerSetupStudioCommands = (
     RegisteredCommands.UPDATE_STUDIO_URL,
     () => setup.saveStudioUrl()
   )
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.ADD_STUDIO_URL,
+    () => setup.saveStudioUrl()
+  )
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.REMOVE_STUDIO_URL,
+    () => setup.removeStudioUrl()
+  )
 }
 
 export const registerSetupCommands = (

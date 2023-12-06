@@ -58,6 +58,7 @@ import * as QuickPickUtil from '../../../setup/quickPick'
 import { EventName } from '../../../telemetry/constants'
 import { Modal } from '../../../vscode/modal'
 import { Toast } from '../../../vscode/toast'
+import { Title } from '../../../vscode/title'
 
 suite('Setup Test Suite', () => {
   const disposable = Disposable.fn()
@@ -1158,6 +1159,67 @@ suite('Setup Test Suite', () => {
         ConfigKey.STUDIO_TOKEN
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it("should be able to save the user's self-hosted url", async () => {
+      const mockConfig = stub(DvcConfig.prototype, 'config')
+      const configCalled = new Promise(resolve =>
+        mockConfig.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve('')
+        })
+      )
+
+      const mockUrl = 'https://studio.example.com'
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub(Setup.prototype as any, 'getCliCompatible').returns(true)
+      const mockInputBox = stub(window, 'showInputBox').resolves(mockUrl)
+
+      void commands.executeCommand(RegisteredCommands.UPDATE_STUDIO_URL)
+
+      await configCalled
+      expect(mockInputBox).to.be.calledWithMatch({
+        title: Title.ENTER_STUDIO_URL
+      })
+
+      expect(mockConfig).to.be.calledWithExactly(
+        dvcDemoPath,
+        Flag.GLOBAL,
+        ConfigKey.STUDIO_URL,
+        mockUrl
+      )
+    })
+
+    it("should be able to delete the user's self hosted url from the global dvc config", async () => {
+      const mockConfig = stub(DvcConfig.prototype, 'config')
+      const configCalled = new Promise(resolve =>
+        mockConfig.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve('')
+        })
+      )
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub(Setup.prototype as any, 'getCliCompatible').returns(true)
+
+      void commands.executeCommand(RegisteredCommands.REMOVE_STUDIO_URL)
+
+      await configCalled
+
+      expect(mockConfig).to.be.calledWithExactly(
+        dvcDemoPath,
+        Flag.GLOBAL,
+        Flag.UNSET,
+        ConfigKey.STUDIO_URL
+      )
+
+      expect(mockConfig).to.be.calledWithExactly(
+        dvcDemoPath,
+        Flag.LOCAL,
+        Flag.UNSET,
+        ConfigKey.STUDIO_URL
+      )
+    })
 
     it('should check if experiments and dvc are setup', async () => {
       const { setup } = buildSetup({

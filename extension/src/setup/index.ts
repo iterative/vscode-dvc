@@ -325,8 +325,16 @@ export class Setup
     return this.updateStudioAndSend()
   }
 
+  public removeStudioUrl() {
+    if (!this.getCliCompatible()) {
+      return
+    }
+
+    return this.studio.removeStudioUrl(this.dvcRoots)
+  }
+
   public async saveStudioUrl() {
-    const cwd = this.dvcRoots[0] || getFirstWorkspaceFolder()
+    const cwd = this.getCwd()
 
     if (!cwd) {
       return

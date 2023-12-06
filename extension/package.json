@@ -125,13 +125,8 @@
         "category": "DVC"
       },
       {
-        "title": "Update Studio Access Token",
-        "command": "dvc.updateStudioAccessToken",
-        "category": "DVC"
-      },
-      {
-        "title": "Set Self-Hosted Studio URL",
-        "command": "dvc.updateStudioUrl",
+        "title": "Add Self-Hosted Studio URL",
+        "command": "dvc.addStudioUrl",
         "category": "DVC"
       },
       {
@@ -386,6 +381,11 @@
         "category": "DVC"
       },
       {
+        "title": "Remove Self-Hosted Studio URL",
+        "command": "dvc.removeStudioUrl",
+        "category": "DVC"
+      },
+      {
         "title": "Run Experiment",
         "command": "dvc.resetAndRunCheckpointExperiment",
         "category": "DVC",
@@ -458,6 +458,16 @@
       {
         "title": "Show Setup",
         "command": "dvc.showSetup",
+        "category": "DVC"
+      },
+      {
+        "title": "Update Studio Access Token",
+        "command": "dvc.updateStudioAccessToken",
+        "category": "DVC"
+      },
+      {
+        "title": "Update Self-Hosted Studio URL",
+        "command": "dvc.updateStudioUrl",
         "category": "DVC"
       },
       {
@@ -718,8 +728,12 @@
           "when": "dvc.commands.available && dvc.project.available && dvc.studio.connected"
         },
         {
+          "command": "dvc.addStudioUrl",
+          "when": "dvc.commands.available && dvc.project.available && !dvc.studio.selfhosted"
+        },
+        {
           "command": "dvc.updateStudioUrl",
-          "when": "dvc.commands.available && dvc.project.available"
+          "when": "dvc.commands.available && dvc.project.available && dvc.studio.selfhosted"
         },
         {
           "command": "dvc.addTarget",
@@ -860,6 +874,10 @@
         {
           "command": "dvc.removeStudioAccessToken",
           "when": "dvc.commands.available && dvc.project.available && dvc.studio.connected"
+        },
+        {
+          "command": "dvc.removeStudioUrl",
+          "when": "dvc.commands.available && dvc.project.available && dvc.studio.selfhosted"
         },
         {
           "command": "dvc.removeTarget",
