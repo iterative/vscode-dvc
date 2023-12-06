@@ -34,6 +34,7 @@ import { getCustomPlotId } from '../model/collect'
 import { RegisteredCommands } from '../../commands/external'
 import { ErrorsModel } from '../errors/model'
 import { openUrl } from '../../vscode/external'
+import { PathType } from '../paths/collect'
 
 export class WebviewMessages {
   private readonly dvcRoot: string
@@ -44,6 +45,7 @@ export class WebviewMessages {
 
   private readonly getWebview: () => BaseWebview<TPlotsData> | undefined
   private readonly selectPlots: () => Promise<void>
+  private readonly shouldShowTooManyPlotsMessage: (types: PathType[]) => boolean
 
   constructor(
     dvcRoot: string,
@@ -52,7 +54,8 @@ export class WebviewMessages {
     errors: ErrorsModel,
     experiments: Experiments,
     getWebview: () => BaseWebview<TPlotsData> | undefined,
-    selectPlots: () => Promise<void>
+    selectPlots: () => Promise<void>,
+    shouldShowTooManyPlotsMessage: (types: PathType[]) => boolean
   ) {
     this.dvcRoot = dvcRoot
     this.paths = paths
@@ -61,6 +64,7 @@ export class WebviewMessages {
     this.experiments = experiments
     this.getWebview = getWebview
     this.selectPlots = selectPlots
+    this.shouldShowTooManyPlotsMessage = shouldShowTooManyPlotsMessage
   }
 
   public async sendWebviewMessage() {
@@ -140,8 +144,23 @@ export class WebviewMessages {
           { isImage: !!message.payload },
           undefined
         )
+      case MessageFromWebviewType.REFRESH_PLOTS:
+        return this.sendDataForSection(message.payload)
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
+    }
+  }
+
+  private sendDataForSection(section: PlotsSection) {
+    switch (section) {
+      case PlotsSection.COMPARISON_TABLE:
+        return this.sendComparisonPlots()
+      case PlotsSection.CUSTOM_PLOTS:
+        return this.sendCustomPlots()
+      case PlotsSection.TEMPLATE_PLOTS:
+        return this.sendTemplatePlots()
+      default:
+        return this.sendWebviewMessage()
     }
   }
 
@@ -165,6 +184,13 @@ export class WebviewMessages {
       this.plots.getSectionCollapsed(),
       this.getTemplatePlots(selectedRevisions)
     ])
+    const shouldShowTooManyTemplatePlotsMessage =
+      this.shouldShowTooManyPlotsMessage([
+        PathType.TEMPLATE_SINGLE,
+        PathType.TEMPLATE_MULTI
+      ])
+    const shouldShowTooManyComparisonImagesMessage =
+      this.shouldShowTooManyPlotsMessage([PathType.COMPARISON])
 
     return {
       cliError,
@@ -174,6 +200,8 @@ export class WebviewMessages {
       hasUnselectedPlots,
       sectionCollapsed,
       selectedRevisions,
+      shouldShowTooManyComparisonImagesMessage,
+      shouldShowTooManyTemplatePlotsMessage,
       template
     }
   }

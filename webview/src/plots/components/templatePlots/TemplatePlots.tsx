@@ -16,6 +16,7 @@ import { isSameGroup } from '../../../shared/components/dragDrop/util'
 import { changeOrderWithDraggedInfo } from '../../../util/array'
 import { LoadingSection, sectionIsLoading } from '../LoadingSection'
 import { reorderTemplatePlots } from '../../util/messages'
+import { TooManyPlots } from '../TooManyPlots'
 
 export enum NewSectionBlock {
   TOP = 'drop-section-top',
@@ -23,9 +24,8 @@ export enum NewSectionBlock {
 }
 
 export const TemplatePlots: React.FC = () => {
-  const { nbItemsPerRow, sections, hasItems } = useSelector(
-    (state: PlotsState) => state.template
-  )
+  const { nbItemsPerRow, sections, hasItems, shouldShowTooManyPlotsMessage } =
+    useSelector((state: PlotsState) => state.template)
 
   const draggedOverGroup = useSelector(
     (state: PlotsState) => state.dragAndDrop.draggedOverGroup
@@ -216,7 +216,6 @@ export const TemplatePlots: React.FC = () => {
             <TemplatePlotsGrid
               groupId={groupId}
               groupIndex={i}
-              onDropInSection={handleDropInSection}
               multiView={isMultiView}
               setSectionEntries={setSectionEntries}
               useVirtualizedGrid={useVirtualizedGrid}
@@ -231,6 +230,7 @@ export const TemplatePlots: React.FC = () => {
         id={NewSectionBlock.BOTTOM}
         closestSection={lastSection}
       />
+      {shouldShowTooManyPlotsMessage && <TooManyPlots />}
     </>
   )
 }

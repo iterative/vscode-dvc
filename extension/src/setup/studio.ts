@@ -1,6 +1,6 @@
-import { Event, EventEmitter } from 'vscode'
+import { Event, EventEmitter, Disposable as VSCodeDisposable } from 'vscode'
 import fetch from 'node-fetch'
-import { STUDIO_URL } from './webview/contract'
+import { DEFAULT_STUDIO_URL } from './webview/contract'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
 import { Args, ConfigKey, Flag } from '../cli/dvc/constants'
@@ -27,6 +27,9 @@ export class Studio extends Disposable {
   private studioAccessToken: string | undefined = undefined
   private studioIsConnected = false
   private shareLiveToStudio: boolean | undefined = undefined
+  private accessTokenUriHandler: VSCodeDisposable | undefined = undefined
+  private accessTokenUriHandlerTimeout: NodeJS.Timeout | undefined = undefined
+  private studioUrl: string = DEFAULT_STUDIO_URL
 
   constructor(
     internalCommands: InternalCommands,
@@ -49,6 +52,10 @@ export class Studio extends Disposable {
 
   public getShareLiveToStudio() {
     return this.shareLiveToStudio
+  }
+
+  public getStudioUrl() {
+    return this.studioUrl
   }
 
   public async removeStudioAccessToken(dvcRoots: string[]) {
@@ -108,8 +115,10 @@ export class Studio extends Disposable {
   }
 
   public async requestStudioTokenAuthentication() {
+    this.resetAccessTokenUriHandler()
+
     const response = await this.fetchFromStudio(
-      `${STUDIO_URL}/api/device-login`,
+      `${this.getStudioUrl()}/api/device-login`,
       {
         client_name: 'VS Code'
       }
@@ -134,9 +143,31 @@ export class Studio extends Disposable {
     verificationUrlWithParams.searchParams.append('code', userCode)
 
     await openUrl(verificationUrlWithParams.toString())
-    void waitForUriResponse('/studio-complete-auth', () => {
-      void this.requestStudioToken(deviceCode, tokenUri)
-    })
+    this.accessTokenUriHandler = waitForUriResponse(
+      '/studio-complete-auth',
+      () => {
+        void this.requestStudioToken(deviceCode, tokenUri)
+      }
+    )
+    this.cancelUriHandlerAfterTimeout()
+  }
+
+  private resetAccessTokenUriHandler() {
+    if (this.accessTokenUriHandlerTimeout) {
+      clearTimeout(this.accessTokenUriHandlerTimeout)
+    }
+    this.accessTokenUriHandlerTimeout = undefined
+
+    this.accessTokenUriHandler?.dispose()
+    this.accessTokenUriHandler = undefined
+  }
+
+  private cancelUriHandlerAfterTimeout() {
+    const waitTime = 5 * 60000
+    this.accessTokenUriHandlerTimeout = setTimeout(
+      () => this.resetAccessTokenUriHandler(),
+      waitTime
+    )
   }
 
   private fetchFromStudio(reqUri: string, body: Record<string, unknown>) {
@@ -171,6 +202,7 @@ export class Studio extends Disposable {
   }
 
   private requestStudioToken(deviceCode: string, tokenUri: string) {
+    this.resetAccessTokenUriHandler()
     return Toast.showProgress('Connecting to Studio', async progress => {
       progress.report({ increment: 0 })
       progress.report({ increment: 25, message: 'Fetching token...' })
@@ -193,30 +225,57 @@ export class Studio extends Disposable {
     })
   }
 
+  private resetStudioValues(
+    previousStudioUrl: string,
+    previousStudioAccessToken: string | undefined,
+    previousShareLiveToStudio: boolean | undefined
+  ) {
+    this.studioAccessToken = undefined
+    this.shareLiveToStudio = undefined
+    this.studioUrl = DEFAULT_STUDIO_URL
+
+    if (
+      previousStudioAccessToken ||
+      previousStudioUrl !== DEFAULT_STUDIO_URL ||
+      previousShareLiveToStudio
+    ) {
+      this.studioConnectionChanged.fire()
+    }
+  }
+
   private async setStudioValues() {
     const cwd = this.getCwd()
 
     const previousStudioAccessToken = this.studioAccessToken
+    const previousStudioUrl = this.studioUrl
+    const previousShareLiveToStudio = this.shareLiveToStudio
 
     if (!cwd) {
-      this.studioAccessToken = undefined
-      this.shareLiveToStudio = undefined
-
-      if (previousStudioAccessToken) {
-        this.studioConnectionChanged.fire()
-      }
+      this.resetStudioValues(
+        previousStudioUrl,
+        previousStudioAccessToken,
+        previousShareLiveToStudio
+      )
       return
     }
 
-    const [studioAccessToken, shareLiveToStudio] = await Promise.all([
-      this.accessConfig(cwd, ConfigKey.STUDIO_TOKEN),
-      (await this.accessConfig(cwd, ConfigKey.STUDIO_OFFLINE)) !== 'true'
-    ])
+    const [studioAccessToken, shareLiveToStudio, studioUrl] = await Promise.all(
+      [
+        this.accessConfig(cwd, ConfigKey.STUDIO_TOKEN),
+        (await this.accessConfig(cwd, ConfigKey.STUDIO_OFFLINE)) !== 'true',
+        (await this.accessConfig(cwd, ConfigKey.STUDIO_URL)) ||
+          DEFAULT_STUDIO_URL
+      ]
+    )
 
     this.studioAccessToken = studioAccessToken
     this.shareLiveToStudio = shareLiveToStudio
+    this.studioUrl = studioUrl
 
-    if (previousStudioAccessToken !== this.studioAccessToken) {
+    if (
+      previousStudioAccessToken !== this.studioAccessToken ||
+      previousStudioUrl !== this.studioUrl
+    ) {
       this.studioConnectionChanged.fire()
     }
   }

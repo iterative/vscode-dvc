@@ -56,7 +56,7 @@ describe('waitForUriResponse', () => {
 
     const uriWithoutPath = Uri.from({
       authority: 'iterative.dvc',
-      path: '/not-correct-path',
+      path: '/path-but-not-the-right-one',
       scheme: mockedUriScheme
     })
     mockHandleUriResponse(uriWithoutPath)

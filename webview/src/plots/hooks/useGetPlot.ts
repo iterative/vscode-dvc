@@ -1,40 +1,57 @@
-import { CustomPlotData, PlotsSection } from 'dvc/src/plots/webview/contract'
-import { SpecWithTitles } from 'dvc/src/plots/vega/util'
-import { useCallback, useEffect, useState } from 'react'
+import { PlotsSection } from 'dvc/src/plots/webview/contract'
+import { RefObject, useCallback, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { PlainObject } from 'react-vega'
+import { VisualizationSpec } from 'react-vega'
 import { plotDataStore } from '../components/plotDataStore'
 import { PlotsState } from '../store'
+import { fillTemplate } from '../components/vegaLite/util'
 
-export const useGetPlot = (section: PlotsSection, id: string) => {
-  const isTemplatePlot = section === PlotsSection.TEMPLATE_PLOTS
-  const storeSection = isTemplatePlot ? 'template' : 'custom'
-  const snapshot = useSelector(
-    (state: PlotsState) => state[storeSection].plotsSnapshots
-  )
+export const useGetPlot = (
+  section: PlotsSection,
+  id: string,
+  plotRef: RefObject<HTMLButtonElement | HTMLDivElement>
+): VisualizationSpec | undefined => {
+  const storeSection =
+    section === PlotsSection.TEMPLATE_PLOTS ? 'template' : 'custom'
+  const {
+    plotsSnapshots: snapshot,
+    nbItemsPerRow,
+    height: itemHeight
+  } = useSelector((state: PlotsState) => state[storeSection])
 
-  const [data, setData] = useState<PlainObject | undefined>()
-  const [spec, setSpec] = useState<SpecWithTitles | undefined>()
+  const [spec, setSpec] = useState<VisualizationSpec | undefined>()
+
+  const [height, setHeight] = useState(0)
+  const [width, setWidth] = useState(0)
 
   const setPlotData = useCallback(() => {
     const plot = plotDataStore[section][id]
-    if (!plot) {
+
+    const spec = fillTemplate(plot, width, height, false)
+    if (!spec) {
       return
     }
-
-    setData(
-      isTemplatePlot ? undefined : { values: (plot as CustomPlotData).values }
-    )
-    setSpec({
-      ...plot.content,
-      height: 'container',
-      width: 'container'
-    } as SpecWithTitles)
-  }, [id, isTemplatePlot, setData, setSpec, section])
+    setSpec(spec)
+  }, [section, id, width, height])
 
   useEffect(() => {
-    setPlotData()
-  }, [snapshot, setPlotData])
+    const onResize = () => {
+      if (!plotRef.current) {
+        return
+      }
+      const { height, width } = plotRef.current.getBoundingClientRect()
+      setHeight(height)
+      setWidth(width)
+    }
+    window.addEventListener('resize', onResize)
 
-  return { data, isTemplatePlot, spec }
+    onResize()
+
+    setPlotData()
+    return () => {
+      window.removeEventListener('resize', onResize)
+    }
+  }, [snapshot, setPlotData, plotRef, nbItemsPerRow, itemHeight])
+
+  return spec
 }

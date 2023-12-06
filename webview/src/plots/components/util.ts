@@ -5,9 +5,18 @@ import {
   FILE_SPLIT_REGEX,
   METRIC_PARAM_SEPARATOR
 } from 'dvc/src/experiments/columns/constants'
-import { toggleDragAndDropMode as toggleTemplateDragAndDrop } from './templatePlots/templatePlotsSlice'
-import { toggleDragAndDropMode as toggleCustomDragAndDrop } from './customPlots/customPlotsSlice'
-import { toggleDragAndDropMode as toggleComparisonDragAndDrop } from './comparisonTable/comparisonTableSlice'
+import {
+  clearState as clearTemplateState,
+  toggleDragAndDropMode as toggleTemplateDragAndDrop
+} from './templatePlots/templatePlotsSlice'
+import {
+  clearState as clearCustomState,
+  toggleDragAndDropMode as toggleCustomDragAndDrop
+} from './customPlots/customPlotsSlice'
+import {
+  clearState as clearComparisonState,
+  toggleDragAndDropMode as toggleComparisonDragAndDrop
+} from './comparisonTable/comparisonTableSlice'
 import { PlotsState } from '../store'
 
 export const shouldUseVirtualizedGrid = (
@@ -37,6 +46,12 @@ export const isDragAndDropModeSelector = createSelector(
     }
   }
 )
+
+export const clearStateActions = {
+  [PlotsSection.TEMPLATE_PLOTS]: clearTemplateState,
+  [PlotsSection.CUSTOM_PLOTS]: clearCustomState,
+  [PlotsSection.COMPARISON_TABLE]: clearComparisonState
+}
 
 const toggleDragAndDropModeActions = {
   [PlotsSection.TEMPLATE_PLOTS]: toggleTemplateDragAndDrop,

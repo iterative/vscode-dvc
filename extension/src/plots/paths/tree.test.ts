@@ -7,11 +7,11 @@ import { ResourceLocator } from '../../resourceLocator'
 import { InternalCommands } from '../../commands/internal'
 import { Plots } from '..'
 import { buildMockedEventEmitter } from '../../test/util/jest'
-import { Shape, StrokeDash } from '../multiSource/constants'
 import { join } from '../../test/util/path'
 import { DecoratableTreeItemScheme, getDecoratableUri } from '../../tree'
 import { RegisteredCommands } from '../../commands/external'
 import { getMarkdownString } from '../../vscode/markdownString'
+import { PLOT_SHAPE, PLOT_STROKE_DASH } from '../../cli/dvc/contract'
 
 const mockedDisposable = jest.mocked(Disposable)
 const mockedGetChildPaths = jest.fn()
@@ -52,12 +52,12 @@ describe('PlotsPathsTree', () => {
       {
         label: 'A',
         type: EncodingType.STROKE_DASH,
-        value: StrokeDash[0]
+        value: PLOT_STROKE_DASH[0]
       },
       {
         label: 'Y',
         type: EncodingType.SHAPE,
-        value: Shape[1]
+        value: PLOT_SHAPE[1]
       }
     ])
 

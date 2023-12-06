@@ -12,7 +12,7 @@ interface ComparisonTableRowsProps {
   pinnedColumn: string
 }
 
-export const ComparisionTableRows: React.FC<ComparisonTableRowsProps> = ({
+export const ComparisonTableRows: React.FC<ComparisonTableRowsProps> = ({
   plots,
   columns,
   pinnedColumn

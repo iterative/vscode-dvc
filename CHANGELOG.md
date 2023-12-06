@@ -2,6 +2,42 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.18] - 2023-12-01
+
+### 🚀 New Features and Enhancements
+
+- Add a message when we are showing only 20 plots [#5008](https://github.com/iterative/vscode-dvc/pull/5008) by [@sroy3](https://github.com/sroy3)
+- Extend available workspace params available to modify [#5030](https://github.com/iterative/vscode-dvc/pull/5030) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Handle missing items in drag and drop container [#5054](https://github.com/iterative/vscode-dvc/pull/5054) by [@mattseddon](https://github.com/mattseddon)
+- Handle project having experiments with no data [#5045](https://github.com/iterative/vscode-dvc/pull/5045) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (3.30.3) [#5053](https://github.com/iterative/vscode-dvc/pull/5053) by [@julieg18](https://github.com/julieg18)
+- Remove dead code from Setup [#5055](https://github.com/iterative/vscode-dvc/pull/5055) by [@mattseddon](https://github.com/mattseddon)
+- Improve Studio Token Authentication URI Handler [#5049](https://github.com/iterative/vscode-dvc/pull/5049) by [@julieg18](https://github.com/julieg18)
+
+## [1.1.17] - 2023-11-29
+
+### 🐛 Bug Fixes
+
+- Collect columns from experiments under baseline with error [#5041](https://github.com/iterative/vscode-dvc/pull/5041) by [@mattseddon](https://github.com/mattseddon)
+
+## [1.1.16] - 2023-11-29
+
+### 🚀 New Features and Enhancements
+
+- Add drag and drop mode to comparison table headers [#5017](https://github.com/iterative/vscode-dvc/pull/5017) by [@sroy3](https://github.com/sroy3)
+- Add progress indicator when fetching a studio token [#5000](https://github.com/iterative/vscode-dvc/pull/5000) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Update latest tested cli version [#5016](https://github.com/iterative/vscode-dvc/pull/5016) by [@sroy3](https://github.com/sroy3)
+- Do not render section if it is not open [#5025](https://github.com/iterative/vscode-dvc/pull/5025) by [@sroy3](https://github.com/sroy3)
+
 ## [1.1.15] - 2023-11-20
 
 ### 🚀 New Features and Enhancements

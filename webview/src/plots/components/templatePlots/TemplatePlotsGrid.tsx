@@ -3,12 +3,10 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { PlotsState } from '../../store'
 import { Grid } from '../Grid'
-import { OnDrop } from '../../../shared/hooks/useDragAndDrop'
 
 interface TemplatePlotsGridProps {
   groupId: string
   groupIndex: number
-  onDropInSection: OnDrop
   multiView: boolean
   setSectionEntries: (groupIndex: number, entries: string[]) => void
   useVirtualizedGrid?: boolean
@@ -19,7 +17,6 @@ interface TemplatePlotsGridProps {
 export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   groupId,
   groupIndex,
-  onDropInSection,
   multiView,
   setSectionEntries,
   useVirtualizedGrid,
@@ -41,7 +38,6 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
       useVirtualizedGrid={useVirtualizedGrid}
       order={entries}
       groupId={groupId}
-      onDrop={onDropInSection}
       parentDraggedOver={parentDraggedOver}
       multiView={multiView}
       sectionKey={PlotsSection.TEMPLATE_PLOTS}

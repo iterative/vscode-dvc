@@ -1,30 +1,26 @@
 import { sep } from 'path'
-import {
-  ImagePlot,
-  isImagePlot,
-  Plot,
-  TemplatePlot,
-  TemplatePlotGroup
-} from '../webview/contract'
+import { TemplatePlotGroup } from '../webview/contract'
 import {
   EXPERIMENT_WORKSPACE_ID,
+  ImagePlotOutput,
+  isImagePlotOutput,
   PlotError,
+  PlotOutput,
   PlotsData,
-  PlotsOutput
+  PlotsOutput,
+  ShapeScale,
+  ShapeValue,
+  StrokeDashScale,
+  StrokeDashValue,
+  TemplatePlotOutput
 } from '../../cli/dvc/contract'
 import { getParent, getPath, getPathArray } from '../../fileSystem/util'
 import { splitMatchedOrdered, definedAndNonEmpty } from '../../util/array'
 import { isMultiViewPlot } from '../vega/util'
 import { createTypedAccumulator } from '../../util/object'
-import {
-  ShapeScale,
-  ShapeValue,
-  StrokeDashScale,
-  StrokeDashValue
-} from '../multiSource/constants'
-import { MultiSourceEncoding } from '../multiSource/collect'
 import { truncate } from '../../util/string'
 import { FIELD_SEPARATOR, MULTI_IMAGE_PATH_REG } from '../../cli/dvc/constants'
+import { MultiSourceEncoding } from '../multiSource/collect'
 
 export enum PathType {
   COMPARISON = 'comparison',
@@ -41,16 +37,16 @@ export type PlotPath = {
   type?: Set<PathType>
 }
 
-const collectType = (plots: Plot[]) => {
+const collectType = (plots: PlotOutput[]) => {
   const type = new Set<PathType>()
 
   for (const plot of plots) {
-    if (isImagePlot(plot)) {
+    if (isImagePlotOutput(plot)) {
       type.add(PathType.COMPARISON)
       continue
     }
 
-    isMultiViewPlot(plot.content)
+    isMultiViewPlot(plot.content, plot.anchor_definitions)
       ? type.add(PathType.TEMPLATE_MULTI)
       : type.add(PathType.TEMPLATE_SINGLE)
   }
@@ -79,7 +75,10 @@ const filterRevisionIfFetched = (
   })
 }
 
-const collectImageRevision = (acc: Set<string>, plot: ImagePlot): void => {
+const collectImageRevision = (
+  acc: Set<string>,
+  plot: ImagePlotOutput
+): void => {
   const id = plot.revisions?.[0]
   if (id) {
     acc.add(id)
@@ -88,12 +87,10 @@ const collectImageRevision = (acc: Set<string>, plot: ImagePlot): void => {
 
 const collectTemplateRevisions = (
   acc: Set<string>,
-  plot: TemplatePlot
+  plot: TemplatePlotOutput
 ): void => {
-  for (const [id, datapoints] of Object.entries(plot?.datapoints || {})) {
-    if (datapoints.length > 0) {
-      acc.add(id)
-    }
+  for (const rev of plot.revisions || []) {
+    acc.add(rev)
   }
 }
 
@@ -101,7 +98,7 @@ const collectPathRevisions = (data: PlotsData, path: string): Set<string> => {
   const revisions = new Set<string>()
 
   for (const plot of data[path] || []) {
-    if (isImagePlot(plot)) {
+    if (isImagePlotOutput(plot)) {
       collectImageRevision(revisions, plot)
       continue
     }
@@ -536,7 +533,9 @@ export const collectEncodingElements = (
 
   const { strokeDash } = encoding
   const acc: EncodingElement[] = []
-  collectElements(acc, strokeDash.scale, EncodingType.STROKE_DASH)
+  if (strokeDash) {
+    collectElements(acc, strokeDash.scale, EncodingType.STROKE_DASH)
+  }
 
   const { shape } = encoding
 

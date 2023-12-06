@@ -5,13 +5,11 @@ import styles from './styles.module.scss'
 import { DragAndDropPlot } from './DragAndDropPlot'
 import { plotDataStore } from './plotDataStore'
 import { VirtualizedGrid } from '../../shared/components/virtualizedGrid/VirtualizedGrid'
-import { OnDrop } from '../../shared/hooks/useDragAndDrop'
 
 interface DragAndDropGridProps {
   order: string[]
   setOrder: (order: string[]) => void
   groupId: string
-  onDrop?: OnDrop
   nbItemsPerRow: number
   useVirtualizedGrid?: boolean
   parentDraggedOver?: boolean
@@ -23,7 +21,6 @@ export const DragAndDropGrid: React.FC<DragAndDropGridProps> = ({
   order,
   setOrder,
   groupId,
-  onDrop,
   nbItemsPerRow,
   useVirtualizedGrid,
   parentDraggedOver,
@@ -47,7 +44,6 @@ export const DragAndDropGrid: React.FC<DragAndDropGridProps> = ({
         sectionKey={sectionKey}
         className={plotClassName}
         colSpan={colSpan}
-        onPlotDrop={onDrop}
         group={groupId}
         isParentDraggedOver={parentDraggedOver}
         setOrder={setOrder}

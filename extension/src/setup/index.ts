@@ -85,14 +85,11 @@ export class Setup
 
   private readonly webviewMessages: WebviewMessages
   private readonly getHasData: () => boolean | undefined
-  private readonly getExpShowError: () => string | undefined
   private readonly collectWorkspaceScale: () => Promise<WorkspaceScale>
 
   private readonly setupRun: EventEmitter<void> = this.dispose.track(
     new EventEmitter<void>()
   )
-
-  private readonly onDidRunSetup: Event<void> = this.setupRun.event
 
   private readonly workspaceChanged: EventEmitter<void> = this.dispose.track(
     new EventEmitter()
@@ -155,7 +152,6 @@ export class Setup
     void this.sendDataToWebview()
 
     this.getHasData = () => experiments.getHasData()
-    this.getExpShowError = () => experiments.getCliError()
     const onDidChangeHasData = experiments.columnsChanged.event
     this.dispose.track(onDidChangeHasData(() => this.updateProjectHasData()))
 
@@ -256,7 +252,7 @@ export class Setup
   public shouldBeShown(): { dvc: boolean; experiments: boolean } {
     return {
       dvc: !!this.getCliCompatible() && this.hasRoots(),
-      experiments: !!(this.getExpShowError() || this.getHasData())
+      experiments: !!this.getHasData()
     }
   }
 
@@ -331,6 +327,10 @@ export class Setup
 
   public getStudioAccessToken() {
     return this.studio.getStudioAccessToken()
+  }
+
+  public getStudioUrl() {
+    return this.studio.getStudioUrl()
   }
 
   public sendInitialWebviewData() {

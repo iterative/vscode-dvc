@@ -63,21 +63,15 @@ export const collectColumns = async (
 
   const promises = []
   for (const expState of output) {
-    if (experimentHasError(expState)) {
-      continue
+    if (!experimentHasError(expState)) {
+      promises.push(collectFromExperiment(acc, expState))
     }
 
-    promises.push(
-      collectFromExperiment(acc, expState),
-      collectFromExperiments(acc, expState.experiments)
-    )
+    promises.push(collectFromExperiments(acc, expState.experiments))
   }
   await Promise.all(promises)
 
-  const columns = Object.values(acc.columns)
-  const hasNoData = isEqual(columns, [timestampColumn])
-
-  return hasNoData ? [] : columns
+  return Object.values(acc.columns)
 }
 
 export const getExpData = (expState: ExpState): ExpData | undefined => {

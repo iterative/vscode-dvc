@@ -1,6 +1,4 @@
 import { join } from 'dvc/src/test/util/path'
-import { Title } from 'dvc/src/vscode/title'
-import { SpecWithTitles } from 'dvc/src/plots/vega/util'
 import { configureStore } from '@reduxjs/toolkit'
 import React from 'react'
 import { Provider } from 'react-redux'
@@ -17,12 +15,10 @@ import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import customPlotsFixture from 'dvc/src/test/fixtures/expShow/base/customPlots'
 import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
 import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template/webview'
-import smoothTemplatePlotContent from 'dvc/src/test/fixtures/plotsDiff/template/smoothTemplatePlot'
 import manyTemplatePlots from 'dvc/src/test/fixtures/plotsDiff/template/virtualization'
 import {
   DEFAULT_SECTION_COLLAPSED,
   PlotsData,
-  PlotsType,
   Revision,
   PlotsSection,
   TemplatePlotGroup,
@@ -36,7 +32,6 @@ import {
   MessageToWebviewType
 } from 'dvc/src/webview/contract'
 import { act } from 'react-dom/test-utils'
-import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import { App } from './App'
 import { NewSectionBlock } from './templatePlots/TemplatePlots'
 import {
@@ -45,8 +40,15 @@ import {
   TemplatePlotsById
 } from './plotDataStore'
 import { setMaxNbPlotsPerRow } from './webviewSlice'
-import { toggleDragAndDropMode as toggleTemplatePlotsDragAndDropMode } from './templatePlots/templatePlotsSlice'
-import { toggleDragAndDropMode as toggleCustomPlotsDragAndDropMode } from './customPlots/customPlotsSlice'
+import {
+  templatePlotsInitialState,
+  toggleDragAndDropMode as toggleTemplatePlotsDragAndDropMode
+} from './templatePlots/templatePlotsSlice'
+import {
+  customPlotsInitialState,
+  toggleDragAndDropMode as toggleCustomPlotsDragAndDropMode
+} from './customPlots/customPlotsSlice'
+import { comparisonTableInitialState } from './comparisonTable/comparisonTableSlice'
 import { plotsReducers, plotsStore } from '../store'
 import { vsCodeApi } from '../../shared/api'
 import {
@@ -700,42 +702,6 @@ describe('App', () => {
     expect(screen.queryByText('Images')).not.toBeInTheDocument()
   })
 
-  it('should hide plots when their section is collapsed (setting to null can break some Vega plots)', async () => {
-    renderAppWithOptionalData({
-      custom: customPlotsFixture
-    })
-
-    const summaryElement = await screen.findByText('Custom')
-    const visiblePlots = await screen.findAllByLabelText('Vega visualization')
-    for (const visiblePlot of visiblePlots) {
-      expect(visiblePlot).toBeInTheDocument()
-      expect(visiblePlot).toBeVisible()
-    }
-
-    fireEvent.click(summaryElement, {
-      bubbles: true,
-      cancelable: true
-    })
-
-    expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: { [PlotsSection.CUSTOM_PLOTS]: true },
-      type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
-    })
-
-    sendSetDataMessage({
-      sectionCollapsed: {
-        ...DEFAULT_SECTION_COLLAPSED,
-        [PlotsSection.CUSTOM_PLOTS]: true
-      }
-    })
-
-    const hiddenPlots = await screen.findAllByLabelText('Vega visualization')
-    for (const hiddenPlot of hiddenPlots) {
-      expect(hiddenPlot).toBeInTheDocument()
-      expect(hiddenPlot).not.toBeVisible()
-    }
-  })
-
   it('should not toggle the custom plots section when its header is clicked and its title is selected', async () => {
     renderAppWithOptionalData({
       custom: customPlotsFixture
@@ -848,6 +814,95 @@ describe('App', () => {
     expect(mockPostMessage).toHaveBeenCalledWith({
       payload: { [PlotsSection.CUSTOM_PLOTS]: true },
       type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
+    })
+  })
+
+  it('should clear the template plots state when closing the section', () => {
+    const store = renderAppWithOptionalData({
+      template: templatePlotsFixture
+    })
+
+    const toggle = within(
+      screen.getByTestId(`${PlotsSection.TEMPLATE_PLOTS}-section-details`)
+    ).getAllByRole('button')[0]
+    fireEvent.click(toggle)
+
+    expect(store.getState().template).toMatchObject(templatePlotsInitialState)
+  })
+
+  it('should clear the custom plots state when closing the section', () => {
+    const store = renderAppWithOptionalData({
+      custom: customPlotsFixture
+    })
+
+    const toggle = within(
+      screen.getByTestId(`${PlotsSection.CUSTOM_PLOTS}-section-details`)
+    ).getAllByRole('button')[0]
+    fireEvent.click(toggle)
+
+    expect(store.getState().custom).toMatchObject(customPlotsInitialState)
+  })
+
+  it('should clear the comparison table state when closing the section', () => {
+    const store = renderAppWithOptionalData({
+      comparison: comparisonTableFixture
+    })
+
+    const toggle = within(
+      screen.getByTestId(`${PlotsSection.COMPARISON_TABLE}-section-details`)
+    ).getAllByRole('button')[0]
+    fireEvent.click(toggle)
+
+    expect(store.getState().comparison).toMatchObject(
+      comparisonTableInitialState
+    )
+  })
+
+  it('should send a message to refresh the template plots when closing the section', () => {
+    renderAppWithOptionalData({
+      template: templatePlotsFixture
+    })
+
+    const toggle = within(
+      screen.getByTestId(`${PlotsSection.TEMPLATE_PLOTS}-section-details`)
+    ).getAllByRole('button')[0]
+    fireEvent.click(toggle)
+
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      payload: PlotsSection.TEMPLATE_PLOTS,
+      type: MessageFromWebviewType.REFRESH_PLOTS
+    })
+  })
+
+  it('should send a message to refresh the custom plots when closing the section', () => {
+    renderAppWithOptionalData({
+      custom: customPlotsFixture
+    })
+
+    const toggle = within(
+      screen.getByTestId(`${PlotsSection.CUSTOM_PLOTS}-section-details`)
+    ).getAllByRole('button')[0]
+    fireEvent.click(toggle)
+
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      payload: PlotsSection.CUSTOM_PLOTS,
+      type: MessageFromWebviewType.REFRESH_PLOTS
+    })
+  })
+
+  it('should send a message to refresh the comparison table when closing the section', () => {
+    renderAppWithOptionalData({
+      comparison: comparisonTableFixture
+    })
+
+    const toggle = within(
+      screen.getByTestId(`${PlotsSection.COMPARISON_TABLE}-section-details`)
+    ).getAllByRole('button')[0]
+    fireEvent.click(toggle)
+
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      payload: PlotsSection.COMPARISON_TABLE,
+      type: MessageFromWebviewType.REFRESH_PLOTS
     })
   })
 
@@ -1206,7 +1261,7 @@ describe('App', () => {
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
 
     const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByLabelText(
-      'Open Plot in Popup'
+      'See Plot Export Options'
     )
 
     fireEvent.click(plot)
@@ -2182,23 +2237,18 @@ describe('App', () => {
       for (let i = 0; i < nbOfPlots; i++) {
         const id = `plot-${i}`
         plots.push({
+          anchorDefinitions: { DVC_METRIC_DATA: [] },
           content: {
             $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
             encoding: {},
             height: 100,
             layer: [],
-            titles: {
-              main: { normal: '' as unknown as Title, truncated: '' },
-              x: { normal: '' as unknown as Title, truncated: '' },
-              y: { normal: '' as unknown as Title, truncated: '' }
-            },
             transform: [],
             width: 100
           },
           id,
           metric: '',
-          param: '',
-          values: []
+          param: ''
         })
       }
       return {
@@ -2751,24 +2801,13 @@ describe('App', () => {
   })
 
   describe('Vega panels', () => {
-    const smoothId = join('template', 'smooth.tsv')
+    const smoothPlot = templatePlotsFixture.plots[0].entries[0]
+    const smoothId = smoothPlot.id
     const withVegaPanels = {
       ...templatePlotsFixture,
       plots: [
         {
-          entries: [
-            {
-              content: {
-                ...smoothTemplatePlotContent
-              } as unknown as SpecWithTitles,
-              datapoints: {
-                [EXPERIMENT_WORKSPACE_ID]:
-                  smoothTemplatePlotContent.data.values.slice(0, 10)
-              },
-              id: smoothId,
-              type: PlotsType.VEGA
-            }
-          ],
+          entries: [smoothPlot],
           group: TemplatePlotGroup.SINGLE_VIEW
         }
       ]
@@ -2796,172 +2835,6 @@ describe('App', () => {
       clickEvent.stopPropagation = jest.fn()
       fireEvent(panel, clickEvent)
       expect(clickEvent.stopPropagation).toHaveBeenCalledTimes(1)
-    })
-
-    it('should have a tooltip on the plot if the title is cut', () => {
-      const title = 'Plot with a long title'
-      const truncatedTitle = '… with a long title'
-
-      renderAppWithOptionalData({
-        template: {
-          ...templatePlotsFixture,
-          plots: [
-            {
-              entries: [
-                {
-                  ...templatePlotsFixture.plots[0].entries[0],
-                  content: {
-                    ...templatePlotsFixture.plots[0].entries[0].content,
-                    titles: {
-                      main: { normal: title, truncated: truncatedTitle },
-                      x: { normal: '' as Title, truncated: '' },
-                      y: { normal: '' as Title, truncated: '' }
-                    }
-                  } as unknown as SpecWithTitles,
-                  id: title
-                }
-              ],
-              group: TemplatePlotGroup.SINGLE_VIEW
-            }
-          ]
-        }
-      })
-
-      expect(screen.queryByText(title)).not.toBeInTheDocument()
-
-      const plot = within(screen.getByTestId(`plot_${title}`)).getAllByRole(
-        'button'
-      )[0]
-      fireEvent.mouseEnter(plot, {
-        bubbles: true,
-        cancelable: true
-      })
-
-      expect(screen.getByText(title)).toBeInTheDocument()
-    })
-
-    it('should have a tooltip on the plot if the x axis label is cut', () => {
-      const title = 'Plot with a long title'
-      const truncatedTitle = '… with a long title'
-
-      renderAppWithOptionalData({
-        template: {
-          ...templatePlotsFixture,
-          plots: [
-            {
-              entries: [
-                {
-                  ...templatePlotsFixture.plots[0].entries[0],
-                  content: {
-                    ...templatePlotsFixture.plots[0].entries[0].content,
-                    titles: {
-                      main: { normal: title, truncated: truncatedTitle },
-                      x: { normal: '' as Title, truncated: '' },
-                      y: { normal: '' as Title, truncated: '' }
-                    }
-                  } as unknown as SpecWithTitles,
-                  id: title
-                }
-              ],
-              group: TemplatePlotGroup.SINGLE_VIEW
-            }
-          ]
-        }
-      })
-
-      expect(screen.queryByText(title)).not.toBeInTheDocument()
-
-      const plot = within(screen.getByTestId(`plot_${title}`)).getAllByRole(
-        'button'
-      )[0]
-      fireEvent.mouseEnter(plot, {
-        bubbles: true,
-        cancelable: true
-      })
-
-      expect(screen.getByText(title)).toBeInTheDocument()
-    })
-
-    it('should have a tooltip on the plot if the y axis label is cut', () => {
-      const title = 'Plot with a long title'
-      const truncatedTitle = '… with a long title'
-
-      renderAppWithOptionalData({
-        template: {
-          ...templatePlotsFixture,
-          plots: [
-            {
-              entries: [
-                {
-                  ...templatePlotsFixture.plots[0].entries[0],
-                  content: {
-                    ...templatePlotsFixture.plots[0].entries[0].content,
-                    titles: {
-                      main: { normal: title, truncated: truncatedTitle },
-                      x: { normal: '' as Title, truncated: '' },
-                      y: { normal: '' as Title, truncated: '' }
-                    }
-                  } as unknown as SpecWithTitles,
-                  id: title
-                }
-              ],
-              group: TemplatePlotGroup.SINGLE_VIEW
-            }
-          ]
-        }
-      })
-
-      expect(screen.queryByText(title)).not.toBeInTheDocument()
-
-      const plot = within(screen.getByTestId(`plot_${title}`)).getAllByRole(
-        'button'
-      )[0]
-      fireEvent.mouseEnter(plot, {
-        bubbles: true,
-        cancelable: true
-      })
-
-      expect(screen.getByText(title)).toBeInTheDocument()
-    })
-
-    it('should not have a tooltip on the plot if the title is not cut', () => {
-      const title = 'Short title'
-      renderAppWithOptionalData({
-        template: {
-          ...templatePlotsFixture,
-          plots: [
-            {
-              entries: [
-                {
-                  ...templatePlotsFixture.plots[0].entries[0],
-                  content: {
-                    ...templatePlotsFixture.plots[0].entries[0].content,
-                    titles: {
-                      main: { normal: title, truncated: title },
-                      x: { normal: title, truncated: title },
-                      y: { normal: title, truncated: title }
-                    }
-                  } as unknown as SpecWithTitles,
-                  id: title
-                }
-              ],
-              group: TemplatePlotGroup.SINGLE_VIEW
-            }
-          ]
-        }
-      })
-
-      expect(screen.queryByText(title)).not.toBeInTheDocument()
-
-      const plot = within(screen.getByTestId(`plot_${title}`)).getAllByRole(
-        'button'
-      )[0]
-      fireEvent.mouseEnter(plot, {
-        bubbles: true,
-        cancelable: true
-      })
-
-      expect(screen.queryByText(title)).not.toBeInTheDocument()
     })
 
     describe('Smooth Plots', () => {
@@ -3056,7 +2929,7 @@ describe('App', () => {
 
       it('should update a vega panel slider value when given a new value', async () => {
         renderAppWithOptionalData({
-          template: { ...withVegaPanels }
+          template: { ...withVegaPanels, smoothPlotValues: { [smoothId]: 0.2 } }
         })
 
         const smoothPlot = screen.getByTestId(`plot_${smoothId}`)
@@ -3081,6 +2954,38 @@ describe('App', () => {
         await waitFor(() => expect(slider).toHaveValue('0.7'), {
           timeout: 5000
         })
+      })
+    })
+
+    describe('Too many plots message', () => {
+      it('should not display a message that only 20 plots are shown if shouldShowTooManyPlotsMessage is false', () => {
+        renderAppWithOptionalData({
+          shouldShowTooManyComparisonImagesMessage: false,
+          shouldShowTooManyTemplatePlotsMessage: false,
+          template: templatePlotsFixture
+        })
+
+        expect(
+          screen.queryByTestId('too-many-plots-message')
+        ).not.toBeInTheDocument()
+      })
+
+      it('should display a message that only 20 plots are shown for template plots if shouldShowTooManyTemplatePlotsMessage is true', () => {
+        renderAppWithOptionalData({
+          shouldShowTooManyTemplatePlotsMessage: true,
+          template: templatePlotsFixture
+        })
+
+        expect(screen.getByTestId('too-many-plots-message')).toBeInTheDocument()
+      })
+
+      it('should display a message that only 20 plots are shown for the comparison table if shouldShowTooManyComparisonImagesMessage is true', () => {
+        renderAppWithOptionalData({
+          comparison: comparisonTableFixture,
+          shouldShowTooManyComparisonImagesMessage: true
+        })
+
+        expect(screen.getByTestId('too-many-plots-message')).toBeInTheDocument()
       })
     })
   })

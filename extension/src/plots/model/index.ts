@@ -2,10 +2,10 @@ import { Memento } from 'vscode'
 import {
   collectData,
   collectSelectedTemplatePlots,
-  collectTemplates,
+  collectTemplatesDetails,
   ComparisonData,
   RevisionData,
-  TemplateAccumulator,
+  TemplateDetailsAccumulator,
   collectCustomPlots,
   getCustomPlotId,
   collectOrderedRevisions,
@@ -47,12 +47,6 @@ import {
 import { TemplateOrder } from '../paths/collect'
 import { PersistenceKey } from '../../persistence/constants'
 import { ModelWithPersistence } from '../../persistence/model'
-import {
-  collectMultiSourceEncoding,
-  collectMultiSourceVariations,
-  MultiSourceEncoding,
-  MultiSourceVariations
-} from '../multiSource/collect'
 import { isDvcError } from '../../cli/dvc/reader'
 import { ErrorsModel } from '../errors/model'
 import {
@@ -62,6 +56,10 @@ import {
   writeTsv
 } from '../../fileSystem'
 import { Toast } from '../../vscode/toast'
+import {
+  MultiSourceEncoding,
+  collectMultiSourceEncoding
+} from '../multiSource/collect'
 
 export class PlotsModel extends ModelWithPersistence {
   private readonly experiments: Experiments
@@ -81,8 +79,7 @@ export class PlotsModel extends ModelWithPersistence {
   private smoothPlotValues: SmoothPlotValues = {}
 
   private revisionData: RevisionData = {}
-  private templates: TemplateAccumulator = {}
-  private multiSourceVariations: MultiSourceVariations = {}
+  private templateDetails: TemplateDetailsAccumulator = {}
   private multiSourceEncoding: MultiSourceEncoding = {}
 
   constructor(
@@ -152,10 +149,6 @@ export class PlotsModel extends ModelWithPersistence {
     const experiments = this.experiments.getUnfilteredCommitsAndExperiments()
     const hasUnfilteredExperiments = experiments.length > 0
     const plotsOrderValues = this.getCustomPlotsOrder()
-    const height = this.getHeight(PlotsSection.CUSTOM_PLOTS)
-    const nbItemsPerRow = this.getNbItemsPerRowOrWidth(
-      PlotsSection.CUSTOM_PLOTS
-    )
     const hasAddedPlots = plotsOrderValues.length > 0
 
     const colorScale = getColorScale(
@@ -167,14 +160,12 @@ export class PlotsModel extends ModelWithPersistence {
     return {
       hasAddedPlots,
       hasUnfilteredExperiments,
-      height,
-      nbItemsPerRow,
+      height: this.getHeight(PlotsSection.CUSTOM_PLOTS),
+      nbItemsPerRow: this.getNbItemsPerRowOrWidth(PlotsSection.CUSTOM_PLOTS),
       plots: hasUnfilteredExperiments
         ? collectCustomPlots({
             colorScale,
             experiments,
-            height,
-            nbItemsPerRow,
             plotsOrderValues
           })
         : []
@@ -389,8 +380,7 @@ export class PlotsModel extends ModelWithPersistence {
   private handleCliError() {
     this.comparisonData = {}
     this.revisionData = {}
-    this.templates = {}
-    this.multiSourceVariations = {}
+    this.templateDetails = {}
     this.multiSourceEncoding = {}
   }
 
@@ -399,11 +389,11 @@ export class PlotsModel extends ModelWithPersistence {
       this.deleteRevisionData(rev)
     }
 
-    const [{ comparisonData, revisionData }, templates, multiSourceVariations] =
+    const [{ comparisonData, revisionData }, templates, multiSourceEncoding] =
       await Promise.all([
         collectData(output),
-        collectTemplates(output),
-        collectMultiSourceVariations(output)
+        collectTemplatesDetails(output),
+        collectMultiSourceEncoding(output)
       ])
 
     this.comparisonData = {
@@ -415,11 +405,8 @@ export class PlotsModel extends ModelWithPersistence {
       ...this.revisionData,
       ...revisionData
     }
-    this.templates = templates
-    this.multiSourceVariations = multiSourceVariations
-    this.multiSourceEncoding = collectMultiSourceEncoding(
-      this.multiSourceVariations
-    )
+    this.templateDetails = templates
+    this.multiSourceEncoding = multiSourceEncoding
   }
 
   private cleanupOutdatedCustomPlotsState() {
@@ -476,12 +463,9 @@ export class PlotsModel extends ModelWithPersistence {
     return collectSelectedTemplatePlots(
       order,
       selectedRevisions.map(({ id }) => id),
-      this.templates,
+      this.templateDetails,
       this.revisionData,
-      this.getNbItemsPerRowOrWidth(PlotsSection.TEMPLATE_PLOTS),
-      this.getHeight(PlotsSection.TEMPLATE_PLOTS),
-      this.getRevisionColors(),
-      this.multiSourceEncoding
+      this.getRevisionColors()
     )
   }
 
@@ -489,11 +473,9 @@ export class PlotsModel extends ModelWithPersistence {
     const selectedRevisions = this.getSelectedRevisionDetails()
 
     return collectSelectedTemplatePlotRawData({
-      multiSourceEncodingUpdate: this.multiSourceEncoding[path] || {},
       path,
       revisionData: this.revisionData,
-      selectedRevisions: selectedRevisions.map(({ id }) => id),
-      template: this.templates[path]
+      selectedRevisions: selectedRevisions.map(({ id }) => id)
     })
   }
 

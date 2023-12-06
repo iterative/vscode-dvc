@@ -84,10 +84,11 @@ export class WebviewMessages {
     }
     const data = await this.getWebviewData()
 
-    const hasNoRows = data.rows.length === 0
-    const hasNoData = !this.columns.hasNonDefaultColumns() || hasNoRows
+    const hasNoData = !this.experiments.hasData(
+      this.columns.hasNonDefaultColumns()
+    )
 
-    if (hasNoData && !data.cliError) {
+    if (hasNoData) {
       await commands.executeCommand(RegisteredCommands.SETUP_SHOW_EXPERIMENTS)
       return webview.dispose()
     }

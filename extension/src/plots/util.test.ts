@@ -1,9 +1,8 @@
 import { sep } from 'path'
+import type { TopLevelSpec } from 'vega-lite'
 import { ensurePlotsDataPathsOsSep } from './util'
-import { PlotsType } from './webview/contract'
-import { SpecWithTitles } from './vega/util'
 import { FIELD_SEPARATOR } from '../cli/dvc/constants'
-import { PlotsOutput } from '../cli/dvc/contract'
+import { PLOT_ANCHORS, PlotsOutput, PlotsType } from '../cli/dvc/contract'
 
 const joinWithSep = (pathArr: string[], slash = sep) => pathArr.join(slash)
 
@@ -19,8 +18,8 @@ const getOutput = (slash = sep): PlotsOutput => {
       ],
       [joinWithSep([`dvc.yaml${FIELD_SEPARATOR}logs`, 'acc.tsv'], slash)]: [
         {
-          content: {} as SpecWithTitles,
-          datapoints: { main: [{}] },
+          anchor_definitions: { [PLOT_ANCHORS.DATA]: [] },
+          content: {} as TopLevelSpec,
           revisions: ['main'],
           type: PlotsType.VEGA
         }

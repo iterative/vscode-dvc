@@ -1,106 +1,36 @@
-import { TopLevelSpec } from 'vega-lite'
+import type { TopLevelSpec } from 'vega-lite'
+import { PLOT_ANCHORS } from '../../../../cli/dvc/contract'
 
 const data = {
-  $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
+  $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
   data: {
-    values: '<DVC_METRIC_DATA>'
+    values: PLOT_ANCHORS.DATA
   },
-  title: '<DVC_METRIC_TITLE>',
-  width: 300,
-  height: 300,
-  layer: [
-    {
-      encoding: {
-        x: {
-          field: '<DVC_METRIC_X>',
-          type: 'quantitative',
-          title: '<DVC_METRIC_X_LABEL>'
-        },
-        y: {
-          field: '<DVC_METRIC_Y>',
-          type: 'quantitative',
-          title: '<DVC_METRIC_Y_LABEL>',
-          scale: {
-            zero: false
-          }
-        },
-        color: {
-          field: 'rev',
-          type: 'nominal'
-        }
-      },
-      layer: [
-        {
-          mark: 'point'
-        },
-        {
-          selection: {
-            label: {
-              type: 'single',
-              nearest: true,
-              on: 'mouseover',
-              encodings: ['x'],
-              empty: 'none',
-              clear: 'mouseout'
-            }
-          },
-          mark: 'point',
-          encoding: {
-            opacity: {
-              condition: {
-                selection: 'label',
-                value: 1
-              },
-              value: 0
-            }
-          }
-        }
-      ]
-    },
-    {
-      transform: [
-        {
-          filter: {
-            selection: 'label'
-          }
-        }
-      ],
-      layer: [
-        {
-          encoding: {
-            text: {
-              type: 'quantitative',
-              field: '<DVC_METRIC_Y>'
-            },
-            x: {
-              field: '<DVC_METRIC_X>',
-              type: 'quantitative'
-            },
-            y: {
-              field: '<DVC_METRIC_Y>',
-              type: 'quantitative'
-            }
-          },
-          layer: [
-            {
-              mark: {
-                type: 'text',
-                align: 'left',
-                dx: 5,
-                dy: -5
-              },
-              encoding: {
-                color: {
-                  type: 'nominal',
-                  field: 'rev'
-                }
-              }
-            }
-          ]
-        }
-      ]
+  title: PLOT_ANCHORS.TITLE,
+  width: PLOT_ANCHORS.WIDTH,
+  height: PLOT_ANCHORS.HEIGHT,
+  mark: {
+    type: 'point',
+    tooltip: {
+      content: 'data'
     }
-  ]
-} as TopLevelSpec
+  },
+  params: [PLOT_ANCHORS.ZOOM_AND_PAN],
+  encoding: {
+    x: {
+      field: PLOT_ANCHORS.X,
+      type: 'quantitative',
+      title: PLOT_ANCHORS.X_LABEL
+    },
+    y: {
+      field: PLOT_ANCHORS.Y,
+      type: 'quantitative',
+      title: PLOT_ANCHORS.Y_LABEL
+    },
+    color: PLOT_ANCHORS.COLOR,
+    shape: PLOT_ANCHORS.SHAPE,
+    tooltip: '<DVC_METRIC_TOOLTIP>'
+  }
+} as unknown as TopLevelSpec
 
 export default data

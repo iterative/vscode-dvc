@@ -1,6 +1,6 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { STUDIO_URL } from 'dvc/src/setup/webview/contract'
+import { DEFAULT_STUDIO_URL } from 'dvc/src/setup/webview/contract'
 import { Connect } from './Connect'
 import { Settings } from './Settings'
 import { SetupState } from '../../store'
@@ -16,7 +16,7 @@ export const Studio: React.FC<{
     return (
       <CliIncompatible>
         <p>
-          Locate DVC to connect to <a href={STUDIO_URL}>Studio</a>
+          Locate DVC to connect to <a href={DEFAULT_STUDIO_URL}>Studio</a>
         </p>
       </CliIncompatible>
     )

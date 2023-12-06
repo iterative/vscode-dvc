@@ -34,7 +34,7 @@ import {
   isStudioExperimentsOutput
 } from '../../../../data'
 import { Studio } from '../../../../experiments/studio'
-import { STUDIO_URL } from '../../../../setup/webview/contract'
+import { DEFAULT_STUDIO_URL } from '../../../../setup/webview/contract'
 
 const MOCK_WORKSPACE_GIT_FOLDER = join(dvcDemoPath, '.mock-git')
 
@@ -351,7 +351,51 @@ suite('Experiments Data Test Suite', () => {
 
       expect(mockFetch).to.be.calledOnce
       expect(mockFetch).to.be.calledWithExactly(
-        STUDIO_URL +
+        DEFAULT_STUDIO_URL +
+          '/api/view-links?' +
+          'commits=53c3851f46955fa3e2b8f6e1c52999acc8c9ea77' +
+          '&commits=fe2919bb4394b30494bea905c253e10077b9a1bd' +
+          '&commits=7df876cb5147800cd3e489d563bc6dcd67188621' +
+          '&git_remote_url=git%40github.com%3Aiterative%2Fvscode-dvc-demo.git',
+        {
+          headers: {
+            Authorization: `token ${mockStudioToken}`
+          },
+          method: 'GET'
+        }
+      )
+    })
+
+    it('should send the expected request to Studio if the user has a token and self hosted instance url set', async () => {
+      const mockStudioToken = 'isat_BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
+      const mockSelfHostedStudioUrl = 'https://studio.example.com'
+      const { data, mockFetch } = buildExperimentsData(
+        disposable,
+        '* main',
+        gitLogFixture,
+        mockStudioToken,
+        mockSelfHostedStudioUrl
+      )
+      const requestSent = new Promise(resolve =>
+        data.onDidUpdate(data => {
+          if (isStudioExperimentsOutput(data)) {
+            resolve(undefined)
+            expect(data).to.deep.equal({
+              live: [],
+              pushed: [],
+              view_url: mockBaseStudioUrl
+            })
+          }
+        })
+      )
+
+      await data.isReady()
+
+      await requestSent
+
+      expect(mockFetch).to.be.calledOnce
+      expect(mockFetch).to.be.calledWithExactly(
+        mockSelfHostedStudioUrl +
           '/api/view-links?' +
           'commits=53c3851f46955fa3e2b8f6e1c52999acc8c9ea77' +
           '&commits=fe2919bb4394b30494bea905c253e10077b9a1bd' +

@@ -73,9 +73,9 @@ describe('collectColumns', () => {
     expect(metrics).toBeDefined()
   })
 
-  it('should return an empty array if no params and metrics are provided', async () => {
+  it('should return the timestamp column if no params, metrics or deps are provided', async () => {
     const columns = await collectColumns(generateTestExpShowOutput({}))
-    expect(columns).toStrictEqual([])
+    expect(columns).toStrictEqual([timestampColumn])
   })
 
   it('should aggregate multiple different field names', async () => {
@@ -181,6 +181,91 @@ describe('collectColumns', () => {
         'seven'
       )
     ])
+  })
+
+  it('should collect columns from experiments with a broken baseline', async () => {
+    const missingParamsYaml = [
+      {
+        error: {
+          msg: "failed to parse 'stages.main.cmd' in 'dvc.yaml': Could not find 'parameters.parameter_name'",
+          type: 'ResolveError'
+        },
+        experiments: null,
+        rev: 'workspace'
+      },
+      {
+        error: {
+          msg: "failed to parse 'stages.main.cmd' in 'dvc.yaml': Could not find 'parameters.parameter_name'",
+          type: 'ResolveError'
+        },
+        experiments: [
+          {
+            executor: null,
+            name: 'exp1',
+            revs: [
+              {
+                data: {
+                  deps: {},
+                  meta: {},
+                  params: {
+                    'dvclive/params.yaml': {
+                      data: {
+                        result: 0.6936822634315442
+                      }
+                    },
+                    'params.yaml': {
+                      data: {
+                        parameters: {
+                          parameter_name: 'parameter_value'
+                        }
+                      }
+                    }
+                  },
+                  metrics: {},
+                  rev: 'ee23879da223ff9d5bd906bdd8969cc0ea90344f',
+                  outs: {},
+                  timestamp: '2023-11-28T16:07:17'
+                },
+                experiments: null,
+                name: 'exp1',
+                rev: 'ee23879da223ff9d5bd906bdd8969cc0ea90344f'
+              }
+            ]
+          }
+        ],
+        name: 'master',
+        rev: '616500724541bcd2f7f89584187b00f838ecf9a9'
+      },
+      {
+        data: {
+          deps: {},
+          meta: {},
+          metrics: {},
+          outs: {},
+          params: {},
+          rev: '7d527bc6ae94befdc9352e59d80b133cdb0a1e7a',
+          timestamp: '2023-11-28T15:57:50'
+        },
+        experiments: null,
+        rev: '7d527bc6ae94befdc9352e59d80b133cdb0a1e7a'
+      },
+      {
+        data: {
+          deps: {},
+          meta: {},
+          metrics: {},
+          outs: {},
+          params: {},
+          rev: '19825884a7acacc3177716c8fd7b2502ed129c59',
+          timestamp: '2023-11-28T13:09:17'
+        },
+        experiments: null,
+        rev: '19825884a7acacc3177716c8fd7b2502ed129c59'
+      }
+    ]
+
+    const columns = await collectColumns(missingParamsYaml)
+    expect(columns).toHaveLength(6)
   })
 })
 

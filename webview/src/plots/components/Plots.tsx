@@ -8,6 +8,7 @@ import { TemplatePlotsWrapper } from './templatePlots/TemplatePlotsWrapper'
 import { ComparisonTableWrapper } from './comparisonTable/ComparisonTableWrapper'
 import { Ribbon } from './ribbon/Ribbon'
 import { setMaxNbPlotsPerRow, setZoomedInPlot } from './webviewSlice'
+import styles from './styles.module.scss'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { Modal } from '../../shared/components/modal/Modal'
 import { WebviewWrapper } from '../../shared/components/webviewWrapper/WebviewWrapper'
@@ -49,17 +50,16 @@ const PlotsContent = () => {
     return <EmptyState>Loading Plots...</EmptyState>
   }
 
-  const modal = zoomedInPlot?.plot && (
+  const modal = zoomedInPlot?.id && (
     <Modal
       onClose={() => {
         dispatch(setZoomedInPlot(undefined))
       }}
     >
       <ZoomedInPlot
-        isTemplatePlot={zoomedInPlot.isTemplatePlot}
         id={zoomedInPlot.id}
-        props={zoomedInPlot.plot}
         openActionsMenu={zoomedInPlot.openActionsMenu}
+        section={zoomedInPlot.section}
       />
     </Modal>
   )
@@ -88,7 +88,7 @@ const PlotsContent = () => {
   }
 
   return (
-    <div ref={wrapperRef}>
+    <div ref={wrapperRef} className={styles.plotsContent}>
       <Ribbon />
       <TemplatePlotsWrapper />
       <ComparisonTableWrapper />
