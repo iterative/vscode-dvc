@@ -1229,7 +1229,7 @@ suite('Setup Test Suite', () => {
       stub(Setup.prototype as any, 'getCliCompatible').returns(true)
       const mockInputBox = stub(window, 'showInputBox').resolves(mockUrl)
 
-      void commands.executeCommand(RegisteredCommands.UPDATE_STUDIO_URL)
+      void commands.executeCommand(RegisteredCommands.SET_STUDIO_URL)
 
       await configCalled
       expect(mockInputBox).to.be.calledWithMatch({

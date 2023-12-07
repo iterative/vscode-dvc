@@ -125,8 +125,8 @@
         "category": "DVC"
       },
       {
-        "title": "Add Self-Hosted Studio URL",
-        "command": "dvc.addStudioUrl",
+        "title": "Update Studio Access Token",
+        "command": "dvc.updateStudioAccessToken",
         "category": "DVC"
       },
       {
@@ -402,6 +402,11 @@
         "category": "DVC"
       },
       {
+        "title": "Set Self-Hosted Studio URL",
+        "command": "dvc.setStudioUrl",
+        "category": "DVC"
+      },
+      {
         "title": "Setup the Workspace",
         "command": "dvc.setupWorkspace",
         "category": "DVC"
@@ -458,16 +463,6 @@
       {
         "title": "Show Setup",
         "command": "dvc.showSetup",
-        "category": "DVC"
-      },
-      {
-        "title": "Update Studio Access Token",
-        "command": "dvc.updateStudioAccessToken",
-        "category": "DVC"
-      },
-      {
-        "title": "Update Self-Hosted Studio URL",
-        "command": "dvc.updateStudioUrl",
         "category": "DVC"
       },
       {
@@ -728,14 +723,6 @@
           "when": "dvc.commands.available && dvc.project.available && dvc.studio.connected"
         },
         {
-          "command": "dvc.addStudioUrl",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.studio.selfhosted"
-        },
-        {
-          "command": "dvc.updateStudioUrl",
-          "when": "dvc.commands.available && dvc.project.available && dvc.studio.selfhosted"
-        },
-        {
           "command": "dvc.addTarget",
           "when": "false"
         },
@@ -922,6 +909,10 @@
         {
           "command": "dvc.selectFocusedProjects",
           "when": "dvc.commands.available && dvc.project.available && dvc.multiple.projects"
+        },
+        {
+          "command": "dvc.setStudioUrl",
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.showCommands",
