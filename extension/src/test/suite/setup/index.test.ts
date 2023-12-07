@@ -1146,10 +1146,6 @@ suite('Setup Test Suite', () => {
         getFirstWorkspaceFolder(),
         ConfigKey.STUDIO_TOKEN
       )
-      expect(mockConfig).to.be.calledWithExactly(
-        getFirstWorkspaceFolder(),
-        ConfigKey.STUDIO_URL
-      )
       expect(executeCommandSpy).to.be.calledWithExactly(
         'setContext',
         ContextKey.STUDIO_CONNECTED,
@@ -1215,15 +1211,16 @@ suite('Setup Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it("should be able to save the user's self-hosted url", async () => {
-      const mockConfig = stub(DvcConfig.prototype, 'config')
-      const configCalled = new Promise(resolve =>
-        mockConfig.callsFake(() => {
+      const mockUrl = 'https://studio.example.com'
+      const mockConfig = stub(DvcConfig.prototype, 'config').resolves(mockUrl)
+      const executeCommandSpy = spy(commands, 'executeCommand')
+      const dataSent = new Promise(resolve =>
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        stub(Setup.prototype as any, 'sendDataToWebview').callsFake(() => {
           resolve(undefined)
           return Promise.resolve('')
         })
       )
-
-      const mockUrl = 'https://studio.example.com'
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       stub(Setup.prototype as any, 'getCliCompatible').returns(true)
@@ -1231,16 +1228,29 @@ suite('Setup Test Suite', () => {
 
       void commands.executeCommand(RegisteredCommands.SET_STUDIO_URL)
 
-      await configCalled
+      await dataSent
+
       expect(mockInputBox).to.be.calledWithMatch({
         title: Title.ENTER_STUDIO_URL
       })
-
       expect(mockConfig).to.be.calledWithExactly(
         dvcDemoPath,
         Flag.GLOBAL,
         ConfigKey.STUDIO_URL,
         mockUrl
+      )
+      expect(mockConfig).to.be.calledWithExactly(
+        getFirstWorkspaceFolder(),
+        ConfigKey.STUDIO_URL
+      )
+      expect(mockConfig).to.be.calledWithExactly(
+        getFirstWorkspaceFolder(),
+        ConfigKey.STUDIO_URL
+      )
+      expect(executeCommandSpy).to.be.calledWithExactly(
+        'setContext',
+        ContextKey.STUDIO_SELFHOSTED,
+        true
       )
     })
 
