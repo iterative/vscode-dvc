@@ -59,6 +59,7 @@ import { EventName } from '../../../telemetry/constants'
 import { Modal } from '../../../vscode/modal'
 import { Toast } from '../../../vscode/toast'
 import { Title } from '../../../vscode/title'
+import { Studio } from '../../../setup/studio'
 
 suite('Setup Test Suite', () => {
   const disposable = Disposable.fn()
@@ -1214,6 +1215,28 @@ suite('Setup Test Suite', () => {
       const mockUrl = 'https://studio.example.com'
       const mockConfig = stub(DvcConfig.prototype, 'config').resolves(mockUrl)
       const executeCommandSpy = spy(commands, 'executeCommand')
+      const saveStudioUrlSpy = spy(Studio.prototype, 'saveStudioUrlInConfig')
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub(Setup.prototype as any, 'getCliCompatible').returns(true)
+      const mockInputBox = stub(window, 'showInputBox')
+
+      const inputEvent = new Promise(resolve =>
+        mockInputBox.onFirstCall().callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(undefined)
+        })
+      )
+
+      void commands.executeCommand(RegisteredCommands.SET_STUDIO_URL)
+      await inputEvent
+
+      expect(mockInputBox).to.be.calledWithMatch({
+        title: Title.ENTER_STUDIO_URL
+      })
+      expect(saveStudioUrlSpy).not.to.be.called
+
+      mockInputBox.onSecondCall().resolves(mockUrl)
       const dataSent = new Promise(resolve =>
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         stub(Setup.prototype as any, 'sendDataToWebview').callsFake(() => {
@@ -1222,26 +1245,18 @@ suite('Setup Test Suite', () => {
         })
       )
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub(Setup.prototype as any, 'getCliCompatible').returns(true)
-      const mockInputBox = stub(window, 'showInputBox').resolves(mockUrl)
-
       void commands.executeCommand(RegisteredCommands.SET_STUDIO_URL)
-
       await dataSent
 
       expect(mockInputBox).to.be.calledWithMatch({
         title: Title.ENTER_STUDIO_URL
       })
+      expect(saveStudioUrlSpy).to.be.calledWithExactly(dvcDemoPath, mockUrl)
       expect(mockConfig).to.be.calledWithExactly(
         dvcDemoPath,
         Flag.GLOBAL,
         ConfigKey.STUDIO_URL,
         mockUrl
-      )
-      expect(mockConfig).to.be.calledWithExactly(
-        getFirstWorkspaceFolder(),
-        ConfigKey.STUDIO_URL
       )
       expect(mockConfig).to.be.calledWithExactly(
         getFirstWorkspaceFolder(),

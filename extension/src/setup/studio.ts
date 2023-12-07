@@ -281,7 +281,7 @@ export class Studio extends Disposable {
 
     await this.accessConfig(cwd, Flag.LOCAL, Flag.UNSET, key)
 
-    return await this.accessConfig(cwd, Flag.GLOBAL, Flag.UNSET, key)
+    return this.accessConfig(cwd, Flag.GLOBAL, Flag.UNSET, key)
   }
 
   private accessConfig(cwd: string, ...args: Args) {
