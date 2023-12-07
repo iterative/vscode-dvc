@@ -1,8 +1,8 @@
-import { TopLevelSpec } from 'vega-lite'
+import type { TopLevelSpec } from 'vega-lite'
 import { getCustomPlotId } from './collect'
 import { Column, ColumnType } from '../../experiments/webview/contract'
+import { PLOT_ANCHORS } from '../../cli/dvc/contract'
 import { FILE_SEPARATOR } from '../../experiments/columns/constants'
-import { ColorScale } from '../webview/contract'
 
 export type CustomPlotsOrderValue = {
   metric: string
@@ -52,21 +52,15 @@ export const getCustomPlotPathsFromColumns = (
   return { metrics, params }
 }
 
-const getSpecDataType = (type: string) =>
+export const getDataType = (type: string) =>
   type === 'number' ? 'quantitative' : 'nominal'
 
-export const createSpec = (
-  metric: string,
-  param: string,
-  metricType: string,
-  paramType: string,
-  colorScale: ColorScale
-) =>
+export const getContent = (): TopLevelSpec =>
   ({
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-    data: { name: 'values' },
+    data: { values: PLOT_ANCHORS.DATA },
     encoding: {
-      color: { field: 'id', legend: null, scale: colorScale },
+      color: PLOT_ANCHORS.COLOR,
       x: {
         axis: {
           labelLimit: 75,
@@ -76,8 +70,8 @@ export const createSpec = (
         scale: {
           zero: false
         },
-        title: param,
-        type: getSpecDataType(paramType)
+        title: PLOT_ANCHORS.X_LABEL,
+        type: PLOT_ANCHORS.PARAM_TYPE
       },
       y: {
         axis: {
@@ -88,8 +82,8 @@ export const createSpec = (
         scale: {
           zero: false
         },
-        title: metric,
-        type: getSpecDataType(metricType)
+        title: PLOT_ANCHORS.Y_LABEL,
+        type: PLOT_ANCHORS.METRIC_TYPE
       }
     },
     height: 'container',
@@ -103,11 +97,11 @@ export const createSpec = (
             },
             {
               field: 'metric',
-              title: metric
+              title: PLOT_ANCHORS.Y_LABEL
             },
             {
               field: 'param',
-              title: param
+              title: PLOT_ANCHORS.X_LABEL
             }
           ]
         },
@@ -115,8 +109,9 @@ export const createSpec = (
           filled: true,
           size: 60,
           type: 'point'
-        }
+        },
+        params: [PLOT_ANCHORS.ZOOM_AND_PAN]
       }
     ],
     width: 'container'
-  }) as TopLevelSpec
+  }) as unknown as TopLevelSpec

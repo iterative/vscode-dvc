@@ -1,6 +1,6 @@
 import { Uri } from 'vscode'
 import { Disposable } from './class/dispose'
-import { ShapeValue, StrokeDashValue } from './plots/multiSource/constants'
+import { ShapeValue, StrokeDashValue } from './cli/dvc/contract'
 
 export type Resource = { dark: Uri; light: Uri }
 

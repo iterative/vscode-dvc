@@ -1,19 +1,10 @@
 import React, { useEffect, useRef } from 'react'
-import VegaLite, { VegaLiteProps } from 'react-vega/lib/VegaLite'
-import { Config } from 'vega-lite'
-import merge from 'lodash.merge'
-import cloneDeep from 'lodash.clonedeep'
-import {
-  SpecWithTitles,
-  makePlotZoomOnWheel,
-  reverseOfLegendSuppressionUpdate
-} from 'dvc/src/plots/vega/util'
+import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import { View } from 'react-vega'
-import { TemplateVegaLite } from './templatePlots/TemplateVegaLite'
+import { ExtendedVegaLite } from './vegaLite/ExtendedVegaLite'
 import styles from './styles.module.scss'
-import { ZoomablePlotWrapper } from './ZoomablePlotWrapper'
 import {
-  getThemeValue,
+  addExportBackgroundColor,
   preventSvgTruncation,
   replaceThemeValuesForExport,
   ThemeProperty
@@ -27,8 +18,7 @@ import {
 
 type ZoomedInPlotProps = {
   id: string
-  props: VegaLiteProps
-  isTemplatePlot: boolean
+  section: PlotsSection
   openActionsMenu?: boolean
 }
 
@@ -49,16 +39,9 @@ const appendActionToVega = (
 
 export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
   id,
-  props,
-  isTemplatePlot,
+  section,
   openActionsMenu
 }: ZoomedInPlotProps) => {
-  const isCustomPlot = !isTemplatePlot
-  const hasSmoothing =
-    isTemplatePlot &&
-    (props.spec as { params?: { name: string }[] }).params?.[0]?.name ===
-      'smooth'
-
   const zoomedInPlotRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -84,7 +67,9 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
           ThemeProperty.FONT
         ])
 
-        const fullThemedSvg = preventSvgTruncation(themedSvg)
+        const fullThemedSvg = addExportBackgroundColor(
+          preventSvgTruncation(themedSvg)
+        )
 
         exportPlotAsSvg(fullThemedSvg)
       })
@@ -103,42 +88,24 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
     }
   }
 
-  const specUpdate = merge(
-    reverseOfLegendSuppressionUpdate(),
-    makePlotZoomOnWheel(isCustomPlot, hasSmoothing)
-  )
-
-  const vegaLiteProps = {
-    ...merge({ ...cloneDeep(props) }, specUpdate),
-    actions: {
-      compiled: false,
-      editor: false,
-      export: false,
-      source: false
-    },
-    config: {
-      ...(props.config as Config),
-      background: getThemeValue(ThemeProperty.MENU_BACKGROUND)
-    }
-  }
-
   return (
-    <ZoomablePlotWrapper spec={props.spec as SpecWithTitles}>
-      <div
-        className={styles.zoomedInPlot}
-        data-testid="zoomed-in-plot"
-        ref={zoomedInPlotRef}
-      >
-        {isTemplatePlot ? (
-          <TemplateVegaLite
-            id={id}
-            vegaLiteProps={vegaLiteProps}
-            onNewView={onNewView}
-          />
-        ) : (
-          <VegaLite {...vegaLiteProps} onNewView={onNewView} />
-        )}
-      </div>
-    </ZoomablePlotWrapper>
+    <div
+      className={styles.zoomedInPlot}
+      data-testid="zoomed-in-plot"
+      ref={zoomedInPlotRef}
+    >
+      <ExtendedVegaLite
+        actions={{
+          compiled: false,
+          editor: false,
+          export: false,
+          source: false
+        }}
+        id={id}
+        onNewView={onNewView}
+        parentRef={zoomedInPlotRef}
+        section={section}
+      />
+    </div>
   )
 }

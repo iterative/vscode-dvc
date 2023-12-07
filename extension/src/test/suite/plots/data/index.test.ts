@@ -19,7 +19,10 @@ import {
 import { fireWatcher } from '../../../../fileSystem/watcher'
 import { getProcessPlatform } from '../../../../env'
 import { removeDir } from '../../../../fileSystem'
-import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
+import {
+  EXPERIMENT_WORKSPACE_ID,
+  PLOT_ANCHORS
+} from '../../../../cli/dvc/contract'
 
 suite('Plots Data Test Suite', () => {
   const disposable = getTimeSafeDisposer()
@@ -82,17 +85,15 @@ suite('Plots Data Test Suite', () => {
             data: {
               'dvc.yaml::Accuracy': [
                 {
-                  datapoints: {
-                    workspace: [
+                  anchor_definitions: {
+                    [PLOT_ANCHORS.DATA]: [
                       {
-                        dvc_data_version_info: {
-                          field: join('train', 'acc'),
-                          filename: collectedFile,
-                          revision: EXPERIMENT_WORKSPACE_ID
-                        },
                         dvc_inferred_y_value: '0.2707333333333333',
-                        step: '0',
-                        [join('train', 'acc')]: '0.2707333333333333'
+                        field: join('train', 'acc'),
+                        [join('train', 'acc')]: '0.2707333333333333',
+                        filename: collectedFile,
+                        rev: EXPERIMENT_WORKSPACE_ID,
+                        step: '0'
                       }
                     ]
                   },
