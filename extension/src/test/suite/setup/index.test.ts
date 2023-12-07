@@ -1216,11 +1216,19 @@ suite('Setup Test Suite', () => {
       const mockConfig = stub(DvcConfig.prototype, 'config').resolves(mockUrl)
       const executeCommandSpy = spy(commands, 'executeCommand')
       const saveStudioUrlSpy = spy(Studio.prototype, 'saveStudioUrlInConfig')
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub(Setup.prototype as any, 'getCliCompatible').returns(true)
+      const mockGetCliCompatible = stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        Setup.prototype as any,
+        'getCliCompatible'
+      ).returns(false)
       const mockInputBox = stub(window, 'showInputBox')
 
+      void commands.executeCommand(RegisteredCommands.SET_STUDIO_URL)
+
+      expect(mockInputBox).not.to.be.called
+      expect(saveStudioUrlSpy).not.to.be.called
+
+      mockGetCliCompatible.returns(true)
       const inputEvent = new Promise(resolve =>
         mockInputBox.onFirstCall().callsFake(() => {
           resolve(undefined)
@@ -1270,7 +1278,30 @@ suite('Setup Test Suite', () => {
     })
 
     it("should be able to delete the user's self hosted url from the global dvc config", async () => {
+      const mockGetCliCompatible = stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        Setup.prototype as any,
+        'getCliCompatible'
+      ).returns(false)
       const mockConfig = stub(DvcConfig.prototype, 'config')
+
+      await commands.executeCommand(RegisteredCommands.REMOVE_STUDIO_URL)
+
+      expect(mockConfig).not.to.be.calledWithExactly(
+        dvcDemoPath,
+        Flag.GLOBAL,
+        Flag.UNSET,
+        ConfigKey.STUDIO_URL
+      )
+
+      expect(mockConfig).not.to.be.calledWithExactly(
+        dvcDemoPath,
+        Flag.LOCAL,
+        Flag.UNSET,
+        ConfigKey.STUDIO_URL
+      )
+
+      mockGetCliCompatible.returns(true)
       const configCalled = new Promise(resolve =>
         mockConfig.callsFake(() => {
           resolve(undefined)
@@ -1278,11 +1309,7 @@ suite('Setup Test Suite', () => {
         })
       )
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub(Setup.prototype as any, 'getCliCompatible').returns(true)
-
-      void commands.executeCommand(RegisteredCommands.REMOVE_STUDIO_URL)
-
+      await commands.executeCommand(RegisteredCommands.REMOVE_STUDIO_URL)
       await configCalled
 
       expect(mockConfig).to.be.calledWithExactly(
@@ -1291,7 +1318,6 @@ suite('Setup Test Suite', () => {
         Flag.UNSET,
         ConfigKey.STUDIO_URL
       )
-
       expect(mockConfig).to.be.calledWithExactly(
         dvcDemoPath,
         Flag.LOCAL,
