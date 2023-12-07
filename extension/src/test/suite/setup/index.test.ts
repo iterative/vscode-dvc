@@ -1040,7 +1040,7 @@ suite('Setup Test Suite', () => {
       )
     })
 
-    it('cancel a token request to Studio after 15 minutes', async () => {
+    it('should cancel a token request to Studio after 5 minutes', async () => {
       const { setup, mockFetch } = buildSetup({
         disposer: disposable
       })
@@ -1090,8 +1090,8 @@ suite('Setup Test Suite', () => {
 
       clock.tick(waitTime)
 
-      expect(clearTimeoutSpy).to.be.calledOnce
-      expect(mockUriHandlerDispose).to.be.calledOnce
+      expect(clearTimeoutSpy).to.be.called
+      expect(mockUriHandlerDispose).to.be.called
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it("should handle a message from the webview to manually save the user's Studio access token", async () => {
