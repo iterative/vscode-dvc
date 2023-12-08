@@ -1,6 +1,10 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { EventEmitter, window, OutputChannel as VSOutputChannel } from 'vscode'
+import {
+  EventEmitter,
+  window,
+  LogOutputChannel as VSOutputChannel
+} from 'vscode'
 import { restore, stub, fake } from 'sinon'
 import { OutputChannel } from '../../../vscode/outputChannel'
 import { Disposable } from '../../../extension'
