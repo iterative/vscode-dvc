@@ -1291,13 +1291,15 @@ suite('Setup Test Suite', () => {
 
       await commands.executeCommand(RegisteredCommands.REMOVE_STUDIO_URL)
 
-      expect(mockConfig).not.to.be.calledWithExactly(
+      expect(
+        mockConfig,
+        'should not be called if cwd is not found'
+      ).not.to.be.calledWithExactly(
         dvcDemoPath,
         Flag.GLOBAL,
         Flag.UNSET,
         ConfigKey.STUDIO_URL
       )
-
       expect(mockConfig).not.to.be.calledWithExactly(
         dvcDemoPath,
         Flag.LOCAL,
