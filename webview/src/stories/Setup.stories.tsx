@@ -32,6 +32,7 @@ const DEFAULT_DATA: SetupData = {
     [SetupSection.REMOTES]: false,
     [SetupSection.STUDIO]: true
   },
+  selfHostedStudioUrl: null,
   shareLiveToStudio: false
 }
 

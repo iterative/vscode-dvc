@@ -22,12 +22,12 @@ export const DetailsTableRow: React.FC<DetailsTableRowProps> = ({
         {actions && (
           <span>
             {actions.map(({ text, onClick }, index) => (
-              <>
+              <span key={index}>
                 {index > 0 && <span className={styles.separator} />}
                 <button className={styles.buttonAsLink} onClick={onClick}>
                   {text}
                 </button>
-              </>
+              </span>
             ))}
           </span>
         )}

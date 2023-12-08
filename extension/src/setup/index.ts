@@ -3,6 +3,7 @@ import { Event, EventEmitter } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import isEmpty from 'lodash.isempty'
 import {
+  DEFAULT_STUDIO_URL,
   DvcCliDetails,
   SetupSection,
   SetupData as TSetupData
@@ -421,6 +422,8 @@ export class Setup
     const isPythonEnvironmentGlobal =
       isPythonExtensionUsed && (await isActivePythonEnvGlobal())
 
+    const studioUrl = this.studio.getStudioUrl()
+
     this.webviewMessages.sendWebviewMessage({
       canGitInitialize,
       cliCompatible: this.getCliCompatible(),
@@ -437,6 +440,7 @@ export class Setup
       pythonBinPath: getBinDisplayText(pythonBinPath),
       remoteList,
       sectionCollapsed: collectSectionCollapsed(this.focusedSection),
+      selfHostedStudioUrl: studioUrl === DEFAULT_STUDIO_URL ? null : studioUrl,
       shareLiveToStudio: !!this.studio.getShareLiveToStudio()
     })
     this.focusedSection = undefined

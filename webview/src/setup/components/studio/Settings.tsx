@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { PropsWithChildren } from 'react'
 import { useSelector } from 'react-redux'
 import { VSCodeCheckbox } from '@vscode/webview-ui-toolkit/react'
 import styles from './styles.module.scss'
@@ -7,9 +7,11 @@ import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { Button } from '../../../shared/components/button/Button'
 import { SetupState } from '../../store'
 
-export const Settings: React.FC<{
-  setShareLiveToStudio: (shareLiveToStudio: boolean) => void
-}> = ({ setShareLiveToStudio }) => {
+export const Settings: React.FC<
+  PropsWithChildren<{
+    setShareLiveToStudio: (shareLiveToStudio: boolean) => void
+  }>
+> = ({ children, setShareLiveToStudio }) => {
   const shareLiveToStudio = useSelector(
     (state: SetupState) => state.studio.shareLiveToStudio
   )
@@ -18,6 +20,7 @@ export const Settings: React.FC<{
     <EmptyState isFullScreen={false}>
       <div>
         <h1>Studio Settings</h1>
+        {children}
         <div className={styles.studioSettings}>
           <div className={styles.checkboxWrapper}>
             <VSCodeCheckbox
