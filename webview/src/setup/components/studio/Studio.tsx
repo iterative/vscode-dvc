@@ -28,7 +28,7 @@ export const Studio: React.FC<{
   }
 
   const children = selfHostedStudioUrl && (
-    <DetailsTable>
+    <DetailsTable testId="studio-url-details">
       <DetailsTableRow
         title="Self-Hosted Url"
         text={selfHostedStudioUrl}
