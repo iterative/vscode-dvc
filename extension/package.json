@@ -130,6 +130,11 @@
         "category": "DVC"
       },
       {
+        "title": "Add Self-Hosted Studio URL",
+        "command": "dvc.addStudioUrl",
+        "category": "DVC"
+      },
+      {
         "title": "Add",
         "command": "dvc.addTarget",
         "category": "DVC",
@@ -381,6 +386,11 @@
         "category": "DVC"
       },
       {
+        "title": "Remove Self-Hosted Studio URL",
+        "command": "dvc.removeStudioUrl",
+        "category": "DVC"
+      },
+      {
         "title": "Run Experiment",
         "command": "dvc.resetAndRunCheckpointExperiment",
         "category": "DVC",
@@ -453,6 +463,11 @@
       {
         "title": "Show Setup",
         "command": "dvc.showSetup",
+        "category": "DVC"
+      },
+      {
+        "title": "Update Self-Hosted Studio URL",
+        "command": "dvc.updateStudioUrl",
         "category": "DVC"
       },
       {
@@ -709,6 +724,10 @@
           "when": "dvc.commands.available && dvc.project.available && !dvc.studio.connected"
         },
         {
+          "command": "dvc.addStudioUrl",
+          "when": "dvc.commands.available && dvc.project.available && !dvc.studio.selfhosted"
+        },
+        {
           "command": "dvc.updateStudioAccessToken",
           "when": "dvc.commands.available && dvc.project.available && dvc.studio.connected"
         },
@@ -853,6 +872,10 @@
           "when": "dvc.commands.available && dvc.project.available && dvc.studio.connected"
         },
         {
+          "command": "dvc.removeStudioUrl",
+          "when": "dvc.commands.available && dvc.project.available && dvc.studio.selfhosted"
+        },
+        {
           "command": "dvc.removeTarget",
           "when": "false"
         },
@@ -931,6 +954,10 @@
         {
           "command": "dvc.stopAllRunningExperiments",
           "when": "dvc.commands.available && dvc.project.available && dvc.experiment.running"
+        },
+        {
+          "command": "dvc.updateStudioUrl",
+          "when": "dvc.commands.available && dvc.project.available && dvc.studio.selfhosted"
         },
         {
           "command": "dvc.views.experiments.selectColumns",

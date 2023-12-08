@@ -17,7 +17,8 @@ export enum ContextKey {
   PROJECT_HAS_DATA = 'dvc.project.hasData',
   SCM_RUNNING = 'dvc.scm.command.running',
   SETUP_WEBVIEW_ACTIVE = 'dvc.setup.webview.active',
-  STUDIO_CONNECTED = 'dvc.studio.connected'
+  STUDIO_CONNECTED = 'dvc.studio.connected',
+  STUDIO_SELFHOSTED = 'dvc.studio.selfhosted'
 }
 
 export const setContextValue = (key: ContextKey, value: unknown) =>
