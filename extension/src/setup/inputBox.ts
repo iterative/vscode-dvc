@@ -9,11 +9,10 @@ export const validateTokenInput = (input: string | undefined) => {
 
 export const validateUrlInput = (input: string | undefined = '') => {
   try {
-    // We're using new URL to check for url validity since it will throw a typeerror if the url isn't valid
-    // eslint-disable-next-line no-new
-    new URL(input)
-    return null
-  } catch {
-    return 'please enter a valid URL'
-  }
+    const validUrl = new URL(input)
+    if (validUrl) {
+      return null
+    }
+  } catch {}
+  return 'please enter a valid URL'
 }

@@ -1223,10 +1223,11 @@ suite('Setup Test Suite', () => {
       ).returns(false)
       const mockInputBox = stub(window, 'showInputBox')
 
-      void commands.executeCommand(RegisteredCommands.SET_STUDIO_URL)
+      void commands.executeCommand(RegisteredCommands.ADD_STUDIO_URL)
 
       expect(mockInputBox).not.to.be.called
-      expect(saveStudioUrlSpy).not.to.be.called
+      expect(saveStudioUrlSpy, 'should not be called when the cwd is not found')
+        .not.to.be.called
 
       mockGetCliCompatible.returns(true)
       const inputEvent = new Promise(resolve =>
@@ -1236,13 +1237,16 @@ suite('Setup Test Suite', () => {
         })
       )
 
-      void commands.executeCommand(RegisteredCommands.SET_STUDIO_URL)
+      void commands.executeCommand(RegisteredCommands.ADD_STUDIO_URL)
       await inputEvent
 
       expect(mockInputBox).to.be.calledWithMatch({
         title: Title.ENTER_STUDIO_URL
       })
-      expect(saveStudioUrlSpy).not.to.be.called
+      expect(
+        saveStudioUrlSpy,
+        'should not be called when the user does not submit a url'
+      ).not.to.be.called
 
       mockInputBox.onSecondCall().resolves(mockUrl)
       const dataSent = new Promise(resolve =>
@@ -1253,7 +1257,7 @@ suite('Setup Test Suite', () => {
         })
       )
 
-      void commands.executeCommand(RegisteredCommands.SET_STUDIO_URL)
+      void commands.executeCommand(RegisteredCommands.ADD_STUDIO_URL)
       await dataSent
 
       expect(mockInputBox).to.be.calledWithMatch({
