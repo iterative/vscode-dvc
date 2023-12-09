@@ -395,6 +395,7 @@ suite('Setup Test Suite', () => {
         pythonBinPath: undefined,
         remoteList: undefined,
         sectionCollapsed: undefined,
+        selfHostedStudioUrl: null,
         shareLiveToStudio: false
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
@@ -441,6 +442,7 @@ suite('Setup Test Suite', () => {
         pythonBinPath: undefined,
         remoteList: undefined,
         sectionCollapsed: undefined,
+        selfHostedStudioUrl: null,
         shareLiveToStudio: true
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
@@ -495,6 +497,7 @@ suite('Setup Test Suite', () => {
         pythonBinPath: undefined,
         remoteList: undefined,
         sectionCollapsed: undefined,
+        selfHostedStudioUrl: null,
         shareLiveToStudio: true
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
@@ -549,6 +552,7 @@ suite('Setup Test Suite', () => {
         pythonBinPath: undefined,
         remoteList: { [dvcDemoPath]: undefined },
         sectionCollapsed: undefined,
+        selfHostedStudioUrl: null,
         shareLiveToStudio: true
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
@@ -1331,6 +1335,72 @@ suite('Setup Test Suite', () => {
         ConfigKey.STUDIO_URL
       )
     })
+
+    it("should handle a message from the webview to update the user's self hosted url", async () => {
+      const { setup, mockExecuteCommand } = buildSetup({
+        disposer: disposable
+      })
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub(Setup.prototype as any, 'getCliCompatible').returns(true)
+
+      mockExecuteCommand.restore()
+      const executeCommandSpy = spy(commands, 'executeCommand')
+
+      const webview = await setup.showWebview()
+      await webview.isReady()
+
+      const inputEvent = new Promise(resolve =>
+        stub(window, 'showInputBox').callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(undefined)
+        })
+      )
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.SAVE_STUDIO_URL
+      })
+
+      await inputEvent
+
+      expect(executeCommandSpy).to.be.calledWithExactly(
+        RegisteredCommands.UPDATE_STUDIO_URL
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it("should handle a message from the webview to remove the user's self hosted url", async () => {
+      const { setup, mockExecuteCommand } = buildSetup({
+        disposer: disposable
+      })
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub(Setup.prototype as any, 'getCliCompatible').returns(true)
+
+      mockExecuteCommand.restore()
+      const executeCommandSpy = spy(commands, 'executeCommand')
+
+      const webview = await setup.showWebview()
+      await webview.isReady()
+
+      const configCalled = new Promise(resolve =>
+        stub(DvcConfig.prototype, 'config').callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(undefined)
+        })
+      )
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.REMOVE_STUDIO_URL
+      })
+
+      await configCalled
+
+      expect(executeCommandSpy).to.be.calledWithExactly(
+        RegisteredCommands.REMOVE_STUDIO_URL
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should check if experiments and dvc are setup', async () => {
       const { setup } = buildSetup({
