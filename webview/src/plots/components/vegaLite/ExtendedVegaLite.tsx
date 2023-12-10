@@ -13,7 +13,8 @@ export const ExtendedVegaLite = ({
   id,
   parentRef,
   onNewView,
-  section
+  section,
+  focused = false
 }: {
   actions:
     | false
@@ -23,12 +24,13 @@ export const ExtendedVegaLite = ({
         export: false
         source: false
       }
+  focused?: boolean
   id: string
   parentRef: React.RefObject<HTMLDivElement | HTMLButtonElement>
   onNewView: (view: View) => void
   section: PlotsSection
 }) => {
-  const spec = useGetPlot(section, id, parentRef)
+  const spec = useGetPlot(section, id, parentRef, focused)
 
   const vegaLiteProps: VegaLiteProps = {
     actions,

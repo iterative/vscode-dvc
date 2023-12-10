@@ -105,6 +105,7 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
         onNewView={onNewView}
         parentRef={zoomedInPlotRef}
         section={section}
+        focused={true}
       />
     </div>
   )
