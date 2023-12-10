@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### 🚀 New Features and Enhancements
 
+- Bump min DVC version to 3.33.0 (standardise plots across products) [#4734](https://github.com/iterative/vscode-dvc/pull/4734) by [@mattseddon](https://github.com/mattseddon)
 - Add commands for updating `studio.url` in DVC configuration [#5072](https://github.com/iterative/vscode-dvc/pull/5072) by [@julieg18](https://github.com/julieg18)
 
 ### 🐛 Bug Fixes
