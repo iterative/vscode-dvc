@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0] - 2023-12-10
+
+### 🚀 New Features and Enhancements
+
+- Bump min DVC version to 3.33.0 (standardise plots across products) [#4734](https://github.com/iterative/vscode-dvc/pull/4734) by [@mattseddon](https://github.com/mattseddon)
+- Add commands for updating `studio.url` in DVC configuration [#5072](https://github.com/iterative/vscode-dvc/pull/5072) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Fix scheduled CLI output test (<DVC_METRIC_DATA> is an array) [#5074](https://github.com/iterative/vscode-dvc/pull/5074) by [@mattseddon](https://github.com/mattseddon)
+- Bump min version of VS Code to 1.75.0 [#5084](https://github.com/iterative/vscode-dvc/pull/5084) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (3.31.2) [#5063](https://github.com/iterative/vscode-dvc/pull/5063) by [@julieg18](https://github.com/julieg18)
+- Get studio url from dvc config  [#5061](https://github.com/iterative/vscode-dvc/pull/5061) by [@julieg18](https://github.com/julieg18)
+- Update demo project and latest tested CLI version (3.32.0)  [#5073](https://github.com/iterative/vscode-dvc/pull/5073) by [@julieg18](https://github.com/julieg18)
+- Cancel Studio Token Request after five minutes [#5071](https://github.com/iterative/vscode-dvc/pull/5071) by [@julieg18](https://github.com/julieg18)
+- Use signal API to simplify using the smooth slider [#5077](https://github.com/iterative/vscode-dvc/pull/5077) by [@sroy3](https://github.com/sroy3)
+- Fix flaky cancel token request test [#5079](https://github.com/iterative/vscode-dvc/pull/5079) by [@mattseddon](https://github.com/mattseddon)
+- Move e2e tests to stable [#5082](https://github.com/iterative/vscode-dvc/pull/5082) by [@julieg18](https://github.com/julieg18)
+- Bump min version of DVC to 3.33.3 (umask error in dvc_objects) [#5078](https://github.com/iterative/vscode-dvc/pull/5078) by [@mattseddon](https://github.com/mattseddon)
+- Use resize observer to simplify use get plot [#5085](https://github.com/iterative/vscode-dvc/pull/5085) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.1.18] - 2023-12-01
 
 ### 🚀 New Features and Enhancements

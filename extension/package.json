@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "1.1.18",
+  "version": "1.2.0",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -39,7 +39,7 @@
     "theme": "dark"
   },
   "engines": {
-    "vscode": "^1.64.0",
+    "vscode": "^1.75.0",
     "node": ">=16.13.0"
   },
   "activationEvents": [
@@ -1778,7 +1778,7 @@
     "@types/sinon-chai": "3.2.12",
     "@types/uuid": "9.0.7",
     "@types/vega": "3.2.0",
-    "@types/vscode": "1.64.0",
+    "@types/vscode": "1.75.0",
     "@vscode/test-electron": "2.3.8",
     "@vscode/vsce": "2.22.0",
     "@wdio/cli": "8.16.7",
