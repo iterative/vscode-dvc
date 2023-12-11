@@ -7,6 +7,7 @@ import React, {
 } from 'react'
 import cx from 'classnames'
 import { useDispatch, useSelector } from 'react-redux'
+import { useDeferredDragLeave } from './useDeferredDragLeave'
 import {
   DragEnterDirection,
   getDragEnterDirection,
@@ -14,7 +15,6 @@ import {
   isExactGroup,
   isSameGroup
 } from '../components/dragDrop/util'
-import { useDeferredDragLeave } from './useDeferredDragLeave'
 import { PlotsState } from '../../plots/store'
 import {
   changeRef,
@@ -28,7 +28,7 @@ import { getStyleProperty } from '../../util/styles'
 import { DropTarget } from '../components/dragDrop/DropTarget'
 import styles from '../components/dragDrop/styles.module.scss'
 
-export type OnDrop = (
+type OnDrop = (
   draggedId: string,
   draggedGroup: string,
   groupId: string,
@@ -83,7 +83,7 @@ export const useDragAndDrop = ({
   isParentDraggedOver,
   style,
   dropTarget,
-  type
+  type // eslint-disable-next-line sonarjs/cognitive-complexity
 }: DragAndDropProps) => {
   const [isDragged, setIsDragged] = useState(false)
 
@@ -113,7 +113,7 @@ export const useDragAndDrop = ({
     setIsDragged(false)
     dispatch(setDirection(undefined))
     dispatch(changeRef(undefined))
-  }, [setIsDraggedOver, immediateDragLeave, dispatch])
+  }, [immediateDragLeave, dispatch])
 
   const handleDragStart = (e: DragEvent<HTMLElement>) => {
     const defaultDragEnterDirection = vertical
@@ -152,13 +152,11 @@ export const useDragAndDrop = ({
   const handleDragEnter = (e: DragEvent<HTMLElement>) => {
     immediateDragEnter()
 
-    if (isSameGroup(draggedRef?.group, group)) {
-      if (!isDisabled && !isDropTarget) {
-        setIsDraggedOver(true)
-        setIsDraggedOver(true)
-        dispatch(setDirection(getDragEnterDirection(e, vertical)))
-        dispatch(setDraggedOverGroup(group))
-      }
+    if (isSameGroup(draggedRef?.group, group) && !isDisabled && !isDropTarget) {
+      setIsDraggedOver(true)
+      setIsDraggedOver(true)
+      dispatch(setDirection(getDragEnterDirection(e, vertical)))
+      dispatch(setDraggedOverGroup(group))
     }
   }
 
@@ -260,17 +258,17 @@ export const useDragAndDrop = ({
   )
 
   return {
-    onDragStart: handleDragStart,
+    draggable: !disabledDropIds.includes(id),
+    isAfter,
     onDragEnd: handleDragEnd,
     onDragEnter: handleDragEnter,
-    onDragOver: handleDragOver,
     onDragLeave: handleDragLeave,
+    onDragOver: handleDragOver,
+    onDragStart: handleDragStart,
     onDrop: handleOnDrop,
-    draggable: !disabledDropIds.includes(id),
     style:
       (!shouldShowOnDrag && isDragged && { ...style, display: 'none' }) ||
       style,
-    isAfter,
     target
   }
 }

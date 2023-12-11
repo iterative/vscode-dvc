@@ -61,7 +61,7 @@ module.exports = {
             cases: {
               pascalCase: true
             },
-            ignore: [/.*\.stories.tsx$/, /.*\.test\.tsx$/]
+            ignore: [/.*\.stories.tsx$/, /.*\.test\.tsx$/, /.*use.*\.tsx$/]
           }
         ]
       }

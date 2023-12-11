@@ -9,7 +9,7 @@ export type BaseType =
   | undefined
   | null
 
-export type Any = BaseType | BaseType[]
+type Any = BaseType | BaseType[]
 
 type Obj = { [key: string]: Any }
 

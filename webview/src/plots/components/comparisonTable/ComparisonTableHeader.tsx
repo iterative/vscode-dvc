@@ -1,15 +1,15 @@
 import cx from 'classnames'
+import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import React, { MouseEvent } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import styles from './styles.module.scss'
+import { DropTarget } from './DropTarget'
+import { changeDragAndDropMode } from '../util'
+import { PlotsState } from '../../store'
+import { useDragAndDrop } from '../../../shared/hooks/useDragAndDrop'
 import { Pinned } from '../../../shared/components/icons'
 import { GripIcon } from '../../../shared/components/dragDrop/GripIcon'
-import { changeDragAndDropMode } from '../util'
-import { PlotsSection } from 'dvc/src/plots/webview/contract'
-import { useDispatch, useSelector } from 'react-redux'
-import { useDragAndDrop } from '../../../shared/hooks/useDragAndDrop'
-import { DropTarget } from './DropTarget'
 import { ThemeProperty, getThemeValue } from '../../../util/styles'
-import { PlotsState } from '../../store'
 import { DragDropItemWithTarget } from '../../../shared/components/dragDrop/DragDropItemWithTarget'
 
 export interface ComparisonTableHeaderProps {
@@ -39,19 +39,19 @@ export const ComparisonTableHeader: React.FC<ComparisonTableHeaderProps> = ({
     (state: PlotsState) => state.comparison.isInDragAndDropMode
   )
   const { isAfter, target, ...dragAndDropProps } = useDragAndDrop({
-    id,
-    group: 'comparison',
-    dropTarget: <DropTarget />,
-    order,
-    setOrder,
     disabledDropIds: pinnedColumn ? [pinnedColumn] : [],
-    onDragEnd: () =>
-      changeDragAndDropMode(PlotsSection.COMPARISON_TABLE, dispatch, true),
-    shouldShowOnDrag: true,
+    dropTarget: <DropTarget />,
     ghostElemStyle: {
       backgroundColor: getThemeValue(ThemeProperty.ACCENT_COLOR),
       color: getThemeValue(ThemeProperty.BACKGROUND_COLOR)
     },
+    group: 'comparison',
+    id,
+    onDragEnd: () =>
+      changeDragAndDropMode(PlotsSection.COMPARISON_TABLE, dispatch, true),
+    order,
+    setOrder,
+    shouldShowOnDrag: true,
     type: <div />
   })
   const isPinned = id === pinnedColumn
@@ -61,13 +61,6 @@ export const ComparisonTableHeader: React.FC<ComparisonTableHeaderProps> = ({
   })
 
   const headerProps = isInDragAndDropMode ? dragAndDropProps : {}
-
-  const handleEndOfDragAndDrop = () => {
-    // This makes sure every onDrop and onDragEnd events have been called before switching to normal mode
-    window.setTimeout(() => {
-      changeDragAndDropMode(PlotsSection.COMPARISON_TABLE, dispatch, true)
-    }, 100)
-  }
 
   return (
     <th

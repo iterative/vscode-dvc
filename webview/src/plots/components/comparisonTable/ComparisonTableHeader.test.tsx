@@ -13,10 +13,10 @@ describe('ComparisonTableHeader', () => {
 
   const basicProps: ComparisonTableHeaderProps = {
     displayColor: '#ffffff',
-    pinnedColumn: undefined,
-    onClicked: jest.fn(),
     id: 'id',
+    onClicked: jest.fn(),
     order: [],
+    pinnedColumn: undefined,
     setOrder: jest.fn()
   }
   const headerContent = 'ComparisonTableHeader'

@@ -4,12 +4,12 @@ import { useDispatch } from 'react-redux'
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import styles from './styles.module.scss'
 import { changeDragAndDropMode } from './util'
+import { DropTarget } from './DropTarget'
 import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
 import { Icon } from '../../shared/components/Icon'
 import { GraphLine } from '../../shared/components/icons'
 import { withScale } from '../../util/styles'
 import { useDragAndDrop } from '../../shared/hooks/useDragAndDrop'
-import { DropTarget } from './DropTarget'
 import { useGetTitles } from '../hooks/useGetTitles'
 import { DragDropItemWithTarget } from '../../shared/components/dragDrop/DragDropItemWithTarget'
 
@@ -44,13 +44,13 @@ export const DragAndDropPlot: React.FC<DragAndDropPlotProps> = ({
   }
 
   const { isAfter, target, ...dragAndDropProps } = useDragAndDrop({
+    dropTarget: <DropTarget />,
+    group,
     id: plot,
+    isParentDraggedOver,
     onDragEnd: handleDragEnd,
     order,
     setOrder,
-    group,
-    dropTarget: <DropTarget />,
-    isParentDraggedOver,
     style: withScale(colSpan)
   })
 

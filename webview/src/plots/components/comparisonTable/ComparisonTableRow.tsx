@@ -11,6 +11,7 @@ import { useSelector } from 'react-redux'
 import styles from './styles.module.scss'
 import { ComparisonTableCell } from './cell/ComparisonTableCell'
 import { ComparisonTableMultiCell } from './cell/ComparisonTableMultiCell'
+import { RowDropTarget } from './RowDropTarget'
 import { Icon } from '../../../shared/components/Icon'
 import { ChevronDown, ChevronRight } from '../../../shared/components/icons'
 import { PlotsState } from '../../store'
@@ -20,7 +21,6 @@ import Tooltip, {
   NORMAL_TOOLTIP_DELAY
 } from '../../../shared/components/tooltip/Tooltip'
 import { useDragAndDrop } from '../../../shared/hooks/useDragAndDrop'
-import { RowDropTarget } from './RowDropTarget'
 import { DragDropItemWithTarget } from '../../../shared/components/dragDrop/DragDropItemWithTarget'
 
 export interface ComparisonTableRowProps {
@@ -56,15 +56,15 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
   )
   const [isShown, setIsShown] = useState(true)
   const { target, isAfter, ...dragAndDropProps } = useDragAndDrop({
-    id: path,
-    group: 'comparison-table',
+    disabledDropIds: [],
     dropTarget: <RowDropTarget colSpan={nbColumns} />,
+    group: 'comparison-table',
+    id: path,
+    onDragEnd: () => {},
     order,
     setOrder,
-    disabledDropIds: [],
-    onDragEnd: () => {},
-    vertical: true,
-    type: <tbody />
+    type: <tbody />,
+    vertical: true
   })
 
   useLayoutEffect(() => {
@@ -108,7 +108,6 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
       { once: true }
     )
   }, [comparisonWidth])
-  console.log(path, !!target)
 
   return (
     <DragDropItemWithTarget

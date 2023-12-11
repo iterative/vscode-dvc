@@ -25,11 +25,11 @@ export interface DragDropState {
 }
 
 export const dragDropInitialState: DragDropState = {
-  draggedOverGroup: '',
-  draggedRef: undefined,
-  groups: {},
   direction: undefined,
-  draggedOverId: undefined
+  draggedOverGroup: '',
+  draggedOverId: undefined,
+  draggedRef: undefined,
+  groups: {}
 }
 
 export const dragDropSlice = createSlice({
@@ -42,6 +42,15 @@ export const dragDropSlice = createSlice({
         draggedRef: action.payload
       }
     },
+    setDirection: (
+      state,
+      action: PayloadAction<DragEnterDirection | undefined>
+    ) => {
+      return {
+        ...state,
+        direction: action.payload
+      }
+    },
     setDraggedOverGroup: (state, action: PayloadAction<string>) => {
       return {
         ...state,
@@ -52,15 +61,6 @@ export const dragDropSlice = createSlice({
       return {
         ...state,
         draggedOverId: action.payload
-      }
-    },
-    setDirection: (
-      state,
-      action: PayloadAction<DragEnterDirection | undefined>
-    ) => {
-      return {
-        ...state,
-        direction: action.payload
       }
     },
     setGroup: (
