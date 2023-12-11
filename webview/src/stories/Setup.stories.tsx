@@ -100,6 +100,11 @@ CompletedConnected.args = getUpdatedArgs({
   shareLiveToStudio: true
 })
 
+export const WithSelfHostedStudioUrl = Template.bind({})
+WithSelfHostedStudioUrl.args = getUpdatedArgs({
+  selfHostedStudioUrl: 'https://studio.example.com'
+})
+
 export const CLIPythonNotFound = Template.bind({})
 CLIPythonNotFound.args = getUpdatedArgs({
   cliCompatible: undefined,
