@@ -19,7 +19,8 @@ import { PlotsState } from '../../plots/store'
 import {
   changeRef,
   setDirection,
-  setDraggedOverGroup
+  setDraggedOverGroup,
+  setDraggedOverId
 } from '../components/dragDrop/dragDropSlice'
 import { getIDIndex } from '../../util/ids'
 import { idToNode } from '../../util/helpers'
@@ -39,7 +40,7 @@ interface DragAndDropProps {
   disabledDropIds?: string[]
   shouldShowOnDrag?: boolean
   onDrop?: OnDrop
-  onDragEnd: () => void
+  onDragEnd?: () => void
   order: string[]
   setOrder: (order: string[]) => void
   group: string
@@ -47,7 +48,6 @@ interface DragAndDropProps {
   ghostElemStyle?: CSSProperties
   isParentDraggedOver?: boolean
   vertical?: boolean
-  onLayoutChange?: () => void
   style?: CSSProperties
   type?: JSX.Element
 }
@@ -85,7 +85,6 @@ export const useDragAndDrop = ({
   dropTarget,
   type
 }: DragAndDropProps) => {
-  const [isDraggedOver, setIsDraggedOver] = useState(false)
   const [isDragged, setIsDragged] = useState(false)
 
   const {
@@ -94,27 +93,26 @@ export const useDragAndDrop = ({
     immediateDragEnter,
     deferredDragLeave
   } = useDeferredDragLeave()
-  const { draggedRef, draggedOverGroup, direction } = useSelector(
-    (state: PlotsState) => state.dragAndDrop
-  )
+  const { draggedRef, draggedOverGroup, direction, draggedOverId } =
+    useSelector((state: PlotsState) => state.dragAndDrop)
   const draggedOverIdTimeout = useRef<number>(0)
-  const pickedUp = useRef<boolean>(false)
 
   const dispatch = useDispatch()
 
   const isDropTarget = id.includes('__drop')
   const isDisabled = disabledDropIds.includes(id)
 
+  const isDraggedOver = draggedOverId === id
+  const setIsDraggedOver = (isDraggedOver: boolean) =>
+    isDraggedOver && dispatch(setDraggedOverId(id))
+
   const cleanup = useCallback(() => {
     immediateDragLeave()
 
-    if (pickedUp.current) {
-      setIsDraggedOver(false)
-      setIsDragged(false)
-      dispatch(setDirection(undefined))
-      pickedUp.current = false
-      dispatch(changeRef(undefined))
-    }
+    dispatch(setDraggedOverId(undefined))
+    setIsDragged(false)
+    dispatch(setDirection(undefined))
+    dispatch(changeRef(undefined))
   }, [setIsDraggedOver, immediateDragLeave, dispatch])
 
   const handleDragStart = (e: DragEvent<HTMLElement>) => {
@@ -156,6 +154,7 @@ export const useDragAndDrop = ({
 
     if (isSameGroup(draggedRef?.group, group)) {
       if (!isDisabled && !isDropTarget) {
+        setIsDraggedOver(true)
         setIsDraggedOver(true)
         dispatch(setDirection(getDragEnterDirection(e, vertical)))
         dispatch(setDraggedOverGroup(group))
@@ -233,6 +232,7 @@ export const useDragAndDrop = ({
 
   const isBeingDraggedOver =
     isDraggedOver && (hoveringSomething || !isParentDraggedOver)
+
   const hasTarget =
     isBeingDraggedOver &&
     isExactGroup(draggedOverGroup, draggedRef?.group, group)

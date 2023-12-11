@@ -10,8 +10,8 @@ import { GraphLine } from '../../shared/components/icons'
 import { withScale } from '../../util/styles'
 import { useDragAndDrop } from '../../shared/hooks/useDragAndDrop'
 import { DropTarget } from './DropTarget'
-import { DragAndDropPlotWrapper } from './DragAndDropPlotWrapper'
 import { useGetTitles } from '../hooks/useGetTitles'
+import { DragDropItemWithTarget } from '../../shared/components/dragDrop/DragDropItemWithTarget'
 
 interface DragAndDropPlotProps extends HTMLAttributes<HTMLDivElement> {
   plot: string
@@ -68,7 +68,11 @@ export const DragAndDropPlot: React.FC<DragAndDropPlotProps> = ({
   }
 
   return (
-    <DragAndDropPlotWrapper isAfter={isAfter} target={target || null}>
+    <DragDropItemWithTarget
+      isAfter={isAfter}
+      dropTarget={target || null}
+      draggable={<div />}
+    >
       <div {...props} {...dragAndDropProps}>
         {
           // eslint-disable-next-line jsx-a11y/no-static-element-interactions
@@ -89,6 +93,6 @@ export const DragAndDropPlot: React.FC<DragAndDropPlotProps> = ({
           />
         </div>
       </div>
-    </DragAndDropPlotWrapper>
+    </DragDropItemWithTarget>
   )
 }

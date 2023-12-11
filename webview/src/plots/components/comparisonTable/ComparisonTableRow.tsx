@@ -1,5 +1,11 @@
 import { ComparisonPlot } from 'dvc/src/plots/webview/contract'
-import React, { useState, useEffect, useRef } from 'react'
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  Fragment,
+  useLayoutEffect
+} from 'react'
 import cx from 'classnames'
 import { useSelector } from 'react-redux'
 import styles from './styles.module.scss'
@@ -15,6 +21,7 @@ import Tooltip, {
 } from '../../../shared/components/tooltip/Tooltip'
 import { useDragAndDrop } from '../../../shared/hooks/useDragAndDrop'
 import { RowDropTarget } from './RowDropTarget'
+import { DragDropItemWithTarget } from '../../../shared/components/dragDrop/DragDropItemWithTarget'
 
 export interface ComparisonTableRowProps {
   path: string
@@ -44,8 +51,8 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
   const comparisonWidth = useSelector(
     (state: PlotsState) => state.comparison.width
   )
-  const disabledDragPlotIds = useSelector(
-    (state: PlotsState) => state.comparison.disabledDragPlotIds
+  const { isInDragAndDropMode } = useSelector(
+    (state: PlotsState) => state.comparison
   )
   const [isShown, setIsShown] = useState(true)
   const { target, isAfter, ...dragAndDropProps } = useDragAndDrop({
@@ -54,10 +61,14 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
     dropTarget: <RowDropTarget colSpan={nbColumns} />,
     order,
     setOrder,
-    disabledDropIds: disabledDragPlotIds,
+    disabledDropIds: [],
     onDragEnd: () => {},
     vertical: true,
-    onLayoutChange
+    type: <tbody />
+  })
+
+  useLayoutEffect(() => {
+    onLayoutChange?.()
   })
 
   const toggleIsShownState = () => {
@@ -97,61 +108,72 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
       { once: true }
     )
   }, [comparisonWidth])
+  console.log(path, !!target)
 
   return (
-    <tbody
-      {...dragAndDropProps}
-      data-testid="comparison-table-body"
-      key={path}
-      id={path}
-      ref={bodyRef}
+    <DragDropItemWithTarget
+      isAfter={isAfter}
+      dropTarget={target || null}
+      draggable={<Fragment />}
     >
-      <tr>
-        <td
-          className={cx({ [styles.pinnedColumnCell]: pinnedColumn })}
-          colSpan={pinnedColumn ? 1 : nbColumns}
-        >
-          <div className={styles.rowPath}>
-            <button className={styles.rowToggler} onClick={toggleIsShownState}>
-              <Icon icon={isShown ? ChevronDown : ChevronRight} />
-              <Tooltip
-                content={path}
-                placement="bottom-start"
-                delay={NORMAL_TOOLTIP_DELAY}
+      <tbody
+        {...dragAndDropProps}
+        data-testid="comparison-table-body"
+        key={path}
+        id={path}
+        ref={bodyRef}
+      >
+        <tr>
+          <td
+            className={cx({ [styles.pinnedColumnCell]: pinnedColumn })}
+            colSpan={pinnedColumn ? 1 : nbColumns}
+          >
+            <div className={styles.rowPath}>
+              <button
+                className={styles.rowToggler}
+                onClick={toggleIsShownState}
               >
-                <span className={styles.pathText}>{path}</span>
-              </Tooltip>
-            </button>
-            <CopyButton value={path} className={styles.copyButton} />
-          </div>
-        </td>
-        {nbColumns > 1 && pinnedColumn && <td colSpan={nbColumns - 1}></td>}
-      </tr>
-      <tr ref={plotsRowRef}>
-        {plots.map(plot => {
-          const isPinned = pinnedColumn === plot.id
-          return (
-            <td
-              key={path + plot.id}
-              className={cx({
-                [styles.pinnedColumnCell]: isPinned,
-                [styles.draggedColumn]: draggedId === plot.id
-              })}
-            >
-              <div
-                data-testid="row-images"
-                className={cx(styles.cell, { [styles.cellHidden]: !isShown })}
+                <Icon icon={isShown ? ChevronDown : ChevronRight} />
+                <Tooltip
+                  content={path}
+                  placement="bottom-start"
+                  delay={NORMAL_TOOLTIP_DELAY}
+                >
+                  <span className={styles.pathText}>{path}</span>
+                </Tooltip>
+              </button>
+              <CopyButton value={path} className={styles.copyButton} />
+            </div>
+          </td>
+          {nbColumns > 1 && pinnedColumn && <td colSpan={nbColumns - 1}></td>}
+        </tr>
+        <tr ref={plotsRowRef}>
+          {plots.map(plot => {
+            const isPinned = pinnedColumn === plot.id
+            return (
+              <td
+                key={path + plot.id}
+                className={cx({
+                  [styles.pinnedColumnCell]: isPinned,
+                  [styles.draggedColumn]:
+                    isInDragAndDropMode && draggedId === plot.id
+                })}
               >
-                {plot.imgs.length > 1 ? (
-                  <ComparisonTableMultiCell plot={plot} path={path} />
-                ) : (
-                  <ComparisonTableCell plot={plot} path={path} />
-                )}
-              </div>
-            </td>
-          )
-        })}
-      </tr>
-    </tbody>
+                <div
+                  data-testid="row-images"
+                  className={cx(styles.cell, { [styles.cellHidden]: !isShown })}
+                >
+                  {plot.imgs.length > 1 ? (
+                    <ComparisonTableMultiCell plot={plot} path={path} />
+                  ) : (
+                    <ComparisonTableCell plot={plot} path={path} />
+                  )}
+                </div>
+              </td>
+            )
+          })}
+        </tr>
+      </tbody>
+    </DragDropItemWithTarget>
   )
 }

@@ -10,6 +10,7 @@ import { useDragAndDrop } from '../../../shared/hooks/useDragAndDrop'
 import { DropTarget } from './DropTarget'
 import { ThemeProperty, getThemeValue } from '../../../util/styles'
 import { PlotsState } from '../../store'
+import { DragDropItemWithTarget } from '../../../shared/components/dragDrop/DragDropItemWithTarget'
 
 export interface ComparisonTableHeaderProps {
   displayColor: string
@@ -37,7 +38,7 @@ export const ComparisonTableHeader: React.FC<ComparisonTableHeaderProps> = ({
   const isInDragAndDropMode = useSelector(
     (state: PlotsState) => state.comparison.isInDragAndDropMode
   )
-  const { ...dragAndDropProps } = useDragAndDrop({
+  const { isAfter, target, ...dragAndDropProps } = useDragAndDrop({
     id,
     group: 'comparison',
     dropTarget: <DropTarget />,
@@ -50,7 +51,8 @@ export const ComparisonTableHeader: React.FC<ComparisonTableHeaderProps> = ({
     ghostElemStyle: {
       backgroundColor: getThemeValue(ThemeProperty.ACCENT_COLOR),
       color: getThemeValue(ThemeProperty.BACKGROUND_COLOR)
-    }
+    },
+    type: <div />
   })
   const isPinned = id === pinnedColumn
 
@@ -60,40 +62,53 @@ export const ComparisonTableHeader: React.FC<ComparisonTableHeaderProps> = ({
 
   const headerProps = isInDragAndDropMode ? dragAndDropProps : {}
 
+  const handleEndOfDragAndDrop = () => {
+    // This makes sure every onDrop and onDragEnd events have been called before switching to normal mode
+    window.setTimeout(() => {
+      changeDragAndDropMode(PlotsSection.COMPARISON_TABLE, dispatch, true)
+    }, 100)
+  }
+
   return (
     <th
       id={id}
       className={cx(styles.comparisonTableHeader, {
         [styles.pinnedColumnHeader]: isPinned,
-        [styles.draggedColumn]: draggedId === id
+        [styles.draggedColumn]: isInDragAndDropMode && draggedId === id
       })}
       onMouseDown={() =>
         changeDragAndDropMode(PlotsSection.COMPARISON_TABLE, dispatch, false)
       }
       {...headerProps}
     >
-      <div
-        className={styles.header}
-        data-testid={`${
-          children?.toString().split(',')[0] || 'no-children'
-        }-header`}
+      <DragDropItemWithTarget
+        isAfter={isAfter}
+        dropTarget={(isInDragAndDropMode && target) || null}
+        draggable={<th />}
       >
-        {!isPinned && <GripIcon className={styles.gripIcon} />}
-        <button
-          className={pinClasses}
-          onMouseDown={(e: MouseEvent<HTMLButtonElement>) =>
-            e.stopPropagation()
-          }
-          onClick={onClicked}
+        <div
+          className={styles.header}
+          data-testid={`${
+            children?.toString().split(',')[0] || 'no-children'
+          }-header`}
         >
-          <Pinned />
-        </button>
-        <span
-          className={styles.bullet}
-          style={{ backgroundColor: displayColor }}
-        />
-        <span className={styles.headerText}>{children}</span>
-      </div>
+          {!isPinned && <GripIcon className={styles.gripIcon} />}
+          <button
+            className={pinClasses}
+            onMouseDown={(e: MouseEvent<HTMLButtonElement>) =>
+              e.stopPropagation()
+            }
+            onClick={onClicked}
+          >
+            <Pinned />
+          </button>
+          <span
+            className={styles.bullet}
+            style={{ backgroundColor: displayColor }}
+          />
+          <span className={styles.headerText}>{children}</span>
+        </div>
+      </DragDropItemWithTarget>
     </th>
   )
 }
