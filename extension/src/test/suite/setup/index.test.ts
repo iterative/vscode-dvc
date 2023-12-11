@@ -1344,27 +1344,25 @@ suite('Setup Test Suite', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       stub(Setup.prototype as any, 'getCliCompatible').returns(true)
 
-      mockExecuteCommand.restore()
-      const executeCommandSpy = spy(commands, 'executeCommand')
-
       const webview = await setup.showWebview()
       await webview.isReady()
 
-      const inputEvent = new Promise(resolve =>
-        stub(window, 'showInputBox').callsFake(() => {
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      const commandCalled = new Promise(resolve =>
+        mockExecuteCommand.callsFake(() => {
           resolve(undefined)
           return Promise.resolve(undefined)
         })
       )
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       mockMessageReceived.fire({
         type: MessageFromWebviewType.SAVE_STUDIO_URL
       })
 
-      await inputEvent
+      await commandCalled
 
-      expect(executeCommandSpy).to.be.calledWithExactly(
+      expect(mockExecuteCommand).to.be.calledWithExactly(
         RegisteredCommands.UPDATE_STUDIO_URL
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
@@ -1377,28 +1375,26 @@ suite('Setup Test Suite', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       stub(Setup.prototype as any, 'getCliCompatible').returns(true)
 
-      mockExecuteCommand.restore()
-      const executeCommandSpy = spy(commands, 'executeCommand')
-
       const webview = await setup.showWebview()
       await webview.isReady()
 
-      const configCalled = new Promise(resolve =>
-        stub(DvcConfig.prototype, 'config').callsFake(() => {
+      const commandCalled = new Promise(resolve =>
+        mockExecuteCommand.callsFake(() => {
           resolve(undefined)
           return Promise.resolve(undefined)
         })
       )
+
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       mockMessageReceived.fire({
-        type: MessageFromWebviewType.REMOVE_STUDIO_URL
+        type: MessageFromWebviewType.SAVE_STUDIO_URL
       })
 
-      await configCalled
+      await commandCalled
 
-      expect(executeCommandSpy).to.be.calledWithExactly(
-        RegisteredCommands.REMOVE_STUDIO_URL
+      expect(mockExecuteCommand).to.be.calledWithExactly(
+        RegisteredCommands.UPDATE_STUDIO_URL
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
