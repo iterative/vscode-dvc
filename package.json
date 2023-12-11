@@ -34,8 +34,8 @@
     "svgr": "yarn workspace dvc-vscode-webview svgr"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "6.13.1",
-    "@typescript-eslint/parser": "6.13.1",
+    "@typescript-eslint/eslint-plugin": "6.13.2",
+    "@typescript-eslint/parser": "6.13.2",
     "@vscode/codicons": "0.0.35",
     "eslint": "8.55.0",
     "eslint-config-prettier": "9.1.0",
