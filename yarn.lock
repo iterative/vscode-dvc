@@ -18831,10 +18831,10 @@ react-lifecycles-compat@^3.0.4:
   resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz#4f1a273afdfc8f3488a8c516bfda78f872352362"
   integrity sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==
 
-react-redux@9.0.0:
-  version "9.0.0"
-  resolved "https://registry.yarnpkg.com/react-redux/-/react-redux-9.0.0.tgz#5d3a71926ddec69a5ae726587abb7a425f01ffd6"
-  integrity sha512-/X/wiza+G2IXbz1Ow9Gs5qK7KNdoEnzzsR7ne7jcOWJMBOx9wvraPZwFddCs84xqwilvYaoENHowQMiW0axbsQ==
+react-redux@9.0.1:
+  version "9.0.1"
+  resolved "https://registry.yarnpkg.com/react-redux/-/react-redux-9.0.1.tgz#bbdbdd55d5c3b0e996975269b7d6101b80487139"
+  integrity sha512-d+S89OqyChnY2J0O8wv8boRgnGo0tjvxkMLV78wx7h2ZyJvyeOQcBg4yrm7IxY36gxc63iOCfjjQAyhohKWJbA==
   dependencies:
     "@types/use-sync-external-store" "^0.0.3"
     use-sync-external-store "^1.0.0"
