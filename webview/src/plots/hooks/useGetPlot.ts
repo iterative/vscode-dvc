@@ -9,49 +9,44 @@ import { fillTemplate } from '../components/vegaLite/util'
 export const useGetPlot = (
   section: PlotsSection,
   id: string,
-  plotRef: RefObject<HTMLButtonElement | HTMLDivElement>,
+  parentRef: RefObject<HTMLButtonElement | HTMLDivElement>,
   plotFocused: boolean
-  // eslint-disable-next-line sonarjs/cognitive-complexity
 ): VisualizationSpec | undefined => {
   const storeSection =
     section === PlotsSection.TEMPLATE_PLOTS ? 'template' : 'custom'
-  const { plotsSnapshots } = useSelector(
-    (state: PlotsState) => state[storeSection]
-  )
+  const {
+    plotsSnapshots,
+    nbItemsPerRow,
+    height: plotHeight,
+    sectionHeight,
+    sectionWidth
+  } = useSelector((state: PlotsState) => state[storeSection])
 
   const [spec, setSpec] = useState<VisualizationSpec | undefined>()
 
-  const [height, setHeight] = useState(0)
-  const [width, setWidth] = useState(0)
-
   useEffect(() => {
-    const resizeObserver = new ResizeObserver(() => {
-      if (!plotRef.current) {
-        return
-      }
-      const { height, width } = plotRef.current.getBoundingClientRect()
-      setHeight(height)
-      setWidth(width)
-    })
-
-    if (plotRef.current) {
-      resizeObserver.observe(plotRef.current)
+    if (!parentRef.current) {
+      return
     }
-
-    return () => {
-      resizeObserver.disconnect()
-    }
-  }, [plotRef])
-
-  useEffect(() => {
     const plot = plotDataStore[section][id]
+    const { height, width } = parentRef.current.getBoundingClientRect()
 
     const spec = fillTemplate(plot, width, height, plotFocused)
     if (!spec) {
       return
     }
     setSpec(spec)
-  }, [height, id, plotFocused, plotsSnapshots, section, width])
+  }, [
+    id,
+    nbItemsPerRow,
+    parentRef,
+    plotFocused,
+    plotHeight,
+    plotsSnapshots,
+    section,
+    sectionHeight,
+    sectionWidth
+  ])
 
   return spec
 }
