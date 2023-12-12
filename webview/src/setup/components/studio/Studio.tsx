@@ -27,21 +27,25 @@ export const Studio: React.FC<{
     )
   }
 
-  const children = selfHostedStudioUrl && (
+  const children = (
     <DetailsTable testId="studio-url-details">
       <DetailsTableRow
         title="Self-Hosted Url"
-        text={selfHostedStudioUrl}
-        actions={[
-          {
-            onClick: saveStudioUrl,
-            text: 'Update'
-          },
-          {
-            onClick: removeStudioUrl,
-            text: 'Remove'
-          }
-        ]}
+        text={selfHostedStudioUrl || 'Not found'}
+        actions={
+          selfHostedStudioUrl
+            ? [
+                {
+                  onClick: saveStudioUrl,
+                  text: 'Update'
+                },
+                {
+                  onClick: removeStudioUrl,
+                  text: 'Remove'
+                }
+              ]
+            : [{ onClick: saveStudioUrl, text: 'Add Url' }]
+        }
       />
     </DetailsTable>
   )

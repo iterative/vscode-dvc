@@ -710,6 +710,31 @@ describe('App', () => {
         type: MessageFromWebviewType.REMOVE_STUDIO_URL
       })
     })
+
+    it('should show the self hosted url with "Not found" with an action to add one if the user has not set one', () => {
+      renderApp()
+
+      const urlDetails = screen.getByTestId('studio-url-details')
+
+      expect(
+        within(urlDetails).getByText('Self-Hosted Url:')
+      ).toBeInTheDocument()
+      expect(within(urlDetails).getByText('Not found')).toBeInTheDocument()
+
+      const addUrlBtn = within(urlDetails).getByText('Add Url')
+
+      expect(addUrlBtn).toBeInTheDocument()
+
+      mockPostMessage.mockClear()
+      fireEvent.click(addUrlBtn)
+
+      expect(mockPostMessage).toHaveBeenCalledTimes(1)
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.SAVE_STUDIO_URL
+      })
+
+      mockPostMessage.mockClear()
+    })
   })
 
   describe('Studio connected', () => {
@@ -756,7 +781,7 @@ describe('App', () => {
 
     it('should show the self hosted url with actions to change it if the user has set one', () => {
       const selfHostedUrl = 'https://studio.example.com'
-      renderApp({ selfHostedStudioUrl: selfHostedUrl })
+      renderApp({ isStudioConnected: true, selfHostedStudioUrl: selfHostedUrl })
 
       const urlDetails = screen.getByTestId('studio-url-details')
 
