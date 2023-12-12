@@ -75,7 +75,7 @@ describe('DvcConfig', () => {
       })
     })
 
-    it('should return undefined if the underlying process throws', async () => {
+    it('should return an error message if the underlying process throws', async () => {
       const cwd = __dirname
 
       mockedCreateProcess.mockImplementationOnce(() => {
@@ -83,7 +83,9 @@ describe('DvcConfig', () => {
       })
 
       const output = await dvcConfig.config(cwd, ConfigKey.STUDIO_OFFLINE)
-      expect(output).toStrictEqual(undefined)
+      expect(output).toStrictEqual(
+        'config studio.offline failed with unable to access DVC'
+      )
     })
   })
 

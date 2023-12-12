@@ -1,6 +1,7 @@
 import { DvcCli } from '.'
 import { Args, Command } from './constants'
 import { typeCheckCommands } from '..'
+import { MaybeConsoleError } from '../error'
 
 export const autoRegisteredCommands = {
   CONFIG: 'config',
@@ -28,6 +29,10 @@ export class DvcConfig extends DvcCli {
   ) {
     try {
       return await this.executeDvcProcess(cwd, command, ...args)
-    } catch {}
+    } catch (error: unknown) {
+      const message =
+        (error as MaybeConsoleError).stderr || (error as Error).message
+      return `${[command, ...args].join(' ')} failed with ${message}`
+    }
   }
 }
