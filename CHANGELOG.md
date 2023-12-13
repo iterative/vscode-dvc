@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.2] - 2023-12-13
+
+### 🚀 New Features and Enhancements
+
+- Add self-hosted url info in Studio setup section [#5089](https://github.com/iterative/vscode-dvc/pull/5089) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (3.33.4) [#5110](https://github.com/iterative/vscode-dvc/pull/5110) by [@julieg18](https://github.com/julieg18)
+
 ## [1.2.1] - 2023-12-13
 
 ### 🔨 Maintenance
