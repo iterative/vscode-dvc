@@ -58,6 +58,11 @@ export class Studio extends Disposable {
     return this.studioUrl
   }
 
+  public getSelfHostedStudioUrl() {
+    const url = this.getStudioUrl()
+    return url === DEFAULT_STUDIO_URL ? null : url
+  }
+
   public removeStudioAccessToken(dvcRoots: string[]) {
     return this.removeKeyFromConfig(dvcRoots, ConfigKey.STUDIO_TOKEN)
   }

@@ -22,6 +22,7 @@ export type SetupData = {
   pythonBinPath: string | undefined
   remoteList: RemoteList
   sectionCollapsed: typeof DEFAULT_SECTION_COLLAPSED | undefined
+  selfHostedStudioUrl: string | null
   shareLiveToStudio: boolean
   isAboveLatestTestedVersion: boolean | undefined
 }
