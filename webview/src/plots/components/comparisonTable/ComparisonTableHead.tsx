@@ -1,14 +1,9 @@
 import React, { createRef, useEffect } from 'react'
-import { PlotsSection, Revision } from 'dvc/src/plots/webview/contract'
-import cx from 'classnames'
-import { useDispatch, useSelector } from 'react-redux'
+import { Revision } from 'dvc/src/plots/webview/contract'
+import { useSelector } from 'react-redux'
 import styles from './styles.module.scss'
-import { DropTarget } from './DropTarget'
 import { ComparisonTableHeader } from './ComparisonTableHeader'
-import { DragDropContainer } from '../../../shared/components/dragDrop/DragDropContainer'
 import { PlotsState } from '../../store'
-import { getThemeValue, ThemeProperty } from '../../../util/styles'
-import { changeDragAndDropMode } from '../util'
 
 export type ComparisonTableColumn = Revision
 
@@ -32,13 +27,6 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
   setColumnsOrder,
   setPinnedColumn
 }) => {
-  const dispatch = useDispatch()
-  const draggedId = useSelector(
-    (state: PlotsState) => state.dragAndDrop.draggedRef?.itemId
-  )
-  const isInDragAndDropMode = useSelector(
-    (state: PlotsState) => state.comparison.isInDragAndDropMode
-  )
   const ribbonHeight = useSelector((state: PlotsState) => state.ribbon.height)
   const headRef = createRef<HTMLTableSectionElement>()
 
@@ -64,66 +52,28 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
 
   const items = columns.map(
     ({ label, id, displayColor, description, commit }) => {
-      const isPinned = label === pinnedColumn
       return (
-        <th
+        <ComparisonTableHeader
           key={id}
+          pinnedColumn={pinnedColumn}
+          onClicked={() => setPinnedColumn(id)}
+          displayColor={displayColor}
           id={id}
-          className={cx(styles.comparisonTableHeader, {
-            [styles.pinnedColumnHeader]: isPinned,
-            [styles.draggedColumn]: draggedId === id
-          })}
-          onMouseDown={() =>
-            changeDragAndDropMode(
-              PlotsSection.COMPARISON_TABLE,
-              dispatch,
-              false
-            )
-          }
+          order={columns.map(col => col.id)}
+          setOrder={setColumnsOrder}
         >
-          <ComparisonTableHeader
-            isPinned={isPinned}
-            onClicked={() => setPinnedColumn(id)}
-            displayColor={displayColor}
-          >
-            {label}
-            {!commit && description && (
-              <span className={styles.experimentName}>{description}</span>
-            )}
-          </ComparisonTableHeader>
-        </th>
+          {label}
+          {!commit && description && (
+            <span className={styles.experimentName}>{description}</span>
+          )}
+        </ComparisonTableHeader>
       )
     }
   )
 
   return (
     <thead data-testid="comparison-table-head" ref={headRef}>
-      <tr>
-        {isInDragAndDropMode ? (
-          <DragDropContainer
-            order={columns.map(col => col.id)}
-            setOrder={setColumnsOrder}
-            disabledDropIds={[pinnedColumn]}
-            items={items}
-            group="comparison"
-            dropTarget={<DropTarget />}
-            ghostElemStyle={{
-              backgroundColor: getThemeValue(ThemeProperty.ACCENT_COLOR),
-              color: getThemeValue(ThemeProperty.BACKGROUND_COLOR)
-            }}
-            onDragEnd={() =>
-              changeDragAndDropMode(
-                PlotsSection.COMPARISON_TABLE,
-                dispatch,
-                true
-              )
-            }
-            shouldShowOnDrag
-          />
-        ) : (
-          items
-        )}
-      </tr>
+      <tr>{items}</tr>
     </thead>
   )
 }

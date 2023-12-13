@@ -166,7 +166,10 @@ $gap: 20px;
 
   &:first-child {
     margin-top: 0;
-    margin-bottom: -30px;
+
+    &:empty {
+      margin-bottom: -30px;
+    }
   }
 }
 
