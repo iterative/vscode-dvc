@@ -5,12 +5,17 @@ import { Connect } from './Connect'
 import { Settings } from './Settings'
 import { SetupState } from '../../store'
 import { CliIncompatible } from '../shared/CliIncompatible'
+import { DetailsTable } from '../shared/DetailsTable'
+import { DetailsTableRow } from '../shared/DetailsTableRow'
+import { removeStudioUrl, saveStudioUrl } from '../../util/messages'
 
 export const Studio: React.FC<{
   cliCompatible: boolean
   setShareLiveToStudio: (shareLiveToStudio: boolean) => void
 }> = ({ cliCompatible, setShareLiveToStudio }) => {
-  const { isStudioConnected } = useSelector((state: SetupState) => state.studio)
+  const { isStudioConnected, selfHostedStudioUrl } = useSelector(
+    (state: SetupState) => state.studio
+  )
 
   if (!cliCompatible) {
     return (
@@ -22,9 +27,32 @@ export const Studio: React.FC<{
     )
   }
 
+  const children = (
+    <DetailsTable testId="studio-url-details">
+      <DetailsTableRow
+        title="Self-Hosted Url"
+        text={selfHostedStudioUrl || 'Not found'}
+        actions={
+          selfHostedStudioUrl
+            ? [
+                {
+                  onClick: saveStudioUrl,
+                  text: 'Update'
+                },
+                {
+                  onClick: removeStudioUrl,
+                  text: 'Remove'
+                }
+              ]
+            : [{ onClick: saveStudioUrl, text: 'Add Url' }]
+        }
+      />
+    </DetailsTable>
+  )
+
   return isStudioConnected ? (
-    <Settings setShareLiveToStudio={setShareLiveToStudio} />
+    <Settings setShareLiveToStudio={setShareLiveToStudio}>{children}</Settings>
   ) : (
-    <Connect />
+    <Connect>{children}</Connect>
   )
 }

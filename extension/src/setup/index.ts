@@ -437,6 +437,7 @@ export class Setup
       pythonBinPath: getBinDisplayText(pythonBinPath),
       remoteList,
       sectionCollapsed: collectSectionCollapsed(this.focusedSection),
+      selfHostedStudioUrl: this.studio.getSelfHostedStudioUrl(),
       shareLiveToStudio: !!this.studio.getShareLiveToStudio()
     })
     this.focusedSection = undefined

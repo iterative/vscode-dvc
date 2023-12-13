@@ -1,16 +1,17 @@
-import React from 'react'
+import React, { PropsWithChildren } from 'react'
 import { DEFAULT_STUDIO_URL } from 'dvc/src/setup/webview/contract'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { requestStudioToken, saveStudioToken } from '../../util/messages'
 import { Button } from '../../../shared/components/button/Button'
 
-export const Connect: React.FC = () => {
+export const Connect: React.FC<PropsWithChildren> = ({ children }) => {
   return (
     <EmptyState isFullScreen={false}>
       <div>
         <h1>
           Connect to <a href={DEFAULT_STUDIO_URL}>Studio</a>
         </h1>
+        {children}
         <p>
           Share experiments and plots with collaborators directly from your IDE.
           Start sending data with an{' '}
