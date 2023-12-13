@@ -33,6 +33,7 @@ import {
 import { updateRemoteList } from '../state/remoteSlice'
 import {
   updateIsStudioConnected,
+  updateSelfHostedStudioUrl,
   updateShareLiveToStudio
 } from '../state/studioSlice'
 import { setStudioShareExperimentsLive } from '../util/messages'
@@ -118,6 +119,9 @@ export const feedStore = (
         continue
       case 'shareLiveToStudio':
         dispatch(updateShareLiveToStudio(data.data.shareLiveToStudio))
+        continue
+      case 'selfHostedStudioUrl':
+        dispatch(updateSelfHostedStudioUrl(data.data.selfHostedStudioUrl))
         continue
       case 'remoteList':
         dispatch(updateRemoteList(data.data.remoteList))

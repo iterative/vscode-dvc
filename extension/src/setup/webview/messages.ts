@@ -70,10 +70,14 @@ export class WebviewMessages {
         return commands.executeCommand(
           RegisteredCommands.ADD_STUDIO_ACCESS_TOKEN
         )
+      case MessageFromWebviewType.SAVE_STUDIO_URL:
+        return commands.executeCommand(RegisteredCommands.UPDATE_STUDIO_URL)
       case MessageFromWebviewType.REMOVE_STUDIO_TOKEN:
         return commands.executeCommand(
           RegisteredCommands.REMOVE_STUDIO_ACCESS_TOKEN
         )
+      case MessageFromWebviewType.REMOVE_STUDIO_URL:
+        return commands.executeCommand(RegisteredCommands.REMOVE_STUDIO_URL)
       case MessageFromWebviewType.SET_STUDIO_SHARE_EXPERIMENTS_LIVE:
         return this.updateStudioOffline(message.payload)
       case MessageFromWebviewType.REQUEST_STUDIO_TOKEN:
