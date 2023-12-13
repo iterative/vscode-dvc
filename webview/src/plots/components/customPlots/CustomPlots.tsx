@@ -1,11 +1,10 @@
-import React, { DragEvent, useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
-import { PlotsSection } from 'dvc/src/plots/webview/contract'
+import React, { DragEvent, useEffect, useRef, useState } from 'react'
 import cx from 'classnames'
+import { useSelector } from 'react-redux'
 import { NoPlotsAdded } from './NoPlotsAdded'
+import { CustomPlotsGrid } from './CustomPlotsGrid'
 import styles from '../styles.module.scss'
 import { shouldUseVirtualizedGrid } from '../util'
-import { Grid } from '../Grid'
 import { LoadingSection, sectionIsLoading } from '../LoadingSection'
 import { PlotsState } from '../../store'
 import { changeOrderWithDraggedInfo } from '../../../util/array'
@@ -32,6 +31,8 @@ export const CustomPlots: React.FC<CustomPlotsProps> = ({ plotsIds }) => {
   const selectedRevisions = useSelector(
     (state: PlotsState) => state.webview.selectedRevisions
   )
+
+  const gridRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     setOrder(plotsIds)
@@ -82,15 +83,15 @@ export const CustomPlots: React.FC<CustomPlotsProps> = ({ plotsIds }) => {
       onDragLeave={() => setOnSection(false)}
       onDragOver={handleDragOver}
       onDrop={handleDropAtTheEnd}
+      ref={gridRef}
     >
-      <Grid
-        setOrder={setPlotsIdsOrder}
+      <CustomPlotsGrid
+        gridRef={gridRef}
         nbItemsPerRow={nbItemsPerRow}
-        useVirtualizedGrid={useVirtualizedGrid}
         order={order}
-        groupId="custom-plots"
         parentDraggedOver={onSection}
-        sectionKey={PlotsSection.CUSTOM_PLOTS}
+        setOrder={setPlotsIdsOrder}
+        useVirtualizedGrid={useVirtualizedGrid}
       />
     </div>
   )

@@ -306,7 +306,7 @@ export class Setup
   }
 
   public async saveStudioAccessToken() {
-    const cwd = this.dvcRoots[0] || getFirstWorkspaceFolder()
+    const cwd = this.getCwd()
 
     if (!cwd) {
       return

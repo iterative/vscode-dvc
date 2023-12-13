@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "1.1.18",
+  "version": "1.2.1",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -39,7 +39,7 @@
     "theme": "dark"
   },
   "engines": {
-    "vscode": "^1.64.0",
+    "vscode": "^1.75.0",
     "node": ">=16.13.0"
   },
   "activationEvents": [
@@ -122,11 +122,6 @@
       {
         "title": "Add Studio Access Token",
         "command": "dvc.addStudioAccessToken",
-        "category": "DVC"
-      },
-      {
-        "title": "Update Studio Access Token",
-        "command": "dvc.updateStudioAccessToken",
         "category": "DVC"
       },
       {
@@ -466,6 +461,11 @@
         "category": "DVC"
       },
       {
+        "title": "Update Studio Access Token",
+        "command": "dvc.updateStudioAccessToken",
+        "category": "DVC"
+      },
+      {
         "title": "Update Self-Hosted Studio URL",
         "command": "dvc.updateStudioUrl",
         "category": "DVC"
@@ -728,10 +728,6 @@
           "when": "dvc.commands.available && dvc.project.available && !dvc.studio.selfhosted"
         },
         {
-          "command": "dvc.updateStudioAccessToken",
-          "when": "dvc.commands.available && dvc.project.available && dvc.studio.connected"
-        },
-        {
           "command": "dvc.addTarget",
           "when": "false"
         },
@@ -954,6 +950,10 @@
         {
           "command": "dvc.stopAllRunningExperiments",
           "when": "dvc.commands.available && dvc.project.available && dvc.experiment.running"
+        },
+        {
+          "command": "dvc.updateStudioAccessToken",
+          "when": "dvc.commands.available && dvc.project.available && dvc.studio.connected"
         },
         {
           "command": "dvc.updateStudioUrl",
@@ -1765,7 +1765,7 @@
     "@types/chai-as-promised": "7.1.8",
     "@types/copy-webpack-plugin": "10.1.0",
     "@types/fs-extra": "11.0.4",
-    "@types/jest": "29.5.10",
+    "@types/jest": "29.5.11",
     "@types/lodash.clonedeep": "4.5.9",
     "@types/lodash.get": "4.4.9",
     "@types/lodash.isempty": "4.4.9",
@@ -1778,7 +1778,7 @@
     "@types/sinon-chai": "3.2.12",
     "@types/uuid": "9.0.7",
     "@types/vega": "3.2.0",
-    "@types/vscode": "1.64.0",
+    "@types/vscode": "1.75.0",
     "@vscode/test-electron": "2.3.8",
     "@vscode/vsce": "2.22.0",
     "@wdio/cli": "8.16.7",

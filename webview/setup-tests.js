@@ -4,11 +4,12 @@ window = {
   dispatchEvent: jest.fn()
 }
 
-const intersectionObserverMock = jest.fn().mockImplementation(() => {
-  return {
-    disconnect: jest.fn(),
-    observe: jest.fn(),
-    unobserve: jest.fn()
-  }
-})
-global.IntersectionObserver = intersectionObserverMock
+for (const observer of ['IntersectionObserver', 'ResizeObserver']) {
+  global[observer] = jest.fn().mockImplementation(() => {
+    return {
+      disconnect: jest.fn(),
+      observe: jest.fn(),
+      unobserve: jest.fn()
+    }
+  })
+}

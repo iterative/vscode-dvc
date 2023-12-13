@@ -10,12 +10,14 @@ import {
 import { addPlotsWithSnapshots, removePlots } from '../plotDataStore'
 
 export interface CustomPlotsState extends Omit<CustomPlotsData, 'plots'> {
-  isCollapsed: boolean
   hasData: boolean
   hasItems: boolean
+  isCollapsed: boolean
+  isInDragAndDropMode: boolean
   plotsIds: string[]
   plotsSnapshots: { [key: string]: string }
-  isInDragAndDropMode: boolean
+  sectionHeight: number
+  sectionWidth: number
 }
 
 export const customPlotsInitialState: CustomPlotsState = {
@@ -29,7 +31,9 @@ export const customPlotsInitialState: CustomPlotsState = {
   nbItemsPerRow:
     DEFAULT_SECTION_NB_ITEMS_PER_ROW_OR_WIDTH[PlotsSection.CUSTOM_PLOTS],
   plotsIds: [],
-  plotsSnapshots: {}
+  plotsSnapshots: {},
+  sectionHeight: 0,
+  sectionWidth: 0
 }
 
 export const customPlotsSlice = createSlice({
@@ -75,16 +79,28 @@ export const customPlotsSlice = createSlice({
         plotsIds: plots?.map(plot => plot.id) || [],
         plotsSnapshots
       }
+    },
+    updateSectionDimensions: (
+      state,
+      action: PayloadAction<{ sectionHeight: number; sectionWidth: number }>
+    ) => {
+      const { sectionHeight, sectionWidth } = action.payload
+      return {
+        ...state,
+        sectionHeight,
+        sectionWidth
+      }
     }
   }
 })
 
 export const {
-  update,
-  setCollapsed,
   changeSize,
+  clearState,
+  setCollapsed,
   toggleDragAndDropMode,
-  clearState
+  update,
+  updateSectionDimensions
 } = customPlotsSlice.actions
 
 export default customPlotsSlice.reducer
