@@ -1,4 +1,5 @@
 @import '../../../shared/variables';
+@import '../../../shared/mixins';
 
 .codeBlock {
   text-align: left;
@@ -18,4 +19,36 @@
 .infoIcon {
   fill: $accent-color;
   margin-bottom: -3px;
+}
+
+.detailsTable {
+  margin: 0 auto;
+  text-align: left;
+  margin-bottom: 1rem;
+}
+
+.detailsTableKey {
+  font-weight: bold;
+  white-space: nowrap;
+  vertical-align: top;
+}
+
+.detailsTableValue {
+  padding-left: 50px;
+  display: flex;
+  flex-direction: column;
+}
+
+.buttonAsLink {
+  @extend %buttonAsLink;
+
+  font-size: inherit;
+}
+
+.separator {
+  margin: 0 5px;
+
+  &::before {
+    content: '|';
+  }
 }
