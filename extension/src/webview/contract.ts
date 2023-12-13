@@ -47,6 +47,7 @@ export enum MessageFromWebviewType {
   RESIZE_PLOTS = 'resize-plots',
   REQUEST_STUDIO_TOKEN = 'request-studio-token',
   SAVE_STUDIO_TOKEN = 'save-studio-token',
+  SAVE_STUDIO_URL = 'save-studio-url',
   SET_COMPARISON_MULTI_PLOT_VALUE = 'update-comparison-multi-plot-value',
   SET_SMOOTH_PLOT_VALUE = 'update-smooth-plot-value',
   SHOW_EXPERIMENT_LOGS = 'show-experiment-logs',
@@ -71,6 +72,7 @@ export enum MessageFromWebviewType {
   REMOTE_REMOVE = 'remote-remove',
   REMOVE_CUSTOM_PLOTS = 'remove-custom-plots',
   REMOVE_STUDIO_TOKEN = 'remove-studio-token',
+  REMOVE_STUDIO_URL = 'remove-studio-url',
   MODIFY_WORKSPACE_PARAMS_AND_QUEUE = 'modify-workspace-params-and-queue',
   MODIFY_WORKSPACE_PARAMS_AND_RUN = 'modify-workspace-params-and-run',
   MODIFY_WORKSPACE_PARAMS_RESET_AND_RUN = 'modify-workspace-params-reset-and-run',
@@ -224,6 +226,7 @@ export type MessageFromWebview =
       type: MessageFromWebviewType.REMOVE_CUSTOM_PLOTS
     }
   | { type: MessageFromWebviewType.REMOVE_STUDIO_TOKEN }
+  | { type: MessageFromWebviewType.REMOVE_STUDIO_URL }
   | {
       type: MessageFromWebviewType.REORDER_PLOTS_COMPARISON
       payload: string[]
@@ -291,6 +294,7 @@ export type MessageFromWebview =
   | { type: MessageFromWebviewType.UPGRADE_DVC }
   | { type: MessageFromWebviewType.SETUP_WORKSPACE }
   | { type: MessageFromWebviewType.SAVE_STUDIO_TOKEN }
+  | { type: MessageFromWebviewType.SAVE_STUDIO_URL }
   | { type: MessageFromWebviewType.REQUEST_STUDIO_TOKEN }
   | { type: MessageFromWebviewType.ADD_CONFIGURATION }
   | { type: MessageFromWebviewType.ZOOM_PLOT; payload?: string }

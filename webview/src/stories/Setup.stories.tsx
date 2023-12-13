@@ -32,6 +32,7 @@ const DEFAULT_DATA: SetupData = {
     [SetupSection.REMOTES]: false,
     [SetupSection.STUDIO]: true
   },
+  selfHostedStudioUrl: null,
   shareLiveToStudio: false
 }
 
@@ -97,6 +98,11 @@ CompletedConnected.args = getUpdatedArgs({
   remoteList: { demo: undefined },
   sectionCollapsed: undefined,
   shareLiveToStudio: true
+})
+
+export const WithSelfHostedStudioUrl = Template.bind({})
+WithSelfHostedStudioUrl.args = getUpdatedArgs({
+  selfHostedStudioUrl: 'https://studio.example.com'
 })
 
 export const CLIPythonNotFound = Template.bind({})

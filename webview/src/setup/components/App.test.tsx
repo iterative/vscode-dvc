@@ -41,6 +41,7 @@ const DEFAULT_DATA = {
   pythonBinPath: undefined,
   remoteList: undefined,
   sectionCollapsed: undefined,
+  selfHostedStudioUrl: null,
   shareLiveToStudio: false
 }
 
@@ -675,6 +676,65 @@ describe('App', () => {
         within(iconWrapper).getByTestId(TooltipIconType.WARNING)
       ).toBeInTheDocument()
     })
+
+    it('should show the self hosted url with actions to change it if the user has set one', () => {
+      const selfHostedUrl = 'https://studio.example.com'
+      renderApp({ selfHostedStudioUrl: selfHostedUrl })
+
+      const urlDetails = screen.getByTestId('studio-url-details')
+
+      expect(
+        within(urlDetails).getByText('Self-Hosted Url:')
+      ).toBeInTheDocument()
+      expect(within(urlDetails).getByText(selfHostedUrl)).toBeInTheDocument()
+
+      const updateUrlBtn = within(urlDetails).getByText('Update')
+      const removeUrlBtn = within(urlDetails).getByText('Remove')
+
+      expect(updateUrlBtn).toBeInTheDocument()
+      expect(removeUrlBtn).toBeInTheDocument()
+
+      mockPostMessage.mockClear()
+      fireEvent.click(updateUrlBtn)
+
+      expect(mockPostMessage).toHaveBeenCalledTimes(1)
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.SAVE_STUDIO_URL
+      })
+
+      mockPostMessage.mockClear()
+      fireEvent.click(removeUrlBtn)
+
+      expect(mockPostMessage).toHaveBeenCalledTimes(1)
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.REMOVE_STUDIO_URL
+      })
+    })
+
+    it('should show the self hosted url with "Not found" with an action to add one if the user has not set one', () => {
+      renderApp()
+
+      const urlDetails = screen.getByTestId('studio-url-details')
+
+      expect(
+        within(urlDetails).getByText('Self-Hosted Url:')
+      ).toBeInTheDocument()
+      expect(within(urlDetails).getByText('Not found')).toBeInTheDocument()
+
+      const addUrlBtn = within(urlDetails).getByText('Add Url')
+
+      expect(addUrlBtn).toBeInTheDocument()
+
+      mockPostMessage.mockClear()
+      fireEvent.click(addUrlBtn)
+
+      expect(mockPostMessage).toHaveBeenCalledTimes(1)
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.SAVE_STUDIO_URL
+      })
+
+      mockPostMessage.mockClear()
+    })
   })
 
   describe('Studio connected', () => {
@@ -717,6 +777,24 @@ describe('App', () => {
       expect(
         within(iconWrapper).getByTestId(TooltipIconType.PASSED)
       ).toBeInTheDocument()
+    })
+
+    it('should show the self hosted url with actions to change it if the user has set one', () => {
+      const selfHostedUrl = 'https://studio.example.com'
+      renderApp({ isStudioConnected: true, selfHostedStudioUrl: selfHostedUrl })
+
+      const urlDetails = screen.getByTestId('studio-url-details')
+
+      expect(
+        within(urlDetails).getByText('Self-Hosted Url:')
+      ).toBeInTheDocument()
+      expect(within(urlDetails).getByText(selfHostedUrl)).toBeInTheDocument()
+
+      const updateUrlBtn = within(urlDetails).getByText('Update')
+      const removeUrlBtn = within(urlDetails).getByText('Remove')
+
+      expect(updateUrlBtn).toBeInTheDocument()
+      expect(removeUrlBtn).toBeInTheDocument()
     })
   })
 
