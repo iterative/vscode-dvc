@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import cx from 'classnames'
 import styles from './styles.module.scss'
 import { Copy, Check } from '../icons'
@@ -9,12 +9,10 @@ const enum CopyButtonState {
   FAILURE
 }
 
-const FailureIcon = () => <span>&#10005;</span>
-
-const copyIconComponents: Record<CopyButtonState, FC> = {
-  [CopyButtonState.DEFAULT]: Copy,
-  [CopyButtonState.SUCCESS]: Check,
-  [CopyButtonState.FAILURE]: FailureIcon
+const copyIconComponents: Record<CopyButtonState, JSX.Element> = {
+  [CopyButtonState.DEFAULT]: <Copy />,
+  [CopyButtonState.SUCCESS]: <Check />,
+  [CopyButtonState.FAILURE]: <span>&#10005;</span>
 }
 
 export const CopyButton: React.FC<{
@@ -30,7 +28,7 @@ export const CopyButton: React.FC<{
 
   const timer = useRef<number>()
   const [state, setState] = useState<CopyButtonState>(CopyButtonState.DEFAULT)
-  const IconComponent = copyIconComponents[state]
+
   useEffect(
     () => () => {
       if (timer.current) {
@@ -64,7 +62,7 @@ export const CopyButton: React.FC<{
           })
       }}
     >
-      <IconComponent />
+      {copyIconComponents[state]}
     </button>
   )
 }
