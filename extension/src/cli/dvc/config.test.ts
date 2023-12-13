@@ -75,7 +75,7 @@ describe('DvcConfig', () => {
       })
     })
 
-    it('should return an error message if the underlying process throws', async () => {
+    it('should return undefined if the underlying process throws', async () => {
       const cwd = __dirname
 
       mockedCreateProcess.mockImplementationOnce(() => {
@@ -83,9 +83,7 @@ describe('DvcConfig', () => {
       })
 
       const output = await dvcConfig.config(cwd, ConfigKey.STUDIO_OFFLINE)
-      expect(output).toStrictEqual(
-        'config studio.offline failed with unable to access DVC'
-      )
+      expect(output).toStrictEqual(undefined)
     })
   })
 
@@ -101,6 +99,80 @@ describe('DvcConfig', () => {
 
       expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['remote', 'list', '--local'],
+        cwd,
+        env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
+  })
+
+  describe('remoteAdd', () => {
+    it('should call createProcess with the correct parameters to add a remote to the config', async () => {
+      const cwd = __dirname
+      const stdout = ''
+
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
+
+      const storage = 'storage'
+      const url = 'url.com'
+      const output = await dvcConfig.remoteAdd(cwd, Flag.PROJECT, storage, url)
+      expect(output).toStrictEqual(stdout)
+
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
+        args: ['remote', 'add', '--project', storage, url],
+        cwd,
+        env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
+  })
+
+  describe('remoteRename', () => {
+    it('should call createProcess with the correct parameters to rename a remote in the config', async () => {
+      const cwd = __dirname
+      const stdout = ''
+
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
+
+      const oldName = 'storagge'
+      const newName = 'storage'
+      const output = await dvcConfig.remoteRename(
+        cwd,
+        Flag.LOCAL,
+        oldName,
+        newName
+      )
+      expect(output).toStrictEqual(stdout)
+
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
+        args: ['remote', 'rename', '--local', oldName, newName],
+        cwd,
+        env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
+  })
+
+  describe('remoteModifyUrl', () => {
+    it('should call createProcess with the correct parameters to modify a remote in the config', async () => {
+      const cwd = __dirname
+      const stdout = ''
+
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
+
+      const name = 'storage'
+      const newUrl = 'url.com'
+      const output = await dvcConfig.remoteModify(
+        cwd,
+        Flag.PROJECT,
+        name,
+        'url',
+        newUrl
+      )
+      expect(output).toStrictEqual(stdout)
+
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
+        args: ['remote', 'modify', '--project', name, 'url', newUrl],
         cwd,
         env: mockedEnv,
         executable: 'dvc'

@@ -1,11 +1,13 @@
 import { DvcCli } from '.'
-import { Args, Command } from './constants'
+import { Args, Command, SubCommand } from './constants'
 import { typeCheckCommands } from '..'
-import { MaybeConsoleError } from '../error'
 
 export const autoRegisteredCommands = {
   CONFIG: 'config',
-  REMOTE: 'remote'
+  REMOTE: 'remote',
+  REMOTE_ADD: 'remoteAdd',
+  REMOTE_MODIFY: 'remoteModify',
+  REMOTE_RENAME: 'remoteRename'
 } as const
 
 export class DvcConfig extends DvcCli {
@@ -22,6 +24,28 @@ export class DvcConfig extends DvcCli {
     return this.executeSafeProcess(cwd, Command.REMOTE, ...args)
   }
 
+  public remoteAdd(cwd: string, ...args: Args) {
+    return this.executeDvcProcess(cwd, Command.REMOTE, SubCommand.ADD, ...args)
+  }
+
+  public remoteRename(cwd: string, ...args: Args) {
+    return this.executeDvcProcess(
+      cwd,
+      Command.REMOTE,
+      SubCommand.RENAME,
+      ...args
+    )
+  }
+
+  public remoteModify(cwd: string, ...args: Args) {
+    return this.executeDvcProcess(
+      cwd,
+      Command.REMOTE,
+      SubCommand.MODIFY,
+      ...args
+    )
+  }
+
   private async executeSafeProcess(
     cwd: string,
     command: Command,
@@ -29,10 +53,6 @@ export class DvcConfig extends DvcCli {
   ) {
     try {
       return await this.executeDvcProcess(cwd, command, ...args)
-    } catch (error: unknown) {
-      const message =
-        (error as MaybeConsoleError).stderr || (error as Error).message
-      return `${[command, ...args].join(' ')} failed with ${message}`
-    }
+    } catch {}
   }
 }
