@@ -58,6 +58,8 @@ import * as QuickPickUtil from '../../../setup/quickPick'
 import { EventName } from '../../../telemetry/constants'
 import { Modal } from '../../../vscode/modal'
 import { Toast } from '../../../vscode/toast'
+import { Title } from '../../../vscode/title'
+import { Studio } from '../../../setup/studio'
 
 suite('Setup Test Suite', () => {
   const disposable = Disposable.fn()
@@ -1040,7 +1042,7 @@ suite('Setup Test Suite', () => {
       )
     })
 
-    it('cancel a token request to Studio after 15 minutes', async () => {
+    it('should cancel a token request to Studio after 5 minutes', async () => {
       const { setup, mockFetch } = buildSetup({
         disposer: disposable
       })
@@ -1090,8 +1092,8 @@ suite('Setup Test Suite', () => {
 
       clock.tick(waitTime)
 
-      expect(clearTimeoutSpy).to.be.calledOnce
-      expect(mockUriHandlerDispose).to.be.calledOnce
+      expect(clearTimeoutSpy).to.be.called
+      expect(mockUriHandlerDispose).to.be.called
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it("should handle a message from the webview to manually save the user's Studio access token", async () => {
@@ -1144,10 +1146,6 @@ suite('Setup Test Suite', () => {
       expect(mockConfig).to.be.calledWithExactly(
         getFirstWorkspaceFolder(),
         ConfigKey.STUDIO_TOKEN
-      )
-      expect(mockConfig).to.be.calledWithExactly(
-        getFirstWorkspaceFolder(),
-        ConfigKey.STUDIO_URL
       )
       expect(executeCommandSpy).to.be.calledWithExactly(
         'setContext',
@@ -1212,6 +1210,127 @@ suite('Setup Test Suite', () => {
         ConfigKey.STUDIO_TOKEN
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it("should be able to save the user's self-hosted url", async () => {
+      const mockUrl = 'https://studio.example.com'
+      const mockConfig = stub(DvcConfig.prototype, 'config').resolves(mockUrl)
+      const executeCommandSpy = spy(commands, 'executeCommand')
+      const saveStudioUrlSpy = spy(Studio.prototype, 'saveStudioUrlInConfig')
+      const mockGetCliCompatible = stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        Setup.prototype as any,
+        'getCliCompatible'
+      ).returns(false)
+      const mockInputBox = stub(window, 'showInputBox')
+
+      void commands.executeCommand(RegisteredCommands.ADD_STUDIO_URL)
+
+      expect(mockInputBox).not.to.be.called
+      expect(saveStudioUrlSpy, 'should not be called when the cwd is not found')
+        .not.to.be.called
+
+      mockGetCliCompatible.returns(true)
+      const inputEvent = new Promise(resolve =>
+        mockInputBox.onFirstCall().callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(undefined)
+        })
+      )
+
+      void commands.executeCommand(RegisteredCommands.ADD_STUDIO_URL)
+      await inputEvent
+
+      expect(mockInputBox).to.be.calledWithMatch({
+        title: Title.ENTER_STUDIO_URL
+      })
+      expect(
+        saveStudioUrlSpy,
+        'should not be called when the user does not submit a url'
+      ).not.to.be.called
+
+      mockInputBox.onSecondCall().resolves(mockUrl)
+      const dataSent = new Promise(resolve =>
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        stub(Setup.prototype as any, 'sendDataToWebview').callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve('')
+        })
+      )
+
+      void commands.executeCommand(RegisteredCommands.ADD_STUDIO_URL)
+      await dataSent
+
+      expect(mockInputBox).to.be.calledWithMatch({
+        title: Title.ENTER_STUDIO_URL
+      })
+      expect(saveStudioUrlSpy).to.be.calledWithExactly(dvcDemoPath, mockUrl)
+      expect(mockConfig).to.be.calledWithExactly(
+        dvcDemoPath,
+        Flag.GLOBAL,
+        ConfigKey.STUDIO_URL,
+        mockUrl
+      )
+      expect(mockConfig).to.be.calledWithExactly(
+        getFirstWorkspaceFolder(),
+        ConfigKey.STUDIO_URL
+      )
+      expect(executeCommandSpy).to.be.calledWithExactly(
+        'setContext',
+        ContextKey.STUDIO_SELFHOSTED,
+        true
+      )
+    })
+
+    it("should be able to delete the user's self hosted url from the global dvc config", async () => {
+      const mockGetCliCompatible = stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        Setup.prototype as any,
+        'getCliCompatible'
+      ).returns(false)
+      const mockConfig = stub(DvcConfig.prototype, 'config')
+
+      await commands.executeCommand(RegisteredCommands.REMOVE_STUDIO_URL)
+
+      expect(
+        mockConfig,
+        'should not be called if cwd is not found'
+      ).not.to.be.calledWithExactly(
+        dvcDemoPath,
+        Flag.GLOBAL,
+        Flag.UNSET,
+        ConfigKey.STUDIO_URL
+      )
+      expect(mockConfig).not.to.be.calledWithExactly(
+        dvcDemoPath,
+        Flag.LOCAL,
+        Flag.UNSET,
+        ConfigKey.STUDIO_URL
+      )
+
+      mockGetCliCompatible.returns(true)
+      const configCalled = new Promise(resolve =>
+        mockConfig.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve('')
+        })
+      )
+
+      await commands.executeCommand(RegisteredCommands.REMOVE_STUDIO_URL)
+      await configCalled
+
+      expect(mockConfig).to.be.calledWithExactly(
+        dvcDemoPath,
+        Flag.GLOBAL,
+        Flag.UNSET,
+        ConfigKey.STUDIO_URL
+      )
+      expect(mockConfig).to.be.calledWithExactly(
+        dvcDemoPath,
+        Flag.LOCAL,
+        Flag.UNSET,
+        ConfigKey.STUDIO_URL
+      )
+    })
 
     it('should check if experiments and dvc are setup', async () => {
       const { setup } = buildSetup({

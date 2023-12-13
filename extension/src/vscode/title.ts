@@ -13,6 +13,7 @@ export enum Title {
   ENTER_PLOT_TITLE = 'Enter a Name for Your Plot',
   ENTER_STUDIO_USERNAME = 'Enter your Studio username',
   ENTER_STUDIO_TOKEN = 'Enter your Studio access token',
+  ENTER_STUDIO_URL = 'Enter the URL of Your Self-Hosted Studio Instance',
   ENTER_STAGE_NAME = 'Enter a Name for the Main Stage of your Pipeline',
   GARBAGE_COLLECT_EXPERIMENTS = 'Garbage Collect Experiments',
   SHOW_SETUP = 'Show Setup',

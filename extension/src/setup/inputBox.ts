@@ -6,3 +6,13 @@ export const validateTokenInput = (input: string | undefined) => {
   }
   return null
 }
+
+export const validateUrlInput = (input: string | undefined = '') => {
+  try {
+    const validUrl = new URL(input)
+    if (validUrl) {
+      return null
+    }
+  } catch {}
+  return 'please enter a valid URL'
+}

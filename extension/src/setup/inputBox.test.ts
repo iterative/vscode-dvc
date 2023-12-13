@@ -1,4 +1,4 @@
-import { validateTokenInput } from './inputBox'
+import { validateTokenInput, validateUrlInput } from './inputBox'
 
 describe('validateTokenInput', () => {
   const mockedStudioAccessToken =
@@ -16,5 +16,17 @@ describe('validateTokenInput', () => {
 
   it('should return null if the input is valid', () => {
     expect(validateTokenInput(mockedStudioAccessToken)).toBeNull()
+  })
+})
+
+describe('validateUrlInput', () => {
+  it('should return the warning if the input is not an url', () => {
+    expect(validateUrlInput('not-a-real-url')).not.toBeNull()
+    expect(validateUrlInput('gibberishcom')).toStrictEqual(
+      'please enter a valid URL'
+    )
+  })
+  it('should return null if the input is a valid url', () => {
+    expect(validateUrlInput('https://studio.example.com')).toBeNull()
   })
 })

@@ -13,7 +13,7 @@ import {
   collectSubProjects
 } from './collect'
 import { WebviewMessages } from './webview/messages'
-import { validateTokenInput } from './inputBox'
+import { validateTokenInput, validateUrlInput } from './inputBox'
 import { findPythonBinForInstall } from './autoInstall'
 import { run, runWithRecheck, runWorkspace } from './runner'
 import { Studio } from './studio'
@@ -306,7 +306,7 @@ export class Setup
   }
 
   public async saveStudioAccessToken() {
-    const cwd = this.dvcRoots[0] || getFirstWorkspaceFolder()
+    const cwd = this.getCwd()
 
     if (!cwd) {
       return
@@ -322,6 +322,30 @@ export class Setup
     }
 
     await this.studio.saveStudioAccessTokenInConfig(cwd, token)
+    return this.updateStudioAndSend()
+  }
+
+  public removeStudioUrl() {
+    if (!this.getCliCompatible()) {
+      return
+    }
+
+    return this.studio.removeStudioUrl(this.dvcRoots)
+  }
+
+  public async saveStudioUrl() {
+    const cwd = this.getCwd()
+
+    if (!cwd) {
+      return
+    }
+
+    const url = await getValidInput(Title.ENTER_STUDIO_URL, validateUrlInput)
+    if (!url) {
+      return
+    }
+
+    await this.studio.saveStudioUrlInConfig(cwd, url)
     return this.updateStudioAndSend()
   }
 

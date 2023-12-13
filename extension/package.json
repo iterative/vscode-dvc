@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "1.1.18",
+  "version": "1.2.1",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -39,7 +39,7 @@
     "theme": "dark"
   },
   "engines": {
-    "vscode": "^1.64.0",
+    "vscode": "^1.75.0",
     "node": ">=16.13.0"
   },
   "activationEvents": [
@@ -125,8 +125,8 @@
         "category": "DVC"
       },
       {
-        "title": "Update Studio Access Token",
-        "command": "dvc.updateStudioAccessToken",
+        "title": "Add Self-Hosted Studio URL",
+        "command": "dvc.addStudioUrl",
         "category": "DVC"
       },
       {
@@ -381,6 +381,11 @@
         "category": "DVC"
       },
       {
+        "title": "Remove Self-Hosted Studio URL",
+        "command": "dvc.removeStudioUrl",
+        "category": "DVC"
+      },
+      {
         "title": "Run Experiment",
         "command": "dvc.resetAndRunCheckpointExperiment",
         "category": "DVC",
@@ -453,6 +458,16 @@
       {
         "title": "Show Setup",
         "command": "dvc.showSetup",
+        "category": "DVC"
+      },
+      {
+        "title": "Update Studio Access Token",
+        "command": "dvc.updateStudioAccessToken",
+        "category": "DVC"
+      },
+      {
+        "title": "Update Self-Hosted Studio URL",
+        "command": "dvc.updateStudioUrl",
         "category": "DVC"
       },
       {
@@ -709,8 +724,8 @@
           "when": "dvc.commands.available && dvc.project.available && !dvc.studio.connected"
         },
         {
-          "command": "dvc.updateStudioAccessToken",
-          "when": "dvc.commands.available && dvc.project.available && dvc.studio.connected"
+          "command": "dvc.addStudioUrl",
+          "when": "dvc.commands.available && dvc.project.available && !dvc.studio.selfhosted"
         },
         {
           "command": "dvc.addTarget",
@@ -853,6 +868,10 @@
           "when": "dvc.commands.available && dvc.project.available && dvc.studio.connected"
         },
         {
+          "command": "dvc.removeStudioUrl",
+          "when": "dvc.commands.available && dvc.project.available && dvc.studio.selfhosted"
+        },
+        {
           "command": "dvc.removeTarget",
           "when": "false"
         },
@@ -931,6 +950,14 @@
         {
           "command": "dvc.stopAllRunningExperiments",
           "when": "dvc.commands.available && dvc.project.available && dvc.experiment.running"
+        },
+        {
+          "command": "dvc.updateStudioAccessToken",
+          "when": "dvc.commands.available && dvc.project.available && dvc.studio.connected"
+        },
+        {
+          "command": "dvc.updateStudioUrl",
+          "when": "dvc.commands.available && dvc.project.available && dvc.studio.selfhosted"
         },
         {
           "command": "dvc.views.experiments.selectColumns",
@@ -1732,13 +1759,13 @@
     "yaml": "2.3.4"
   },
   "devDependencies": {
-    "@swc/core": "1.3.99",
+    "@swc/core": "1.3.100",
     "@swc/jest": "0.2.29",
     "@types/chai": "4.3.11",
     "@types/chai-as-promised": "7.1.8",
     "@types/copy-webpack-plugin": "10.1.0",
     "@types/fs-extra": "11.0.4",
-    "@types/jest": "29.5.10",
+    "@types/jest": "29.5.11",
     "@types/lodash.clonedeep": "4.5.9",
     "@types/lodash.get": "4.4.9",
     "@types/lodash.isempty": "4.4.9",
@@ -1751,7 +1778,7 @@
     "@types/sinon-chai": "3.2.12",
     "@types/uuid": "9.0.7",
     "@types/vega": "3.2.0",
-    "@types/vscode": "1.64.0",
+    "@types/vscode": "1.75.0",
     "@vscode/test-electron": "2.3.8",
     "@vscode/vsce": "2.22.0",
     "@wdio/cli": "8.16.7",
