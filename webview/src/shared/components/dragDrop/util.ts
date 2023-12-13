@@ -47,8 +47,8 @@ export const getDragEnterDirection = (
     : DragEnterDirection.BOTTOM
 }
 
-export const isEnteringAfter = (direction: DragEnterDirection) =>
-  AFTER_DIRECTIONS.has(direction)
+export const isEnteringAfter = (direction: DragEnterDirection | undefined) =>
+  direction && AFTER_DIRECTIONS.has(direction)
 
 export const isExactGroup = (
   group1?: string,
@@ -58,3 +58,6 @@ export const isExactGroup = (
 
 export const isSameGroup = (group1?: string, group2?: string) =>
   getIDWithoutIndex(group1) === getIDWithoutIndex(group2)
+
+export const isSameGroupOtherSection = (group1?: string, group2?: string) =>
+  isSameGroup(group1, group2) && !isExactGroup(group1, undefined, group2)

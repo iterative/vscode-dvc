@@ -1,5 +1,5 @@
 import { DEFAULT_NB_ITEMS_PER_ROW } from 'dvc/src/plots/webview/contract'
-import React, { useRef } from 'react'
+import React, { PropsWithChildren, useRef } from 'react'
 import {
   AutoSizer,
   CellMeasurer,
@@ -10,16 +10,15 @@ import {
 import styles from './styles.module.scss'
 
 interface VirtualizedGridProps {
-  items: JSX.Element[]
   nbItemsPerRow: number
+  children: JSX.Element[]
 }
 
 export const OVERSCAN_ROW_COUNT = 15
 
-export const VirtualizedGrid: React.FC<VirtualizedGridProps> = ({
-  items,
-  nbItemsPerRow = DEFAULT_NB_ITEMS_PER_ROW
-}) => {
+export const VirtualizedGrid: React.FC<
+  PropsWithChildren<VirtualizedGridProps>
+> = ({ children, nbItemsPerRow = DEFAULT_NB_ITEMS_PER_ROW }) => {
   const cache = useRef(
     new CellMeasurerCache({
       defaultHeight: 200,
@@ -33,7 +32,7 @@ export const VirtualizedGrid: React.FC<VirtualizedGridProps> = ({
     rowIndex,
     style
   }: GridCellProps) => {
-    const gridItem = items[rowIndex * nbItemsPerRow + columnIndex]
+    const gridItem = children[rowIndex * nbItemsPerRow + columnIndex]
 
     return (
       gridItem && (
@@ -46,7 +45,7 @@ export const VirtualizedGrid: React.FC<VirtualizedGridProps> = ({
       )
     )
   }
-  const nbRows = Math.ceil(items.length / nbItemsPerRow)
+  const nbRows = Math.ceil(children.length / nbItemsPerRow)
 
   return (
     <div className={styles.grid}>

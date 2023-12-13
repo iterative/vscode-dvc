@@ -1,30 +1,30 @@
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { OnDrop } from '../../../shared/components/dragDrop/DragDropContainer'
 import { PlotsState } from '../../store'
 import { Grid } from '../Grid'
+import { OnDrop } from '../../../shared/hooks/useDragAndDrop'
 
 interface TemplatePlotsGridProps {
   groupId: string
   groupIndex: number
-  onDropInSection: OnDrop
   multiView: boolean
   setSectionEntries: (groupIndex: number, entries: string[]) => void
   useVirtualizedGrid?: boolean
   nbItemsPerRow: number
   parentDraggedOver?: boolean
+  onDropInSection: OnDrop
 }
 
 export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   groupId,
   groupIndex,
-  onDropInSection,
   multiView,
   setSectionEntries,
   useVirtualizedGrid,
   nbItemsPerRow,
-  parentDraggedOver
+  parentDraggedOver,
+  onDropInSection
 }) => {
   const entries = useSelector(
     (state: PlotsState) => state.template.sections[groupIndex].entries
@@ -41,10 +41,10 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
       useVirtualizedGrid={useVirtualizedGrid}
       order={entries}
       groupId={groupId}
-      onDrop={onDropInSection}
       parentDraggedOver={parentDraggedOver}
       multiView={multiView}
       sectionKey={PlotsSection.TEMPLATE_PLOTS}
+      onDrop={onDropInSection}
     />
   )
 }
