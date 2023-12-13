@@ -1,14 +1,12 @@
 import React, { useEffect } from 'react'
 import cx from 'classnames'
 import { Experiment } from 'dvc/src/experiments/webview/contract'
-import { flexRender, Header } from '@tanstack/react-table'
+import { Header } from '@tanstack/react-table'
 import { ColumnResizer, ResizerHeight } from './ColumnResizer'
 import { SortOrder } from './util'
+import { ColumnDragHandle } from './ColumnDragHandle'
 import styles from '../styles.module.scss'
-import {
-  Draggable,
-  DragFunction
-} from '../../../../shared/components/dragDrop/Draggable'
+import { DragFunction } from '../../../../shared/components/dragDrop/Draggable'
 import { IconMenu } from '../../../../shared/components/iconMenu/IconMenu'
 import { ArrowDown, ArrowUp, Filter } from '../../../../shared/components/icons'
 
@@ -28,50 +26,6 @@ const getIconMenuItems = (
     tooltip: 'Table Filtered By'
   }
 ]
-
-const ColumnDragHandle: React.FC<{
-  disabled: boolean
-  header: Header<Experiment, unknown>
-  onDragEnter: DragFunction
-  onDragStart: DragFunction
-  onDrop: DragFunction
-  onDragEnd: DragFunction
-  onDragLeave: DragFunction
-}> = ({
-  disabled,
-  header,
-  onDragEnter,
-  onDragStart,
-  onDragEnd,
-  onDrop,
-  onDragLeave
-}) => {
-  return (
-    <span
-      data-testid="rendered-header"
-      className={cx(styles.cellContents)}
-      style={{
-        width: header.getSize()
-      }}
-    >
-      <Draggable
-        id={header.id}
-        disabled={disabled}
-        onDragEnter={onDragEnter}
-        onDragStart={onDragStart}
-        onDragEnd={onDragEnd}
-        onDrop={onDrop}
-        onDragLeave={onDragLeave}
-      >
-        <span className={header.isPlaceholder ? '' : styles.cellDraggable}>
-          {header.isPlaceholder
-            ? null
-            : flexRender(header.column.columnDef.header, header.getContext())}
-        </span>
-      </Draggable>
-    </span>
-  )
-}
 
 export const TableHeaderCellContents: React.FC<{
   header: Header<Experiment, unknown>

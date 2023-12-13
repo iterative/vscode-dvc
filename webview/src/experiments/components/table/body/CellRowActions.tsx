@@ -1,8 +1,8 @@
-import React, { MouseEventHandler, ReactElement } from 'react'
+import React from 'react'
 import { VSCodeCheckbox } from '@vscode/webview-ui-toolkit/react'
 import { ExecutorStatus, isQueued } from 'dvc/src/experiments/webview/contract'
-import { CellHintTooltip } from './CellHintTooltip'
-import { Indicator } from '../Indicators'
+import { CellRowAction } from './CellRowAction'
+import { ClickableTooltipContent } from './ClickableTooltipContent'
 import { addStarredFilter, openPlotsWebview } from '../../../util/messages'
 import styles from '../styles.module.scss'
 import { clickAndEnterProps } from '../../../../util/props'
@@ -30,58 +30,8 @@ export type CellRowActionsProps = {
   toggleStarred: () => void
 }
 
-type CellRowActionProps = {
-  showSubRowStates: boolean
-  subRowsAffected: number
-  children: ReactElement
-  testId: string
-  tooltipContent: string | ReactElement
-  onClick?: MouseEventHandler
-}
-
-const CellRowAction: React.FC<CellRowActionProps> = ({
-  children,
-  onClick,
-  showSubRowStates,
-  subRowsAffected,
-  testId,
-  tooltipContent
-}) => {
-  const count = (showSubRowStates && subRowsAffected) || 0
-
-  return (
-    <CellHintTooltip tooltipContent={tooltipContent}>
-      <div className={styles.rowActions} data-testid={testId}>
-        <Indicator onClick={onClick} count={count}>
-          {children}
-        </Indicator>
-      </div>
-    </CellHintTooltip>
-  )
-}
-
 const getTooltipContent = (determiner: boolean, action: string): string =>
   'Click to ' + (determiner ? `un${action}` : action)
-
-type ClickableTooltipContentProps = {
-  clickableText: string
-  helperText: string
-  onClick: MouseEventHandler
-}
-
-const ClickableTooltipContent: React.FC<ClickableTooltipContentProps> = ({
-  clickableText,
-  helperText,
-  onClick
-}) => (
-  <span>
-    {helperText}
-    <br />
-    <button className={styles.buttonAsLink} onClick={onClick}>
-      {clickableText}
-    </button>
-  </span>
-)
 
 export const CellRowActions: React.FC<CellRowActionsProps> = ({
   plotColor,

@@ -1,9 +1,8 @@
 import { Revision } from 'dvc/src/plots/webview/contract'
 import React from 'react'
-import cx from 'classnames'
-import { VSCodeProgressRing } from '@vscode/webview-ui-toolkit/react'
 import styles from './styles.module.scss'
 import { RibbonBlockTooltip } from './RibbonBlockTooltip'
+import { RevisionIcon } from './RevisionIcon'
 import { Icon } from '../../../shared/components/Icon'
 import Tooltip from '../../../shared/components/tooltip/Tooltip'
 import { CopyButton } from '../../../shared/components/copyButton/CopyButton'
@@ -13,18 +12,6 @@ interface RibbonBlockProps {
   revision: Revision
   onClear: () => void
 }
-
-const RevisionIcon: React.FC<{ fetched: boolean; errors?: string[] }> = ({
-  fetched,
-  errors
-}) => (
-  <div className={styles.iconPlaceholder}>
-    {fetched && errors && '!'}
-    {!fetched && (
-      <VSCodeProgressRing className={cx(styles.fetching, 'chromatic-ignore')} />
-    )}
-  </div>
-)
 
 export const RibbonBlock: React.FC<RibbonBlockProps> = ({
   revision,
