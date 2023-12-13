@@ -4,7 +4,8 @@ import React, {
   useEffect,
   useRef,
   Fragment,
-  useLayoutEffect
+  useLayoutEffect,
+  RefObject
 } from 'react'
 import cx from 'classnames'
 import { useSelector } from 'react-redux'
@@ -31,7 +32,7 @@ export interface ComparisonTableRowProps {
   onLayoutChange: () => void
   setOrder: (order: string[]) => void
   order: string[]
-  bodyRef?: React.RefObject<HTMLTableSectionElement>
+  bodyRef?: RefObject<HTMLTableSectionElement>
 }
 
 export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({

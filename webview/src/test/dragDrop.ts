@@ -50,7 +50,7 @@ export const dragEnter = (
   })
 
   act(() => {
-    jest.advanceTimersByTime(501)
+    jest.advanceTimersByTime(1)
   })
 
   let draggedOver = idToNode(draggedOverId)
@@ -84,7 +84,7 @@ export const dragEnter = (
       })
 
       draggedOver?.dispatchEvent(dragOverEvent)
-      jest.advanceTimersByTime(501)
+      jest.advanceTimersByTime(1)
     }
   })
 

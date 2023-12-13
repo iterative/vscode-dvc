@@ -1730,7 +1730,7 @@ describe('App', () => {
       ])
     })
 
-    it('should show a drop target at the end of the custom plots when moving a plot inside the section but not over any other plot', () => {
+    it('should show a drop target at the end of the custom plots when moving a plot inside the section', () => {
       renderAppWithOptionalDataInDragAndDropMode(
         {
           custom: customPlotsFixture
@@ -1745,7 +1745,7 @@ describe('App', () => {
       expect(screen.getByTestId('plot_drop-target')).toBeInTheDocument()
     })
 
-    it('should show a drop target a plot at the end of the custom plots when moving a plot inside the section but not over any other plot', () => {
+    it('should show a drop target a plot at the end of the custom plots when moving a plot inside the section', () => {
       renderAppWithOptionalDataInDragAndDropMode(
         {
           custom: customPlotsFixture
