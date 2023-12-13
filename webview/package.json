@@ -60,7 +60,7 @@
     "@types/node": "16.x",
     "@types/react": "18.2.42",
     "@types/react-dom": "18.2.17",
-    "@types/react-virtualized": "9.21.28",
+    "@types/react-virtualized": "9.21.29",
     "@types/vega": "3.2.0",
     "@types/webpack": "5.28.5",
     "@welldone-software/why-did-you-render": "7.0.1",
