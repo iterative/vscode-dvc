@@ -1,133 +1,18 @@
 import { PlotsSection, TemplatePlotGroup } from 'dvc/src/plots/webview/contract'
-import React, {
-  DragEvent,
-  useState,
-  useCallback,
-  useRef,
-  RefObject
-} from 'react'
-import cx from 'classnames'
+import React, { DragEvent, useState, useCallback, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { AddedSection } from './AddedSection'
-import { TemplatePlotsGrid } from './TemplatePlotsGrid'
 import { NoPlotsToDisplay } from './NoPlotsToDisplay'
 import { PlotGroup, updateSections } from './templatePlotsSlice'
 import { removeFromPreviousAndAddToNewSection } from './util'
-import { createIDWithIndex, getIDIndex } from '../../../util/ids'
-import styles from '../styles.module.scss'
-import { shouldUseVirtualizedGrid } from '../util'
+import { TemplatePlotGroups } from './TemplatePlotGroups'
+import { TooManyPlots } from '../TooManyPlots'
+import { getIDIndex } from '../../../util/ids'
 import { PlotsState } from '../../store'
-import {
-  DraggedInfo,
-  setDraggedOverGroup
-} from '../../../shared/components/dragDrop/dragDropSlice'
-import { isSameGroup } from '../../../shared/components/dragDrop/util'
-import { changeOrderWithDraggedInfo } from '../../../util/array'
+import { setDraggedOverGroup } from '../../../shared/components/dragDrop/dragDropSlice'
 import { LoadingSection, sectionIsLoading } from '../LoadingSection'
 import { reorderTemplatePlots } from '../../util/messages'
-import { TooManyPlots } from '../TooManyPlots'
 import { useObserveGridDimensions } from '../../hooks/useObserveGridDimensions'
-
-interface TemplatePlotGroupsProps {
-  draggedRef: DraggedInfo
-  draggedOverGroup: string
-  gridRef: RefObject<HTMLDivElement>
-  handleDropInSection: (
-    draggedId: string,
-    draggedGroup: string,
-    groupId: string,
-    position?: number
-  ) => void
-  handleEnteringSection: (groupId: string) => void
-  nbItemsPerRow: number
-  sections: PlotGroup[]
-  setSectionEntries: (index: number, entries: string[]) => void
-  setSections: (sections: PlotGroup[]) => void
-}
-
-const TemplatePlotGroups: React.FC<TemplatePlotGroupsProps> = ({
-  draggedOverGroup,
-  draggedRef,
-  gridRef,
-  handleDropInSection,
-  handleEnteringSection,
-  nbItemsPerRow,
-  sections,
-  setSectionEntries,
-  setSections
-}) => {
-  useObserveGridDimensions(PlotsSection.TEMPLATE_PLOTS, gridRef)
-
-  return sections.map((section, i) => {
-    const groupId = createIDWithIndex(section.group, i)
-    const useVirtualizedGrid = shouldUseVirtualizedGrid(
-      Object.keys(section.entries).length,
-      nbItemsPerRow
-    )
-
-    const isMultiView = section.group === TemplatePlotGroup.MULTI_VIEW
-
-    const classes = cx(styles.sectionWrapper, {
-      [styles.multiViewPlotsGrid]: isMultiView,
-      [styles.singleViewPlotsGrid]: !isMultiView,
-      [styles.noBigGrid]: !useVirtualizedGrid
-    })
-
-    const handleDropAtTheEnd = () => {
-      handleEnteringSection('')
-      if (!draggedRef) {
-        return
-      }
-
-      if (draggedRef.group === groupId) {
-        const order = section.entries
-        const updatedSections = [...sections]
-
-        const newOrder = changeOrderWithDraggedInfo(order, draggedRef)
-        updatedSections[i] = {
-          ...sections[i],
-          entries: newOrder
-        }
-        setSections(updatedSections)
-      } else if (isSameGroup(draggedRef.group, groupId)) {
-        handleDropInSection(
-          draggedRef.itemId,
-          draggedRef.group,
-          groupId,
-          section.entries.length
-        )
-      }
-    }
-
-    const handleDragOver = (e: DragEvent) => {
-      e.preventDefault()
-      handleEnteringSection(groupId)
-    }
-
-    return (
-      <div
-        key={groupId}
-        id={groupId}
-        data-testid={`plots-section_${groupId}`}
-        className={classes}
-        onDragEnter={() => handleEnteringSection(groupId)}
-        onDragOver={handleDragOver}
-        onDrop={handleDropAtTheEnd}
-      >
-        <TemplatePlotsGrid
-          groupId={groupId}
-          groupIndex={i}
-          onDropInSection={handleDropInSection}
-          multiView={isMultiView}
-          setSectionEntries={setSectionEntries}
-          useVirtualizedGrid={useVirtualizedGrid}
-          nbItemsPerRow={nbItemsPerRow}
-          parentDraggedOver={draggedOverGroup === groupId}
-        />
-      </div>
-    )
-  })
-}
 
 export enum NewSectionBlock {
   TOP = 'drop-section-top',
@@ -149,6 +34,7 @@ export const TemplatePlots: React.FC = () => {
   )
 
   const gridRef = useRef<HTMLDivElement>(null)
+  useObserveGridDimensions(PlotsSection.TEMPLATE_PLOTS, gridRef)
 
   const [hoveredSection, setHoveredSection] = useState('')
   const dispatch = useDispatch()
@@ -273,7 +159,6 @@ export const TemplatePlots: React.FC = () => {
       <TemplatePlotGroups
         draggedRef={draggedRef}
         draggedOverGroup={draggedOverGroup}
-        gridRef={gridRef}
         handleDropInSection={handleDropInSection}
         handleEnteringSection={handleEnteringSection}
         nbItemsPerRow={nbItemsPerRow}

@@ -1,5 +1,6 @@
 import React, { DragEvent, useEffect, useRef, useState } from 'react'
 import cx from 'classnames'
+import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import { useSelector } from 'react-redux'
 import { NoPlotsAdded } from './NoPlotsAdded'
 import { CustomPlotsGrid } from './CustomPlotsGrid'
@@ -10,6 +11,7 @@ import { PlotsState } from '../../store'
 import { changeOrderWithDraggedInfo } from '../../../util/array'
 import { reorderCustomPlots } from '../../util/messages'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
+import { useObserveGridDimensions } from '../../hooks/useObserveGridDimensions'
 
 interface CustomPlotsProps {
   plotsIds: string[]
@@ -33,6 +35,7 @@ export const CustomPlots: React.FC<CustomPlotsProps> = ({ plotsIds }) => {
   )
 
   const gridRef = useRef<HTMLDivElement>(null)
+  useObserveGridDimensions(PlotsSection.CUSTOM_PLOTS, gridRef)
 
   useEffect(() => {
     setOrder(plotsIds)
@@ -86,7 +89,6 @@ export const CustomPlots: React.FC<CustomPlotsProps> = ({ plotsIds }) => {
       ref={gridRef}
     >
       <CustomPlotsGrid
-        gridRef={gridRef}
         nbItemsPerRow={nbItemsPerRow}
         order={order}
         parentDraggedOver={onSection}
