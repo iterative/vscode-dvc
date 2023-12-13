@@ -58,3 +58,6 @@ export const isExactGroup = (
 
 export const isSameGroup = (group1?: string, group2?: string) =>
   getIDWithoutIndex(group1) === getIDWithoutIndex(group2)
+
+export const isSameGroupOtherSection = (group1?: string, group2?: string) =>
+  isSameGroup(group1, group2) && !isExactGroup(group1, undefined, group2)

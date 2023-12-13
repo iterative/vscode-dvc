@@ -22,6 +22,7 @@ export interface DragDropState {
   draggedOverGroup: string
   direction: DragEnterDirection | undefined
   draggedOverId: string | undefined
+  isHoveringSomething: boolean
 }
 
 export const dragDropInitialState: DragDropState = {
@@ -29,7 +30,8 @@ export const dragDropInitialState: DragDropState = {
   draggedOverGroup: '',
   draggedOverId: undefined,
   draggedRef: undefined,
-  groups: {}
+  groups: {},
+  isHoveringSomething: false
 }
 
 export const dragDropSlice = createSlice({
@@ -71,6 +73,12 @@ export const dragDropSlice = createSlice({
         ...state,
         groups: { ...state.groups, [action.payload.id]: action.payload.group }
       }
+    },
+    setIsHoveringSomething: (state, action: PayloadAction<boolean>) => {
+      return {
+        ...state,
+        isHoveringSomething: action.payload
+      }
     }
   }
 })
@@ -80,7 +88,8 @@ export const {
   setGroup,
   setDraggedOverGroup,
   setDraggedOverId,
-  setDirection
+  setDirection,
+  setIsHoveringSomething
 } = dragDropSlice.actions
 
 export default dragDropSlice.reducer

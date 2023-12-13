@@ -51,12 +51,12 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
   const comparisonWidth = useSelector(
     (state: PlotsState) => state.comparison.width
   )
-  const { isInDragAndDropMode } = useSelector(
+  const { disabledDragPlotIds, isInDragAndDropMode } = useSelector(
     (state: PlotsState) => state.comparison
   )
   const [isShown, setIsShown] = useState(true)
   const { target, isAfter, ...dragAndDropProps } = useDragAndDrop({
-    disabledDropIds: [],
+    disabledDropIds: disabledDragPlotIds,
     dropTarget: <RowDropTarget colSpan={nbColumns} />,
     group: 'comparison-table',
     id: path,
@@ -147,30 +147,27 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
           {nbColumns > 1 && pinnedColumn && <td colSpan={nbColumns - 1}></td>}
         </tr>
         <tr ref={plotsRowRef}>
-          {plots.map(plot => {
-            const isPinned = pinnedColumn === plot.id
-            return (
-              <td
-                key={path + plot.id}
-                className={cx({
-                  [styles.pinnedColumnCell]: isPinned,
-                  [styles.draggedColumn]:
-                    isInDragAndDropMode && draggedId === plot.id
-                })}
+          {plots.map(plot => (
+            <td
+              key={path + plot.id}
+              className={cx({
+                [styles.pinnedColumnCell]: pinnedColumn === plot.id,
+                [styles.draggedColumn]:
+                  isInDragAndDropMode && draggedId === plot.id
+              })}
+            >
+              <div
+                data-testid="row-images"
+                className={cx(styles.cell, { [styles.cellHidden]: !isShown })}
               >
-                <div
-                  data-testid="row-images"
-                  className={cx(styles.cell, { [styles.cellHidden]: !isShown })}
-                >
-                  {plot.imgs.length > 1 ? (
-                    <ComparisonTableMultiCell plot={plot} path={path} />
-                  ) : (
-                    <ComparisonTableCell plot={plot} path={path} />
-                  )}
-                </div>
-              </td>
-            )
-          })}
+                {plot.imgs.length > 1 ? (
+                  <ComparisonTableMultiCell plot={plot} path={path} />
+                ) : (
+                  <ComparisonTableCell plot={plot} path={path} />
+                )}
+              </div>
+            </td>
+          ))}
         </tr>
       </tbody>
     </DragDropItemWithTarget>

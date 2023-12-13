@@ -139,15 +139,44 @@ export const TemplatePlots: React.FC = () => {
     }
   }
 
-  const handleEnteringSection = (groupId: string) => {
+  const handleEnteringSection = (groupId: string) =>
     dispatch(setDraggedOverGroup(groupId))
-  }
 
   const newDropSection = {
     acceptedGroups: Object.values(TemplatePlotGroup),
     hoveredSection,
     onDrop: handleDropInNewSection,
     setHoveredSection
+  }
+
+  const handleDropAtTheEnd = (groupId: string, order: string[], i: number) => {
+    handleEnteringSection('')
+    if (!draggedRef) {
+      return
+    }
+
+    if (draggedRef.group === groupId) {
+      const updatedSections = [...sections]
+
+      const newOrder = changeOrderWithDraggedInfo(order, draggedRef)
+      updatedSections[i] = {
+        ...sections[i],
+        entries: newOrder
+      }
+      setSections(updatedSections)
+    } else if (isSameGroup(draggedRef.group, groupId)) {
+      handleDropInSection(
+        draggedRef.itemId,
+        draggedRef.group,
+        groupId,
+        order.length
+      )
+    }
+  }
+
+  const handleDragOver = (e: DragEvent, groupId: string) => {
+    e.preventDefault()
+    handleEnteringSection(groupId)
   }
 
   return (
@@ -172,37 +201,6 @@ export const TemplatePlots: React.FC = () => {
           [styles.noBigGrid]: !useVirtualizedGrid
         })
 
-        const handleDropAtTheEnd = () => {
-          handleEnteringSection('')
-          if (!draggedRef) {
-            return
-          }
-
-          if (draggedRef.group === groupId) {
-            const order = section.entries
-            const updatedSections = [...sections]
-
-            const newOrder = changeOrderWithDraggedInfo(order, draggedRef)
-            updatedSections[i] = {
-              ...sections[i],
-              entries: newOrder
-            }
-            setSections(updatedSections)
-          } else if (isSameGroup(draggedRef.group, groupId)) {
-            handleDropInSection(
-              draggedRef.itemId,
-              draggedRef.group,
-              groupId,
-              section.entries.length
-            )
-          }
-        }
-
-        const handleDragOver = (e: DragEvent) => {
-          e.preventDefault()
-          handleEnteringSection(groupId)
-        }
-
         return (
           <div
             key={groupId}
@@ -210,8 +208,8 @@ export const TemplatePlots: React.FC = () => {
             data-testid={`plots-section_${groupId}`}
             className={classes}
             onDragEnter={() => handleEnteringSection(groupId)}
-            onDragOver={handleDragOver}
-            onDrop={handleDropAtTheEnd}
+            onDragOver={e => handleDragOver(e, groupId)}
+            onDrop={() => handleDropAtTheEnd(groupId, section.entries, i)}
           >
             <TemplatePlotsGrid
               groupId={groupId}
@@ -220,7 +218,10 @@ export const TemplatePlots: React.FC = () => {
               setSectionEntries={setSectionEntries}
               useVirtualizedGrid={useVirtualizedGrid}
               nbItemsPerRow={nbItemsPerRow}
-              parentDraggedOver={draggedOverGroup === groupId}
+              parentDraggedOver={
+                draggedOverGroup === groupId || draggedRef?.group === groupId
+              }
+              onDropInSection={handleDropInSection}
             />
           </div>
         )

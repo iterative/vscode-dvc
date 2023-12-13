@@ -1733,8 +1733,7 @@ describe('App', () => {
     it('should show a drop target at the end of the custom plots when moving a plot inside the section but not over any other plot', () => {
       renderAppWithOptionalDataInDragAndDropMode(
         {
-          custom: customPlotsFixture,
-          template: templatePlotsFixture
+          custom: customPlotsFixture
         },
         true
       )
@@ -1749,8 +1748,7 @@ describe('App', () => {
     it('should show a drop target a plot at the end of the custom plots when moving a plot inside the section but not over any other plot', () => {
       renderAppWithOptionalDataInDragAndDropMode(
         {
-          custom: customPlotsFixture,
-          template: templatePlotsFixture
+          custom: customPlotsFixture
         },
         true
       )

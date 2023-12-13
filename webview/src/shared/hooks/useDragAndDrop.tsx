@@ -13,7 +13,8 @@ import {
   getDragEnterDirection,
   isEnteringAfter,
   isExactGroup,
-  isSameGroup
+  isSameGroup,
+  isSameGroupOtherSection
 } from '../components/dragDrop/util'
 import { PlotsState } from '../../plots/store'
 import {
@@ -28,7 +29,7 @@ import { getStyleProperty } from '../../util/styles'
 import { DropTarget } from '../components/dragDrop/DropTarget'
 import styles from '../components/dragDrop/styles.module.scss'
 
-type OnDrop = (
+export type OnDrop = (
   draggedId: string,
   draggedGroup: string,
   groupId: string,
@@ -50,6 +51,7 @@ interface DragAndDropProps {
   vertical?: boolean
   style?: CSSProperties
   type?: JSX.Element
+  isLast?: boolean
 }
 
 const orderIdxTune = (
@@ -83,18 +85,20 @@ export const useDragAndDrop = ({
   isParentDraggedOver,
   style,
   dropTarget,
+  isLast,
   type // eslint-disable-next-line sonarjs/cognitive-complexity
 }: DragAndDropProps) => {
   const [isDragged, setIsDragged] = useState(false)
 
+  const { immediateDragLeave, immediateDragEnter, deferredDragLeave } =
+    useDeferredDragLeave()
   const {
-    hoveringSomething,
-    immediateDragLeave,
-    immediateDragEnter,
-    deferredDragLeave
-  } = useDeferredDragLeave()
-  const { draggedRef, draggedOverGroup, direction, draggedOverId } =
-    useSelector((state: PlotsState) => state.dragAndDrop)
+    draggedRef,
+    draggedOverGroup,
+    direction,
+    draggedOverId,
+    isHoveringSomething
+  } = useSelector((state: PlotsState) => state.dragAndDrop)
   const draggedOverIdTimeout = useRef<number>(0)
 
   const dispatch = useDispatch()
@@ -154,7 +158,6 @@ export const useDragAndDrop = ({
 
     if (isSameGroup(draggedRef?.group, group) && !isDisabled && !isDropTarget) {
       setIsDraggedOver(true)
-      setIsDraggedOver(true)
       dispatch(setDirection(getDragEnterDirection(e, vertical)))
       dispatch(setDraggedOverGroup(group))
     }
@@ -173,7 +176,6 @@ export const useDragAndDrop = ({
   }
 
   const handleDragLeave = () => {
-    setIsDraggedOver(false)
     deferredDragLeave()
   }
 
@@ -228,13 +230,24 @@ export const useDragAndDrop = ({
     }
   }
 
-  const isBeingDraggedOver =
-    isDraggedOver && (hoveringSomething || !isParentDraggedOver)
+  const isInOtherSection =
+    draggedRef?.itemId === id &&
+    isSameGroupOtherSection(draggedRef?.group, draggedOverGroup)
 
-  const hasTarget =
-    isBeingDraggedOver &&
-    isExactGroup(draggedOverGroup, draggedRef?.group, group)
-  const isAfter = isEnteringAfter(direction)
+  const isBeingDraggedOver =
+    isInOtherSection ||
+    (isDraggedOver &&
+      (isHoveringSomething || !isParentDraggedOver) &&
+      isExactGroup(draggedOverGroup, draggedRef?.group, group))
+
+  const atTheEnd =
+    isLast &&
+    isSameGroup(draggedRef?.group, group) &&
+    !isHoveringSomething &&
+    isParentDraggedOver
+
+  const hasTarget = atTheEnd || isBeingDraggedOver
+  const isAfter = atTheEnd || isEnteringAfter(direction)
 
   const dropTargetClassNames = shouldShowOnDrag
     ? cx(styles.dropTargetWhenShowingOnDrag, {

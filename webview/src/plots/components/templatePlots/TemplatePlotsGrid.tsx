@@ -3,6 +3,7 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { PlotsState } from '../../store'
 import { Grid } from '../Grid'
+import { OnDrop } from '../../../shared/hooks/useDragAndDrop'
 
 interface TemplatePlotsGridProps {
   groupId: string
@@ -12,6 +13,7 @@ interface TemplatePlotsGridProps {
   useVirtualizedGrid?: boolean
   nbItemsPerRow: number
   parentDraggedOver?: boolean
+  onDropInSection: OnDrop
 }
 
 export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
@@ -21,7 +23,8 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   setSectionEntries,
   useVirtualizedGrid,
   nbItemsPerRow,
-  parentDraggedOver
+  parentDraggedOver,
+  onDropInSection
 }) => {
   const entries = useSelector(
     (state: PlotsState) => state.template.sections[groupIndex].entries
@@ -41,6 +44,7 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
       parentDraggedOver={parentDraggedOver}
       multiView={multiView}
       sectionKey={PlotsSection.TEMPLATE_PLOTS}
+      onDrop={onDropInSection}
     />
   )
 }

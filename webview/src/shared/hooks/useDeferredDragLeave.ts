@@ -1,7 +1,9 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
+import { useDispatch } from 'react-redux'
+import { setIsHoveringSomething } from '../components/dragDrop/dragDropSlice'
 
 export const useDeferredDragLeave = () => {
-  const [hoveringSomething, setHoveringSomething] = useState(false)
+  const dispatch = useDispatch()
   const isHovering = useRef(false)
   const hoveringTimeout = useRef<number>(0)
 
@@ -16,27 +18,26 @@ export const useDeferredDragLeave = () => {
       isHovering.current = false
       hoveringTimeout.current = window.setTimeout(() => {
         if (!isHovering.current) {
-          setHoveringSomething(false)
+          dispatch(setIsHoveringSomething(false))
           callback?.()
         }
       }, 500)
     },
-    [setHoveringSomething]
+    [dispatch]
   )
 
   const immediateDragLeave = useCallback(() => {
-    setHoveringSomething(false)
+    dispatch(setIsHoveringSomething(false))
     isHovering.current = false
-  }, [setHoveringSomething])
+  }, [dispatch])
 
   const immediateDragEnter = useCallback(() => {
-    setHoveringSomething(true)
+    dispatch(setIsHoveringSomething(true))
     isHovering.current = true
-  }, [setHoveringSomething])
+  }, [dispatch])
 
   return {
     deferredDragLeave,
-    hoveringSomething,
     immediateDragEnter,
     immediateDragLeave
   }

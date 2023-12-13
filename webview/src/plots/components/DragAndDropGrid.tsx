@@ -5,6 +5,7 @@ import styles from './styles.module.scss'
 import { DragAndDropPlot } from './DragAndDropPlot'
 import { plotDataStore } from './plotDataStore'
 import { VirtualizedGrid } from '../../shared/components/virtualizedGrid/VirtualizedGrid'
+import { OnDrop } from '../../shared/hooks/useDragAndDrop'
 
 interface DragAndDropGridProps {
   order: string[]
@@ -15,6 +16,7 @@ interface DragAndDropGridProps {
   parentDraggedOver?: boolean
   multiView?: boolean
   sectionKey: PlotsSection
+  onDrop?: OnDrop
 }
 
 export const DragAndDropGrid: React.FC<DragAndDropGridProps> = ({
@@ -25,20 +27,22 @@ export const DragAndDropGrid: React.FC<DragAndDropGridProps> = ({
   useVirtualizedGrid,
   parentDraggedOver,
   multiView,
-  sectionKey
+  sectionKey,
+  onDrop
 }) => {
   const plotClassName = cx(styles.plot, styles.dragAndDropPlot, {
     [styles.multiViewPlot]: multiView
   })
-  const items = order.map((plot: string) => {
+  const items = order.map((plot: string, i: number) => {
     const colSpan =
       (multiView &&
-        plotDataStore[PlotsSection.TEMPLATE_PLOTS][plot].revisions?.length) ||
+        plotDataStore[PlotsSection.TEMPLATE_PLOTS][plot]?.revisions?.length) ||
       1
 
     return (
       <DragAndDropPlot
         key={plot}
+        id={plot}
         data-testid={`plot_${plot}`}
         plot={plot}
         sectionKey={sectionKey}
@@ -48,6 +52,8 @@ export const DragAndDropGrid: React.FC<DragAndDropGridProps> = ({
         isParentDraggedOver={parentDraggedOver}
         setOrder={setOrder}
         order={order}
+        isLast={i === order.length - 1}
+        afterOnDrop={onDrop}
       />
     )
   })
