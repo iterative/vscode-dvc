@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.1] - 2023-12-13
+
+### 🔨 Maintenance
+
+- Improve studio access token commands [#5088](https://github.com/iterative/vscode-dvc/pull/5088) by [@julieg18](https://github.com/julieg18)
+- Reduce number of plots resize observers [#5097](https://github.com/iterative/vscode-dvc/pull/5097) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.2.0] - 2023-12-10
 
 ### 🚀 New Features and Enhancements
