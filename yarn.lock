@@ -3544,28 +3544,28 @@
   dependencies:
     "@nevware21/ts-utils" ">= 0.9.4 < 2.x"
 
-"@microsoft/fast-element@^1.10.1", "@microsoft/fast-element@^1.6.2", "@microsoft/fast-element@^1.9.0":
-  version "1.10.1"
-  resolved "https://registry.yarnpkg.com/@microsoft/fast-element/-/fast-element-1.10.1.tgz#2ca442a4a8d15f3fd796795a370e3a1bc9bd2738"
-  integrity sha512-cq+vBBa8JCuAhsFEwHM9386YolYu9pNb1sBodp69RqWuaU56ElC60dC3aQWuOKqAMNoQqtCHPh0RQTvVBegSyw==
+"@microsoft/fast-element@^1.12.0":
+  version "1.12.0"
+  resolved "https://registry.yarnpkg.com/@microsoft/fast-element/-/fast-element-1.12.0.tgz#aabfc75518c3a9000710cce5f66dfc677de8c254"
+  integrity sha512-gQutuDHPKNxUEcQ4pypZT4Wmrbapus+P9s3bR/SEOLsMbNqNoXigGImITygI5zhb+aA5rzflM6O8YWkmRbGkPA==
 
-"@microsoft/fast-foundation@^2.38.0", "@microsoft/fast-foundation@^2.41.1":
-  version "2.46.3"
-  resolved "https://registry.yarnpkg.com/@microsoft/fast-foundation/-/fast-foundation-2.46.3.tgz#4230a4cffa7ff2e140119d93e319c2263596f1e1"
-  integrity sha512-UPa1oeLCZNDp7CEMv/wAs4UVjKXVAwrJtGKkERmaj069PU2+Mn0dJ/EtOSCEYIzHBrIXYJ1Pd1NmZUeUtJTpWw==
+"@microsoft/fast-foundation@^2.49.4":
+  version "2.49.4"
+  resolved "https://registry.yarnpkg.com/@microsoft/fast-foundation/-/fast-foundation-2.49.4.tgz#322150cd6f0bed89d6d2238a700e6b9db94ac694"
+  integrity sha512-5I2tSPo6bnOfVAIX7XzX+LhilahwvD7h+yzl3jW0t5IYmMX9Lci9VUVyx5f8hHdb1O9a8Y9Atb7Asw7yFO/u+w==
   dependencies:
-    "@microsoft/fast-element" "^1.10.1"
+    "@microsoft/fast-element" "^1.12.0"
     "@microsoft/fast-web-utilities" "^5.4.1"
     tabbable "^5.2.0"
     tslib "^1.13.0"
 
-"@microsoft/fast-react-wrapper@^0.1.18":
-  version "0.1.48"
-  resolved "https://registry.yarnpkg.com/@microsoft/fast-react-wrapper/-/fast-react-wrapper-0.1.48.tgz#aa89c0dfb703c2f71619c536de2342e28b40b8c9"
-  integrity sha512-9NvEjru9Kn5ZKjomAMX6v+eF0DR+eDkxKDwDfi+Wb73kTbrNzcnmlwd4diN15ygH97kldgj2+lpvI4CKLQQWLg==
+"@microsoft/fast-react-wrapper@^0.3.22":
+  version "0.3.22"
+  resolved "https://registry.yarnpkg.com/@microsoft/fast-react-wrapper/-/fast-react-wrapper-0.3.22.tgz#fe68ed7bccbd1919c36afc3105b572d76215ad25"
+  integrity sha512-XhlX4m6znh7XW92oPvlKoG9USUn9JtF9rP1qtUoIbkaDaFtUS+H8o1Jn6/oK/rS44LbBLJXrvRkInmSWlDiGFw==
   dependencies:
-    "@microsoft/fast-element" "^1.9.0"
-    "@microsoft/fast-foundation" "^2.41.1"
+    "@microsoft/fast-element" "^1.12.0"
+    "@microsoft/fast-foundation" "^2.49.4"
 
 "@microsoft/fast-web-utilities@^5.4.1":
   version "5.4.1"
@@ -6698,14 +6698,15 @@
   optionalDependencies:
     keytar "^7.7.0"
 
-"@vscode/webview-ui-toolkit@1.3.1":
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/@vscode/webview-ui-toolkit/-/webview-ui-toolkit-1.3.1.tgz#df5d7cb0cbd751349c782a9df2034dfaf77be7ba"
-  integrity sha512-vrP45vHytXGl3EeBBkgZFsl70w1FQaPNG/Z3YXbm3ee+4/+WK1F2StFgtpFPYxUYxZFogtR3CmHNW4pb5DjLrw==
+"@vscode/webview-ui-toolkit@1.4.0":
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/@vscode/webview-ui-toolkit/-/webview-ui-toolkit-1.4.0.tgz#abbd5b2f8a08eee6cfb68d47a83778424f926715"
+  integrity sha512-modXVHQkZLsxgmd5yoP3ptRC/G8NBDD+ob+ngPiWNQdlrH6H1xR/qgOBD85bfU3BhOB5sZzFWBwwhp9/SfoHww==
   dependencies:
-    "@microsoft/fast-element" "^1.6.2"
-    "@microsoft/fast-foundation" "^2.38.0"
-    "@microsoft/fast-react-wrapper" "^0.1.18"
+    "@microsoft/fast-element" "^1.12.0"
+    "@microsoft/fast-foundation" "^2.49.4"
+    "@microsoft/fast-react-wrapper" "^0.3.22"
+    tslib "^2.6.2"
 
 "@wdio/cli@8.16.7":
   version "8.16.7"
@@ -21534,6 +21535,11 @@ tslib@^2.5.0, tslib@^2.6.0:
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.6.0.tgz#b295854684dbda164e181d259a22cd779dcd7bc3"
   integrity sha512-7At1WUettjcSRHXCyYtTselblcHl9PJFFVKiCAy/bY97+BPZXSQ2wbq0P9s8tK2G7dFQfNnlJnPAiArVBVBsfA==
+
+tslib@^2.6.2:
+  version "2.6.2"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.6.2.tgz#703ac29425e7b37cd6fd456e92404d46d1f3e4ae"
+  integrity sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==
 
 tsutils-etc@^1.4.1:
   version "1.4.1"
