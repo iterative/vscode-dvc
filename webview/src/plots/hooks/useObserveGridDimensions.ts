@@ -1,5 +1,5 @@
 import type { RefObject } from 'react'
-import { useEffect } from 'react'
+import { useLayoutEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import { updateSectionDimensions as updateTemplateDimensions } from '../components/templatePlots/templatePlotsSlice'
@@ -20,7 +20,7 @@ export const useObserveGridDimensions = (
 ): void => {
   const dispatch = useDispatch()
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const updateSectionDimensions = updateBySection[sectionKey]
     const resizeObserver = new ResizeObserver(() => {
       if (!updateSectionDimensions) {
