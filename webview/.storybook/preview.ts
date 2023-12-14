@@ -1,6 +1,5 @@
 import { Preview } from '@storybook/react'
 import { InternalVsCodeApi } from '../src/shared/api'
-import { action } from '@storybook/addon-actions'
 import { viewports } from '../src/stories/util'
 import '../src/shared/styles.scss'
 import './test-vscode-styles.scss'
@@ -14,8 +13,7 @@ declare global {
 
 window.acquireVsCodeApi = () =>
   ({
-    postMessage: action('postMessage'),
-    setState: action('setState')
+    postMessage: postMessage
   }) as unknown as InternalVsCodeApi
 
 export const preview: Preview = {
