@@ -1,6 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { VSCodeProgressRing } from '@vscode/webview-ui-toolkit/react'
-import cx from 'classnames'
+import React from 'react'
 import { useSelector } from 'react-redux'
 import {
   ExecutorStatus,
@@ -9,10 +7,12 @@ import {
   isRunning
 } from 'dvc/src/experiments/webview/contract'
 import { CellHintTooltip } from './CellHintTooltip'
+import { Progress } from './Progress'
+import { OnRemote } from './OnRemote'
 import styles from '../styles.module.scss'
 import { clickAndEnterProps } from '../../../../util/props'
-import { copyStudioLink, pushExperiment } from '../../../util/messages'
-import { Cloud, CloudUpload, Link } from '../../../../shared/components/icons'
+import { pushExperiment } from '../../../util/messages'
+import { CloudUpload } from '../../../../shared/components/icons'
 import { Icon } from '../../../../shared/components/Icon'
 import { ExperimentsState } from '../../../store'
 
@@ -21,70 +21,6 @@ type ExperimentStatusIndicatorProps = {
   gitRemoteStatus: GitRemoteStatus | undefined
   id: string
   studioLinkType: StudioLinkType | undefined
-}
-
-const Progress: React.FC = () => (
-  <VSCodeProgressRing className={cx(styles.running, 'chromatic-ignore')} />
-)
-
-const CopyStudioLink: React.FC<{ id: string }> = ({ id }) => {
-  const [copying, setCopying] = useState<boolean>()
-  const timer = useRef<number>()
-
-  useEffect(
-    () => () => {
-      if (timer.current) {
-        window.clearTimeout(timer.current)
-      }
-    },
-    []
-  )
-
-  if (copying) {
-    return <Progress />
-  }
-
-  return (
-    <CellHintTooltip
-      tooltipContent={'Experiment on remote\nClick to copy Studio link'}
-    >
-      <div
-        className={styles.upload}
-        {...clickAndEnterProps(() => {
-          setCopying(true)
-          if (timer.current) {
-            window.clearTimeout(timer.current)
-          }
-          timer.current = window.setTimeout(() => {
-            setCopying(false)
-          }, 1000)
-          return copyStudioLink(id, StudioLinkType.PUSHED)
-        })}
-      >
-        <Icon
-          aria-label="Copy Experiment Link"
-          className={styles.remoteStatusBox}
-          icon={Link}
-        />
-      </div>
-    </CellHintTooltip>
-  )
-}
-
-const OnRemote: React.FC<{ id: string; showLinkIcon: boolean }> = ({
-  id,
-  showLinkIcon
-}) => {
-  if (showLinkIcon) {
-    return <CopyStudioLink id={id} />
-  }
-  return (
-    <CellHintTooltip tooltipContent="Experiment on remote">
-      <div className={styles.upload}>
-        <Icon className={styles.cloudIndicator} icon={Cloud} />
-      </div>
-    </CellHintTooltip>
-  )
 }
 
 export const ExperimentStatusIndicator: React.FC<

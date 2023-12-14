@@ -1,10 +1,14 @@
 import React from 'react'
+import { Provider } from 'react-redux'
+import { configureStore } from '@reduxjs/toolkit'
 import { render, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import {
   ComparisonTableHeader,
   ComparisonTableHeaderProps
 } from './ComparisonTableHeader'
+
+import { plotsReducers } from '../../store'
 
 describe('ComparisonTableHeader', () => {
   beforeEach(() => {
@@ -13,13 +17,23 @@ describe('ComparisonTableHeader', () => {
 
   const basicProps: ComparisonTableHeaderProps = {
     displayColor: '#ffffff',
-    isPinned: false,
-    onClicked: jest.fn()
+    id: 'id',
+    onClicked: jest.fn(),
+    order: [],
+    pinnedColumn: undefined,
+    setOrder: jest.fn()
   }
   const headerContent = 'ComparisonTableHeader'
   const fullProps = { ...basicProps, children: headerContent }
+  const store = configureStore({
+    reducer: plotsReducers
+  })
   const renderHeader = (props = fullProps) =>
-    render(<ComparisonTableHeader {...props} />)
+    render(
+      <Provider store={store}>
+        <ComparisonTableHeader {...props} />
+      </Provider>
+    )
 
   it('should render a table header', () => {
     renderHeader()

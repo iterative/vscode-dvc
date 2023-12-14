@@ -10,7 +10,7 @@ import { isSameGroup } from '../../../shared/components/dragDrop/util'
 import { createIDWithIndex } from '../../../util/ids'
 import { changeOrderWithDraggedInfo } from '../../../util/array'
 
-type TemplatePlotGroupsProps = {
+interface TemplatePlotGroupsProps {
   draggedRef: DraggedInfo
   draggedOverGroup: string
   handleDropInSection: (
@@ -36,6 +36,36 @@ export const TemplatePlotGroups: React.FC<TemplatePlotGroupsProps> = ({
   setSectionEntries,
   setSections
 }) => {
+  const handleDragOver = (e: DragEvent, groupId: string) => {
+    e.preventDefault()
+    handleEnteringSection(groupId)
+  }
+
+  const handleDropAtTheEnd = (groupId: string, order: string[], i: number) => {
+    handleEnteringSection('')
+    if (!draggedRef) {
+      return
+    }
+
+    if (draggedRef.group === groupId) {
+      const updatedSections = [...sections]
+
+      const newOrder = changeOrderWithDraggedInfo(order, draggedRef)
+      updatedSections[i] = {
+        ...sections[i],
+        entries: newOrder
+      }
+      setSections(updatedSections)
+    } else if (isSameGroup(draggedRef.group, groupId)) {
+      handleDropInSection(
+        draggedRef.itemId,
+        draggedRef.group,
+        groupId,
+        order.length
+      )
+    }
+  }
+
   return sections.map((section, i) => {
     const groupId = createIDWithIndex(section.group, i)
     const useVirtualizedGrid = shouldUseVirtualizedGrid(
@@ -51,37 +81,6 @@ export const TemplatePlotGroups: React.FC<TemplatePlotGroupsProps> = ({
       [styles.noBigGrid]: !useVirtualizedGrid
     })
 
-    const handleDropAtTheEnd = () => {
-      handleEnteringSection('')
-      if (!draggedRef) {
-        return
-      }
-
-      if (draggedRef.group === groupId) {
-        const order = section.entries
-        const updatedSections = [...sections]
-
-        const newOrder = changeOrderWithDraggedInfo(order, draggedRef)
-        updatedSections[i] = {
-          ...sections[i],
-          entries: newOrder
-        }
-        setSections(updatedSections)
-      } else if (isSameGroup(draggedRef.group, groupId)) {
-        handleDropInSection(
-          draggedRef.itemId,
-          draggedRef.group,
-          groupId,
-          section.entries.length
-        )
-      }
-    }
-
-    const handleDragOver = (e: DragEvent) => {
-      e.preventDefault()
-      handleEnteringSection(groupId)
-    }
-
     return (
       <div
         key={groupId}
@@ -89,18 +88,20 @@ export const TemplatePlotGroups: React.FC<TemplatePlotGroupsProps> = ({
         data-testid={`plots-section_${groupId}`}
         className={classes}
         onDragEnter={() => handleEnteringSection(groupId)}
-        onDragOver={handleDragOver}
-        onDrop={handleDropAtTheEnd}
+        onDragOver={e => handleDragOver(e, groupId)}
+        onDrop={() => handleDropAtTheEnd(groupId, section.entries, i)}
       >
         <TemplatePlotsGrid
           groupId={groupId}
           groupIndex={i}
-          onDropInSection={handleDropInSection}
           multiView={isMultiView}
           setSectionEntries={setSectionEntries}
           useVirtualizedGrid={useVirtualizedGrid}
           nbItemsPerRow={nbItemsPerRow}
-          parentDraggedOver={draggedOverGroup === groupId}
+          parentDraggedOver={
+            draggedOverGroup === groupId || draggedRef?.group === groupId
+          }
+          onDropInSection={handleDropInSection}
         />
       </div>
     )

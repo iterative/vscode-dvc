@@ -1,8 +1,9 @@
-import React, { MouseEventHandler, ReactElement } from 'react'
+import React from 'react'
 import { useSelector } from 'react-redux'
 import cx from 'classnames'
 import styles from './styles.module.scss'
 import { CellHintTooltip } from './body/CellHintTooltip'
+import { Indicator } from './Indicator'
 import {
   focusFiltersTree,
   focusSortsTree,
@@ -21,57 +22,6 @@ import {
   Table
 } from '../../../shared/components/icons'
 import { ExperimentsState } from '../../store'
-
-type CounterBadgeProps = {
-  count?: number
-}
-
-const CounterBadge: React.FC<CounterBadgeProps> = ({ count }) => {
-  return count ? (
-    <span
-      className={styles.indicatorCount}
-      role="marquee"
-      aria-label={String(count)}
-    >
-      {count}
-    </span>
-  ) : null
-}
-
-export const Indicator = ({
-  children,
-  count,
-  'aria-label': ariaLabel,
-  tooltipContent,
-  onClick,
-  disabled
-}: CounterBadgeProps & {
-  'aria-label'?: string
-  onClick?: MouseEventHandler
-  tooltipContent?: string
-  children: ReactElement
-  disabled?: boolean
-}) => {
-  const content = (
-    <button
-      className={styles.indicatorIcon}
-      aria-label={ariaLabel}
-      onClick={onClick}
-      disabled={disabled}
-    >
-      {children}
-      <CounterBadge count={count} />
-    </button>
-  )
-
-  return tooltipContent ? (
-    <CellHintTooltip tooltipContent={tooltipContent} delay={[1000, 0]}>
-      {content}
-    </CellHintTooltip>
-  ) : (
-    content
-  )
-}
 
 export const Indicators = () => {
   const filters = useSelector(

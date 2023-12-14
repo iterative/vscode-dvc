@@ -1,11 +1,7 @@
-import React, { PropsWithChildren } from 'react'
-import styles from './styles.module.scss'
+import React from 'react'
+import { PathHighlight } from './PathHighlight'
 import { MessageBand } from '../../shared/components/messageBand/MessageBand'
 import { Info } from '../../shared/components/icons'
-
-const PathHighlight: React.FC<PropsWithChildren> = ({ children }) => (
-  <span className={styles.pathHighlight}>{children}</span>
-)
 
 export const TooManyPlots: React.FC = () => {
   return (

@@ -21,13 +21,17 @@ jest.mock('../../../shared/api')
 describe('ComparisonTableRow', () => {
   const basicProps: ComparisonTableRowProps = {
     nbColumns: 3,
+    onLayoutChange: jest.fn(),
+    order: ['path/to/the-file/image.png'],
     path: 'path/to/the-file/image.png',
     pinnedColumn: '',
     plots: Object.values(
       comparisonPlotsFixture.plots.find(
         ({ path }) => path === join('plots', 'acc.png')
       )?.revisions || {}
-    ).map(revision => ({ ...revision, fetched: true }))
+    ).map(revision => ({ ...revision, fetched: true })),
+
+    setOrder: jest.fn()
   }
 
   const renderRow = (props = basicProps) =>

@@ -138,9 +138,8 @@ export const TemplatePlots: React.FC = () => {
     }
   }
 
-  const handleEnteringSection = (groupId: string) => {
+  const handleEnteringSection = (groupId: string) =>
     dispatch(setDraggedOverGroup(groupId))
-  }
 
   const newDropSection = {
     acceptedGroups: Object.values(TemplatePlotGroup),
@@ -156,6 +155,7 @@ export const TemplatePlots: React.FC = () => {
         id={NewSectionBlock.TOP}
         closestSection={firstSection}
       />
+
       <TemplatePlotGroups
         draggedRef={draggedRef}
         draggedOverGroup={draggedOverGroup}

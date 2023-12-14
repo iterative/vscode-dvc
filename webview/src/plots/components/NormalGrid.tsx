@@ -62,7 +62,7 @@ export const NormalGrid: React.FC<NormalGridProps> = ({
   })
 
   return useVirtualizedGrid ? (
-    <VirtualizedGrid nbItemsPerRow={nbItemsPerRow} items={plots} />
+    <VirtualizedGrid nbItemsPerRow={nbItemsPerRow}>{plots}</VirtualizedGrid>
   ) : (
     <>{plots}</>
   )

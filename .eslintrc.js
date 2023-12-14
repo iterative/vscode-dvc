@@ -61,7 +61,7 @@ module.exports = {
             cases: {
               pascalCase: true
             },
-            ignore: [/.*\.stories.tsx$/, /.*\.test\.tsx$/]
+            ignore: [/.*\.stories.tsx$/, /.*\.test\.tsx$/, /.*use.*\.tsx$/]
           }
         ]
       }
@@ -87,6 +87,12 @@ module.exports = {
       ],
       rules: {
         'import/no-unused-modules': 'off'
+      }
+    },
+    {
+      files: ['**/stories/**', '**/__mocks__/**'],
+      rules: {
+        'react/no-multi-comp': 'off'
       }
     }
   ],
@@ -177,6 +183,7 @@ module.exports = {
     ],
     'react-hooks/exhaustive-deps': 'error',
     'react-hooks/rules-of-hooks': 'error',
+    'react/no-multi-comp': 'error',
     // This project doesn't use prop types
     'react/prop-types': 'off',
     'react/react-in-jsx-scope': 'off',

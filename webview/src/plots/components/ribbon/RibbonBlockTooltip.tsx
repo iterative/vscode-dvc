@@ -7,7 +7,7 @@ import { Icon } from '../../../shared/components/Icon'
 import Tooltip from '../../../shared/components/tooltip/Tooltip'
 import { CopyButton } from '../../../shared/components/copyButton/CopyButton'
 import { GitCommit, Info } from '../../../shared/components/icons'
-import { ErrorTooltipContent } from '../../../shared/components/tooltip/ErrorTooltip'
+import { ErrorTooltipContent } from '../../../shared/components/tooltip/ErrorTooltipContent'
 
 export const RibbonBlockTooltip: React.FC<{
   revision: Revision
