@@ -104,6 +104,22 @@ describe('DvcConfig', () => {
         executable: 'dvc'
       })
     })
+
+    it('should return undefined if the underlying process throws', async () => {
+      const cwd = __dirname
+
+      mockedCreateProcess.mockImplementationOnce(() => {
+        throw new Error('remote does not exist')
+      })
+
+      const output = await dvcConfig.remote(
+        cwd,
+        SubCommand.REMOVE,
+        Flag.PROJECT,
+        'remote-name'
+      )
+      expect(output).toStrictEqual(undefined)
+    })
   })
 
   describe('remoteAdd', () => {
@@ -128,7 +144,7 @@ describe('DvcConfig', () => {
   })
 
   describe('remoteRename', () => {
-    it('should call createProcess with the correct parameters to rename a remote in the config', async () => {
+    it('should call createProcess with the correct parameters to rename a remote name in the config', async () => {
       const cwd = __dirname
       const stdout = ''
 
@@ -153,8 +169,8 @@ describe('DvcConfig', () => {
     })
   })
 
-  describe('remoteModifyUrl', () => {
-    it('should call createProcess with the correct parameters to modify a remote in the config', async () => {
+  describe('remoteModify', () => {
+    it('should call createProcess with the correct parameters to modify a remote url in the config', async () => {
       const cwd = __dirname
       const stdout = ''
 
