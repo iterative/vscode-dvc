@@ -1465,13 +1465,12 @@ suite('Setup Test Suite', () => {
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
-      const mockRemote = stub(DvcConfig.prototype, 'remote')
+      stub(DvcConfig.prototype, 'remote').resolves('')
+      const mockRemoteAdd = stub(DvcConfig.prototype, 'remoteAdd')
 
       const remoteAdded = new Promise(resolve =>
-        mockRemote.callsFake((_, ...args) => {
-          if (args.includes('add')) {
-            resolve(undefined)
-          }
+        mockRemoteAdd.callsFake(() => {
+          resolve(undefined)
           return Promise.resolve('')
         })
       )
@@ -1491,11 +1490,10 @@ suite('Setup Test Suite', () => {
 
       expect(mockShowInputBox).to.be.calledTwice
       expect(
-        mockRemote,
+        mockRemoteAdd,
         'new remote is set as the default'
       ).to.be.calledWithExactly(
         dvcDemoPath,
-        'add',
         '-d',
         '--project',
         'storage',
@@ -1504,17 +1502,12 @@ suite('Setup Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to add a remote', async () => {
-      const mockRemote = stub(DvcConfig.prototype, 'remote')
+      stub(DvcConfig.prototype, 'remote').resolves('storage s3://my-bucket')
+      const mockRemoteAdd = stub(DvcConfig.prototype, 'remoteAdd')
 
       const remoteAdded = new Promise(resolve =>
-        mockRemote.callsFake((_, ...args) => {
-          if (args.includes('list')) {
-            return Promise.resolve('storage s3://my-bucket')
-          }
-
-          if (args.includes('add')) {
-            resolve(undefined)
-          }
+        mockRemoteAdd.callsFake(() => {
+          resolve(undefined)
           return Promise.resolve('')
         })
       )
@@ -1542,11 +1535,10 @@ suite('Setup Test Suite', () => {
       expect(mockShowInputBox).to.be.calledTwice
       expect(mockShowQuickPick).to.be.calledOnce
       expect(
-        mockRemote,
+        mockRemoteAdd,
         'should not set a remote as the default unless the user explicitly chooses to'
       ).to.be.calledWithExactly(
         dvcDemoPath,
-        'add',
         '--project',
         'backup',
         's3://my-backup-bucket'
@@ -1554,22 +1546,18 @@ suite('Setup Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to rename a remote', async () => {
-      const mockRemote = stub(DvcConfig.prototype, 'remote')
+      stub(DvcConfig.prototype, 'remote').callsFake((_, ...args) => {
+        if (args.includes('list') && args.includes('--project')) {
+          return Promise.resolve('storage s3://my-bucket')
+        }
+        return Promise.resolve('')
+      })
+      const mockRemoteRename = stub(DvcConfig.prototype, 'remoteRename')
       const newName = 'better-name'
 
       const remoteRenamed = new Promise(resolve =>
-        mockRemote.callsFake((_, ...args) => {
-          if (args.includes('list') && args.includes('--project')) {
-            return Promise.resolve('storage s3://my-bucket')
-          }
-
-          if (args.includes('list')) {
-            return Promise.resolve('')
-          }
-
-          if (args.includes('rename')) {
-            resolve(undefined)
-          }
+        mockRemoteRename.callsFake(() => {
+          resolve(undefined)
           return Promise.resolve('')
         })
       )
@@ -1589,9 +1577,8 @@ suite('Setup Test Suite', () => {
 
       expect(mockShowInputBox).to.be.calledOnce
       expect(mockShowQuickPick).to.be.calledOnce
-      expect(mockRemote).to.be.calledWithExactly(
+      expect(mockRemoteRename).to.be.calledWithExactly(
         dvcDemoPath,
-        'rename',
         '--project',
         'storage',
         newName
@@ -1609,24 +1596,21 @@ suite('Setup Test Suite', () => {
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
-      const mockRemote = stub(DvcConfig.prototype, 'remote')
       const projectConfigUrl = 's3://different-url'
+      stub(DvcConfig.prototype, 'remote').callsFake((_, ...args) => {
+        if (args.includes('list') && args.includes('--project')) {
+          return Promise.resolve(
+            `storage ${projectConfigUrl}\nbackup s3://my-backup-bucket`
+          )
+        }
+
+        return Promise.resolve('storage s3://my-bucket')
+      })
+      const mockRemoteRename = stub(DvcConfig.prototype, 'remoteModify')
 
       const remoteModified = new Promise(resolve =>
-        mockRemote.callsFake((_, ...args) => {
-          if (args.includes('list') && args.includes('--project')) {
-            return Promise.resolve(
-              `storage ${projectConfigUrl}\nbackup s3://my-backup-bucket`
-            )
-          }
-
-          if (args.includes('list') && args.includes('--local')) {
-            return Promise.resolve('storage s3://my-bucket')
-          }
-
-          if (args.includes('modify')) {
-            resolve(undefined)
-          }
+        mockRemoteRename.callsFake(() => {
+          resolve(undefined)
           return Promise.resolve('')
         })
       )
@@ -1662,9 +1646,8 @@ suite('Setup Test Suite', () => {
 
       expect(mockShowInputBox).to.be.calledOnce
       expect(mockShowQuickPick).to.be.calledTwice
-      expect(mockRemote).to.be.calledWithExactly(
+      expect(mockRemoteRename).to.be.calledWithExactly(
         dvcDemoPath,
-        'modify',
         '--local',
         'storage',
         'url',
