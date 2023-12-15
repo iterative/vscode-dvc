@@ -1,22 +1,18 @@
-import { TemplatePlotGroup } from 'dvc/src/plots/webview/contract'
-import React, { DragEvent, useState, useCallback } from 'react'
-import cx from 'classnames'
+import { PlotsSection, TemplatePlotGroup } from 'dvc/src/plots/webview/contract'
+import React, { DragEvent, useState, useCallback, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { AddedSection } from './AddedSection'
-import { TemplatePlotsGrid } from './TemplatePlotsGrid'
 import { NoPlotsToDisplay } from './NoPlotsToDisplay'
 import { PlotGroup, updateSections } from './templatePlotsSlice'
 import { removeFromPreviousAndAddToNewSection } from './util'
-import { createIDWithIndex, getIDIndex } from '../../../util/ids'
-import styles from '../styles.module.scss'
-import { shouldUseVirtualizedGrid } from '../util'
+import { TemplatePlotGroups } from './TemplatePlotGroups'
+import { TooManyPlots } from '../TooManyPlots'
+import { getIDIndex } from '../../../util/ids'
 import { PlotsState } from '../../store'
 import { setDraggedOverGroup } from '../../../shared/components/dragDrop/dragDropSlice'
-import { isSameGroup } from '../../../shared/components/dragDrop/util'
-import { changeOrderWithDraggedInfo } from '../../../util/array'
 import { LoadingSection, sectionIsLoading } from '../LoadingSection'
 import { reorderTemplatePlots } from '../../util/messages'
-import { TooManyPlots } from '../TooManyPlots'
+import { useObserveGridDimensions } from '../../hooks/useObserveGridDimensions'
 
 export enum NewSectionBlock {
   TOP = 'drop-section-top',
@@ -36,6 +32,9 @@ export const TemplatePlots: React.FC = () => {
   const selectedRevisions = useSelector(
     (state: PlotsState) => state.webview.selectedRevisions
   )
+
+  const gridRef = useRef<HTMLDivElement>(null)
+  useObserveGridDimensions(PlotsSection.TEMPLATE_PLOTS, gridRef)
 
   const [hoveredSection, setHoveredSection] = useState('')
   const dispatch = useDispatch()
@@ -139,9 +138,8 @@ export const TemplatePlots: React.FC = () => {
     }
   }
 
-  const handleEnteringSection = (groupId: string) => {
+  const handleEnteringSection = (groupId: string) =>
     dispatch(setDraggedOverGroup(groupId))
-  }
 
   const newDropSection = {
     acceptedGroups: Object.values(TemplatePlotGroup),
@@ -151,87 +149,29 @@ export const TemplatePlots: React.FC = () => {
   }
 
   return (
-    <>
+    <div ref={gridRef}>
       <AddedSection
         {...newDropSection}
         id={NewSectionBlock.TOP}
         closestSection={firstSection}
       />
-      {sections.map((section, i) => {
-        const groupId = createIDWithIndex(section.group, i)
-        const useVirtualizedGrid = shouldUseVirtualizedGrid(
-          Object.keys(section.entries).length,
-          nbItemsPerRow
-        )
 
-        const isMultiView = section.group === TemplatePlotGroup.MULTI_VIEW
-
-        const classes = cx(styles.sectionWrapper, {
-          [styles.multiViewPlotsGrid]: isMultiView,
-          [styles.singleViewPlotsGrid]: !isMultiView,
-          [styles.noBigGrid]: !useVirtualizedGrid
-        })
-
-        const handleDropAtTheEnd = () => {
-          handleEnteringSection('')
-          if (!draggedRef) {
-            return
-          }
-
-          if (draggedRef.group === groupId) {
-            const order = section.entries
-            const updatedSections = [...sections]
-
-            const newOrder = changeOrderWithDraggedInfo(order, draggedRef)
-            updatedSections[i] = {
-              ...sections[i],
-              entries: newOrder
-            }
-            setSections(updatedSections)
-          } else if (isSameGroup(draggedRef.group, groupId)) {
-            handleDropInSection(
-              draggedRef.itemId,
-              draggedRef.group,
-              groupId,
-              section.entries.length
-            )
-          }
-        }
-
-        const handleDragOver = (e: DragEvent) => {
-          e.preventDefault()
-          handleEnteringSection(groupId)
-        }
-
-        return (
-          <div
-            key={groupId}
-            id={groupId}
-            data-testid={`plots-section_${groupId}`}
-            className={classes}
-            onDragEnter={() => handleEnteringSection(groupId)}
-            onDragOver={handleDragOver}
-            onDrop={handleDropAtTheEnd}
-          >
-            <TemplatePlotsGrid
-              groupId={groupId}
-              groupIndex={i}
-              onDropInSection={handleDropInSection}
-              multiView={isMultiView}
-              setSectionEntries={setSectionEntries}
-              useVirtualizedGrid={useVirtualizedGrid}
-              nbItemsPerRow={nbItemsPerRow}
-              parentDraggedOver={draggedOverGroup === groupId}
-            />
-          </div>
-        )
-      })}
+      <TemplatePlotGroups
+        draggedRef={draggedRef}
+        draggedOverGroup={draggedOverGroup}
+        handleDropInSection={handleDropInSection}
+        handleEnteringSection={handleEnteringSection}
+        nbItemsPerRow={nbItemsPerRow}
+        sections={sections}
+        setSections={setSections}
+        setSectionEntries={setSectionEntries}
+      />
       <AddedSection
         {...newDropSection}
         id={NewSectionBlock.BOTTOM}
         closestSection={lastSection}
       />
       {shouldShowTooManyPlotsMessage && <TooManyPlots />}
-    </>
+    </div>
   )
 }

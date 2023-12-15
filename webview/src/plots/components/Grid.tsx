@@ -4,14 +4,14 @@ import { NormalGrid, NormalGridProps } from './NormalGrid'
 import { DragAndDropGrid } from './DragAndDropGrid'
 import { isDragAndDropModeSelector } from './util'
 import { PlotsState } from '../store'
-import { OnDrop } from '../../shared/components/dragDrop/DragDropContainer'
+import { OnDrop } from '../../shared/hooks/useDragAndDrop'
 
 interface GridProps extends NormalGridProps {
   setOrder: (order: string[]) => void
   order: string[]
   groupId: string
-  onDrop?: OnDrop
   parentDraggedOver?: boolean
+  onDrop?: OnDrop
 }
 
 export const Grid: React.FC<GridProps> = ({
@@ -20,10 +20,10 @@ export const Grid: React.FC<GridProps> = ({
   nbItemsPerRow,
   order,
   groupId,
-  onDrop,
   parentDraggedOver,
   multiView,
-  sectionKey
+  sectionKey,
+  onDrop
 }) => {
   const isInDragAndDropMode = useSelector((state: PlotsState) =>
     isDragAndDropModeSelector(state, sectionKey)
@@ -36,9 +36,9 @@ export const Grid: React.FC<GridProps> = ({
       multiView={multiView}
       setOrder={setOrder}
       groupId={groupId}
-      onDrop={onDrop}
       parentDraggedOver={parentDraggedOver}
       sectionKey={sectionKey}
+      onDrop={onDrop}
     />
   ) : (
     <NormalGrid

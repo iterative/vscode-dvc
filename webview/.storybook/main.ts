@@ -10,8 +10,6 @@ export const config: StorybookConfig = {
   staticDirs: ['../../extension/src/test/fixtures/plotsDiff/staticImages'],
   addons: [
     'storybook-addon-themes',
-    '@storybook/addon-essentials',
-    '@storybook/addon-interactions',
     {
       name: '@storybook/preset-scss',
       options: {

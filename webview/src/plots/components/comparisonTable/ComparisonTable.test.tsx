@@ -535,14 +535,9 @@ describe('ComparisonTable', () => {
 
       const [headerWrapper] = getHeaders()
 
-      // eslint-disable-next-line testing-library/no-node-access
-      expect(headerWrapper.childElementCount).toBe(2)
       expect(
-        // eslint-disable-next-line testing-library/no-node-access
-        Object.values(headerWrapper.children)
-          .map(child => child.id)
-          .includes(endingNode.id)
-      ).toBe(true)
+        within(headerWrapper).getByTestId('comparison-drop-target')
+      ).toBeInTheDocument()
     })
 
     it('should not change the order when dropping a header in its own spot', () => {

@@ -48,6 +48,9 @@ export const showExperiments = () => {
 export const saveStudioToken = () =>
   sendMessage({ type: MessageFromWebviewType.SAVE_STUDIO_TOKEN })
 
+export const saveStudioUrl = () =>
+  sendMessage({ type: MessageFromWebviewType.SAVE_STUDIO_URL })
+
 export const setStudioShareExperimentsLive = (shouldShareLive: boolean) =>
   sendMessage({
     payload: shouldShareLive,
@@ -56,6 +59,9 @@ export const setStudioShareExperimentsLive = (shouldShareLive: boolean) =>
 
 export const removeStudioToken = () =>
   sendMessage({ type: MessageFromWebviewType.REMOVE_STUDIO_TOKEN })
+
+export const removeStudioUrl = () =>
+  sendMessage({ type: MessageFromWebviewType.REMOVE_STUDIO_URL })
 
 export const requestStudioToken = () =>
   sendMessage({ type: MessageFromWebviewType.REQUEST_STUDIO_TOKEN })

@@ -1,13 +1,15 @@
 import { Experiment, ColumnType } from 'dvc/src/experiments/webview/contract'
-import React, { ReactNode, useEffect, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { Header } from '@tanstack/react-table'
 import cx from 'classnames'
-import { useInView } from 'react-intersection-observer'
 import { TableHeaderCellContents } from './TableHeaderCellContents'
 import { ContextMenuContent } from './ContextMenuContent'
 import { getSortDetails } from './util'
+import { WithExpColumnNeedsShadowUpdates } from './WithExpColumnNeedsShadowUpdates'
 import styles from '../styles.module.scss'
+import { Indicators } from '../Indicators'
+import { ColumnWithGroup } from '../body/columns/Columns'
 import {
   isDefaultColumn,
   isExperimentColumn,
@@ -16,8 +18,6 @@ import {
 import { ExperimentsState } from '../../../store'
 import { ContextMenu } from '../../../../shared/components/contextMenu/ContextMenu'
 import { DragFunction } from '../../../../shared/components/dragDrop/Draggable'
-import { ColumnWithGroup } from '../body/columns/Columns'
-import { Indicators } from '../Indicators'
 
 const getPercentResizer = (depth: number) => `${100 + depth * 105}%`
 
@@ -62,25 +62,6 @@ const getHeaderPropsArgs = (
       position: undefined
     }
   }
-}
-
-const WithExpColumnNeedsShadowUpdates: React.FC<{
-  children: ReactNode
-  setExpColumnNeedsShadow: (needsShadow: boolean) => void
-  root: HTMLElement | null
-}> = ({ root, setExpColumnNeedsShadow, children }) => {
-  const [ref, needsShadow] = useInView({
-    initialInView: true,
-    root,
-    rootMargin: '0px 0px 0px -2px',
-    threshold: 1
-  })
-
-  useEffect(() => {
-    setExpColumnNeedsShadow(needsShadow)
-  }, [needsShadow, setExpColumnNeedsShadow])
-
-  return <div ref={ref}>{children}</div>
 }
 
 export const TableHeaderCell: React.FC<{

@@ -10,7 +10,7 @@ import tableDataFixture from 'dvc/src/test/fixtures/expShow/base/tableData'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import styles from './styles.module.scss'
 import { SortOrder } from './header/util'
-import { ExperimentsTable } from '../Experiments'
+import { ExperimentsTable } from '../ExperimentsTable'
 import { vsCodeApi } from '../../../shared/api'
 import {
   expectHeaders,

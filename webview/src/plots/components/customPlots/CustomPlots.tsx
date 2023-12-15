@@ -1,16 +1,17 @@
-import React, { DragEvent, useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
-import { PlotsSection } from 'dvc/src/plots/webview/contract'
+import React, { DragEvent, useEffect, useRef, useState } from 'react'
 import cx from 'classnames'
+import { PlotsSection } from 'dvc/src/plots/webview/contract'
+import { useSelector } from 'react-redux'
 import { NoPlotsAdded } from './NoPlotsAdded'
+import { CustomPlotsGrid } from './CustomPlotsGrid'
 import styles from '../styles.module.scss'
 import { shouldUseVirtualizedGrid } from '../util'
-import { Grid } from '../Grid'
 import { LoadingSection, sectionIsLoading } from '../LoadingSection'
 import { PlotsState } from '../../store'
 import { changeOrderWithDraggedInfo } from '../../../util/array'
 import { reorderCustomPlots } from '../../util/messages'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
+import { useObserveGridDimensions } from '../../hooks/useObserveGridDimensions'
 
 interface CustomPlotsProps {
   plotsIds: string[]
@@ -32,6 +33,9 @@ export const CustomPlots: React.FC<CustomPlotsProps> = ({ plotsIds }) => {
   const selectedRevisions = useSelector(
     (state: PlotsState) => state.webview.selectedRevisions
   )
+
+  const gridRef = useRef<HTMLDivElement>(null)
+  useObserveGridDimensions(PlotsSection.CUSTOM_PLOTS, gridRef)
 
   useEffect(() => {
     setOrder(plotsIds)
@@ -82,15 +86,14 @@ export const CustomPlots: React.FC<CustomPlotsProps> = ({ plotsIds }) => {
       onDragLeave={() => setOnSection(false)}
       onDragOver={handleDragOver}
       onDrop={handleDropAtTheEnd}
+      ref={gridRef}
     >
-      <Grid
-        setOrder={setPlotsIdsOrder}
+      <CustomPlotsGrid
         nbItemsPerRow={nbItemsPerRow}
-        useVirtualizedGrid={useVirtualizedGrid}
         order={order}
-        groupId="custom-plots"
         parentDraggedOver={onSection}
-        sectionKey={PlotsSection.CUSTOM_PLOTS}
+        setOrder={setPlotsIdsOrder}
+        useVirtualizedGrid={useVirtualizedGrid}
       />
     </div>
   )

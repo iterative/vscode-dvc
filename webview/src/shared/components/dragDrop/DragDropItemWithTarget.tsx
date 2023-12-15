@@ -11,6 +11,10 @@ interface DragDropItemWithTargetProps {
 export const DragDropItemWithTarget: React.FC<
   PropsWithChildren<DragDropItemWithTargetProps>
 > = ({ dropTarget, isAfter, shouldShowOnDrag, draggable, children }) => {
+  if (!dropTarget) {
+    return <>{children}</>
+  }
+
   const block = isAfter ? [children, dropTarget] : [dropTarget, children]
 
   return shouldShowOnDrag ? (

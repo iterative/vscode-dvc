@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.2] - 2023-12-13
+
+### 🚀 New Features and Enhancements
+
+- Add self-hosted url info in Studio setup section [#5089](https://github.com/iterative/vscode-dvc/pull/5089) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (3.33.4) [#5110](https://github.com/iterative/vscode-dvc/pull/5110) by [@julieg18](https://github.com/julieg18)
+
+## [1.2.1] - 2023-12-13
+
+### 🔨 Maintenance
+
+- Improve studio access token commands [#5088](https://github.com/iterative/vscode-dvc/pull/5088) by [@julieg18](https://github.com/julieg18)
+- Reduce number of plots resize observers [#5097](https://github.com/iterative/vscode-dvc/pull/5097) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.2.0] - 2023-12-10
 
 ### 🚀 New Features and Enhancements
