@@ -91,9 +91,8 @@ export const addRemoteToProject = async (
 
   return await Toast.showOutput(
     internalCommands.executeCommand(
-      AvailableCommands.REMOTE,
+      AvailableCommands.REMOTE_ADD,
       dvcRoot,
-      SubCommand.ADD,
       ...args
     )
   )
@@ -135,9 +134,8 @@ const modifyRemoteName = async (
   }
   return await Toast.showOutput(
     internalCommands.executeCommand(
-      AvailableCommands.REMOTE,
+      AvailableCommands.REMOTE_RENAME,
       dvcRoot,
-      SubCommand.RENAME,
       config,
       name,
       newName
@@ -157,9 +155,8 @@ const modifyRemoteUrl = async (
   }
   return await Toast.showOutput(
     internalCommands.executeCommand(
-      AvailableCommands.REMOTE,
+      AvailableCommands.REMOTE_MODIFY,
       dvcRoot,
-      SubCommand.MODIFY,
       config,
       name,
       'url',
@@ -275,25 +272,21 @@ const confirmAndRemove = async (
     return
   }
 
-  try {
-    await internalCommands.executeCommand(
-      AvailableCommands.REMOTE,
-      dvcRoot,
-      SubCommand.REMOVE,
-      Flag.PROJECT,
-      remote
-    )
-  } catch {}
+  await internalCommands.executeCommand(
+    AvailableCommands.REMOTE,
+    dvcRoot,
+    SubCommand.REMOVE,
+    Flag.PROJECT,
+    remote
+  )
 
-  try {
-    await internalCommands.executeCommand(
-      AvailableCommands.REMOTE,
-      dvcRoot,
-      SubCommand.REMOVE,
-      Flag.LOCAL,
-      remote
-    )
-  } catch {}
+  await internalCommands.executeCommand(
+    AvailableCommands.REMOTE,
+    dvcRoot,
+    SubCommand.REMOVE,
+    Flag.LOCAL,
+    remote
+  )
 }
 
 export const pickRemoteAndRemove = async (
