@@ -828,6 +828,42 @@ describe('addPlotToDvcYamlFile', () => {
       mockDvcYamlContent + mockPlotYamlContent
     )
   })
+
+  it('should add a new plot when plot list items have no indent', () => {
+    const mockDvcYamlContent = [
+      'plots:',
+      '- eval/importance.png',
+      '- Precision-Recall:',
+      '    x: recall',
+      '    y:',
+      '        eval/prc/train.json: precision',
+      '        eval/prc/test.json: precision'
+    ].join('\n')
+    const mockPlotYamlContent = [
+      '',
+      '- simple_plot:',
+      '      template: simple',
+      '      x: epochs',
+      '      y:',
+      '          data.json: accuracy',
+      ''
+    ].join('\n')
+    mockedReadFileSync.mockReturnValueOnce(mockDvcYamlContent)
+    mockedReadFileSync.mockReturnValueOnce(mockDvcYamlContent)
+
+    addPlotToDvcYamlFile('/', {
+      template: 'simple',
+      title: 'simple_plot',
+      x: { 'data.json': ['epochs'] },
+      y: { 'data.json': ['accuracy'] }
+    })
+
+    expect(mockedOpenTextDocument).toHaveBeenCalledTimes(1)
+    expect(mockedWriteFileSync).toHaveBeenCalledWith(
+      '//dvc.yaml',
+      mockDvcYamlContent + mockPlotYamlContent
+    )
+  })
 })
 
 describe('isPathInProject', () => {
