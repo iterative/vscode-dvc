@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.3] - 2023-12-15
+
+### 🐛 Bug Fixes
+
+- Fix Toast messages showing a successful message after failed remote command [#5105](https://github.com/iterative/vscode-dvc/pull/5105) by [@julieg18](https://github.com/julieg18)
+- Remove Studio data request failed Toast [#5125](https://github.com/iterative/vscode-dvc/pull/5125) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Use hook for drag and drop [#5062](https://github.com/iterative/vscode-dvc/pull/5062) by [@sroy3](https://github.com/sroy3)
+- Add lint rule for one React component per file [#5113](https://github.com/iterative/vscode-dvc/pull/5113) by [@sroy3](https://github.com/sroy3)
+- Upgrade Storybook to v7.6 [#5115](https://github.com/iterative/vscode-dvc/pull/5115) by [@mattseddon](https://github.com/mattseddon)
+- Do not pass down the grid ref [#5111](https://github.com/iterative/vscode-dvc/pull/5111) by [@sroy3](https://github.com/sroy3)
+
 ## [1.2.2] - 2023-12-13
 
 ### 🚀 New Features and Enhancements
