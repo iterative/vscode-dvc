@@ -19,7 +19,7 @@ export const Settings: React.FC<
   return (
     <EmptyState isFullScreen={false}>
       <div>
-        <h1>Studio Settings</h1>
+        <h1>DVC Studio Settings</h1>
         {children}
         <div className={styles.studioSettings}>
           <div className={styles.checkboxWrapper}>
