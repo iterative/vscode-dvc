@@ -250,14 +250,20 @@ const getPlotsYaml = (plotObj: PlotConfigData, indentSearchLines: string[]) => {
   const indentReg = /^( +)[^ ]/
   const indentLine = indentSearchLines.find(line => indentReg.test(line)) || ''
   const spacesMatches = indentLine.match(indentReg)
-  const spaces = spacesMatches?.[1]
+  const spaces = spacesMatches?.[1].length || 2
 
-  return yaml
-    .stringify(
-      { plots: [getPlotYamlObj(plotObj)] },
-      { indent: spaces ? spaces.length : 2 }
-    )
+  const newPlotLines = yaml
+    .stringify({ plots: [getPlotYamlObj(plotObj)] }, { indent: spaces })
     .split('\n')
+
+  const doesYamlListItemHaveNoIndent = indentSearchLines.find(line =>
+    line.startsWith('-')
+  )
+  return doesYamlListItemHaveNoIndent
+    ? newPlotLines.map(line =>
+        line.startsWith(' ') ? line.slice(spaces) : line
+      )
+    : newPlotLines
 }
 
 export const addPlotToDvcYamlFile = (cwd: string, plotObj: PlotConfigData) => {
