@@ -4453,10 +4453,10 @@
     "@types/prop-types" "*"
     "@types/react" "*"
 
-"@types/react@*", "@types/react@18.2.42":
-  version "18.2.42"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-18.2.42.tgz#6f6b11a904f6d96dda3c2920328a97011a00aba7"
-  integrity sha512-c1zEr96MjakLYus/wPnuWDo1/zErfdU9rNsIGmE+NV71nx88FG9Ttgo5dqorXTu/LImX2f63WBP986gJkMPNbA==
+"@types/react@*", "@types/react@18.2.43":
+  version "18.2.43"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-18.2.43.tgz#c58e5abe241e6f71f60ce30e2a9aceb9d3a2a374"
+  integrity sha512-nvOV01ZdBdd/KW6FahSbcNplt2jCJfyWdTos61RYHV+FVv5L/g9AOX1bmbVcWcLFL8+KHQfh1zVIQrud6ihyQA==
   dependencies:
     "@types/prop-types" "*"
     "@types/scheduler" "*"
@@ -8872,6 +8872,11 @@ escodegen@^2.1.0:
   optionalDependencies:
     source-map "~0.6.1"
 
+eslint-compat-utils@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/eslint-compat-utils/-/eslint-compat-utils-0.1.2.tgz#f45e3b5ced4c746c127cf724fb074cd4e730d653"
+  integrity sha512-Jia4JDldWnFNIru1Ehx1H5s9/yxiRHY/TimCuUc0jNexew3cF1gI6CYZil1ociakfWO3rRqFjl1mskBblB3RYg==
+
 eslint-config-prettier-standard@4.0.1:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/eslint-config-prettier-standard/-/eslint-config-prettier-standard-4.0.1.tgz#602a888eeef5832bf514e98e461faca5f1ddc40d"
@@ -8920,13 +8925,14 @@ eslint-plugin-check-file@2.6.2:
     is-glob "^4.0.3"
     micromatch "^4.0.5"
 
-eslint-plugin-es-x@^7.1.0:
-  version "7.2.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-es-x/-/eslint-plugin-es-x-7.2.0.tgz#5779d742ad31f8fd780b9481331481e142b72311"
-  integrity sha512-9dvv5CcvNjSJPqnS5uZkqb3xmbeqRLnvXKK7iI5+oK/yTusyc46zbBZKENGsOfojm/mKfszyZb+wNqNPAPeGXA==
+eslint-plugin-es-x@^7.5.0:
+  version "7.5.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-es-x/-/eslint-plugin-es-x-7.5.0.tgz#d08d9cd155383e35156c48f736eb06561d07ba92"
+  integrity sha512-ODswlDSO0HJDzXU0XvgZ3lF3lS3XAZEossh15Q2UHjwrJggWeBoKqqEsLTZLXl+dh5eOAozG0zRcYtuE35oTuQ==
   dependencies:
     "@eslint-community/eslint-utils" "^4.1.2"
     "@eslint-community/regexpp" "^4.6.0"
+    eslint-compat-utils "^0.1.2"
 
 eslint-plugin-etc@2.0.3:
   version "2.0.3"
@@ -8992,14 +8998,14 @@ eslint-plugin-jsx-a11y@6.8.0:
     object.entries "^1.1.7"
     object.fromentries "^2.0.7"
 
-eslint-plugin-n@16.3.1:
-  version "16.3.1"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-n/-/eslint-plugin-n-16.3.1.tgz#6cd377d1349fed10854b6535392e91fb4123193b"
-  integrity sha512-w46eDIkxQ2FaTHcey7G40eD+FhTXOdKudDXPUO2n9WNcslze/i/HT2qJ3GXjHngYSGDISIgPNhwGtgoix4zeOw==
+eslint-plugin-n@16.4.0:
+  version "16.4.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-n/-/eslint-plugin-n-16.4.0.tgz#02ff70d2b164319b6d566672969a9c24688a43df"
+  integrity sha512-IkqJjGoWYGskVaJA7WQuN8PINIxc0N/Pk/jLeYT4ees6Fo5lAhpwGsYek6gS9tCUxgDC4zJ+OwY2bY/6/9OMKQ==
   dependencies:
     "@eslint-community/eslint-utils" "^4.4.0"
     builtins "^5.0.1"
-    eslint-plugin-es-x "^7.1.0"
+    eslint-plugin-es-x "^7.5.0"
     get-tsconfig "^4.7.0"
     ignore "^5.2.4"
     is-builtin-module "^3.2.1"
@@ -14757,10 +14763,10 @@ prettier-linter-helpers@^1.0.0:
   dependencies:
     fast-diff "^1.1.2"
 
-prettier@3.1.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.1.0.tgz#c6d16474a5f764ea1a4a373c593b779697744d5e"
-  integrity sha512-TQLvXjq5IAibjh8EpBIkNKxO749UEWABoiIZehEPiY4GNpVdhaFKqSTu+QrlU6D2dPAfubRmtJTi4K4YkQ5eXw==
+prettier@3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.1.1.tgz#6ba9f23165d690b6cbdaa88cb0807278f7019848"
+  integrity sha512-22UbSzg8luF4UuZtzgiUOfcGM8s4tjBv6dJRT7j275NXsy2jb4aJa4NNveul5x4eqlF1wuhuR2RElK71RvmVaw==
 
 prettier@^2.8.0:
   version "2.8.8"
@@ -15182,10 +15188,10 @@ react-lifecycles-compat@^3.0.4:
   resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz#4f1a273afdfc8f3488a8c516bfda78f872352362"
   integrity sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==
 
-react-redux@9.0.2:
-  version "9.0.2"
-  resolved "https://registry.yarnpkg.com/react-redux/-/react-redux-9.0.2.tgz#5654d490be9abd34b73f369d3c1f89d6b14b072e"
-  integrity sha512-34EI42cYZxJF59Iht6RDM5xDun5EdhV8CbJcTe+mYx97XMHLNYA6RrH9r/ZOZX3CetVCYfBEU9oAY9h3sZarsw==
+react-redux@9.0.3:
+  version "9.0.3"
+  resolved "https://registry.yarnpkg.com/react-redux/-/react-redux-9.0.3.tgz#3c4d77ed43b88dc15d127162e0d5c060aabcd4e6"
+  integrity sha512-bilZStJN00qYqAXBpu/taUXv0tcuOrhBFD86fSERgYUm0+IHi/OQnqopbNalhgSo7+KMjSW5H/UTrWasXDvtug==
   dependencies:
     "@types/use-sync-external-store" "^0.0.3"
     use-sync-external-store "^1.0.0"

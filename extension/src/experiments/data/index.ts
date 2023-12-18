@@ -26,7 +26,6 @@ import { COMMITS_SEPARATOR, gitPath } from '../../cli/git/constants'
 import { getGitPath } from '../../fileSystem'
 import { ExperimentsModel } from '../model'
 import { Studio } from '../studio'
-import { Toast } from '../../vscode/toast'
 
 export class ExperimentsData extends BaseData<ExperimentsOutput> {
   private readonly experiments: ExperimentsModel
@@ -157,9 +156,6 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
       })
     } catch {
       this.notifyChanged(defaultData)
-      void Toast.showError(
-        `Unable to fetch data from [Studio](${this.studio.getInstanceUrl()}).`
-      )
     }
   }
 
