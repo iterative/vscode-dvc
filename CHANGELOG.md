@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.4] - 2023-12-20
+
+### 🚀 New Features and Enhancements
+
+- Update "Studio" to "DVC Studio" in titles [#5131](https://github.com/iterative/vscode-dvc/pull/5131) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Fix "Add Plot" breaking dvc.yaml when there is no list indentation [#5126](https://github.com/iterative/vscode-dvc/pull/5126) by [@julieg18](https://github.com/julieg18)
+
 ## [1.2.3] - 2023-12-15
 
 ### 🐛 Bug Fixes
