@@ -1509,7 +1509,7 @@
         },
         {
           "id": "dvc.views.studio",
-          "name": "Studio",
+          "name": "DVC Studio",
           "when": "dvc.commands.available && dvc.project.available"
         },
         {

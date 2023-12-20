@@ -206,7 +206,7 @@ export const App: React.FC = () => {
       </SetupContainer>
       <SetupContainer
         sectionKey={SetupSection.STUDIO}
-        title="Studio"
+        title="DVC Studio"
         icon={getStudioStatusIcon(!!cliCompatible, isStudioConnected)}
       >
         <Studio
