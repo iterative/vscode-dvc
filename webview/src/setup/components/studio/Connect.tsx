@@ -9,7 +9,7 @@ export const Connect: React.FC<PropsWithChildren> = ({ children }) => {
     <EmptyState isFullScreen={false}>
       <div>
         <h1>
-          Connect to <a href={DEFAULT_STUDIO_URL}>Studio</a>
+          Connect to <a href={DEFAULT_STUDIO_URL}>DVC Studio</a>
         </h1>
         {children}
         <p>

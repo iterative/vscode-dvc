@@ -820,7 +820,7 @@ describe('App', () => {
       const experiments = screen.getByText('Experiments')
       expect(experiments).toBeInTheDocument()
       expect(screen.queryByText(experimentsText)).not.toBeInTheDocument()
-      const studio = screen.getByText('Studio')
+      const studio = screen.getByText('DVC Studio')
       expect(studio).toBeInTheDocument()
       expect(screen.queryByText(studioButtonText)).not.toBeInTheDocument()
     })
@@ -836,7 +836,7 @@ describe('App', () => {
         }
       })
       mockPostMessage.mockClear()
-      const studio = screen.getByText('Studio')
+      const studio = screen.getByText('DVC Studio')
       expect(studio).toBeInTheDocument()
       expect(screen.queryByText(studioButtonText)).not.toBeInTheDocument()
       const dvc = screen.getByText('DVC')
@@ -858,7 +858,7 @@ describe('App', () => {
         }
       })
       mockPostMessage.mockClear()
-      const studio = screen.getByText('Studio')
+      const studio = screen.getByText('DVC Studio')
       expect(studio).toBeInTheDocument()
       expect(screen.getByText(studioButtonText)).toBeInTheDocument()
       const dvc = screen.getByText('DVC')
