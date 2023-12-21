@@ -68,7 +68,7 @@ const convertUrlTextToLink = (stdout: string) => {
   if (!(match?.[0] && match?.[1])) {
     return stdout
   }
-  return stdout.replace(match[0], ` in [Studio](${match[1]})`)
+  return stdout.replace(match[0], ` in [DVC Studio](${match[1]})`)
 }
 
 export const getPushExperimentCommand =

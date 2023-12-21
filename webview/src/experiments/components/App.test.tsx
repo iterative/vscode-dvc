@@ -1664,7 +1664,7 @@ describe('App', () => {
 
       const copyLinkOption = menuitems.find(
         item =>
-          item.textContent?.includes('Copy Studio Link') &&
+          item.textContent?.includes('Copy DVC Studio Link') &&
           !item.className.includes('disabled')
       )
 

@@ -84,7 +84,7 @@ export const SectionDescriptionMainText = {
   [SetupSection.STUDIO]: (
     <>
       {"Configure the extension's connection to "}
-      <a href={DEFAULT_STUDIO_URL}>Studio</a>.<br />
+      <a href={DEFAULT_STUDIO_URL}>DVC Studio</a>.<br />
       Studio provides a collaboration platform for Machine Learning and is free
       for small teams and individual contributors.
     </>
