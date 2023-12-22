@@ -4,7 +4,7 @@ import React from 'react'
 import styles from './styles.module.scss'
 import { RibbonBlockIcon } from './RibbonBlockIcon'
 import { RibbonBlockTooltip } from './RibbonBlockTooltip'
-import { RevisionIcon } from './RevisionIcon'
+import { LoadingIcon } from './LoadingIcon'
 import { Icon } from '../../../shared/components/Icon'
 import Tooltip from '../../../shared/components/tooltip/Tooltip'
 import { CopyButton } from '../../../shared/components/copyButton/CopyButton'
@@ -59,9 +59,7 @@ export const RibbonBlock: React.FC<RibbonBlockProps> = ({
           </div>
         )}
       </div>
-      <div className={styles.iconPlaceholder}>
-        <RevisionIcon fetched={fetched} />
-      </div>
+      <LoadingIcon fetched={fetched} />
       <Tooltip content="Clear" placement="bottom" delay={500}>
         <button className={styles.clearButton} onClick={onClear}>
           <Icon icon={Close} width={12} height={12} />

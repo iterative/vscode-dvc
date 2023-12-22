@@ -3,7 +3,7 @@ import cx from 'classnames'
 import { VSCodeProgressRing } from '@vscode/webview-ui-toolkit/react'
 import styles from './styles.module.scss'
 
-export const RevisionIcon: React.FC<{
+export const LoadingIcon: React.FC<{
   fetched: boolean
 }> = ({ fetched }) => (
   <div className={styles.iconPlaceholder}>

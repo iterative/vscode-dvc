@@ -10,7 +10,7 @@ export const RibbonBlockIcon: React.FC<{
     <Error
       width={14}
       height={14}
-      className={cx(styles.blockIcon, styles.error)}
+      className={cx(styles.blockIcon, styles.errorIndicator)}
       aria-label="Error Icon"
     />
   ) : (
