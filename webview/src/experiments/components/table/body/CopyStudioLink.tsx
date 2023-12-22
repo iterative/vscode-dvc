@@ -27,7 +27,7 @@ export const CopyStudioLink: React.FC<{ id: string }> = ({ id }) => {
 
   return (
     <CellHintTooltip
-      tooltipContent={'Experiment on remote\nClick to copy Studio link'}
+      tooltipContent={'Experiment on remote\nClick to copy DVC Studio link'}
     >
       <div
         className={styles.upload}

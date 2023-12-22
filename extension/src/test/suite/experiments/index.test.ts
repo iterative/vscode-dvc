@@ -812,7 +812,7 @@ suite('Experiments Test Suite', () => {
       expect(mockReport).to.be.calledWithExactly({
         increment: 75,
         message:
-          "Experiment major-lamb is up to date on Git remote 'origin'.\nView your experiments in [Studio](https://studio.iterative.ai/user/mattseddon/projects/vscode-dvc-demo-ynm6t3jxdx)"
+          "Experiment major-lamb is up to date on Git remote 'origin'.\nView your experiments in [DVC Studio](https://studio.iterative.ai/user/mattseddon/projects/vscode-dvc-demo-ynm6t3jxdx)"
       })
 
       messageSpy.restore()

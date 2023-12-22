@@ -297,7 +297,7 @@ const getSingleSelectMenuOptions = (
     {
       disabled: !studioLinkType,
       id: MessageFromWebviewType.COPY_STUDIO_LINK,
-      label: 'Copy Studio Link',
+      label: 'Copy DVC Studio Link',
       message: {
         payload: { id, type: studioLinkType },
         type: MessageFromWebviewType.COPY_STUDIO_LINK
