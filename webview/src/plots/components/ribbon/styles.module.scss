@@ -1,11 +1,16 @@
 @import '../../../shared/variables';
 @import '../../../shared/mixins';
 
+.errorIndicator {
+  color: $error-color;
+}
+
 .copyButton {
   display: none;
   position: absolute;
   right: 0;
   top: 0;
+  fill: $fg-color;
 }
 
 .tooltipColumn {
@@ -96,11 +101,6 @@
   align-items: center;
   font-size: 0.8125rem;
 
-  svg {
-    fill: $fg-color;
-    display: block;
-  }
-
   &:hover .copyButton {
     display: inline;
     font-size: 0.8125rem;
@@ -110,18 +110,16 @@
     margin-left: -4px;
     height: 18px;
     width: 18px;
-    color: $error-color;
-    text-align: center;
   }
 
   .fetching {
     height: 18px;
     width: 18px;
   }
+}
 
-  .infoIcon {
-    margin-left: 5px;
-  }
+.blockIcon {
+  margin-left: 5px;
 }
 
 .label {
@@ -153,6 +151,7 @@
 
 .clearButton {
   background-color: transparent;
+  color: $fg-color;
   border: none;
   padding: 3px;
   opacity: 0;

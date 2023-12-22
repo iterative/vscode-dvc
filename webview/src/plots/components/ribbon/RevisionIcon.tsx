@@ -5,10 +5,8 @@ import styles from './styles.module.scss'
 
 export const RevisionIcon: React.FC<{
   fetched: boolean
-  errors?: string[]
-}> = ({ fetched, errors }) => (
+}> = ({ fetched }) => (
   <div className={styles.iconPlaceholder}>
-    {fetched && errors && '!'}
     {!fetched && (
       <VSCodeProgressRing className={cx(styles.fetching, 'chromatic-ignore')} />
     )}

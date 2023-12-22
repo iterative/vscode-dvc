@@ -49,6 +49,7 @@ import {
   toggleDragAndDropMode as toggleCustomPlotsDragAndDropMode
 } from './customPlots/customPlotsSlice'
 import { comparisonTableInitialState } from './comparisonTable/comparisonTableSlice'
+import plotRibbonStyles from './ribbon/styles.module.scss'
 import { plotsReducers, plotsStore } from '../store'
 import { vsCodeApi } from '../../shared/api'
 import {
@@ -2763,11 +2764,11 @@ describe('App', () => {
       })
     })
 
-    it('should show an error indicator for each revision with an error', () => {
+    it('should show an error icon and highlight the title for each revision with an error', () => {
       renderAppWithOptionalData({
         comparison: comparisonTableFixture,
         selectedRevisions: plotsRevisionsFixture.map(rev => {
-          if (rev.label === 'main') {
+          if (rev.label === 'main' || rev.description === '[exp-e7a67]') {
             return {
               ...rev,
               errors: ['error']
@@ -2776,11 +2777,19 @@ describe('App', () => {
           return rev
         })
       })
-      const errorIndicators = screen.getAllByText('!')
-      expect(errorIndicators).toHaveLength(1)
+      const mainTitle = within(screen.getByTestId('ribbon-main')).getByText(
+        'main'
+      )
+      const expTitle = within(screen.getByTestId('ribbon-exp-e7a67')).getByText(
+        '[exp-e7a67]'
+      )
+      const errorIndicators = screen.getAllByLabelText('Error Icon')
+      expect(errorIndicators).toHaveLength(2)
+      expect(mainTitle).toHaveClass(plotRibbonStyles.errorIndicator)
+      expect(expTitle).toHaveClass(plotRibbonStyles.errorIndicator)
     })
 
-    it('should not show an error indicator for a loading revision', () => {
+    it('should not show an error icon or highlight the title for a loading revision', () => {
       renderAppWithOptionalData({
         comparison: comparisonTableFixture,
         selectedRevisions: plotsRevisionsFixture.map(rev => {
@@ -2794,7 +2803,11 @@ describe('App', () => {
           return rev
         })
       })
-      expect(screen.queryByText('!')).not.toBeInTheDocument()
+      expect(screen.queryByLabelText('Error Icon')).not.toBeInTheDocument()
+      const titleText = within(screen.getByTestId('ribbon-main')).getByText(
+        'main'
+      )
+      expect(titleText).not.toHaveClass(plotRibbonStyles.errorIndicator)
     })
   })
 

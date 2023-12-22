@@ -1,12 +1,14 @@
 import { Revision } from 'dvc/src/plots/webview/contract'
+import cx from 'classnames'
 import React from 'react'
 import styles from './styles.module.scss'
+import { RibbonBlockIcon } from './RibbonBlockIcon'
 import { RibbonBlockTooltip } from './RibbonBlockTooltip'
 import { RevisionIcon } from './RevisionIcon'
 import { Icon } from '../../../shared/components/Icon'
 import Tooltip from '../../../shared/components/tooltip/Tooltip'
 import { CopyButton } from '../../../shared/components/copyButton/CopyButton'
-import { Close, Info } from '../../../shared/components/icons'
+import { Close } from '../../../shared/components/icons'
 
 interface RibbonBlockProps {
   revision: Revision
@@ -27,6 +29,7 @@ export const RibbonBlock: React.FC<RibbonBlockProps> = ({
     id,
     label
   } = revision
+  const hasError = fetched && !!errors
 
   const mainContent = (
     <li
@@ -34,12 +37,14 @@ export const RibbonBlock: React.FC<RibbonBlockProps> = ({
       style={{ borderColor: displayColor }}
       data-testid={`ribbon-${id}`}
     >
-      <Info width={14} height={14} className={styles.infoIcon} />
+      <RibbonBlockIcon hasError={hasError} />
       <div className={styles.label}>
         {description ? (
           <>
             <div className={styles.subtitle}>{label}</div>
-            <div className={styles.title}>
+            <div
+              className={cx(styles.title, hasError && styles.errorIndicator)}
+            >
               {description}
               <CopyButton
                 value={description.replace(/[[\]]/g, '')}
@@ -48,14 +53,14 @@ export const RibbonBlock: React.FC<RibbonBlockProps> = ({
             </div>
           </>
         ) : (
-          <div className={styles.title}>
+          <div className={cx(styles.title, hasError && styles.errorIndicator)}>
             {label}
             <CopyButton value={label} className={styles.copyButton} />
           </div>
         )}
       </div>
       <div className={styles.iconPlaceholder}>
-        <RevisionIcon errors={errors} fetched={fetched} />
+        <RevisionIcon fetched={fetched} />
       </div>
       <Tooltip content="Clear" placement="bottom" delay={500}>
         <button className={styles.clearButton} onClick={onClear}>
