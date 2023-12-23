@@ -24,6 +24,7 @@ export interface TemplatePlotsState extends Omit<TemplatePlotsData, 'plots'> {
 }
 
 export const templatePlotsInitialState: TemplatePlotsState = {
+  errors: {},
   hasData: false,
   hasItems: false,
   height: DEFAULT_HEIGHT[PlotsSection.TEMPLATE_PLOTS],
@@ -83,6 +84,7 @@ export const templatePlotsSlice = createSlice({
 
       return {
         ...state,
+        errors: action.payload.errors,
         hasData: !!action.payload,
         hasItems: Object.keys(plotsSnapshots).length > 0,
         nbItemsPerRow: action.payload.nbItemsPerRow,

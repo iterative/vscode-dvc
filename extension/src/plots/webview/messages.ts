@@ -380,6 +380,7 @@ export class WebviewMessages {
     }
 
     return {
+      errors: {},
       height: this.plots.getHeight(PlotsSection.TEMPLATE_PLOTS),
       nbItemsPerRow: this.plots.getNbItemsPerRowOrWidth(
         PlotsSection.TEMPLATE_PLOTS

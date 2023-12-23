@@ -149,6 +149,7 @@ export interface TemplatePlotsData {
   nbItemsPerRow: number
   height: PlotHeight
   smoothPlotValues: SmoothPlotValues
+  errors: { [path: string]: { [rev: string]: string[] } }
 }
 
 export type ComparisonPlotImg = {

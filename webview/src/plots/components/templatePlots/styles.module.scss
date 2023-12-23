@@ -1,0 +1,33 @@
+@import '../../../shared/variables';
+
+.errors {
+  padding: 20px 0;
+  margin: 20px 20px 0;
+  color: $error-color;
+  border-top: 1px solid $error-color;
+  border-bottom: 1px solid $error-color;
+}
+
+.errorsTitle {
+  margin: 0;
+}
+
+.errorsIcon {
+  margin-right: 3px;
+  vertical-align: text-top;
+  fill: $error-color;
+}
+
+.errorsPlot {
+  text-align: left;
+  padding: 15px 0;
+  font-weight: 600;
+}
+
+.errorsRev {
+  padding: 0 20px 0 0;
+}
+
+.errorsMsgs {
+  width: 100%;
+}
