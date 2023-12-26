@@ -4744,10 +4744,10 @@
   resolved "https://registry.yarnpkg.com/@vscode/codicons/-/codicons-0.0.35.tgz#7424a647f39c6e71c86c1edf12bfc27196c8fba1"
   integrity sha512-7iiKdA5wHVYSbO7/Mm0hiHD3i4h+9hKUe1O4hISAe/nHhagMwb2ZbFC8jU6d7Cw+JNT2dWXN2j+WHbkhT5/l2w==
 
-"@vscode/extension-telemetry@0.9.1":
-  version "0.9.1"
-  resolved "https://registry.yarnpkg.com/@vscode/extension-telemetry/-/extension-telemetry-0.9.1.tgz#53109a836f9719c979b91bdac0a8b6b5baa5f8ac"
-  integrity sha512-reNIlRPkr/u9RXkx8dC7qb+Fl7vYXJjtNOHYyr36vEiyE7ZUhCrNJXf+j2Kp6uy48lqYNBYnuaFdJp8X/YPBWQ==
+"@vscode/extension-telemetry@0.9.2":
+  version "0.9.2"
+  resolved "https://registry.yarnpkg.com/@vscode/extension-telemetry/-/extension-telemetry-0.9.2.tgz#da1c3c0f5311b611d31bfa0f9126024efab42b5f"
+  integrity sha512-O6VMCDkzypjULhgy2l6fih3c3fExPmSj7aewtW5jBJYgXcIIjtkJOttIfnKOCP4S8sNfc6xc1Do4MbUDmhduEw==
   dependencies:
     "@microsoft/1ds-core-js" "^4.0.3"
     "@microsoft/1ds-post-js" "^4.0.3"
