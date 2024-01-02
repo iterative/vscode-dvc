@@ -6,8 +6,7 @@ import { Error } from '../../../shared/components/icons'
 export const Errors: React.FC<{ errors: PlotsState['template']['errors'] }> = ({
   errors
 }) => {
-  const revErrors = Object.entries(errors)
-  if (revErrors.length === 0) {
+  if (errors.length === 0) {
     return
   }
 
@@ -19,17 +18,17 @@ export const Errors: React.FC<{ errors: PlotsState['template']['errors'] }> = ({
       </h3>
       <table>
         <tbody>
-          {revErrors.map(([path, msgsByRev]) => (
+          {errors.map(({ path, revs }) => (
             <>
               <tr>
                 <th colSpan={2} className={styles.errorsPlot}>
                   {path}
                 </th>
               </tr>
-              {Object.entries(msgsByRev).map(([rev, msgs], ind) => (
-                <tr key={ind}>
+              {revs.map(({ rev, msg }) => (
+                <tr key={rev}>
                   <td className={styles.errorsRev}>{rev}</td>
-                  <td className={styles.errorsMsgs}>{msgs.join('\n')}</td>
+                  <td className={styles.errorsMsgs}>{msg}</td>
                 </tr>
               ))}
             </>

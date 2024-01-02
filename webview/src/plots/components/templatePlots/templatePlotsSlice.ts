@@ -24,7 +24,7 @@ export interface TemplatePlotsState extends Omit<TemplatePlotsData, 'plots'> {
 }
 
 export const templatePlotsInitialState: TemplatePlotsState = {
-  errors: {},
+  errors: [],
   hasData: false,
   hasItems: false,
   height: DEFAULT_HEIGHT[PlotsSection.TEMPLATE_PLOTS],

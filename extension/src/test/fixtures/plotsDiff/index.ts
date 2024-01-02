@@ -881,7 +881,7 @@ export const getMinimalWebviewMessage = () => ({
   height: DEFAULT_PLOT_HEIGHT,
   revisions: getRevisions(),
   smoothPlotValues: {},
-  errors: {}
+  errors: []
 })
 
 export const getTemplateWebviewMessage = (): TemplatePlotsData => ({
@@ -889,7 +889,7 @@ export const getTemplateWebviewMessage = (): TemplatePlotsData => ({
   nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,
   height: DEFAULT_PLOT_HEIGHT,
   smoothPlotValues: {},
-  errors: {}
+  errors: []
 })
 
 export const getManyTemplatePlotsWebviewMessage = (
@@ -901,7 +901,7 @@ export const getManyTemplatePlotsWebviewMessage = (
   nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,
   height: DEFAULT_PLOT_HEIGHT,
   smoothPlotValues: {},
-  errors: {}
+  errors: []
 })
 
 export const MOCK_IMAGE_MTIME = 946684800000

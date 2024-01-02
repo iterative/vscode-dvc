@@ -10,6 +10,7 @@ import { Disposable } from '../../class/dispose'
 import { DvcError, PlotsOutputOrError } from '../../cli/dvc/contract'
 import { isDvcError } from '../../cli/dvc/reader'
 import { getCliErrorLabel } from '../../tree'
+import { TemplatePlotsData } from '../webview/contract'
 
 export class ErrorsModel extends Disposable {
   private readonly dvcRoot: string
@@ -33,6 +34,18 @@ export class ErrorsModel extends Disposable {
 
   public getImageErrors(path: string, revision: string) {
     return collectImageErrors(path, revision, this.errors)
+  }
+
+  public getTemplateErrors(paths: string[], selectedRevisions: string[]) {
+    const errors: TemplatePlotsData['errors'] = []
+    for (const path of paths) {
+      const pathErrors = this.getPathErrors(path, selectedRevisions)
+      if (pathErrors) {
+        errors.push({ path, revs: pathErrors })
+      }
+    }
+
+    return errors
   }
 
   public getPathErrors(path: string, selectedRevisions: string[]) {
