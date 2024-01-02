@@ -10,6 +10,7 @@ import { refreshSection, togglePlotsSection } from '../util/messages'
 import { IconMenuItemProps } from '../../shared/components/iconMenu/IconMenuItem'
 import { Trash } from '../../shared/components/icons'
 import { SectionContainer } from '../../shared/components/sectionContainer/SectionContainer'
+import { TooltipIconType } from '../../shared/components/sectionContainer/InfoTooltip'
 
 interface PlotsContainerProps {
   sectionCollapsed: boolean
@@ -21,6 +22,7 @@ interface PlotsContainerProps {
   children: React.ReactNode
   hasItems?: boolean
   noHeight?: boolean
+  hasErrors?: boolean
 }
 
 export const PlotsContainer: React.FC<PlotsContainerProps> = ({
@@ -32,7 +34,8 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   height,
   removePlotsButton,
   hasItems,
-  noHeight
+  noHeight,
+  hasErrors
 }) => {
   const dispatch = useDispatch()
   const open = !sectionCollapsed
@@ -95,6 +98,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
           />
         )
       }
+      icon={hasErrors ? TooltipIconType.ERROR : TooltipIconType.INFO}
     >
       <div
         className={cx({

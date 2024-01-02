@@ -19,6 +19,7 @@ export const TemplatePlotsWrapper: React.FC = () => {
       sectionCollapsed={isCollapsed}
       hasItems={hasItems}
       height={height}
+      hasErrors={errors.length > 0}
     >
       <Errors errors={errors} />
       <TemplatePlots />
