@@ -142,6 +142,22 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
     return false
   }
 
+  public getSelectedPlotPaths() {
+    const revisionPaths = this.data.filter(element =>
+      this.hasRevisions(element)
+    )
+
+    const paths: string[] = []
+
+    for (const { path } of revisionPaths) {
+      if (this.status[path] === Status.SELECTED) {
+        paths.push(path)
+      }
+    }
+
+    return paths
+  }
+
   public getTemplateOrder(): TemplateOrder {
     return collectTemplateOrder(
       this.getPathsByType(PathType.TEMPLATE_SINGLE),

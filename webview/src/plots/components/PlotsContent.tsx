@@ -7,6 +7,7 @@ import { CustomPlotsWrapper } from './customPlots/CustomPlotsWrapper'
 import { TemplatePlotsWrapper } from './templatePlots/TemplatePlotsWrapper'
 import { ComparisonTableWrapper } from './comparisonTable/ComparisonTableWrapper'
 import { Ribbon } from './ribbon/Ribbon'
+import { Errors } from './Errors'
 import { setMaxNbPlotsPerRow, setZoomedInPlot } from './webviewSlice'
 import styles from './styles.module.scss'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
@@ -15,8 +16,14 @@ import { PlotsState } from '../store'
 
 export const PlotsContent = () => {
   const dispatch = useDispatch()
-  const { hasData, hasPlots, hasUnselectedPlots, zoomedInPlot, cliError } =
-    useSelector((state: PlotsState) => state.webview)
+  const {
+    hasData,
+    hasPlots,
+    hasUnselectedPlots,
+    plotErrors,
+    zoomedInPlot,
+    cliError
+  } = useSelector((state: PlotsState) => state.webview)
   const hasComparisonData = useSelector(
     (state: PlotsState) => state.comparison.hasData
   )
@@ -89,6 +96,7 @@ export const PlotsContent = () => {
   return (
     <div ref={wrapperRef} className={styles.plotsContent}>
       <Ribbon />
+      <Errors errors={plotErrors} />
       <TemplatePlotsWrapper />
       <ComparisonTableWrapper />
       <CustomPlotsWrapper />

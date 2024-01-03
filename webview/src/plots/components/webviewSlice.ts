@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { PlotsSection, Revision } from 'dvc/src/plots/webview/contract'
+import {
+  PlotErrors,
+  PlotsSection,
+  Revision
+} from 'dvc/src/plots/webview/contract'
 
 type ZoomedInPlotState = {
   section: PlotsSection
@@ -16,6 +20,7 @@ export interface WebviewState {
   selectedRevisions: Revision[]
   zoomedInPlot: ZoomedInPlotState | undefined
   maxNbPlotsPerRow: number
+  plotErrors: PlotErrors
 }
 
 export const webviewInitialState: WebviewState = {
@@ -24,6 +29,7 @@ export const webviewInitialState: WebviewState = {
   hasPlots: false,
   hasUnselectedPlots: false,
   maxNbPlotsPerRow: 4,
+  plotErrors: [],
   selectedRevisions: [],
   zoomedInPlot: {
     id: '',
@@ -88,6 +94,12 @@ export const webviewSlice = createSlice({
     ) => {
       state.hasUnselectedPlots = action.payload
     },
+    updatePlotErrors: (
+      state: { plotErrors: PlotErrors },
+      action: PayloadAction<PlotErrors | undefined>
+    ) => {
+      state.plotErrors = action.payload || []
+    },
     updateSelectedRevisions: (
       state: { selectedRevisions: Revision[] },
       action: PayloadAction<Revision[] | undefined>
@@ -102,6 +114,7 @@ export const {
   updateCliError,
   updateHasPlots,
   updateHasUnselectedPlots,
+  updatePlotErrors,
   updateSelectedRevisions,
   setZoomedInPlot,
   setMaxNbPlotsPerRow
