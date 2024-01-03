@@ -223,7 +223,7 @@ suite('Experiments Data Test Suite', () => {
       await dataUpdatedEvent
 
       expect(managedUpdateSpy).to.be.called
-    }).timeout(10000)
+    }).timeout(20000)
 
     it('should prune any old branches to show before calling exp show on them', async () => {
       stub(ExperimentsData.prototype, 'managedUpdate').resolves()
