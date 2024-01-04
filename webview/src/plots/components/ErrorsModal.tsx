@@ -17,8 +17,8 @@ export const ErrorsModal: React.FC = () => {
       </h3>
       <table>
         <tbody>
-          {errors.map(({ path, revs }) => (
-            <>
+          {errors.map(({ path, revs }, index) => (
+            <React.Fragment key={index}>
               <tr>
                 <th colSpan={2} className={styles.errorsModalPlot}>
                   {path}
@@ -30,7 +30,7 @@ export const ErrorsModal: React.FC = () => {
                   <td className={styles.errorsModalMsgs}>{msg}</td>
                 </tr>
               ))}
-            </>
+            </React.Fragment>
           ))}
         </tbody>
       </table>
