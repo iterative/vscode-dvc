@@ -1104,6 +1104,66 @@ suite('Plots Test Suite', () => {
       ).not.to.contain(brokenExp)
     })
 
+    it.only('should send plot errors to the webview', async () => {
+      const accPngPath = join('plots', 'acc.png')
+      const accPng = [
+        ...plotsDiffFixture.data[join('plots', 'acc.png')]
+      ] as ImagePlot[]
+      const lossTsvPath = join('logs', 'loss.tsv')
+      const lossTsv = [
+        ...plotsDiffFixture.data[lossTsvPath]
+      ] as TemplatePlotOutput[]
+
+      const plotsDiffOutput = {
+        data: {
+          [accPngPath]: accPng,
+          [lossTsvPath]: lossTsv
+        },
+        errors: [
+          {
+            msg: 'File not found',
+            name: accPngPath,
+            rev: 'workspace',
+            type: 'FileNotFoundError'
+          },
+          {
+            msg: 'Could not find provided field',
+            name: lossTsvPath,
+            rev: 'workspace',
+            type: 'FieldNotFoundError'
+          },
+          {
+            msg: 'Could not find provided field',
+            name: lossTsvPath,
+            rev: 'main',
+            type: 'FieldNotFoundError'
+          }
+        ]
+      }
+      const { messageSpy } = await buildPlotsWebview({
+        disposer: disposable,
+        plotsDiff: plotsDiffOutput
+      })
+
+      const expectedPlotsData: TPlotsData = {
+        plotErrors: [
+          {
+            path: accPngPath,
+            revs: [{ msg: 'File not found', rev: 'workspace' }]
+          },
+          {
+            path: lossTsvPath,
+            revs: [
+              { msg: 'Could not find provided field', rev: 'workspace' },
+              { msg: 'Could not find provided field', rev: 'main' }
+            ]
+          }
+        ]
+      }
+
+      expect(messageSpy).to.be.calledWithMatch(expectedPlotsData)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
     it('should handle a toggle experiment message from the webview', async () => {
       const { experiments, mockMessageReceived } = await buildPlotsWebview({
         disposer: disposable,
