@@ -198,3 +198,33 @@
   display: block;
   white-space: nowrap;
 }
+
+.errors {
+  margin: 5px 0 0;
+  color: $error-color;
+  border-top: 1px solid $error-color;
+  border-bottom: 1px solid $error-color;
+  display: flex;
+  width: 100%;
+}
+
+.errorsTitle {
+  margin-right: auto;
+  font-weight: bold;
+}
+
+.errorsIcon {
+  margin-right: 3px;
+  vertical-align: bottom;
+}
+
+.errorsButton {
+  @extend %buttonAsLink;
+
+  color: inherit;
+
+  &:hover {
+    color: inherit;
+    text-decoration: underline;
+  }
+}

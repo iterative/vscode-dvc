@@ -12,6 +12,7 @@ type ZoomedInPlotState = {
   openActionsMenu?: boolean
   refresh?: boolean
 }
+
 export interface WebviewState {
   cliError: string | undefined
   hasData: boolean
@@ -21,6 +22,7 @@ export interface WebviewState {
   zoomedInPlot: ZoomedInPlotState | undefined
   maxNbPlotsPerRow: number
   plotErrors: PlotErrors
+  showErrorsModal: boolean
 }
 
 export const webviewInitialState: WebviewState = {
@@ -31,6 +33,7 @@ export const webviewInitialState: WebviewState = {
   maxNbPlotsPerRow: 4,
   plotErrors: [],
   selectedRevisions: [],
+  showErrorsModal: false,
   zoomedInPlot: {
     id: '',
     section: PlotsSection.TEMPLATE_PLOTS
@@ -51,6 +54,12 @@ export const webviewSlice = createSlice({
       // Action payload here is the max width of the plots webview. When changed, we re-calculate the max number of plots per row
       const maxWidth = action.payload
       state.maxNbPlotsPerRow = Math.floor(maxWidth / 300)
+    },
+    setShowErrorsModal: (
+      state: { showErrorsModal: boolean },
+      action: PayloadAction<boolean>
+    ) => {
+      state.showErrorsModal = action.payload
     },
     setZoomedInPlot: (
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -114,9 +123,10 @@ export const {
   updateCliError,
   updateHasPlots,
   updateHasUnselectedPlots,
-  updatePlotErrors,
   updateSelectedRevisions,
+  updatePlotErrors,
   setZoomedInPlot,
+  setShowErrorsModal,
   setMaxNbPlotsPerRow
 } = webviewSlice.actions
 

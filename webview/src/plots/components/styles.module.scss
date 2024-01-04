@@ -3,38 +3,6 @@
 
 $gap: 20px;
 
-.errors {
-  padding: 20px 0;
-  margin: 20px 20px 0;
-  color: $error-color;
-  border-top: 1px solid $error-color;
-  border-bottom: 1px solid $error-color;
-}
-
-.errorsTitle {
-  margin: 0;
-}
-
-.errorsIcon {
-  margin-right: 3px;
-  vertical-align: text-top;
-  fill: $error-color;
-}
-
-.errorsPlot {
-  text-align: left;
-  padding: 15px 0;
-  font-weight: 600;
-}
-
-.errorsRev {
-  padding: 0 20px 0 0;
-}
-
-.errorsMsgs {
-  width: 100%;
-}
-
 .plots {
   width: 100%;
   height: 100%;
@@ -266,6 +234,37 @@ $gap: 20px;
     width: 100%;
     height: 100%;
   }
+}
+
+.errorsModal {
+  width: 80vw;
+  max-height: calc(80vh - 100px);
+  color: $error-color;
+}
+
+.errorsModalTitle {
+  margin: 0;
+}
+
+.errorsModalIcon {
+  margin-right: 3px;
+  vertical-align: text-bottom;
+  fill: $error-color;
+}
+
+.errorsModalPlot {
+  text-align: left;
+  padding: 15px 0 0;
+  font-weight: 600;
+}
+
+.errorsModalRev {
+  padding: 10px 20px 0 0;
+}
+
+.errorsModalMsgs {
+  width: 100%;
+  padding-top: 10px;
 }
 
 .vegaCustomAction:hover {

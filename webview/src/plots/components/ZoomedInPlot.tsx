@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useRef } from 'react'
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import { View } from 'react-vega'
 import { ExtendedVegaLite } from './vegaLite/ExtendedVegaLite'
@@ -15,6 +15,7 @@ import {
   exportPlotDataAsJson,
   exportPlotDataAsTsv
 } from '../util/messages'
+import { useModalOpenClass } from '../hooks/useModalOpenClass'
 
 type ZoomedInPlotProps = {
   id: string
@@ -43,15 +44,7 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
   openActionsMenu
 }: ZoomedInPlotProps) => {
   const zoomedInPlotRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const modalOpenClass = 'modalOpen'
-    document.body.classList.add(modalOpenClass)
-
-    return () => {
-      document.body.classList.remove(modalOpenClass)
-    }
-  }, [])
+  useModalOpenClass()
 
   const onNewView = (view: View) => {
     const actions: HTMLDivElement | null | undefined =
