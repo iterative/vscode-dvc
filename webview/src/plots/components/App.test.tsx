@@ -2796,6 +2796,70 @@ describe('App', () => {
       })
       expect(screen.queryByText('!')).not.toBeInTheDocument()
     })
+
+    it('should show an error banner when there are errors found', () => {
+      renderAppWithOptionalData({
+        comparison: comparisonTableFixture,
+        plotErrors: [
+          { path: 'image-path', revs: [{ msg: 'error', rev: 'main' }] }
+        ],
+        selectedRevisions: plotsRevisionsFixture.map(rev => {
+          if (rev.label === 'main') {
+            return {
+              ...rev,
+              errors: ['error'],
+              fetched: false
+            }
+          }
+          return rev
+        })
+      })
+
+      expect(screen.getByText('Errors Found')).toBeInTheDocument()
+      expect(screen.getByText('Show error')).toBeInTheDocument()
+
+      sendSetDataMessage({
+        plotErrors: [
+          { path: 'image-path', revs: [{ msg: 'error', rev: 'main' }] },
+          { path: 'second-image-path', revs: [{ msg: 'error', rev: 'main' }] }
+        ]
+      })
+
+      expect(screen.getByText('Show 2 errors')).toBeInTheDocument()
+    })
+
+    it('should show a button that opens an error modal when there are errors found', () => {
+      renderAppWithOptionalData({
+        comparison: comparisonTableFixture,
+        plotErrors: [
+          { path: 'image-path', revs: [{ msg: 'error', rev: 'main' }] }
+        ],
+        selectedRevisions: plotsRevisionsFixture.map(rev => {
+          if (rev.label === 'main') {
+            return {
+              ...rev,
+              errors: ['error'],
+              fetched: false
+            }
+          }
+          return rev
+        })
+      })
+
+      const showErrorsBtn = screen.getByText('Show error')
+
+      expect(showErrorsBtn).toBeInTheDocument()
+
+      fireEvent.click(showErrorsBtn)
+
+      expect(screen.getByTestId('modal')).toBeInTheDocument()
+
+      const modalContents = screen.getByTestId('errors-modal')
+
+      expect(within(modalContents).getByText('image-path')).toBeInTheDocument()
+      expect(within(modalContents).getByText('main')).toBeInTheDocument()
+      expect(within(modalContents).getByText('error')).toBeInTheDocument()
+    })
   })
 
   describe('Vega panels', () => {
