@@ -1104,7 +1104,7 @@ suite('Plots Test Suite', () => {
       ).not.to.contain(brokenExp)
     })
 
-    it.only('should send plot errors to the webview', async () => {
+    it('should send plot errors to the webview', async () => {
       const accPngPath = join('plots', 'acc.png')
       const accPng = [
         ...plotsDiffFixture.data[join('plots', 'acc.png')]
