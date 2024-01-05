@@ -2805,7 +2805,6 @@ describe('App', () => {
         ]
       })
 
-      expect(screen.getByText('Errors Found')).toBeInTheDocument()
       expect(screen.getByText('Show error')).toBeInTheDocument()
 
       sendSetDataMessage({

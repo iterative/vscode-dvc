@@ -208,11 +208,6 @@
   width: 100%;
 }
 
-.errorsTitle {
-  margin-right: auto;
-  font-weight: bold;
-}
-
 .errorsIcon {
   margin-right: 3px;
   vertical-align: bottom;
@@ -222,6 +217,8 @@
   @extend %buttonAsLink;
 
   color: inherit;
+  font-weight: 600;
+  padding: 6px 0;
 
   &:hover {
     color: inherit;
