@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.5] - 2024-01-09
+
+### 🚀 New Features and Enhancements
+
+- Rename "Studio" to "DVC Studio" in text instances [#5142](https://github.com/iterative/vscode-dvc/pull/5142) by [@julieg18](https://github.com/julieg18)
+- Add plots error message below ribbon [#5165](https://github.com/iterative/vscode-dvc/pull/5165) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Revert @vscode/extension-telemetry to 0.8.5 [#5175](https://github.com/iterative/vscode-dvc/pull/5175) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (3.34.0) [#5140](https://github.com/iterative/vscode-dvc/pull/5140) by [@julieg18](https://github.com/julieg18)
+- Update demo project and latest tested CLI version (3.35.0) [#5144](https://github.com/iterative/vscode-dvc/pull/5144) by [@julieg18](https://github.com/julieg18)
+- Update demo to latest commit and update version (3.37.0) [#5149](https://github.com/iterative/vscode-dvc/pull/5149) by [@julieg18](https://github.com/julieg18)
+- Increase VSCode test timeout [#5147](https://github.com/iterative/vscode-dvc/pull/5147) by [@julieg18](https://github.com/julieg18)
+- Update demo to latest commit and update version (3.38.1) [#5171](https://github.com/iterative/vscode-dvc/pull/5171) by [@julieg18](https://github.com/julieg18)
+
 ## [1.2.4] - 2023-12-20
 
 ### 🚀 New Features and Enhancements
