@@ -2,6 +2,7 @@
   "ignoreDeps": [
     "@types/node",
     "@types/vscode",
+    "@vscode/extension-telemetry",
     "@wdio/cli",
     "@wdio/local-runner",
     "@wdio/mocha-framework",
