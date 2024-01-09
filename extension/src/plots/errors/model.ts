@@ -10,6 +10,7 @@ import { Disposable } from '../../class/dispose'
 import { DvcError, PlotsOutputOrError } from '../../cli/dvc/contract'
 import { isDvcError } from '../../cli/dvc/reader'
 import { getCliErrorLabel } from '../../tree'
+import { PlotErrors } from '../webview/contract'
 
 export class ErrorsModel extends Disposable {
   private readonly dvcRoot: string
@@ -64,6 +65,17 @@ export class ErrorsModel extends Disposable {
     }
 
     return [...acc]
+  }
+
+  public getErrorsByPath(paths: string[], selectedRevisions: string[]) {
+    const errors: PlotErrors = []
+    for (const path of paths) {
+      const pathErrors = this.getPathErrors(path, selectedRevisions)
+      if (pathErrors) {
+        errors.push({ path, revs: pathErrors })
+      }
+    }
+    return errors
   }
 
   public hasCliError() {

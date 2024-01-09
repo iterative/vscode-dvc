@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { PlotsSection, Revision } from 'dvc/src/plots/webview/contract'
+import {
+  PlotErrors,
+  PlotsSection,
+  Revision
+} from 'dvc/src/plots/webview/contract'
 
 type ZoomedInPlotState = {
   section: PlotsSection
@@ -8,6 +12,7 @@ type ZoomedInPlotState = {
   openActionsMenu?: boolean
   refresh?: boolean
 }
+
 export interface WebviewState {
   cliError: string | undefined
   hasData: boolean
@@ -16,6 +21,8 @@ export interface WebviewState {
   selectedRevisions: Revision[]
   zoomedInPlot: ZoomedInPlotState | undefined
   maxNbPlotsPerRow: number
+  plotErrors: PlotErrors
+  showErrorsModal: boolean
 }
 
 export const webviewInitialState: WebviewState = {
@@ -24,7 +31,9 @@ export const webviewInitialState: WebviewState = {
   hasPlots: false,
   hasUnselectedPlots: false,
   maxNbPlotsPerRow: 4,
+  plotErrors: [],
   selectedRevisions: [],
+  showErrorsModal: false,
   zoomedInPlot: {
     id: '',
     section: PlotsSection.TEMPLATE_PLOTS
@@ -45,6 +54,12 @@ export const webviewSlice = createSlice({
       // Action payload here is the max width of the plots webview. When changed, we re-calculate the max number of plots per row
       const maxWidth = action.payload
       state.maxNbPlotsPerRow = Math.floor(maxWidth / 300)
+    },
+    setShowErrorsModal: (
+      state: { showErrorsModal: boolean },
+      action: PayloadAction<boolean>
+    ) => {
+      state.showErrorsModal = action.payload
     },
     setZoomedInPlot: (
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -88,6 +103,12 @@ export const webviewSlice = createSlice({
     ) => {
       state.hasUnselectedPlots = action.payload
     },
+    updatePlotErrors: (
+      state: { plotErrors: PlotErrors },
+      action: PayloadAction<PlotErrors | undefined>
+    ) => {
+      state.plotErrors = action.payload || []
+    },
     updateSelectedRevisions: (
       state: { selectedRevisions: Revision[] },
       action: PayloadAction<Revision[] | undefined>
@@ -103,7 +124,9 @@ export const {
   updateHasPlots,
   updateHasUnselectedPlots,
   updateSelectedRevisions,
+  updatePlotErrors,
   setZoomedInPlot,
+  setShowErrorsModal,
   setMaxNbPlotsPerRow
 } = webviewSlice.actions
 

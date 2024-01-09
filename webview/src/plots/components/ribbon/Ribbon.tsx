@@ -5,6 +5,7 @@ import { useInView } from 'react-intersection-observer'
 import styles from './styles.module.scss'
 import { RibbonBlock } from './RibbonBlock'
 import { update } from './ribbonSlice'
+import { Errors } from './Errors'
 import { IconButton } from '../../../shared/components/button/IconButton'
 import { PlotsState } from '../../store'
 import { Add, ListFilter, Refresh } from '../../../shared/components/icons'
@@ -95,6 +96,7 @@ export const Ribbon: React.FC = () => {
           onClear={() => removeRevision(revision.id)}
         />
       ))}
+      <Errors />
     </ul>
   )
 }

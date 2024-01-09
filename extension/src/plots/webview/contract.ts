@@ -163,12 +163,18 @@ export type ComparisonPlot = {
   imgs: ComparisonPlotImg[]
 }
 
+export type PlotErrors = {
+  path: string
+  revs: { rev: string; msg: string }[]
+}[]
+
 export enum PlotsDataKeys {
   COMPARISON = 'comparison',
   CLI_ERROR = 'cliError',
   CUSTOM = 'custom',
   HAS_UNSELECTED_PLOTS = 'hasUnselectedPlots',
   HAS_PLOTS = 'hasPlots',
+  PLOT_ERRORS = 'plotErrors',
   SELECTED_REVISIONS = 'selectedRevisions',
   TEMPLATE = 'template',
   SECTION_COLLAPSED = 'sectionCollapsed',
@@ -188,6 +194,7 @@ export type PlotsData =
       [PlotsDataKeys.SECTION_COLLAPSED]?: SectionCollapsed
       [PlotsDataKeys.SHOW_TOO_MANY_TEMPLATE_PLOTS]?: boolean
       [PlotsDataKeys.SHOW_TOO_MANY_COMPARISON_IMAGES]?: boolean
+      [PlotsDataKeys.PLOT_ERRORS]?: PlotErrors
     }
   | undefined
 

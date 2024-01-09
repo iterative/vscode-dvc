@@ -50,18 +50,21 @@ const MockedState: React.FC<{ data: PlotsData; children: React.ReactNode }> = ({
   return <>{children}</>
 }
 
+const defaultPlotsData = {
+  cliError: null,
+  comparison: comparisonPlotsFixture,
+  custom: customPlotsFixture,
+  hasPlots: true,
+  hasUnselectedPlots: false,
+  plotErrors: [],
+  sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+  selectedRevisions: plotsRevisionsFixture,
+  template: templatePlotsFixture
+}
+
 export default {
   args: {
-    data: {
-      cliError: null,
-      comparison: comparisonPlotsFixture,
-      custom: customPlotsFixture,
-      hasPlots: true,
-      hasUnselectedPlots: false,
-      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
-      selectedRevisions: plotsRevisionsFixture,
-      template: templatePlotsFixture
-    }
+    data: defaultPlotsData
   },
   component: Plots,
   title: 'Plots'
@@ -82,6 +85,29 @@ const Template: StoryFn<{
 
 export const WithData = Template.bind({})
 WithData.parameters = CHROMATIC_VIEWPORTS_WITH_DELAY
+
+export const WithPlotsErrors = Template.bind({})
+const errorMsg = 'Could not find provided field'
+WithPlotsErrors.args = {
+  data: {
+    ...defaultPlotsData,
+    plotErrors: [
+      {
+        path: 'dvc.yaml:Loss',
+        revs: [{ msg: errorMsg, rev: 'main' }]
+      }
+    ],
+    selectedRevisions: plotsRevisionsFixture.map(rev => {
+      if (rev.id === 'main') {
+        return {
+          ...rev,
+          errors: [errorMsg]
+        }
+      }
+      return rev
+    })
+  }
+}
 
 export const WithCustomOnly = Template.bind({})
 WithCustomOnly.args = {

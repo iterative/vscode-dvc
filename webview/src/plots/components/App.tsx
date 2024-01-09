@@ -30,6 +30,7 @@ import {
   updateCliError,
   updateHasPlots,
   updateHasUnselectedPlots,
+  updatePlotErrors,
   updateSelectedRevisions
 } from './webviewSlice'
 import { PlotsDispatch } from '../store'
@@ -80,6 +81,9 @@ export const feedStore = (
           continue
         case PlotsDataKeys.HAS_UNSELECTED_PLOTS:
           dispatch(updateHasUnselectedPlots(!!data.data[key]))
+          continue
+        case PlotsDataKeys.PLOT_ERRORS:
+          dispatch(updatePlotErrors(data.data[key]))
           continue
         case PlotsDataKeys.SELECTED_REVISIONS:
           dispatch(updateSelectedRevisions(data.data[key]))

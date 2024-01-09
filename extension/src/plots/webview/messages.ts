@@ -174,7 +174,8 @@ export class WebviewMessages {
       hasPlots,
       hasUnselectedPlots,
       sectionCollapsed,
-      template
+      template,
+      plotErrors
     ] = await Promise.all([
       this.errors.getCliError()?.error || null,
       this.getComparisonPlots(),
@@ -182,7 +183,11 @@ export class WebviewMessages {
       !!this.paths.hasPaths(),
       this.paths.getHasUnselectedPlots(),
       this.plots.getSectionCollapsed(),
-      this.getTemplatePlots(selectedRevisions)
+      this.getTemplatePlots(selectedRevisions),
+      this.errors.getErrorsByPath(
+        this.paths.getSelectedPlotPaths(),
+        this.plots.getSelectedRevisionIds()
+      )
     ])
     const shouldShowTooManyTemplatePlotsMessage =
       this.shouldShowTooManyPlotsMessage([
@@ -198,6 +203,7 @@ export class WebviewMessages {
       custom,
       hasPlots,
       hasUnselectedPlots,
+      plotErrors,
       sectionCollapsed,
       selectedRevisions,
       shouldShowTooManyComparisonImagesMessage,

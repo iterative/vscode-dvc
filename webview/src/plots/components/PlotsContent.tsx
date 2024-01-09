@@ -3,11 +3,16 @@ import { useSelector, useDispatch } from 'react-redux'
 import { ErrorState } from './emptyState/ErrorState'
 import { GetStarted } from './emptyState/GetStarted'
 import { ZoomedInPlot } from './ZoomedInPlot'
+import { ErrorsModal } from './ErrorsModal'
 import { CustomPlotsWrapper } from './customPlots/CustomPlotsWrapper'
 import { TemplatePlotsWrapper } from './templatePlots/TemplatePlotsWrapper'
 import { ComparisonTableWrapper } from './comparisonTable/ComparisonTableWrapper'
 import { Ribbon } from './ribbon/Ribbon'
-import { setMaxNbPlotsPerRow, setZoomedInPlot } from './webviewSlice'
+import {
+  setMaxNbPlotsPerRow,
+  setZoomedInPlot,
+  setShowErrorsModal
+} from './webviewSlice'
 import styles from './styles.module.scss'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { Modal } from '../../shared/components/modal/Modal'
@@ -15,8 +20,14 @@ import { PlotsState } from '../store'
 
 export const PlotsContent = () => {
   const dispatch = useDispatch()
-  const { hasData, hasPlots, hasUnselectedPlots, zoomedInPlot, cliError } =
-    useSelector((state: PlotsState) => state.webview)
+  const {
+    hasData,
+    hasPlots,
+    hasUnselectedPlots,
+    zoomedInPlot,
+    cliError,
+    showErrorsModal
+  } = useSelector((state: PlotsState) => state.webview)
   const hasComparisonData = useSelector(
     (state: PlotsState) => state.comparison.hasData
   )
@@ -63,6 +74,16 @@ export const PlotsContent = () => {
     </Modal>
   )
 
+  const errorsModal = showErrorsModal && (
+    <Modal
+      onClose={() => {
+        dispatch(setShowErrorsModal(false))
+      }}
+    >
+      <ErrorsModal />
+    </Modal>
+  )
+
   const hasCustomPlots = customPlotIds.length > 0
 
   if (cliError) {
@@ -93,6 +114,7 @@ export const PlotsContent = () => {
       <ComparisonTableWrapper />
       <CustomPlotsWrapper />
       {modal}
+      {errorsModal}
     </div>
   )
 }

@@ -236,6 +236,37 @@ $gap: 20px;
   }
 }
 
+.errorsModal {
+  width: 80vw;
+  max-height: calc(80vh - 100px);
+  color: $error-color;
+}
+
+.errorsModalTitle {
+  margin: 0;
+}
+
+.errorsModalIcon {
+  margin-right: 3px;
+  vertical-align: text-bottom;
+  fill: $error-color;
+}
+
+.errorsModalPlot {
+  text-align: left;
+  padding: 15px 0 0;
+  font-weight: 600;
+}
+
+.errorsModalRev {
+  padding: 10px 20px 0 0;
+}
+
+.errorsModalMsgs {
+  width: 100%;
+  padding-top: 10px;
+}
+
 .vegaCustomAction:hover {
   cursor: pointer;
 }
