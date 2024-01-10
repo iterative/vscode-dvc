@@ -24,7 +24,7 @@ export const Ribbon: React.FC = () => {
     rootMargin: '-5px',
     threshold: 0.95
   })
-  const measurementsRef = useRef<HTMLUListElement>()
+  const measurementsRef = useRef<HTMLDivElement>()
   const dispatch = useDispatch()
 
   const revisions = useSelector(
@@ -60,7 +60,7 @@ export const Ribbon: React.FC = () => {
   }, [changeRibbonHeight])
 
   return (
-    <ul
+    <div
       ref={node => {
         if (node) {
           measurementsRef.current = node
@@ -68,35 +68,37 @@ export const Ribbon: React.FC = () => {
         ref(node)
       }}
       data-testid="ribbon"
-      className={cx(styles.list, needsShadow && styles.withShadow)}
+      className={cx(styles.ribbon, needsShadow && styles.withShadow)}
     >
-      <li className={styles.buttonWrapper}>
-        <IconButton onClick={addPlot} icon={Add} text="Add Plot" />
-      </li>
-      <li className={styles.buttonWrapper}>
-        <IconButton
-          onClick={selectRevisions}
-          icon={ListFilter}
-          text={`${revisions.length} of ${MAX_NB_EXP}`}
-          appearance="secondary"
-        />
-      </li>
-      <li className={styles.buttonWrapper}>
-        <IconButton
-          onClick={refreshRevisions}
-          icon={Refresh}
-          text="Refresh All"
-          appearance="secondary"
-        />
-      </li>
-      {revisions.map(revision => (
-        <RibbonBlock
-          revision={revision}
-          key={revision.id}
-          onClear={() => removeRevision(revision.id)}
-        />
-      ))}
+      <ul className={styles.list}>
+        <li className={styles.buttonWrapper}>
+          <IconButton onClick={addPlot} icon={Add} text="Add Plot" />
+        </li>
+        <li className={styles.buttonWrapper}>
+          <IconButton
+            onClick={selectRevisions}
+            icon={ListFilter}
+            text={`${revisions.length} of ${MAX_NB_EXP}`}
+            appearance="secondary"
+          />
+        </li>
+        <li className={styles.buttonWrapper}>
+          <IconButton
+            onClick={refreshRevisions}
+            icon={Refresh}
+            text="Refresh All"
+            appearance="secondary"
+          />
+        </li>
+        {revisions.map(revision => (
+          <RibbonBlock
+            revision={revision}
+            key={revision.id}
+            onClear={() => removeRevision(revision.id)}
+          />
+        ))}
+      </ul>
       <Errors />
-    </ul>
+    </div>
   )
 }

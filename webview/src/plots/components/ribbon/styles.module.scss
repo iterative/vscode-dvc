@@ -166,24 +166,28 @@
   }
 }
 
-.list {
-  display: flex;
+.ribbon {
   position: sticky;
-  align-items: center;
-  gap: 6px;
+  transition: box-shadow 0.25s;
+  z-index: 100;
+  top: 0;
+  background-color: $bg-color;
   border-bottom: 1px solid $border-color;
   padding: 10px 15px;
-  margin: 0;
-  flex-wrap: wrap;
-  top: 0;
-  width: 100%;
-  z-index: 100;
-  background-color: $bg-color;
-  transition: box-shadow 0.25s;
 
   &.withShadow {
     box-shadow: 0 5px 8px -2px $shadow;
   }
+}
+
+.list {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  flex-wrap: wrap;
+  width: 100%;
 }
 
 .buttonWrapper {
@@ -200,7 +204,7 @@
 }
 
 .errors {
-  margin: 5px 0 0;
+  margin: 10px 0 0;
   color: $error-color;
   border-top: 1px solid $error-color;
   border-bottom: 1px solid $error-color;
