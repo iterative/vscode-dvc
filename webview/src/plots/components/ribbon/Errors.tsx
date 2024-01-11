@@ -23,7 +23,7 @@ export const Errors: React.FC = () => {
   }
 
   return (
-    <li className={styles.errors}>
+    <div className={styles.errors}>
       <button
         className={styles.errorsButton}
         onClick={() => dispatch(setShowErrorsModal(true))}
@@ -31,6 +31,6 @@ export const Errors: React.FC = () => {
         <Error className={styles.errorsIcon} width="16" height="16" />
         {errorsTotal === 1 ? 'Show error' : `Show ${errorsTotal} errors`}
       </button>
-    </li>
+    </div>
   )
 }
