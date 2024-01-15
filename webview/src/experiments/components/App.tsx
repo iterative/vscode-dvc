@@ -27,6 +27,47 @@ import {
   updateShowOnlyChanged
 } from '../state/tableDataSlice'
 import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
+import { ExperimentsDispatch } from '../store'
+
+const actionToDispatch = {
+  changes: updateChanges,
+  cliError: updateCliError,
+  columnOrder: updateColumnOrder,
+  columnWidths: updateColumnWidths,
+  columns: updateColumns,
+  filters: updateFilters,
+  hasBranchesToSelect: updateHasBranchesToSelect,
+  hasCheckpoints: updateHasCheckpoints,
+  hasConfig: updateHasConfig,
+  hasMoreCommits: updateHasMoreCommits,
+  hasRunningWorkspaceExperiment: updateHasRunningWorkspaceExperiment,
+  isShowingMoreCommits: updateIsShowingMoreCommits,
+  rows: updateRows,
+  selectedBranches: updateSelectedBranches,
+  selectedForPlotsCount: updateSelectedForPlotsCount,
+  showOnlyChanged: updateShowOnlyChanged,
+  sorts: updateSorts
+} as const
+
+const feedStore = (
+  data: MessageToWebview<TableData>,
+  dispatch: ExperimentsDispatch
+) => {
+  if (data?.type !== MessageToWebviewType.SET_DATA) {
+    return
+  }
+  dispatch(update(!!data.data))
+
+  for (const key of Object.keys(data.data)) {
+    const tKey = key as keyof typeof data.data
+    const action = actionToDispatch[tKey]
+    const value = data.data[tKey]
+    if (!action) {
+      continue
+    }
+    dispatch(action(value as never))
+  }
+}
 
 export const App: React.FC<Record<string, unknown>> = () => {
   const dispatch = useDispatch()
@@ -34,76 +75,7 @@ export const App: React.FC<Record<string, unknown>> = () => {
   useVsCodeMessaging(
     useCallback(
       ({ data }: { data: MessageToWebview<TableData> }) => {
-        if (data.type === MessageToWebviewType.SET_DATA) {
-          dispatch(update(!!data.data))
-          for (const key of Object.keys(data.data)) {
-            switch (key) {
-              case 'changes':
-                dispatch(updateChanges(data.data.changes))
-                continue
-              case 'cliError':
-                dispatch(updateCliError(data.data.cliError))
-                continue
-              case 'columnOrder':
-                dispatch(updateColumnOrder(data.data.columnOrder))
-                continue
-              case 'columns':
-                dispatch(updateColumns(data.data.columns))
-                continue
-              case 'columnsWidths':
-                dispatch(updateColumnWidths(data.data.columnWidths))
-                continue
-              case 'filters':
-                dispatch(updateFilters(data.data.filters))
-                continue
-              case 'hasBranchesToSelect':
-                dispatch(
-                  updateHasBranchesToSelect(data.data.hasBranchesToSelect)
-                )
-                continue
-              case 'hasCheckpoints':
-                dispatch(updateHasCheckpoints(data.data.hasCheckpoints))
-                continue
-              case 'hasConfig':
-                dispatch(updateHasConfig(data.data.hasConfig))
-                continue
-              case 'hasMoreCommits':
-                dispatch(updateHasMoreCommits(data.data.hasMoreCommits))
-                continue
-              case 'hasRunningWorkspaceExperiment':
-                dispatch(
-                  updateHasRunningWorkspaceExperiment(
-                    data.data.hasRunningWorkspaceExperiment
-                  )
-                )
-                continue
-              case 'isShowingMoreCommits':
-                dispatch(
-                  updateIsShowingMoreCommits(data.data.isShowingMoreCommits)
-                )
-                continue
-              case 'rows':
-                dispatch(updateRows(data.data.rows))
-                continue
-              case 'selectedBranches':
-                dispatch(updateSelectedBranches(data.data.selectedBranches))
-                continue
-              case 'selectedForPlotsCount':
-                dispatch(
-                  updateSelectedForPlotsCount(data.data.selectedForPlotsCount)
-                )
-                continue
-              case 'showOnlyChanged':
-                dispatch(updateShowOnlyChanged(data.data.showOnlyChanged))
-                continue
-              case 'sorts':
-                dispatch(updateSorts(data.data.sorts))
-                continue
-              default:
-                continue
-            }
-          }
-        }
+        feedStore(data, dispatch)
       },
       [dispatch]
     )
