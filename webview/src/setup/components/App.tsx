@@ -1,6 +1,6 @@
 import { SetupSection, SetupData } from 'dvc/src/setup/webview/contract'
 import { MessageToWebview } from 'dvc/src/webview/contract'
-import React, { useCallback } from 'react'
+import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Dvc } from './dvc/Dvc'
 import { Experiments } from './experiments/Experiments'
@@ -10,30 +10,10 @@ import { Remotes } from './remotes/Remotes'
 import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
 import { TooltipIconType } from '../../shared/components/sectionContainer/InfoTooltip'
 import { SetupDispatch, SetupState } from '../store'
-import { initialize, updateSectionCollapsed } from '../state/webviewSlice'
-import {
-  updateCanGitInitialize,
-  updateCliCompatible,
-  updateDvcCliDetails,
-  updateIsAboveLatestTestedVersion,
-  updateIsPythonEnvironmentGlobal,
-  updateIsPythonExtensionInstalled,
-  updateIsPythonExtensionUsed,
-  updateNeedsGitInitialized,
-  updateProjectInitialized,
-  updatePythonBinPath
-} from '../state/dvcSlice'
-import {
-  updateHasData as updateExperimentsHasData,
-  updateNeedsGitCommit
-} from '../state/experimentsSlice'
-import { updateRemoteList } from '../state/remoteSlice'
-import {
-  updateIsStudioConnected,
-  updateSelfHostedStudioUrl,
-  updateShareLiveToStudio
-} from '../state/studioSlice'
+import { initialize } from '../state/webviewSlice'
+import { updateShareLiveToStudio } from '../state/studioSlice'
 import { setStudioShareExperimentsLive } from '../util/messages'
+import { dispatchAction } from '../../shared/dispatchAction'
 
 const getDvcStatusIcon = (
   isDvcSetup: boolean,
@@ -56,44 +36,17 @@ const getStudioStatusIcon = (cliCompatible: boolean, isConnected: boolean) => {
   return isConnected ? TooltipIconType.PASSED : TooltipIconType.WARNING
 }
 
-const actionToDispatch = {
-  canGitInitialize: updateCanGitInitialize,
-  cliCompatible: updateCliCompatible,
-  dvcCliDetails: updateDvcCliDetails,
-  hasData: updateExperimentsHasData,
-  isAboveLatestTestedVersion: updateIsAboveLatestTestedVersion,
-  isPythonEnvironmentGlobal: updateIsPythonEnvironmentGlobal,
-  isPythonExtensionInstalled: updateIsPythonExtensionInstalled,
-  isPythonExtensionUsed: updateIsPythonExtensionUsed,
-  isStudioConnected: updateIsStudioConnected,
-  needsGitCommit: updateNeedsGitCommit,
-  needsGitInitialized: updateNeedsGitInitialized,
-  projectInitialized: updateProjectInitialized,
-  pythonBinPath: updatePythonBinPath,
-  remoteList: updateRemoteList,
-  sectionCollapsed: updateSectionCollapsed,
-  selfHostedStudioUrl: updateSelfHostedStudioUrl,
-  shareLiveToStudio: updateShareLiveToStudio
-} as const
-
 export const feedStore = (
   data: MessageToWebview<SetupData>,
   dispatch: SetupDispatch
 ) => {
-  if (!data?.data) {
+  const stateUpdate = data?.data
+  if (!stateUpdate) {
     return
   }
   dispatch(initialize())
 
-  for (const key of Object.keys(data.data)) {
-    const tKey = key as keyof typeof data.data
-    const action = actionToDispatch[tKey]
-    const value = data.data[tKey]
-    if (!action) {
-      continue
-    }
-    dispatch(action(value as never))
-  }
+  dispatchAction('setup', stateUpdate, dispatch)
 }
 
 export const App: React.FC = () => {
@@ -110,14 +63,7 @@ export const App: React.FC = () => {
 
   const dispatch = useDispatch()
 
-  useVsCodeMessaging(
-    useCallback(
-      ({ data }: { data: MessageToWebview<SetupData> }) => {
-        feedStore(data, dispatch)
-      },
-      [dispatch]
-    )
-  )
+  useVsCodeMessaging(feedStore)
 
   const setShareLiveToStudio = (shouldShareLive: boolean) => {
     dispatch(updateShareLiveToStudio(shouldShareLive))

@@ -1,53 +1,14 @@
-import React, { useCallback } from 'react'
-import { useDispatch } from 'react-redux'
+import React from 'react'
 import {
   MessageToWebview,
   MessageToWebviewType
 } from 'dvc/src/webview/contract'
 import { TableData } from 'dvc/src/experiments/webview/contract'
 import Experiments from './Experiments'
-import {
-  update,
-  updateSelectedBranches,
-  updateChanges,
-  updateCliError,
-  updateColumnOrder,
-  updateColumns,
-  updateColumnWidths,
-  updateFilters,
-  updateHasBranchesToSelect,
-  updateHasCheckpoints,
-  updateHasConfig,
-  updateHasMoreCommits,
-  updateHasRunningWorkspaceExperiment,
-  updateIsShowingMoreCommits,
-  updateRows,
-  updateSelectedForPlotsCount,
-  updateSorts,
-  updateShowOnlyChanged
-} from '../state/tableDataSlice'
+import { update } from '../state/tableDataSlice'
 import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
 import { ExperimentsDispatch } from '../store'
-
-const actionToDispatch = {
-  changes: updateChanges,
-  cliError: updateCliError,
-  columnOrder: updateColumnOrder,
-  columnWidths: updateColumnWidths,
-  columns: updateColumns,
-  filters: updateFilters,
-  hasBranchesToSelect: updateHasBranchesToSelect,
-  hasCheckpoints: updateHasCheckpoints,
-  hasConfig: updateHasConfig,
-  hasMoreCommits: updateHasMoreCommits,
-  hasRunningWorkspaceExperiment: updateHasRunningWorkspaceExperiment,
-  isShowingMoreCommits: updateIsShowingMoreCommits,
-  rows: updateRows,
-  selectedBranches: updateSelectedBranches,
-  selectedForPlotsCount: updateSelectedForPlotsCount,
-  showOnlyChanged: updateShowOnlyChanged,
-  sorts: updateSorts
-} as const
+import { dispatchAction } from '../../shared/dispatchAction'
 
 const feedStore = (
   data: MessageToWebview<TableData>,
@@ -56,30 +17,14 @@ const feedStore = (
   if (data?.type !== MessageToWebviewType.SET_DATA) {
     return
   }
-  dispatch(update(!!data.data))
+  const stateUpdate = data?.data
+  dispatch(update(!!stateUpdate))
 
-  for (const key of Object.keys(data.data)) {
-    const tKey = key as keyof typeof data.data
-    const action = actionToDispatch[tKey]
-    const value = data.data[tKey]
-    if (!action) {
-      continue
-    }
-    dispatch(action(value as never))
-  }
+  dispatchAction('experiments', stateUpdate, dispatch)
 }
 
 export const App: React.FC<Record<string, unknown>> = () => {
-  const dispatch = useDispatch()
-
-  useVsCodeMessaging(
-    useCallback(
-      ({ data }: { data: MessageToWebview<TableData> }) => {
-        feedStore(data, dispatch)
-      },
-      [dispatch]
-    )
-  )
+  useVsCodeMessaging(feedStore)
 
   return <Experiments />
 }
