@@ -59,6 +59,26 @@ const getStudioStatusIcon = (cliCompatible: boolean, isConnected: boolean) => {
   return isConnected ? TooltipIconType.PASSED : TooltipIconType.WARNING
 }
 
+const actionToDispatch = {
+  canGitInitialize: updateCanGitInitialize,
+  cliCompatible: updateCliCompatible,
+  dvcCliDetails: updateDvcCliDetails,
+  hasData: updateExperimentsHasData,
+  isAboveLatestTestedVersion: updateIsAboveLatestTestedVersion,
+  isPythonEnvironmentGlobal: updateIsPythonEnvironmentGlobal,
+  isPythonExtensionInstalled: updateIsPythonExtensionInstalled,
+  isPythonExtensionUsed: updateIsPythonExtensionUsed,
+  isStudioConnected: updateIsStudioConnected,
+  needsGitCommit: updateNeedsGitCommit,
+  needsGitInitialized: updateNeedsGitInitialized,
+  projectInitialized: updateProjectInitialized,
+  pythonBinPath: updatePythonBinPath,
+  remoteList: updateRemoteList,
+  sectionCollapsed: updateSectionCollapsed,
+  selfHostedStudioUrl: updateSelfHostedStudioUrl,
+  shareLiveToStudio: updateShareLiveToStudio
+} as const
+
 export const feedStore = (
   data: MessageToWebview<SetupData>,
   dispatch: SetupDispatch
@@ -67,69 +87,15 @@ export const feedStore = (
     return
   }
   dispatch(updateWebviewHasData())
-  for (const key of Object.keys(data.data)) {
-    switch (key) {
-      case 'canGitInitialize':
-        dispatch(updateCanGitInitialize(data.data.canGitInitialize))
-        continue
-      case 'cliCompatible':
-        dispatch(updateCliCompatible(data.data.cliCompatible))
-        continue
-      case 'dvcCliDetails':
-        dispatch(updateDvcCliDetails(data.data.dvcCliDetails))
-        continue
-      case 'hasData':
-        dispatch(updateExperimentsHasData(data.data.hasData))
-        continue
-      case 'isPythonEnvironmentGlobal':
-        dispatch(
-          updateIsPythonEnvironmentGlobal(data.data.isPythonEnvironmentGlobal)
-        )
-        continue
-      case 'isPythonExtensionInstalled':
-        dispatch(
-          updateIsPythonExtensionInstalled(data.data.isPythonExtensionInstalled)
-        )
-        continue
-      case 'isPythonExtensionUsed':
-        dispatch(updateIsPythonExtensionUsed(data.data.isPythonExtensionUsed))
-        continue
-      case 'isAboveLatestTestedVersion':
-        dispatch(
-          updateIsAboveLatestTestedVersion(data.data.isAboveLatestTestedVersion)
-        )
-        continue
-      case 'isStudioConnected':
-        dispatch(updateIsStudioConnected(data.data.isStudioConnected))
-        continue
-      case 'needsGitCommit':
-        dispatch(updateNeedsGitCommit(data.data.needsGitCommit))
-        continue
-      case 'needsGitInitialized':
-        dispatch(updateNeedsGitInitialized(data.data.needsGitInitialized))
-        continue
-      case 'projectInitialized':
-        dispatch(updateProjectInitialized(data.data.projectInitialized))
-        continue
-      case 'pythonBinPath':
-        dispatch(updatePythonBinPath(data.data.pythonBinPath))
-        continue
-      case 'sectionCollapsed':
-        dispatch(updateSectionCollapsed(data.data.sectionCollapsed))
-        continue
-      case 'shareLiveToStudio':
-        dispatch(updateShareLiveToStudio(data.data.shareLiveToStudio))
-        continue
-      case 'selfHostedStudioUrl':
-        dispatch(updateSelfHostedStudioUrl(data.data.selfHostedStudioUrl))
-        continue
-      case 'remoteList':
-        dispatch(updateRemoteList(data.data.remoteList))
-        continue
 
-      default:
-        continue
+  for (const key of Object.keys(data.data)) {
+    const tKey = key as keyof typeof data.data
+    const action = actionToDispatch[tKey]
+    const value = data.data[tKey]
+    if (!action) {
+      continue
     }
+    dispatch(action(value as never))
   }
 }
 
