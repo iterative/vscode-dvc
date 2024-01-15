@@ -1,19 +1,40 @@
-import { SetupSection, SetupData } from 'dvc/src/setup/webview/contract'
+import { SetupData, SetupSection } from 'dvc/src/setup/webview/contract'
 import { MessageToWebview } from 'dvc/src/webview/contract'
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { SetupContainer } from './SetupContainer'
 import { Dvc } from './dvc/Dvc'
 import { Experiments } from './experiments/Experiments'
-import { Studio } from './studio/Studio'
-import { SetupContainer } from './SetupContainer'
 import { Remotes } from './remotes/Remotes'
-import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
+import { Studio } from './studio/Studio'
 import { TooltipIconType } from '../../shared/components/sectionContainer/InfoTooltip'
+import { dispatchActions } from '../../shared/dispatchActions'
+import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
+import {
+  updateCanGitInitialize,
+  updateCliCompatible,
+  updateDvcCliDetails,
+  updateIsAboveLatestTestedVersion,
+  updateIsPythonEnvironmentGlobal,
+  updateIsPythonExtensionInstalled,
+  updateIsPythonExtensionUsed,
+  updateNeedsGitInitialized,
+  updateProjectInitialized,
+  updatePythonBinPath
+} from '../state/dvcSlice'
+import {
+  updateHasData as updateExperimentsHasData,
+  updateNeedsGitCommit
+} from '../state/experimentsSlice'
+import { updateRemoteList } from '../state/remoteSlice'
+import {
+  updateIsStudioConnected,
+  updateSelfHostedStudioUrl,
+  updateShareLiveToStudio
+} from '../state/studioSlice'
+import { initialize, updateSectionCollapsed } from '../state/webviewSlice'
 import { SetupDispatch, SetupState } from '../store'
-import { initialize } from '../state/webviewSlice'
-import { updateShareLiveToStudio } from '../state/studioSlice'
 import { setStudioShareExperimentsLive } from '../util/messages'
-import { dispatchAction } from '../../shared/dispatchAction'
 
 const getDvcStatusIcon = (
   isDvcSetup: boolean,
@@ -36,6 +57,28 @@ const getStudioStatusIcon = (cliCompatible: boolean, isConnected: boolean) => {
   return isConnected ? TooltipIconType.PASSED : TooltipIconType.WARNING
 }
 
+const actionToDispatch = {
+  canGitInitialize: updateCanGitInitialize,
+  cliCompatible: updateCliCompatible,
+  dvcCliDetails: updateDvcCliDetails,
+  hasData: updateExperimentsHasData,
+  isAboveLatestTestedVersion: updateIsAboveLatestTestedVersion,
+  isPythonEnvironmentGlobal: updateIsPythonEnvironmentGlobal,
+  isPythonExtensionInstalled: updateIsPythonExtensionInstalled,
+  isPythonExtensionUsed: updateIsPythonExtensionUsed,
+  isStudioConnected: updateIsStudioConnected,
+  needsGitCommit: updateNeedsGitCommit,
+  needsGitInitialized: updateNeedsGitInitialized,
+  projectInitialized: updateProjectInitialized,
+  pythonBinPath: updatePythonBinPath,
+  remoteList: updateRemoteList,
+  sectionCollapsed: updateSectionCollapsed,
+  selfHostedStudioUrl: updateSelfHostedStudioUrl,
+  shareLiveToStudio: updateShareLiveToStudio
+} as const
+
+export type SetupActions = typeof actionToDispatch
+
 export const feedStore = (
   data: MessageToWebview<SetupData>,
   dispatch: SetupDispatch
@@ -46,7 +89,7 @@ export const feedStore = (
   }
   dispatch(initialize())
 
-  dispatchAction('setup', stateUpdate, dispatch)
+  dispatchActions(actionToDispatch, stateUpdate, dispatch)
 }
 
 export const App: React.FC = () => {

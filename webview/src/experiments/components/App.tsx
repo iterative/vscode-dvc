@@ -1,14 +1,55 @@
-import React from 'react'
+import { TableData } from 'dvc/src/experiments/webview/contract'
 import {
   MessageToWebview,
   MessageToWebviewType
 } from 'dvc/src/webview/contract'
-import { TableData } from 'dvc/src/experiments/webview/contract'
+import React from 'react'
 import Experiments from './Experiments'
-import { update } from '../state/tableDataSlice'
+import { dispatchActions } from '../../shared/dispatchActions'
 import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
+import {
+  update,
+  updateChanges,
+  updateCliError,
+  updateColumnOrder,
+  updateColumnWidths,
+  updateColumns,
+  updateFilters,
+  updateHasBranchesToSelect,
+  updateHasCheckpoints,
+  updateHasConfig,
+  updateHasMoreCommits,
+  updateHasRunningWorkspaceExperiment,
+  updateIsShowingMoreCommits,
+  updateRows,
+  updateSelectedBranches,
+  updateSelectedForPlotsCount,
+  updateShowOnlyChanged,
+  updateSorts
+} from '../state/tableDataSlice'
 import { ExperimentsDispatch } from '../store'
-import { dispatchAction } from '../../shared/dispatchAction'
+
+const actionToDispatch = {
+  changes: updateChanges,
+  cliError: updateCliError,
+  columnOrder: updateColumnOrder,
+  columnWidths: updateColumnWidths,
+  columns: updateColumns,
+  filters: updateFilters,
+  hasBranchesToSelect: updateHasBranchesToSelect,
+  hasCheckpoints: updateHasCheckpoints,
+  hasConfig: updateHasConfig,
+  hasMoreCommits: updateHasMoreCommits,
+  hasRunningWorkspaceExperiment: updateHasRunningWorkspaceExperiment,
+  isShowingMoreCommits: updateIsShowingMoreCommits,
+  rows: updateRows,
+  selectedBranches: updateSelectedBranches,
+  selectedForPlotsCount: updateSelectedForPlotsCount,
+  showOnlyChanged: updateShowOnlyChanged,
+  sorts: updateSorts
+}
+
+export type ExperimentsActions = typeof actionToDispatch
 
 const feedStore = (
   data: MessageToWebview<TableData>,
@@ -20,7 +61,7 @@ const feedStore = (
   const stateUpdate = data?.data
   dispatch(update(!!stateUpdate))
 
-  dispatchAction('experiments', stateUpdate, dispatch)
+  dispatchActions(actionToDispatch, stateUpdate, dispatch)
 }
 
 export const App: React.FC<Record<string, unknown>> = () => {
