@@ -10,10 +10,7 @@ import { Remotes } from './remotes/Remotes'
 import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
 import { TooltipIconType } from '../../shared/components/sectionContainer/InfoTooltip'
 import { SetupDispatch, SetupState } from '../store'
-import {
-  updateSectionCollapsed,
-  updateHasData as updateWebviewHasData
-} from '../state/webviewSlice'
+import { initialize, updateSectionCollapsed } from '../state/webviewSlice'
 import {
   updateCanGitInitialize,
   updateCliCompatible,
@@ -86,7 +83,7 @@ export const feedStore = (
   if (!data?.data) {
     return
   }
-  dispatch(updateWebviewHasData())
+  dispatch(initialize())
 
   for (const key of Object.keys(data.data)) {
     const tKey = key as keyof typeof data.data

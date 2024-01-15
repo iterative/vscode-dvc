@@ -1,13 +1,10 @@
 import React, { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 import {
-  CustomPlotsData,
-  PlotsComparisonData,
   PlotsData,
   PlotsDataKeys,
   PlotsSection,
-  SectionCollapsed,
-  TemplatePlotsData
+  SectionCollapsed
 } from 'dvc/src/plots/webview/contract'
 import { MessageToWebview } from 'dvc/src/webview/contract'
 import { Plots } from './Plots'
@@ -49,59 +46,46 @@ const dispatchCollapsedSections = (
   }
 }
 
+const actionToDispatch = {
+  [PlotsDataKeys.CLI_ERROR]: updateCliError,
+  [PlotsDataKeys.CUSTOM]: updateCustomPlots,
+  [PlotsDataKeys.COMPARISON]: updateComparisonTable,
+  [PlotsDataKeys.TEMPLATE]: updateTemplatePlots,
+  [PlotsDataKeys.HAS_PLOTS]: updateHasPlots,
+  [PlotsDataKeys.HAS_UNSELECTED_PLOTS]: updateHasUnselectedPlots,
+  [PlotsDataKeys.PLOT_ERRORS]: updatePlotErrors,
+  [PlotsDataKeys.SELECTED_REVISIONS]: updateSelectedRevisions,
+  [PlotsDataKeys.SHOW_TOO_MANY_TEMPLATE_PLOTS]:
+    updateShouldShowTooManyTemplatesMessage,
+  [PlotsDataKeys.SHOW_TOO_MANY_COMPARISON_IMAGES]:
+    updateShouldShowTooManyImagesMessage
+} as const
+
 export const feedStore = (
   data: MessageToWebview<PlotsData>,
   dispatch: PlotsDispatch
 ) => {
-  if (data.data) {
-    dispatch(initialize())
-    const keys = Object.keys(data.data) as PlotsDataKeys[]
-    for (const key of keys) {
-      switch (key) {
-        case PlotsDataKeys.CLI_ERROR:
-          dispatch(updateCliError(data.data[key]))
-          continue
-        case PlotsDataKeys.CUSTOM:
-          dispatch(updateCustomPlots(data.data[key] as CustomPlotsData))
-          continue
-        case PlotsDataKeys.COMPARISON:
-          dispatch(updateComparisonTable(data.data[key] as PlotsComparisonData))
-          continue
-        case PlotsDataKeys.TEMPLATE:
-          dispatch(updateTemplatePlots(data.data[key] as TemplatePlotsData))
-          continue
-        case PlotsDataKeys.SECTION_COLLAPSED:
-          dispatchCollapsedSections(
-            data.data[key] as SectionCollapsed,
-            dispatch
-          )
-          continue
-        case PlotsDataKeys.HAS_PLOTS:
-          dispatch(updateHasPlots(!!data.data[key]))
-          continue
-        case PlotsDataKeys.HAS_UNSELECTED_PLOTS:
-          dispatch(updateHasUnselectedPlots(!!data.data[key]))
-          continue
-        case PlotsDataKeys.PLOT_ERRORS:
-          dispatch(updatePlotErrors(data.data[key]))
-          continue
-        case PlotsDataKeys.SELECTED_REVISIONS:
-          dispatch(updateSelectedRevisions(data.data[key]))
-          continue
-        case PlotsDataKeys.SHOW_TOO_MANY_TEMPLATE_PLOTS:
-          dispatch(
-            updateShouldShowTooManyTemplatesMessage(data.data[key] as boolean)
-          )
-          continue
-        case PlotsDataKeys.SHOW_TOO_MANY_COMPARISON_IMAGES:
-          dispatch(
-            updateShouldShowTooManyImagesMessage(data.data[key] as boolean)
-          )
-          continue
-        default:
-          continue
-      }
+  if (!data?.data) {
+    return
+  }
+  dispatch(initialize())
+
+  const keys = Object.keys(data.data) as PlotsDataKeys[]
+  for (const key of keys) {
+    if (key === PlotsDataKeys.SECTION_COLLAPSED) {
+      dispatchCollapsedSections(
+        data.data[PlotsDataKeys.SECTION_COLLAPSED] as SectionCollapsed,
+        dispatch
+      )
+      continue
     }
+
+    const action = actionToDispatch[key as keyof typeof actionToDispatch]
+    const value = data.data[key]
+    if (!action) {
+      continue
+    }
+    dispatch(action(value as never))
   }
 }
 
