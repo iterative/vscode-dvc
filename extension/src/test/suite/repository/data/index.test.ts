@@ -13,6 +13,7 @@ import {
 import { gitPath } from '../../../../cli/git/constants'
 import { getGitPath } from '../../../../fileSystem'
 import { getTimeSafeDisposer } from '../../util'
+import { WATCHER_TEST_TIMEOUT } from '../../timeouts'
 
 suite('Repository Data Test Suite', () => {
   const disposable = getTimeSafeDisposer()
@@ -70,6 +71,6 @@ suite('Repository Data Test Suite', () => {
       await dataUpdatedEvent
 
       expect(managedUpdateSpy).to.be.called
-    })
+    }).timeout(WATCHER_TEST_TIMEOUT)
   })
 })

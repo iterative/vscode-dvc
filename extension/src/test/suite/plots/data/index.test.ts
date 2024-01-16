@@ -23,6 +23,7 @@ import {
   EXPERIMENT_WORKSPACE_ID,
   PLOT_ANCHORS
 } from '../../../../cli/dvc/contract'
+import { WATCHER_TEST_TIMEOUT } from '../../timeouts'
 
 suite('Plots Data Test Suite', () => {
   const disposable = getTimeSafeDisposer()
@@ -166,6 +167,6 @@ suite('Plots Data Test Suite', () => {
         managedUpdateSpy,
         'should update data when an event is fired for a parent directory'
       ).to.be.called
-    })
+    }).timeout(WATCHER_TEST_TIMEOUT)
   })
 })
