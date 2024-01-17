@@ -1099,7 +1099,7 @@ describe('App', () => {
       expect(menu).toBeDefined()
     })
 
-    it('should enable the correct options for the workspace row with no checkpoints', () => {
+    it('should enable the correct options for the workspace row', () => {
       renderTableWithPlaceholder()
 
       const target = screen.getByTestId('workspace-row')
@@ -1111,35 +1111,8 @@ describe('App', () => {
       ])
     })
 
-    it('should enable the correct options for the workspace with checkpoints', () => {
+    it('should enable the correct options for a commit', () => {
       renderTableWithoutRunningExperiments()
-
-      const [target] = screen.getAllByText(EXPERIMENT_WORKSPACE_ID)
-      fireEvent.contextMenu(target, { bubbles: true })
-
-      expect(getEnabledOptions()).toStrictEqual([
-        'Modify and Run',
-        'Modify and Resume',
-        'Modify and Queue'
-      ])
-    })
-
-    it('should enable the correct options for a commit with checkpoints', () => {
-      renderTableWithoutRunningExperiments()
-
-      const target = screen.getAllByText('main')[1]
-      fireEvent.contextMenu(target, { bubbles: true })
-
-      expect(getEnabledOptions()).toStrictEqual([
-        'Apply to Workspace',
-        'Create new Branch',
-        'Copy Sha',
-        'Star'
-      ])
-    })
-
-    it('should enable the correct options for a commit without checkpoints', () => {
-      renderTableWithoutRunningExperiments(false)
 
       const target = screen.getAllByText('main')[1]
       fireEvent.contextMenu(target, { bubbles: true })
@@ -1201,7 +1174,7 @@ describe('App', () => {
       expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
     })
 
-    const menuItemLength = 14
+    const menuItemLength = 13
 
     it('should not close when a disabled item is clicked', () => {
       renderTableWithoutRunningExperiments()

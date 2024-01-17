@@ -698,57 +698,5 @@ suite('Experiments Tree Test Suite', () => {
         'params.yaml:process.threshold=0.82'
       )
     })
-
-    it('should be able to reset and run a new checkpoint experiment from an existing one with dvc.views.experiments.resetAndRunCheckpointExperiment', async () => {
-      const { dvcRunner, experimentsModel, mockGetOnlyOrPickProject } =
-        await stubWorkspaceGetters(disposable)
-
-      const mockRunExperimentReset = stub(
-        dvcRunner,
-        'runExperimentReset'
-      ).resolves(undefined)
-
-      const getParamsSpy = spy(experimentsModel, 'getWorkspaceParams')
-
-      const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
-        [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
-        Thenable<QuickPickItem[] | QuickPickItemWithValue<string> | undefined>
-      >
-      mockShowQuickPick.resolves([
-        {
-          label: 'params.yaml:dropout',
-          value: { path: 'params.yaml:dropout', value: 0.1 }
-        },
-        {
-          label: 'params.yaml:process.threshold',
-          value: { path: 'params.yaml:process.threshold', value: 0.8 }
-        }
-      ] as QuickPickItemWithValue<Param>[])
-
-      stub(window, 'showInputBox')
-        .onFirstCall()
-        .resolves('0.11')
-        .onSecondCall()
-        .resolves('0.82')
-
-      await commands.executeCommand(
-        RegisteredCliCommands.EXPERIMENT_VIEW_RESET_AND_RUN,
-        {
-          dvcRoot: dvcDemoPath
-        }
-      )
-
-      expect(mockGetOnlyOrPickProject).not.to.be.called
-      expect(getParamsSpy).to.be.calledOnce
-      expect(mockShowQuickPick).to.be.calledOnce
-      expect(mockRunExperimentReset).to.be.calledOnce
-      expect(mockRunExperimentReset).to.be.calledWith(
-        dvcDemoPath,
-        '-S',
-        'params.yaml:dropout=0.11',
-        '-S',
-        'params.yaml:process.threshold=0.82'
-      )
-    })
   })
 })

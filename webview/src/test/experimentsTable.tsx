@@ -63,12 +63,9 @@ export const renderTableWithFilters = () => {
   })
 }
 
-export const renderTableWithoutRunningExperiments = (
-  hasCheckpoints?: boolean
-) => {
+export const renderTableWithoutRunningExperiments = () => {
   renderTable({
     ...tableDataFixture,
-    hasCheckpoints: hasCheckpoints ?? tableDataFixture.hasCheckpoints,
     hasRunningWorkspaceExperiment: false,
     rows: tableDataFixture.rows.map(row => ({
       ...row,

@@ -64,21 +64,14 @@ import { Pipeline } from '../pipeline'
 import { definedAndNonEmpty } from '../util/array'
 
 export const ExperimentsScale = {
-  ...omit(ColumnType, 'TIMESTAMP'),
-  HAS_CHECKPOINTS: 'hasCheckpoints',
-  NO_CHECKPOINTS: 'noCheckpoints'
+  ...omit(ColumnType, 'TIMESTAMP')
 } as const
-
-export type ModifiedExperimentAndRunCommandId =
-  | typeof AvailableCommands.EXPERIMENT_RUN
-  | typeof AvailableCommands.EXPERIMENT_RESET_AND_RUN
 
 export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeIsExperimentsFileFocused: Event<string | undefined>
   public readonly onDidChangeExperiments: Event<void>
   public readonly onDidChangeColumns: Event<void>
   public readonly onDidChangeColumnOrderOrStatus: Event<void>
-  public readonly onDidChangeCheckpoints: Event<void>
 
   public readonly viewKey = ViewKey.EXPERIMENTS
 
@@ -94,10 +87,6 @@ export class Experiments extends BaseRepository<TableData> {
   )
 
   private readonly experimentsChanged = this.dispose.track(
-    new EventEmitter<void>()
-  )
-
-  private readonly checkpointsChanged = this.dispose.track(
     new EventEmitter<void>()
   )
 
@@ -147,7 +136,6 @@ export class Experiments extends BaseRepository<TableData> {
     this.onDidChangeExperiments = this.experimentsChanged.event
     this.onDidChangeColumns = this.columnsChanged.event
     this.onDidChangeColumnOrderOrStatus = this.columnsOrderOrStatusChanged.event
-    this.onDidChangeCheckpoints = this.checkpointsChanged.event
 
     this.experiments = this.dispose.track(
       new ExperimentsModel(dvcRoot, workspaceState)
@@ -209,7 +197,6 @@ export class Experiments extends BaseRepository<TableData> {
 
     const { expShow, gitLog, rowOrder, availableNbCommits } = data
 
-    const hadCheckpoints = this.hasCheckpoints()
     const dvcLiveOnly = await this.checkSignalFile()
     await Promise.all([
       this.columns.transformAndSet(expShow),
@@ -221,10 +208,6 @@ export class Experiments extends BaseRepository<TableData> {
         availableNbCommits
       )
     ])
-
-    if (hadCheckpoints !== this.hasCheckpoints()) {
-      this.checkpointsChanged.fire()
-    }
 
     return this.notifyChanged()
   }
@@ -239,10 +222,6 @@ export class Experiments extends BaseRepository<TableData> {
 
     this.experiments.unsetPushing(ids)
     return this.webviewMessages.sendWebviewMessage()
-  }
-
-  public hasCheckpoints() {
-    return this.experiments.hasCheckpoints()
   }
 
   public getChildColumns(path?: string) {
@@ -287,10 +266,6 @@ export class Experiments extends BaseRepository<TableData> {
         acc[<keyof typeof acc>type] = acc[<keyof typeof acc>type] + 1
       }
     }
-    const checkpointType = this.hasCheckpoints()
-      ? ExperimentsScale.HAS_CHECKPOINTS
-      : ExperimentsScale.NO_CHECKPOINTS
-    acc[checkpointType] = acc[checkpointType] + 1
     return acc
   }
 
@@ -508,9 +483,7 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getRevisionIds()
   }
 
-  public async modifyWorkspaceParamsAndRun(
-    commandId: ModifiedExperimentAndRunCommandId
-  ) {
+  public async modifyWorkspaceParamsAndRun() {
     const cwd = await this.getPipelineCwd()
     if (!cwd) {
       return
@@ -522,7 +495,7 @@ export class Experiments extends BaseRepository<TableData> {
     }
 
     await this.internalCommands.executeCommand<string>(
-      commandId,
+      AvailableCommands.EXPERIMENT_RUN,
       cwd,
       ...paramsToModify
     )

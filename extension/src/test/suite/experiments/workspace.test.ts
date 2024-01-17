@@ -199,53 +199,6 @@ suite('Workspace Experiments Test Suite', () => {
     })
   })
 
-  describe('dvc.modifyWorkspaceParamsAndResume', () => {
-    it('should be able to resume a checkpoint experiment using an existing one as a base', async () => {
-      const { dvcRunner } = await stubWorkspaceGetters(disposable)
-
-      const mockExperimentRun = stub(dvcRunner, 'runExperiment').resolves(
-        undefined
-      )
-
-      const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
-        [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
-        Thenable<QuickPickItem[] | QuickPickItemWithValue<string> | undefined>
-      >
-      mockShowQuickPick.onFirstCall().resolves([
-        {
-          label: 'params.yaml:dropout',
-          value: { path: 'params.yaml:dropout', value: 0.1 }
-        },
-        {
-          label: 'params.yaml:process.threshold',
-          value: { path: 'params.yaml:process.threshold', value: 0.15 }
-        }
-      ] as QuickPickItemWithValue<Param>[])
-
-      const dropout = '0.222222'
-      const threshold = '0.1665'
-
-      stub(window, 'showInputBox')
-        .onFirstCall()
-        .resolves(dropout)
-        .onSecondCall()
-        .resolves(threshold)
-
-      await commands.executeCommand(
-        RegisteredCliCommands.MODIFY_WORKSPACE_PARAMS_AND_RESUME
-      )
-
-      expect(mockExperimentRun).to.be.calledOnce
-      expect(mockExperimentRun).to.be.calledWith(
-        dvcDemoPath,
-        '-S',
-        `params.yaml:dropout=${dropout}`,
-        '-S',
-        `params.yaml:process.threshold=${threshold}`
-      )
-    })
-  })
-
   describe('dvc.modifyWorkspaceParamsAndRun', () => {
     it('should be able to run an experiment using an existing one as a base', async () => {
       const { dvcRunner } = await stubWorkspaceGetters(disposable)
@@ -364,40 +317,6 @@ suite('Workspace Experiments Test Suite', () => {
 
       expect(mockRunExperiment).to.be.calledOnce
       expect(mockRunExperiment).to.be.calledWith(dvcDemoPath)
-    })
-  })
-
-  describe('dvc.resumeCheckpointExperiment', () => {
-    it('should be able to run an experiment', async () => {
-      await stubWorkspaceGetters(disposable)
-
-      const mockRunExperiment = stub(
-        DvcRunner.prototype,
-        'runExperiment'
-      ).resolves(undefined)
-
-      await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_RESUME)
-
-      expect(mockRunExperiment).to.be.calledOnce
-      expect(mockRunExperiment).to.be.calledWith(dvcDemoPath)
-    })
-  })
-
-  describe('dvc.resetAndRunCheckpointExperiment', () => {
-    it('should be able to reset existing checkpoints and restart the experiment', async () => {
-      await stubWorkspaceGetters(disposable)
-
-      const mockRunExperimentReset = stub(
-        DvcRunner.prototype,
-        'runExperimentReset'
-      ).resolves(undefined)
-
-      await commands.executeCommand(
-        RegisteredCliCommands.EXPERIMENT_RESET_AND_RUN
-      )
-
-      expect(mockRunExperimentReset).to.be.calledOnce
-      expect(mockRunExperimentReset).to.be.calledWith(dvcDemoPath)
     })
   })
 

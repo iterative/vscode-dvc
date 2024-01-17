@@ -10,7 +10,6 @@ const data: TableData = {
     'params:params.yaml:nested1.doubled',
     'params:params.yaml:nested1%2Enested2%2Enested3.nested4.nested5b.doubled'
   ],
-  hasCheckpoints: false,
   hasRunningWorkspaceExperiment: false,
   rows,
   selectedForPlotsCount: 0,

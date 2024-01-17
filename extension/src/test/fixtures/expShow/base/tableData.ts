@@ -10,7 +10,6 @@ const tableDataFixture: TableData = {
   columnWidths: {},
   filters: [],
   hasBranchesToSelect: true,
-  hasCheckpoints: true,
   hasConfig: true,
   hasMoreCommits: { main: true },
   hasRunningWorkspaceExperiment: true,

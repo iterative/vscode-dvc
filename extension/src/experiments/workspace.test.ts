@@ -9,7 +9,6 @@ import {
 } from '../commands/internal'
 import { getInput, getValidInput } from '../vscode/inputBox'
 import { buildMockMemento } from '../test/util'
-import { buildMockedEventEmitter } from '../test/util/jest'
 import { OutputChannel } from '../vscode/outputChannel'
 import { Title } from '../vscode/title'
 
@@ -85,8 +84,7 @@ describe('Experiments', () => {
         pickExperiment: jest.fn(),
         showWebview: jest.fn()
       } as unknown as Experiments
-    },
-    buildMockedEventEmitter()
+    }
   )
 
   describe('getCwdThenReport', () => {

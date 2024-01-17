@@ -164,9 +164,7 @@ export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_REMOVE]: undefined
   [EventName.EXPERIMENT_REMOVE_QUEUE]: undefined
   [EventName.EXPERIMENT_VIEW_RENAME]: undefined
-  [EventName.EXPERIMENT_RESUME]: undefined
   [EventName.EXPERIMENT_RUN]: undefined
-  [EventName.EXPERIMENT_RESET_AND_RUN]: undefined
   [EventName.EXPERIMENT_SELECT]: undefined
   [EventName.EXPERIMENT_SHOW]: undefined
   [EventName.EXPERIMENT_SORT_ADD_STARRED]: undefined
@@ -187,14 +185,10 @@ export interface IEventNamePropertyMapping {
   [EventName.QUEUE_STOP]: undefined
 
   [EventName.EXPERIMENT_VIEW_QUEUE]: undefined
-  [EventName.EXPERIMENT_VIEW_RESUME]: undefined
   [EventName.EXPERIMENT_VIEW_RUN]: undefined
-  [EventName.EXPERIMENT_VIEW_RESET_AND_RUN]: undefined
 
   [EventName.MODIFY_WORKSPACE_PARAMS_AND_QUEUE]: undefined
-  [EventName.MODIFY_WORKSPACE_PARAMS_AND_RESUME]: undefined
   [EventName.MODIFY_WORKSPACE_PARAMS_AND_RUN]: undefined
-  [EventName.MODIFY_WORKSPACE_PARAMS_RESET_AND_RUN]: undefined
   [EventName.STOP_EXPERIMENTS]: { stopped: boolean; wasRunning: boolean }
 
   [EventName.PIPELINE_SHOW_DAG]: undefined

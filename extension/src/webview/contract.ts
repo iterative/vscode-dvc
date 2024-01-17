@@ -192,9 +192,6 @@ export type MessageFromWebview =
       type: MessageFromWebviewType.MODIFY_WORKSPACE_PARAMS_AND_RUN
     }
   | {
-      type: MessageFromWebviewType.MODIFY_WORKSPACE_PARAMS_RESET_AND_RUN
-    }
-  | {
       type: MessageFromWebviewType.REMOVE_EXPERIMENT
       payload: string | string[]
     }

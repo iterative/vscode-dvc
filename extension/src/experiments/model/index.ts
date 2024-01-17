@@ -66,7 +66,6 @@ export class ExperimentsModel extends ModelWithPersistence {
   private commits: Experiment[] = []
   private experimentsByCommit: Map<string, Experiment[]> = new Map()
   private rowOrder: { branch: string; sha: string }[] = []
-  private checkpoints = false
   private availableColors: Color[]
   private coloredStatus: ColoredStatus
   private starredExperiments: StarredExperiments
@@ -147,7 +146,6 @@ export class ExperimentsModel extends ModelWithPersistence {
       cliError,
       commits,
       experimentsByCommit,
-      hasCheckpoints,
       runningExperiments,
       workspace
     } = collectExperiments(expShow, gitLog, dvcLiveOnly.running)
@@ -171,7 +169,6 @@ export class ExperimentsModel extends ModelWithPersistence {
     this.cliError = cliError
     this.commits = commits
     this.experimentsByCommit = experimentsByCommit
-    this.checkpoints = hasCheckpoints
 
     const isTransientError = this.hasRunningExperiment() && workspace.error
     if (isTransientError) {
@@ -233,10 +230,6 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   public hasRunningWorkspaceExperiment() {
     return this.running.some(({ executor }) => executor === Executor.WORKSPACE)
-  }
-
-  public hasCheckpoints() {
-    return this.checkpoints
   }
 
   public getCliError() {

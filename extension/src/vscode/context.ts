@@ -3,7 +3,6 @@ import { commands } from 'vscode'
 export enum ContextKey {
   CLI_INCOMPATIBLE = 'dvc.cli.incompatible',
   COMMANDS_AVAILABLE = 'dvc.commands.available',
-  EXPERIMENT_CHECKPOINTS = 'dvc.experiment.checkpoints',
   EXPERIMENT_RUNNING = 'dvc.experiment.running',
   EXPERIMENT_RUNNING_WORKSPACE = 'dvc.experiment.running.workspace',
   EXPERIMENTS_FILE_ACTIVE = 'dvc.experiments.file.active',
