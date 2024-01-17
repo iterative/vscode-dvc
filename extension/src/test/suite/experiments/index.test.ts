@@ -540,8 +540,6 @@ suite('Experiments Test Suite', () => {
         mockUpdateExperimentsData
       } = await stubWorkspaceGettersWebview(disposable)
 
-      stub(Setup.prototype, 'getCliVersion').resolves('3.22.0')
-
       const mockExperimentId = 'exp-e7a67'
       const mockBranch = 'mock-branch-input'
       const mockExperimentBranch = stub(DvcExecutor.prototype, 'expBranch')
@@ -618,8 +616,6 @@ suite('Experiments Test Suite', () => {
 
       const mockNewExperimentName = 'new-experiment-name'
       const inputEvent = getInputBoxEvent(mockNewExperimentName)
-
-      stub(Setup.prototype, 'getCliVersion').resolves('3.22.0')
 
       const mockRenameExperiment = stub(DvcExecutor.prototype, 'expRename')
 
