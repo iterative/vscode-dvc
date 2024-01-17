@@ -53,7 +53,6 @@ const tableData = getTableState({
   columns: columnsFixture,
   filters: ['params:params.yaml:lr'],
   hasBranchesToSelect: true,
-  hasCheckpoints: true,
   hasConfig: true,
   hasMoreCommits: { main: true },
   hasRunningWorkspaceExperiment: true,
@@ -76,22 +75,6 @@ const noRunningExperiments = {
       executorStatus: isRunning(experiment.executorStatus)
         ? ExecutorStatus.SUCCESS
         : experiment.executorStatus
-    }))
-  }))
-}
-
-const noRunningExperimentsNoCheckpoints = {
-  ...noRunningExperiments,
-  hasCheckpoints: false,
-  rows: rowsFixture.map(row => ({
-    ...row,
-    executorStatus: ExecutorStatus.SUCCESS,
-    subRows: row.subRows?.map(experiment => ({
-      ...experiment,
-      executorStatus: isRunning(experiment.executorStatus)
-        ? ExecutorStatus.SUCCESS
-        : experiment.executorStatus,
-      subRows: []
     }))
   }))
 }
@@ -261,12 +244,6 @@ WithContextMenu.args = {
   tableData: noRunningExperiments
 }
 WithContextMenu.play = contextMenuPlay
-
-export const WithContextMenuNoCheckpoints = Template.bind({})
-WithContextMenuNoCheckpoints.args = {
-  tableData: noRunningExperimentsNoCheckpoints
-}
-WithContextMenuNoCheckpoints.play = contextMenuPlay
 
 export const WithAllDataTypes = Template.bind({})
 WithAllDataTypes.args = {

@@ -41,52 +41,15 @@ const registerExperimentCwdCommands = (
       experiments.modifyWorkspaceParamsAndQueue(dvcRoot)
   )
 
-  const modifyWorkspaceParamsAndRun = () =>
-    experiments.modifyWorkspaceParamsAndRun(AvailableCommands.EXPERIMENT_RUN)
-
-  internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.MODIFY_WORKSPACE_PARAMS_AND_RESUME,
-    modifyWorkspaceParamsAndRun
-  )
-
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.MODIFY_WORKSPACE_PARAMS_AND_RUN,
-    modifyWorkspaceParamsAndRun
-  )
-
-  const modifyWorkspaceParamsAndRunFromView = ({
-    dvcRoot
-  }: ExperimentDetails) =>
-    experiments.modifyWorkspaceParamsAndRun(
-      AvailableCommands.EXPERIMENT_RUN,
-      dvcRoot
-    )
-
-  internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.EXPERIMENT_VIEW_RESUME,
-    modifyWorkspaceParamsAndRunFromView
+    () => experiments.modifyWorkspaceParamsAndRun()
   )
 
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_VIEW_RUN,
-    modifyWorkspaceParamsAndRunFromView
-  )
-
-  internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.MODIFY_WORKSPACE_PARAMS_RESET_AND_RUN,
-    () =>
-      experiments.modifyWorkspaceParamsAndRun(
-        AvailableCommands.EXPERIMENT_RESET_AND_RUN
-      )
-  )
-
-  internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.EXPERIMENT_VIEW_RESET_AND_RUN,
     ({ dvcRoot }: ExperimentDetails) =>
-      experiments.modifyWorkspaceParamsAndRun(
-        AvailableCommands.EXPERIMENT_RESET_AND_RUN,
-        dvcRoot
-      )
+      experiments.modifyWorkspaceParamsAndRun(dvcRoot)
   )
 
   internalCommands.registerExternalCliCommand(
@@ -237,18 +200,6 @@ const registerExperimentRunCommands = (
     RegisteredCliCommands.EXPERIMENT_RUN,
     showSetupOrExecuteCommand(setup, () =>
       experiments.getCwdThenRun(AvailableCommands.EXPERIMENT_RUN)
-    )
-  )
-
-  internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.EXPERIMENT_RESUME,
-    () => experiments.getCwdThenRun(AvailableCommands.EXPERIMENT_RUN)
-  )
-
-  internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.EXPERIMENT_RESET_AND_RUN,
-    showSetupOrExecuteCommand(setup, () =>
-      experiments.getCwdThenRun(AvailableCommands.EXPERIMENT_RESET_AND_RUN)
     )
   )
 

@@ -1,24 +1,19 @@
-import { EventEmitter, Memento } from 'vscode'
+import { EventEmitter } from 'vscode'
 import isEmpty from 'lodash.isempty'
-import { Experiments, ModifiedExperimentAndRunCommandId } from '.'
+import { Experiments } from '.'
 import {
   getBranchExperimentCommand,
   getPushExperimentCommand
 } from './commands'
 import { TableData } from './webview/contract'
 import { Args } from '../cli/dvc/constants'
-import {
-  AvailableCommands,
-  CommandId,
-  InternalCommands
-} from '../commands/internal'
+import { AvailableCommands, CommandId } from '../commands/internal'
 import { ResourceLocator } from '../resourceLocator'
 import { Setup } from '../setup'
 import { Toast } from '../vscode/toast'
 import { getInput, getPositiveIntegerInput } from '../vscode/inputBox'
 import { BaseWorkspaceWebviews } from '../webview/workspace'
 import { Title } from '../vscode/title'
-import { ContextKey, setContextValue } from '../vscode/context'
 import { quickPickManyValues } from '../vscode/quickPick'
 import { WorkspacePipeline } from '../pipeline/workspace'
 
@@ -37,36 +32,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     new EventEmitter<void>()
   )
 
-  private readonly checkpointsChanged: EventEmitter<void>
-
   private focusedFileDvcRoot: string | undefined
-
-  constructor(
-    internalCommands: InternalCommands,
-    workspaceState: Memento,
-    experiments?: Record<string, Experiments>,
-    checkpointsChanged?: EventEmitter<void>
-  ) {
-    super(internalCommands, workspaceState, experiments)
-
-    this.checkpointsChanged = this.dispose.track(
-      checkpointsChanged || new EventEmitter()
-    )
-    const onDidChangeCheckpoints = this.checkpointsChanged.event
-
-    this.dispose.track(
-      onDidChangeCheckpoints(() => {
-        const workspaceHasCheckpoints = Object.values(this.repositories).some(
-          experiments => experiments.hasCheckpoints()
-        )
-
-        void setContextValue(
-          ContextKey.EXPERIMENT_CHECKPOINTS,
-          workspaceHasCheckpoints
-        )
-      })
-    )
-  }
 
   public addFilter(overrideRoot?: string) {
     return this.getRepositoryThenUpdate('addFilter', overrideRoot)
@@ -156,10 +122,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return this.runCommand(AvailableCommands.EXP_REMOVE, cwd, ...ids)
   }
 
-  public async modifyWorkspaceParamsAndRun(
-    commandId: ModifiedExperimentAndRunCommandId,
-    overrideRoot?: string
-  ) {
+  public async modifyWorkspaceParamsAndRun(overrideRoot?: string) {
     const project = await this.getDvcRoot(overrideRoot)
     if (!project) {
       return
@@ -169,7 +132,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return
     }
 
-    return await repository.modifyWorkspaceParamsAndRun(commandId)
+    return await repository.modifyWorkspaceParamsAndRun()
   }
 
   public async modifyWorkspaceParamsAndQueue(overrideRoot?: string) {
@@ -341,12 +304,6 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     experiments.dispose.track(
       experiments.onDidChangeColumnOrderOrStatus(() => {
         this.experimentsChanged.fire()
-      })
-    )
-
-    experiments.dispose.track(
-      experiments.onDidChangeCheckpoints(() => {
-        this.checkpointsChanged.fire()
       })
     )
 

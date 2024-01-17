@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore } from 'sinon'
-import { window, commands, EventEmitter, TreeView } from 'vscode'
+import { window, commands, TreeView } from 'vscode'
 import { addFilterViaQuickInput, mockQuickInputFilter } from './util'
 import { Disposable } from '../../../../../extension'
 import columnsFixture, {
@@ -262,12 +262,9 @@ suite('Experiments Filter By Tree Test Suite', () => {
       await experiments.isReady()
 
       const workspaceExperiments = disposable.track(
-        new WorkspaceExperiments(
-          internalCommands,
-          buildMockMemento(),
-          { [dvcDemoPath]: experiments },
-          disposable.track(new EventEmitter())
-        )
+        new WorkspaceExperiments(internalCommands, buildMockMemento(), {
+          [dvcDemoPath]: experiments
+        })
       )
       disposable.track(
         experiments.onDidChangeExperiments(() =>
