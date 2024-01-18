@@ -31,7 +31,13 @@ describe('ComparisonTableHeader', () => {
   const renderHeader = (props = fullProps) =>
     render(
       <Provider store={store}>
-        <ComparisonTableHeader {...props} />
+        <table>
+          <thead>
+            <tr>
+              <ComparisonTableHeader {...props} />
+            </tr>
+          </thead>
+        </table>
       </Provider>
     )
 
