@@ -236,8 +236,8 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
         plots.type?.has(PathType.TEMPLATE_MULTI)
       )
     })
-    const images = sortedData.filter(
-      plots => plots.type?.has(PathType.COMPARISON)
+    const images = sortedData.filter(plots =>
+      plots.type?.has(PathType.COMPARISON)
     )
 
     this.selectDefaultPlots(templatePlots, sortedData)
