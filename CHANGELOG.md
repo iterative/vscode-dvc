@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.6] - 2024-01-18
+
+### 🔨 Maintenance
+
+- Update ribbon error banner to a div [#5187](https://github.com/iterative/vscode-dvc/pull/5187) by [@julieg18](https://github.com/julieg18)
+- Update demo project and latest tested CLI version (3.39.0) [#5193](https://github.com/iterative/vscode-dvc/pull/5193) by [@mattseddon](https://github.com/mattseddon)
+- Replace switch statements that feed the webviews stores [#5194](https://github.com/iterative/vscode-dvc/pull/5194) by [@mattseddon](https://github.com/mattseddon)
+- Update filesystem watcher integration tests [#5195](https://github.com/iterative/vscode-dvc/pull/5195) by [@mattseddon](https://github.com/mattseddon)
+- Remove redundant version check from exp rename code [#5203](https://github.com/iterative/vscode-dvc/pull/5203) by [@mattseddon](https://github.com/mattseddon)
+- Remove redundant checkpoints code [#5204](https://github.com/iterative/vscode-dvc/pull/5204) by [@mattseddon](https://github.com/mattseddon)
+- Remove console statements in tests [#5211](https://github.com/iterative/vscode-dvc/pull/5211) by [@sroy3](https://github.com/sroy3)
+- Update demo project and latest tested CLI version (3.40.0) [#5209](https://github.com/iterative/vscode-dvc/pull/5209) by [@mattseddon](https://github.com/mattseddon)
+- Add on hover style to experiments table header cells [#5210](https://github.com/iterative/vscode-dvc/pull/5210) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.2.5] - 2024-01-09
 
 ### 🚀 New Features and Enhancements
