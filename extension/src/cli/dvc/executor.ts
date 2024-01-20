@@ -24,7 +24,6 @@ export const autoRegisteredCommands = {
   EXP_RENAME: 'expRename',
   INIT: 'init',
   IS_SCM_COMMAND_RUNNING: 'isScmCommandRunning',
-  MOVE: 'move',
   PULL: 'pull',
   PUSH: 'push',
   QUEUE_KILL: 'queueKill',
@@ -119,10 +118,6 @@ export class DvcExecutor extends DvcCli {
       Command.INITIALIZE,
       Flag.SUBDIRECTORY
     )
-  }
-
-  public move(cwd: string, target: string, destination: string) {
-    return this.blockAndExecuteProcess(cwd, Command.MOVE, target, destination)
   }
 
   public pull(cwd: string, ...args: Args) {

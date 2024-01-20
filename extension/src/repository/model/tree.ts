@@ -11,7 +11,7 @@ import {
 import { collectSelected, collectTrackedPaths, PathItem } from './collect'
 import { Resource } from '../commands'
 import { WorkspaceRepositories } from '../workspace'
-import { exists, relativeWithUri } from '../../fileSystem'
+import { exists } from '../../fileSystem'
 import { standardizePath } from '../../fileSystem/path'
 import { fireWatcher } from '../../fileSystem/watcher'
 import { deleteTarget, moveTargets } from '../../fileSystem/workspace'
@@ -32,7 +32,6 @@ import {
 } from '../../commands/external'
 import { sendViewOpenedTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
-import { getInput } from '../../vscode/inputBox'
 import { pickResources } from '../../vscode/resourcePicker'
 import { Modal } from '../../vscode/modal'
 import { Response } from '../../vscode/response'
@@ -240,27 +239,6 @@ export class RepositoriesTree
           AvailableCommands.REMOVE,
           dvcRoot,
           relPath
-        )
-      }
-    )
-
-    this.internalCommands.registerExternalCliCommand<Resource>(
-      RegisteredCliCommands.RENAME_TARGET,
-      async ({ dvcRoot, resourceUri }) => {
-        const relPath = relativeWithUri(dvcRoot, resourceUri)
-        const relDestination = await getInput(
-          Title.ENTER_RELATIVE_DESTINATION,
-          relPath
-        )
-        if (!relDestination || relDestination === relPath) {
-          return
-        }
-
-        return this.internalCommands.executeCommand(
-          AvailableCommands.MOVE,
-          dvcRoot,
-          relPath,
-          relDestination
         )
       }
     )

@@ -336,11 +336,6 @@
         "icon": "$(discard)"
       },
       {
-        "title": "Rename",
-        "command": "dvc.renameTarget",
-        "category": "DVC"
-      },
-      {
         "title": "Run Experiment",
         "command": "dvc.runExperiment",
         "category": "DVC",
@@ -832,10 +827,6 @@
           "when": "false"
         },
         {
-          "command": "dvc.renameTarget",
-          "when": "false"
-        },
-        {
           "command": "dvc.discardWorkspaceChanges",
           "when": "dvc.commands.available && dvc.project.available && !dvc.scm.command.running"
         },
@@ -1169,11 +1160,6 @@
           "command": "dvc.copyRelativeFilePath",
           "group": "6_copypath@2",
           "when": "view == dvc.views.trackedExplorerTree"
-        },
-        {
-          "command": "dvc.renameTarget",
-          "group": "7_modification@1",
-          "when": "view == dvc.views.trackedExplorerTree && viewItem =~ /^.*Data$/"
         },
         {
           "command": "dvc.deleteTarget",

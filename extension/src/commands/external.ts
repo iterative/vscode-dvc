@@ -34,7 +34,6 @@ export enum RegisteredCliCommands {
   PUSH = 'dvc.push',
   PUSH_TARGET = 'dvc.pushTarget',
   REMOVE_TARGET = 'dvc.removeTarget',
-  RENAME_TARGET = 'dvc.renameTarget',
 
   REMOTE_ADD = 'dvc.addRemote',
   REMOTE_MODIFY = 'dvc.modifyRemote',
