@@ -74,7 +74,6 @@ import * as Telemetry from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
 import * as VscodeContext from '../../../vscode/context'
 import { Title } from '../../../vscode/title'
-import { ExperimentFlag } from '../../../cli/dvc/constants'
 import { DvcExecutor } from '../../../cli/dvc/executor'
 import { WorkspacePlots } from '../../../plots/workspace'
 import {
@@ -137,7 +136,6 @@ suite('Experiments Test Suite', () => {
         columnWidths: {},
         columns: columnsFixture,
         filters: [],
-        hasCheckpoints: true,
         hasConfig: true,
         hasRunningWorkspaceExperiment: true,
         rows: rowsFixture,
@@ -540,8 +538,6 @@ suite('Experiments Test Suite', () => {
         mockUpdateExperimentsData
       } = await stubWorkspaceGettersWebview(disposable)
 
-      stub(Setup.prototype, 'getCliVersion').resolves('3.22.0')
-
       const mockExperimentId = 'exp-e7a67'
       const mockBranch = 'mock-branch-input'
       const mockExperimentBranch = stub(DvcExecutor.prototype, 'expBranch')
@@ -618,8 +614,6 @@ suite('Experiments Test Suite', () => {
 
       const mockNewExperimentName = 'new-experiment-name'
       const inputEvent = getInputBoxEvent(mockNewExperimentName)
-
-      stub(Setup.prototype, 'getCliVersion').resolves('3.22.0')
 
       const mockRenameExperiment = stub(DvcExecutor.prototype, 'expRename')
 
@@ -924,38 +918,6 @@ suite('Experiments Test Suite', () => {
       expect(mockRunExperiment).to.be.calledOnce
       expect(mockRunExperiment).to.be.calledWithExactly(
         dvcDemoPath,
-        ...mockModifiedParams
-      )
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
-
-    it('should be able to handle a message to modify the workspace params, reset and run a new experiment', async () => {
-      const { experiments, dvcRunner, mockMessageReceived } =
-        await stubWorkspaceGettersWebview(disposable)
-
-      const mockModifiedParams = [
-        '-S',
-        'params.yaml:lr=0.0001',
-        '-S',
-        'params.yaml:weight_decay=0.2'
-      ]
-
-      stub(experiments, 'pickAndModifyParams').resolves(mockModifiedParams)
-
-      const mockRunExperiment = stub(dvcRunner, 'runExperiment').resolves(
-        undefined
-      )
-
-      const tableChangePromise = experimentsUpdatedEvent(experiments)
-
-      mockMessageReceived.fire({
-        type: MessageFromWebviewType.MODIFY_WORKSPACE_PARAMS_RESET_AND_RUN
-      })
-
-      await tableChangePromise
-      expect(mockRunExperiment).to.be.calledOnce
-      expect(mockRunExperiment).to.be.calledWithExactly(
-        dvcDemoPath,
-        ExperimentFlag.RESET,
         ...mockModifiedParams
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)

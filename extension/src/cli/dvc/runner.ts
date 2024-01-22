@@ -1,10 +1,5 @@
 import { EventEmitter, Event } from 'vscode'
-import {
-  Args,
-  Command,
-  ExperimentFlag,
-  ExperimentSubCommand
-} from './constants'
+import { Args, Command, ExperimentSubCommand } from './constants'
 import { getOptions } from './options'
 import { CliResult, CliStarted, ICli, typeCheckCommands } from '..'
 import { getCommandString } from '../command'
@@ -22,7 +17,6 @@ import {
 } from '../util'
 
 export const autoRegisteredCommands = {
-  EXPERIMENT_RESET_AND_RUN: 'runExperimentReset',
   EXPERIMENT_RUN: 'runExperiment'
 } as const
 
@@ -92,10 +86,6 @@ export class DvcRunner extends Disposable implements ICli {
       ExperimentSubCommand.RUN,
       ...args
     )
-  }
-
-  public runExperimentReset(dvcRoot: string, ...args: Args) {
-    return this.runExperiment(dvcRoot, ExperimentFlag.RESET, ...args)
   }
 
   public async run(cwd: string, ...args: Args) {

@@ -1,19 +1,15 @@
-import { SetupSection, SetupData } from 'dvc/src/setup/webview/contract'
+import { SetupData, SetupSection } from 'dvc/src/setup/webview/contract'
 import { MessageToWebview } from 'dvc/src/webview/contract'
-import React, { useCallback } from 'react'
+import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { SetupContainer } from './SetupContainer'
 import { Dvc } from './dvc/Dvc'
 import { Experiments } from './experiments/Experiments'
-import { Studio } from './studio/Studio'
-import { SetupContainer } from './SetupContainer'
 import { Remotes } from './remotes/Remotes'
-import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
+import { Studio } from './studio/Studio'
 import { TooltipIconType } from '../../shared/components/sectionContainer/InfoTooltip'
-import { SetupDispatch, SetupState } from '../store'
-import {
-  updateSectionCollapsed,
-  updateHasData as updateWebviewHasData
-} from '../state/webviewSlice'
+import { dispatchActions } from '../../shared/dispatchActions'
+import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
 import {
   updateCanGitInitialize,
   updateCliCompatible,
@@ -36,6 +32,8 @@ import {
   updateSelfHostedStudioUrl,
   updateShareLiveToStudio
 } from '../state/studioSlice'
+import { initialize, updateSectionCollapsed } from '../state/webviewSlice'
+import { SetupDispatch, SetupState } from '../store'
 import { setStudioShareExperimentsLive } from '../util/messages'
 
 const getDvcStatusIcon = (
@@ -59,78 +57,39 @@ const getStudioStatusIcon = (cliCompatible: boolean, isConnected: boolean) => {
   return isConnected ? TooltipIconType.PASSED : TooltipIconType.WARNING
 }
 
+const actionToDispatch = {
+  canGitInitialize: updateCanGitInitialize,
+  cliCompatible: updateCliCompatible,
+  dvcCliDetails: updateDvcCliDetails,
+  hasData: updateExperimentsHasData,
+  isAboveLatestTestedVersion: updateIsAboveLatestTestedVersion,
+  isPythonEnvironmentGlobal: updateIsPythonEnvironmentGlobal,
+  isPythonExtensionInstalled: updateIsPythonExtensionInstalled,
+  isPythonExtensionUsed: updateIsPythonExtensionUsed,
+  isStudioConnected: updateIsStudioConnected,
+  needsGitCommit: updateNeedsGitCommit,
+  needsGitInitialized: updateNeedsGitInitialized,
+  projectInitialized: updateProjectInitialized,
+  pythonBinPath: updatePythonBinPath,
+  remoteList: updateRemoteList,
+  sectionCollapsed: updateSectionCollapsed,
+  selfHostedStudioUrl: updateSelfHostedStudioUrl,
+  shareLiveToStudio: updateShareLiveToStudio
+} as const
+
+export type SetupActions = typeof actionToDispatch
+
 export const feedStore = (
   data: MessageToWebview<SetupData>,
   dispatch: SetupDispatch
 ) => {
-  if (!data?.data) {
+  const stateUpdate = data?.data
+  if (!stateUpdate) {
     return
   }
-  dispatch(updateWebviewHasData())
-  for (const key of Object.keys(data.data)) {
-    switch (key) {
-      case 'canGitInitialize':
-        dispatch(updateCanGitInitialize(data.data.canGitInitialize))
-        continue
-      case 'cliCompatible':
-        dispatch(updateCliCompatible(data.data.cliCompatible))
-        continue
-      case 'dvcCliDetails':
-        dispatch(updateDvcCliDetails(data.data.dvcCliDetails))
-        continue
-      case 'hasData':
-        dispatch(updateExperimentsHasData(data.data.hasData))
-        continue
-      case 'isPythonEnvironmentGlobal':
-        dispatch(
-          updateIsPythonEnvironmentGlobal(data.data.isPythonEnvironmentGlobal)
-        )
-        continue
-      case 'isPythonExtensionInstalled':
-        dispatch(
-          updateIsPythonExtensionInstalled(data.data.isPythonExtensionInstalled)
-        )
-        continue
-      case 'isPythonExtensionUsed':
-        dispatch(updateIsPythonExtensionUsed(data.data.isPythonExtensionUsed))
-        continue
-      case 'isAboveLatestTestedVersion':
-        dispatch(
-          updateIsAboveLatestTestedVersion(data.data.isAboveLatestTestedVersion)
-        )
-        continue
-      case 'isStudioConnected':
-        dispatch(updateIsStudioConnected(data.data.isStudioConnected))
-        continue
-      case 'needsGitCommit':
-        dispatch(updateNeedsGitCommit(data.data.needsGitCommit))
-        continue
-      case 'needsGitInitialized':
-        dispatch(updateNeedsGitInitialized(data.data.needsGitInitialized))
-        continue
-      case 'projectInitialized':
-        dispatch(updateProjectInitialized(data.data.projectInitialized))
-        continue
-      case 'pythonBinPath':
-        dispatch(updatePythonBinPath(data.data.pythonBinPath))
-        continue
-      case 'sectionCollapsed':
-        dispatch(updateSectionCollapsed(data.data.sectionCollapsed))
-        continue
-      case 'shareLiveToStudio':
-        dispatch(updateShareLiveToStudio(data.data.shareLiveToStudio))
-        continue
-      case 'selfHostedStudioUrl':
-        dispatch(updateSelfHostedStudioUrl(data.data.selfHostedStudioUrl))
-        continue
-      case 'remoteList':
-        dispatch(updateRemoteList(data.data.remoteList))
-        continue
+  dispatch(initialize())
 
-      default:
-        continue
-    }
-  }
+  dispatchActions(actionToDispatch, stateUpdate, dispatch)
 }
 
 export const App: React.FC = () => {
@@ -147,14 +106,7 @@ export const App: React.FC = () => {
 
   const dispatch = useDispatch()
 
-  useVsCodeMessaging(
-    useCallback(
-      ({ data }: { data: MessageToWebview<SetupData> }) => {
-        feedStore(data, dispatch)
-      },
-      [dispatch]
-    )
-  )
+  useVsCodeMessaging(feedStore)
 
   const setShareLiveToStudio = (shouldShareLive: boolean) => {
     dispatch(updateShareLiveToStudio(shouldShareLive))

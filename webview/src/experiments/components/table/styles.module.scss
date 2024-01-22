@@ -288,6 +288,10 @@ $badge-size: 0.85rem;
     span[draggable='true'] {
       cursor: grab;
     }
+
+    span[draggable='true']:hover {
+      background-color: $hover-background-color;
+    }
   }
 }
 

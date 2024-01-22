@@ -173,34 +173,22 @@ const getMultiSelectMenuOptions = (
   ]
 }
 
-const getRunResumeOptions = (
+const getModifyOptions = (
   disableIfRunningOrNotWorkspace: (
     label: string,
     type: MessageFromWebviewType,
     disabled?: boolean,
     divider?: boolean
   ) => MessagesMenuOptionProps,
-  projectHasCheckpoints: boolean,
   disableVaryAndRun: boolean
 ) => {
-  const resetNeedsSeparator = !disableVaryAndRun && projectHasCheckpoints
-  const runNeedsSeparator = !disableVaryAndRun && !projectHasCheckpoints
+  const runNeedsSeparator = !disableVaryAndRun
 
   const options = []
-  if (projectHasCheckpoints) {
-    options.push(
-      disableIfRunningOrNotWorkspace(
-        'Modify and Run',
-        MessageFromWebviewType.MODIFY_WORKSPACE_PARAMS_RESET_AND_RUN,
-        false,
-        resetNeedsSeparator
-      )
-    )
-  }
 
   options.push(
     disableIfRunningOrNotWorkspace(
-      projectHasCheckpoints ? 'Modify and Resume' : 'Modify and Run',
+      'Modify and Run',
       MessageFromWebviewType.MODIFY_WORKSPACE_PARAMS_AND_RUN,
       false,
       runNeedsSeparator
@@ -218,7 +206,6 @@ const getSingleSelectMenuOptions = (
   id: string,
   sha: string | undefined,
   isWorkspace: boolean,
-  projectHasCheckpoints: boolean,
   hasRunningWorkspaceExperiment: boolean,
   depth: number,
   executorStatus?: ExecutorStatus,
@@ -312,11 +299,7 @@ const getSingleSelectMenuOptions = (
         isRunning(executorStatus),
       true
     ),
-    ...getRunResumeOptions(
-      disableIfRunningOrNotWorkspace,
-      projectHasCheckpoints,
-      isNotExperiment
-    ),
+    ...getModifyOptions(disableIfRunningOrNotWorkspace, isNotExperiment),
     experimentMenuOption(
       [id],
       starred ? 'Unstar' : 'Star',
@@ -345,7 +328,6 @@ const getContextMenuOptions = (
   sha: string | undefined,
   branch: string | undefined | typeof WORKSPACE_BRANCH,
   isWorkspace: boolean,
-  projectHasCheckpoints: boolean,
   hasRunningWorkspaceExperiment: boolean,
   depth: number,
   selectedRows: Record<string, SelectedRow | undefined>,
@@ -371,7 +353,6 @@ const getContextMenuOptions = (
         id,
         sha,
         isWorkspace,
-        projectHasCheckpoints,
         hasRunningWorkspaceExperiment,
         depth,
         executorStatus,
@@ -399,10 +380,9 @@ export const RowContextMenu: React.FC<RowProp> = ({
   const { selectedRows } = useSelector(
     (state: ExperimentsState) => state.rowSelection
   )
-  const {
-    hasRunningWorkspaceExperiment,
-    hasCheckpoints: projectHasCheckpoints
-  } = useSelector((state: ExperimentsState) => state.tableData)
+  const { hasRunningWorkspaceExperiment } = useSelector(
+    (state: ExperimentsState) => state.tableData
+  )
   const dispatch = useDispatch()
 
   const isWorkspace = id === EXPERIMENT_WORKSPACE_ID
@@ -413,7 +393,6 @@ export const RowContextMenu: React.FC<RowProp> = ({
       sha,
       branch,
       isWorkspace,
-      projectHasCheckpoints,
       hasRunningWorkspaceExperiment,
       depth,
       selectedRows,
@@ -431,7 +410,6 @@ export const RowContextMenu: React.FC<RowProp> = ({
     depth,
     id,
     sha,
-    projectHasCheckpoints,
     selectedRows,
     studioLinkType,
     hasRunningWorkspaceExperiment

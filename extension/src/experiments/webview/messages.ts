@@ -150,11 +150,6 @@ export class WebviewMessages {
           RegisteredCliCommands.EXPERIMENT_VIEW_RUN,
           { dvcRoot: this.dvcRoot }
         )
-      case MessageFromWebviewType.MODIFY_WORKSPACE_PARAMS_RESET_AND_RUN:
-        return commands.executeCommand(
-          RegisteredCliCommands.EXPERIMENT_VIEW_RESET_AND_RUN,
-          { dvcRoot: this.dvcRoot }
-        )
 
       case MessageFromWebviewType.REMOVE_EXPERIMENT:
         return commands.executeCommand(
@@ -322,7 +317,6 @@ export class WebviewMessages {
       selectedColumns,
       filters,
       hasBranchesToSelect,
-      hasCheckpoints,
       hasConfig,
       hasMoreCommits,
       hasRunningWorkspaceExperiment,
@@ -340,7 +334,6 @@ export class WebviewMessages {
       this.columns.getSelected(),
       this.experiments.getFilters(),
       this.experiments.getAvailableBranchesToShow().length > 0,
-      this.experiments.hasCheckpoints(),
       this.pipeline.hasPipeline(),
       this.experiments.getHasMoreCommits(),
       this.experiments.hasRunningWorkspaceExperiment(),
@@ -364,7 +357,6 @@ export class WebviewMessages {
       columns,
       filters: filters.map(({ path }) => path),
       hasBranchesToSelect,
-      hasCheckpoints,
       hasConfig,
       hasMoreCommits,
       hasRunningWorkspaceExperiment,

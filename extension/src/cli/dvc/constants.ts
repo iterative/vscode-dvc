@@ -106,7 +106,6 @@ export enum QueueSubCommand {
 export enum ExperimentFlag {
   NO_FETCH = '--no-fetch',
   QUEUE = '--queue',
-  RESET = '--reset',
   NUM_COMMIT = '-n',
   REV = '--rev'
 }

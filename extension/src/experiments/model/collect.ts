@@ -51,7 +51,6 @@ type ExperimentsAccumulator = {
   cliError: string | undefined
   commits: Experiment[]
   experimentsByCommit: Map<string, Experiment[]>
-  hasCheckpoints: boolean
   runningExperiments: RunningExperiment[]
   workspace: Experiment
 }
@@ -323,20 +322,6 @@ const setWorkspaceAsRunning = (
   }
 }
 
-const hasCheckpoints = (data: ExpShowOutput) => {
-  if (!data?.length) {
-    return false
-  }
-
-  const [workspace] = data
-
-  if (experimentHasError(workspace)) {
-    return false
-  }
-
-  return !!workspace?.data?.meta.has_checkpoints
-}
-
 const collectCliError = (
   acc: ExperimentsAccumulator,
   expShow: ExpShowOutput
@@ -355,7 +340,6 @@ export const collectExperiments = (
     cliError: undefined,
     commits: [],
     experimentsByCommit: new Map(),
-    hasCheckpoints: hasCheckpoints(expShow),
     runningExperiments: [],
     workspace: {
       id: EXPERIMENT_WORKSPACE_ID,

@@ -19,15 +19,15 @@ export const webviewSlice = createSlice({
   initialState: webviewInitialState,
   name: 'webview',
   reducers: {
+    initialize: state => {
+      state.hasData = true
+    },
     toggleSectionCollapsed: (state, action: PayloadAction<SetupSection>) => {
       const section = action.payload
       state.sectionCollapsed = {
         ...state.sectionCollapsed,
         [section]: !state.sectionCollapsed[section]
       }
-    },
-    updateHasData: state => {
-      state.hasData = true
     },
     updateSectionCollapsed: (
       state,
@@ -40,7 +40,7 @@ export const webviewSlice = createSlice({
   }
 })
 
-export const { updateHasData, updateSectionCollapsed, toggleSectionCollapsed } =
+export const { initialize, updateSectionCollapsed, toggleSectionCollapsed } =
   webviewSlice.actions
 
 export default webviewSlice.reducer

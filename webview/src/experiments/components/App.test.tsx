@@ -1099,7 +1099,7 @@ describe('App', () => {
       expect(menu).toBeDefined()
     })
 
-    it('should enable the correct options for the workspace row with no checkpoints', () => {
+    it('should enable the correct options for the workspace row', () => {
       renderTableWithPlaceholder()
 
       const target = screen.getByTestId('workspace-row')
@@ -1111,35 +1111,8 @@ describe('App', () => {
       ])
     })
 
-    it('should enable the correct options for the workspace with checkpoints', () => {
+    it('should enable the correct options for a commit', () => {
       renderTableWithoutRunningExperiments()
-
-      const [target] = screen.getAllByText(EXPERIMENT_WORKSPACE_ID)
-      fireEvent.contextMenu(target, { bubbles: true })
-
-      expect(getEnabledOptions()).toStrictEqual([
-        'Modify and Run',
-        'Modify and Resume',
-        'Modify and Queue'
-      ])
-    })
-
-    it('should enable the correct options for a commit with checkpoints', () => {
-      renderTableWithoutRunningExperiments()
-
-      const target = screen.getAllByText('main')[1]
-      fireEvent.contextMenu(target, { bubbles: true })
-
-      expect(getEnabledOptions()).toStrictEqual([
-        'Apply to Workspace',
-        'Create new Branch',
-        'Copy Sha',
-        'Star'
-      ])
-    })
-
-    it('should enable the correct options for a commit without checkpoints', () => {
-      renderTableWithoutRunningExperiments(false)
 
       const target = screen.getAllByText('main')[1]
       fireEvent.contextMenu(target, { bubbles: true })
@@ -1201,7 +1174,7 @@ describe('App', () => {
       expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
     })
 
-    const menuItemLength = 14
+    const menuItemLength = 13
 
     it('should not close when a disabled item is clicked', () => {
       renderTableWithoutRunningExperiments()
@@ -1299,8 +1272,8 @@ describe('App', () => {
         .map(item => item.textContent)
       expect(itemLabels).toContain('Remove Selected')
 
-      const removeOption = menuitems.find(
-        item => item.textContent?.includes('Remove Selected')
+      const removeOption = menuitems.find(item =>
+        item.textContent?.includes('Remove Selected')
       )
 
       expect(removeOption).toBeDefined()
@@ -1346,8 +1319,8 @@ describe('App', () => {
         .map(item => item.textContent)
       expect(itemLabels).toContain('Push Selected')
 
-      const pushOption = menuitems.find(
-        item => item.textContent?.includes('Push Selected')
+      const pushOption = menuitems.find(item =>
+        item.textContent?.includes('Push Selected')
       )
 
       expect(pushOption).toBeDefined()
@@ -1392,8 +1365,8 @@ describe('App', () => {
         .map(item => item.textContent)
       expect(itemLabels).toContain('Stop')
 
-      const stopOption = menuitems.find(
-        item => item.textContent?.includes('Stop')
+      const stopOption = menuitems.find(item =>
+        item.textContent?.includes('Stop')
       )
 
       expect(stopOption).toBeDefined()
@@ -1422,8 +1395,8 @@ describe('App', () => {
         .map(item => item.textContent)
       expect(itemLabels).toContain('Stop')
 
-      const stopOption = menuitems.find(
-        item => item.textContent?.includes('Stop')
+      const stopOption = menuitems.find(item =>
+        item.textContent?.includes('Stop')
       )
 
       expect(stopOption).toBeDefined()
@@ -1466,8 +1439,8 @@ describe('App', () => {
         .map(item => item.textContent)
       expect(itemLabels).toContain('Stop')
 
-      const stopOption = menuitems.find(
-        item => item.textContent?.includes('Stop')
+      const stopOption = menuitems.find(item =>
+        item.textContent?.includes('Stop')
       )
 
       expect(stopOption).toBeDefined()
@@ -1493,8 +1466,8 @@ describe('App', () => {
         .map(item => item.textContent)
       expect(itemLabels).toContain('Push')
 
-      const shareOption = menuitems.find(
-        item => item.textContent?.includes('Push')
+      const shareOption = menuitems.find(item =>
+        item.textContent?.includes('Push')
       )
 
       expect(shareOption).toBeDefined()
@@ -1515,8 +1488,8 @@ describe('App', () => {
 
       advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
-      const renameOption = menuitems.find(
-        item => item.textContent?.includes('Rename')
+      const renameOption = menuitems.find(item =>
+        item.textContent?.includes('Rename')
       )
 
       expect(renameOption).toBeDefined()
@@ -1573,8 +1546,8 @@ describe('App', () => {
       expect(itemLabels).toContain('Plot and Show')
       expect(itemLabels).toContain('Plot')
 
-      const plotOption = menuitems.find(
-        item => item.textContent?.includes('Plot and Show')
+      const plotOption = menuitems.find(item =>
+        item.textContent?.includes('Plot and Show')
       )
 
       expect(plotOption).toBeDefined()
@@ -1630,8 +1603,8 @@ describe('App', () => {
 
       const menuitems = screen.getAllByRole('menuitem')
 
-      const clearOption = menuitems.find(
-        item => item.textContent?.includes('Clear')
+      const clearOption = menuitems.find(item =>
+        item.textContent?.includes('Clear')
       )
       clearOption && fireEvent.click(clearOption)
 

@@ -13,10 +13,6 @@ import { Title } from '../../vscode/title'
 import { Context, getDvcRootFromContext } from '../../vscode/context'
 import { Setup } from '../../setup'
 import { showSetupOrExecuteCommand } from '../../commands/util'
-import { CliCompatible, isVersionCompatible } from '../../cli/dvc/version'
-import { Toast } from '../../vscode/toast'
-import { Response } from '../../vscode/response'
-import { SetupSection } from '../../setup/webview/contract'
 
 type ExperimentDetails = { dvcRoot: string; id: string }
 
@@ -45,52 +41,15 @@ const registerExperimentCwdCommands = (
       experiments.modifyWorkspaceParamsAndQueue(dvcRoot)
   )
 
-  const modifyWorkspaceParamsAndRun = () =>
-    experiments.modifyWorkspaceParamsAndRun(AvailableCommands.EXPERIMENT_RUN)
-
-  internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.MODIFY_WORKSPACE_PARAMS_AND_RESUME,
-    modifyWorkspaceParamsAndRun
-  )
-
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.MODIFY_WORKSPACE_PARAMS_AND_RUN,
-    modifyWorkspaceParamsAndRun
-  )
-
-  const modifyWorkspaceParamsAndRunFromView = ({
-    dvcRoot
-  }: ExperimentDetails) =>
-    experiments.modifyWorkspaceParamsAndRun(
-      AvailableCommands.EXPERIMENT_RUN,
-      dvcRoot
-    )
-
-  internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.EXPERIMENT_VIEW_RESUME,
-    modifyWorkspaceParamsAndRunFromView
+    () => experiments.modifyWorkspaceParamsAndRun()
   )
 
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_VIEW_RUN,
-    modifyWorkspaceParamsAndRunFromView
-  )
-
-  internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.MODIFY_WORKSPACE_PARAMS_RESET_AND_RUN,
-    () =>
-      experiments.modifyWorkspaceParamsAndRun(
-        AvailableCommands.EXPERIMENT_RESET_AND_RUN
-      )
-  )
-
-  internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.EXPERIMENT_VIEW_RESET_AND_RUN,
     ({ dvcRoot }: ExperimentDetails) =>
-      experiments.modifyWorkspaceParamsAndRun(
-        AvailableCommands.EXPERIMENT_RESET_AND_RUN,
-        dvcRoot
-      )
+      experiments.modifyWorkspaceParamsAndRun(dvcRoot)
   )
 
   internalCommands.registerExternalCliCommand(
@@ -129,8 +88,7 @@ const registerExperimentNameCommands = (
 
 const registerExperimentInputCommands = (
   experiments: WorkspaceExperiments,
-  internalCommands: InternalCommands,
-  setup: Setup
+  internalCommands: InternalCommands
 ): void => {
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_BRANCH,
@@ -139,34 +97,14 @@ const registerExperimentInputCommands = (
 
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_VIEW_RENAME,
-    async ({ dvcRoot, id }: ExperimentDetails) => {
-      const cliVersion = await setup.getCliVersion(dvcRoot)
-      const REQUIRED_CLI_VERSION = '3.22.0'
-
-      if (
-        !(
-          isVersionCompatible(cliVersion, REQUIRED_CLI_VERSION) ===
-          CliCompatible.YES
-        )
-      ) {
-        const response = await Toast.warnWithOptions(
-          'To rename experiments, you need DVC version 3.22.0 or greater. Please update your DVC installation.',
-          Response.SHOW_SETUP
-        )
-        if (response === Response.SHOW_SETUP) {
-          return setup.showSetup(SetupSection.DVC)
-        }
-        return
-      }
-
-      return experiments.getInputAndRun(
+    ({ dvcRoot, id }: ExperimentDetails) =>
+      experiments.getInputAndRun(
         getRenameExperimentCommand(experiments),
         Title.ENTER_NEW_EXPERIMENT_NAME,
         id,
         dvcRoot,
         id
       )
-    }
   )
 
   internalCommands.registerExternalCliCommand(
@@ -266,18 +204,6 @@ const registerExperimentRunCommands = (
   )
 
   internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.EXPERIMENT_RESUME,
-    () => experiments.getCwdThenRun(AvailableCommands.EXPERIMENT_RUN)
-  )
-
-  internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.EXPERIMENT_RESET_AND_RUN,
-    showSetupOrExecuteCommand(setup, () =>
-      experiments.getCwdThenRun(AvailableCommands.EXPERIMENT_RESET_AND_RUN)
-    )
-  )
-
-  internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.QUEUE_START,
     () =>
       experiments.getCwdIntegerInputAndRun(
@@ -306,7 +232,7 @@ export const registerExperimentCommands = (
 ) => {
   registerExperimentCwdCommands(experiments, internalCommands)
   registerExperimentNameCommands(experiments, internalCommands)
-  registerExperimentInputCommands(experiments, internalCommands, setup)
+  registerExperimentInputCommands(experiments, internalCommands)
   registerExperimentQuickPickCommands(experiments, internalCommands, setup)
   registerExperimentRunCommands(experiments, internalCommands, setup)
 

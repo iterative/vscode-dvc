@@ -12,7 +12,7 @@ import {
 } from '../../util'
 import { dvcDemoPath, getTestWorkspaceFolder } from '../../../util'
 import { ExperimentsData } from '../../../../experiments/data'
-import * as Watcher from '../../../../fileSystem/watcher'
+import { fireWatcher } from '../../../../fileSystem/watcher'
 import {
   AvailableCommands,
   CommandId,
@@ -26,7 +26,7 @@ import {
 import { gitPath } from '../../../../cli/git/constants'
 import * as FileSystem from '../../../../fileSystem'
 import { ExperimentsModel } from '../../../../experiments/model'
-import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
+import { DEFAULT_EXP_SHOW_OUTPUT } from '../../../../cli/dvc/contract'
 import expShowFixture from '../../../fixtures/expShow/base/output'
 import gitLogFixture from '../../../fixtures/expShow/base/gitLog'
 import {
@@ -35,6 +35,7 @@ import {
 } from '../../../../data'
 import { Studio } from '../../../../experiments/studio'
 import { DEFAULT_STUDIO_URL } from '../../../../setup/webview/contract'
+import { WATCHER_TEST_TIMEOUT } from '../../timeouts'
 
 const MOCK_WORKSPACE_GIT_FOLDER = join(dvcDemoPath, '.mock-git')
 
@@ -119,7 +120,7 @@ suite('Experiments Data Test Suite', () => {
                 return Promise.resolve('')
               }
               if (command === AvailableCommands.EXP_SHOW) {
-                return Promise.resolve([{ rev: EXPERIMENT_WORKSPACE_ID }])
+                return Promise.resolve(DEFAULT_EXP_SHOW_OUTPUT)
               }
               if (
                 command === AvailableCommands.GIT_GET_REMOTE_EXPERIMENT_REFS
@@ -145,30 +146,35 @@ suite('Experiments Data Test Suite', () => {
         )
       )
 
-      await data.isReady()
+      await new Promise(resolve =>
+        data.onDidUpdate(data => {
+          if (isRemoteExperimentsOutput(data)) {
+            resolve(undefined)
+          }
+        })
+      )
       bypassProcessManagerDebounce(mockNow)
 
       const managedUpdateSpy = spy(data, 'managedUpdate')
       const dataUpdatedEvent = getDataUpdatedEvent(data)
 
-      await Watcher.fireWatcher(
-        FileSystem.getGitPath(gitRoot, gitPath.DOT_GIT_HEAD)
-      )
-      await dataUpdatedEvent
+      await Promise.all([
+        dataUpdatedEvent,
+        fireWatcher(FileSystem.getGitPath(gitRoot, gitPath.DOT_GIT_HEAD))
+      ])
 
       expect(managedUpdateSpy).to.be.called
-    }).timeout(10000)
+    }).timeout(WATCHER_TEST_TIMEOUT)
 
     it('should watch the .git directory for updates when the directory is inside workspace', async () => {
       const mockNow = getMockNow()
+      stub(FileSystem, 'getGitPath').returns(MOCK_WORKSPACE_GIT_FOLDER)
       const gitRoot = dvcDemoPath
       const mockDotGitFilePath = join(
         MOCK_WORKSPACE_GIT_FOLDER,
         gitPath.DOT_GIT_HEAD
       )
       ensureFileSync(mockDotGitFilePath)
-
-      stub(FileSystem, 'getGitPath').returns(MOCK_WORKSPACE_GIT_FOLDER)
 
       const data = disposable.track(
         new ExperimentsData(
@@ -186,7 +192,7 @@ suite('Experiments Data Test Suite', () => {
                 return Promise.resolve('')
               }
               if (command === AvailableCommands.EXP_SHOW) {
-                return Promise.resolve([{ rev: EXPERIMENT_WORKSPACE_ID }])
+                return Promise.resolve(DEFAULT_EXP_SHOW_OUTPUT)
               }
               if (
                 command === AvailableCommands.GIT_GET_REMOTE_EXPERIMENT_REFS
@@ -212,18 +218,22 @@ suite('Experiments Data Test Suite', () => {
         )
       )
 
-      await data.isReady()
+      await new Promise(resolve =>
+        data.onDidUpdate(data => {
+          if (isRemoteExperimentsOutput(data)) {
+            resolve(undefined)
+          }
+        })
+      )
       bypassProcessManagerDebounce(mockNow)
 
+      const dataUpdatedEvent = getDataUpdatedEvent(data)
       const managedUpdateSpy = spy(data, 'managedUpdate')
 
-      const dataUpdatedEvent = getDataUpdatedEvent(data)
-
-      await Watcher.fireWatcher(mockDotGitFilePath)
-      await dataUpdatedEvent
+      await Promise.all([dataUpdatedEvent, fireWatcher(mockDotGitFilePath)])
 
       expect(managedUpdateSpy).to.be.called
-    }).timeout(20000)
+    }).timeout(WATCHER_TEST_TIMEOUT)
 
     it('should prune any old branches to show before calling exp show on them', async () => {
       stub(ExperimentsData.prototype, 'managedUpdate').resolves()

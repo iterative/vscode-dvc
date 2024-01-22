@@ -6,7 +6,6 @@ import { TableData } from '../../../../experiments/webview/contract'
 export const data: TableData = {
   ...defaultData,
   columns,
-  hasCheckpoints: false,
   hasRunningWorkspaceExperiment: false,
   rows,
   selectedForPlotsCount: 0
