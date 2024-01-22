@@ -215,7 +215,6 @@ export interface IEventNamePropertyMapping {
   [EventName.PUSH_TARGET]: undefined
   [EventName.PUSH]: undefined
   [EventName.REMOVE_TARGET]: undefined
-  [EventName.RENAME_TARGET]: undefined
 
   [EventName.REMOTE_ADD]: undefined
   [EventName.REMOTE_MODIFY]: undefined

@@ -29,7 +29,6 @@ import {
   RegisteredCommands
 } from '../../../../commands/external'
 import { WEBVIEW_TEST_TIMEOUT } from '../../timeouts'
-import { Title } from '../../../../vscode/title'
 import { Repository } from '../../../../repository'
 import { WorkspaceRepositories } from '../../../../repository/workspace'
 import { RepositoriesTree } from '../../../../repository/model/tree'
@@ -257,31 +256,6 @@ suite('Repositories Tree Test Suite', () => {
         getPathItem(relPath)
       )
       expect(mockRemove).to.be.calledOnce
-    })
-
-    it('should be able to run dvc.renameTarget without error', async () => {
-      const relPath = join('mock', 'data', 'MNIST', 'raw')
-      stub(path, 'relative').returns(relPath)
-
-      const mockMove = stub(DvcExecutor.prototype, 'move').resolves(
-        'target moved to new destination'
-      )
-
-      const mockInputBox = stub(window, 'showInputBox').resolves(
-        relPath + 'est'
-      )
-
-      await commands.executeCommand(
-        RegisteredCliCommands.RENAME_TARGET,
-        getPathItem(relPath)
-      )
-      expect(mockMove).to.be.calledOnce
-      expect(mockInputBox).to.be.calledOnce
-      expect(mockInputBox).to.be.calledWith({
-        prompt: undefined,
-        title: Title.ENTER_RELATIVE_DESTINATION,
-        value: relPath
-      })
     })
 
     it('should pull the correct target(s) when asked to dvc.pullTarget a non-tracked directory', async () => {
