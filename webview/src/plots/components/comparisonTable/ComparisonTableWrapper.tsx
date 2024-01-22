@@ -9,7 +9,6 @@ export const ComparisonTableWrapper: React.FC = () => {
   const { width, isCollapsed, height, plots } = useSelector(
     (state: PlotsState) => state.comparison
   )
-
   return (
     <PlotsContainer
       title="Images"

@@ -406,7 +406,11 @@ export class WebviewMessages {
       height: this.plots.getHeight(PlotsSection.COMPARISON_TABLE),
       multiPlotValues: this.plots.getComparisonMultiPlotValues(),
       plots: comparison.map(({ path, revisions }) => {
-        return { path, revisions: this.getRevisionsWithCorrectUrls(revisions) }
+        return {
+          boundingBoxLabels: {},
+          path,
+          revisions: this.getRevisionsWithCorrectUrls(revisions)
+        }
       }),
       revisions: this.plots.getComparisonRevisions(),
       width: this.plots.getNbItemsPerRowOrWidth(PlotsSection.COMPARISON_TABLE)

@@ -88,21 +88,6 @@ $gap: 4px;
   transform: rotate(0deg);
 }
 
-.rowToggler {
-  border: none;
-  background: none;
-  color: $fg-color;
-  text-align: left;
-  display: flex;
-  user-select: text;
-  max-width: calc(100% - 20px);
-
-  svg {
-    fill: $fg-color;
-    min-width: fit-content;
-  }
-}
-
 .pinnedColumnCell,
 .pinnedColumnHeader {
   position: sticky;
@@ -137,6 +122,81 @@ $gap: 4px;
   z-index: 3;
 }
 
+.rowHeader {
+  display: flex;
+  position: sticky;
+  left: 0;
+  width: min-content;
+}
+
+.rowHeaderPath {
+  display: flex;
+  align-items: center;
+
+  .copyButton {
+    display: inline;
+    opacity: 0;
+    margin: 0;
+  }
+
+  &:hover .copyButton {
+    opacity: 1;
+  }
+}
+
+.rowToggler {
+  border: none;
+  background: none;
+  color: $fg-color;
+  text-align: left;
+  display: flex;
+  user-select: text;
+
+  svg {
+    fill: $fg-color;
+    min-width: fit-content;
+  }
+}
+
+.pathText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  direction: rtl;
+  white-space: nowrap;
+}
+
+.boundingBoxLabels {
+  display: flex;
+  align-items: center;
+  margin-left: 5px;
+}
+
+.boundingBoxLabel {
+  font-size: 0.6rem;
+  margin-right: 10px;
+  color: $fg-color;
+  font-weight: 600;
+}
+
+.boundingBoxLabelButton {
+  white-space: nowrap;
+  border: none;
+  border-radius: 2px;
+  padding: 4px;
+  margin-right: 4px;
+  color: #fff;
+  cursor: pointer;
+  opacity: 0.5;
+
+  &.selected {
+    opacity: 1;
+  }
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
 .cell {
   max-height: 100vh;
   width: 100%;
@@ -155,6 +215,12 @@ $gap: 4px;
   width: 100%;
   height: auto;
   vertical-align: middle;
+}
+
+.boundingBoxImage {
+  text {
+    font-size: 12px;
+  }
 }
 
 .imageWrapper {
@@ -209,29 +275,6 @@ $gap: 4px;
   background-color: $accent-color;
   opacity: 1;
   color: $bg-color;
-}
-
-.copyButton {
-  display: none;
-}
-
-.rowPath {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  width: 100%;
-
-  &:hover .copyButton {
-    display: inline;
-    font-size: 0.8125rem;
-  }
-}
-
-.pathText {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  direction: rtl;
-  white-space: nowrap;
 }
 
 .errorIcon {

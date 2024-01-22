@@ -297,8 +297,8 @@ describe('ComparisonTable', () => {
 
     renderTable({
       ...comparisonTableFixture,
-      plots: comparisonTableFixture.plots.map(({ path, revisions }) => ({
-        path,
+      plots: comparisonTableFixture.plots.map(({ revisions, ...rest }) => ({
+        ...rest,
         revisions: {
           ...revisions,
           [revisionWithNoData]: {
@@ -334,8 +334,8 @@ describe('ComparisonTable', () => {
 
     renderTable({
       ...comparisonTableFixture,
-      plots: comparisonTableFixture.plots.map(({ path, revisions }) => ({
-        path,
+      plots: comparisonTableFixture.plots.map(({ revisions, ...rest }) => ({
+        ...rest,
         revisions: {
           ...revisions,
           [revisionWithNoData]: {

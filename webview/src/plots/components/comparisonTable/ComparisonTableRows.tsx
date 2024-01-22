@@ -50,6 +50,7 @@ export const ComparisonTableRows: React.FC<ComparisonTableRowsProps> = ({
           id: column.id,
           imgs: revs[column.id]?.imgs
         }))}
+        boundingBoxLabels={plot.boundingBoxLabels}
         nbColumns={columns.length}
         pinnedColumn={pinnedColumn}
         onLayoutChange={onLayoutChange}

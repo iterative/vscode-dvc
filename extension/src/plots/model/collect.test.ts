@@ -119,7 +119,8 @@ describe('collectData', () => {
       join('plots', 'acc.png'),
       heatmapPlot,
       join('plots', 'loss.png'),
-      join('plots', 'image')
+      join('plots', 'image'),
+      join('plots', 'bounding_boxes.png')
     ])
 
     const testBranchHeatmap = comparisonData['test-branch'][heatmapPlot]

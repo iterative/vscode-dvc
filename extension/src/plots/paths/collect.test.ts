@@ -66,6 +66,14 @@ const plotsDiffFixturePaths: PlotPath[] = [
   },
   {
     hasChildren: false,
+    label: 'bounding_boxes.png',
+    parentPath: 'plots',
+    path: join('plots', 'bounding_boxes.png'),
+    revisions: new Set(REVISIONS),
+    type: new Set<PathType>([PathType.COMPARISON])
+  },
+  {
+    hasChildren: false,
     label: 'loss.tsv',
     parentPath: 'logs',
     path: join('logs', 'loss.tsv'),
@@ -162,6 +170,7 @@ describe('collectPaths', () => {
       join('plots', 'heatmap.png'),
       join('plots', 'loss.png'),
       join('plots', 'image'),
+      join('plots', 'bounding_boxes.png'),
       join('logs', 'loss.tsv'),
       join('logs', 'acc.tsv'),
       'predictions.json'

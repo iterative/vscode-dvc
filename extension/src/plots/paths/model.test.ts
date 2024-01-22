@@ -83,6 +83,15 @@ describe('PathsModel', () => {
       },
       {
         hasChildren: false,
+        label: 'bounding_boxes.png',
+        parentPath: 'plots',
+        path: join('plots', 'bounding_boxes.png'),
+        revisions: new Set(REVISIONS),
+        selected: true,
+        type: comparisonType
+      },
+      {
+        hasChildren: false,
         label: 'loss.tsv',
         parentPath: 'logs',
         path: logsLoss,
@@ -369,14 +378,16 @@ describe('PathsModel', () => {
       join('plots', 'acc.png'),
       join('plots', 'heatmap.png'),
       join('plots', 'loss.png'),
-      join('plots', 'image')
+      join('plots', 'image'),
+      join('plots', 'bounding_boxes.png')
     ])
 
     const newOrder = [
       join('plots', 'heatmap.png'),
       join('plots', 'acc.png'),
       join('plots', 'loss.png'),
-      join('plots', 'image')
+      join('plots', 'image'),
+      join('plots', 'bounding_boxes.png')
     ]
 
     model.setComparisonPathsOrder(newOrder)
@@ -411,7 +422,7 @@ describe('PathsModel', () => {
         tooltip: undefined
       },
       {
-        descendantStatuses: [2, 2, 2, 2],
+        descendantStatuses: [2, 2, 2, 2, 2],
         hasChildren: true,
         label: 'plots',
         parentPath: undefined,

@@ -18,7 +18,9 @@ import {
   DEFAULT_PLOT_HEIGHT,
   DEFAULT_NB_ITEMS_PER_ROW,
   DEFAULT_PLOT_WIDTH,
-  ComparisonPlotImg
+  ComparisonPlotImg,
+  ComparisonPlotBoundingBoxes,
+  ComparisonBoundingBoxLabels
 } from '../../../plots/webview/contract'
 import { join } from '../../util/path'
 import { copyOriginalColors } from '../../../experiments/model/status/colors'
@@ -538,7 +540,16 @@ const getMultiImageData = (
   return data
 }
 
-const getImageData = (baseUrl: string, joinFunc = join) => ({
+const getImageData = (
+  baseUrl: string,
+  joinFunc = join
+): {
+  [path: string]: {
+    type: PlotsType
+    revisions: string[]
+    url: string
+  }[]
+} => ({
   [join('plots', 'acc.png')]: [
     {
       type: PlotsType.IMAGE,
@@ -626,7 +637,34 @@ const getImageData = (baseUrl: string, joinFunc = join) => ({
     'exp-e7a67',
     'test-branch',
     'exp-83425'
-  ])
+  ]),
+  [join('plots', 'bounding_boxes.png')]: [
+    {
+      type: PlotsType.IMAGE,
+      revisions: [EXPERIMENT_WORKSPACE_ID],
+      url: joinFunc(baseUrl, 'bounding_boxes.png')
+    },
+    {
+      type: PlotsType.IMAGE,
+      revisions: ['main'],
+      url: joinFunc(baseUrl, 'bounding_boxes.png')
+    },
+    {
+      type: PlotsType.IMAGE,
+      revisions: ['exp-e7a67'],
+      url: joinFunc(baseUrl, 'bounding_boxes.png')
+    },
+    {
+      type: PlotsType.IMAGE,
+      revisions: ['test-branch'],
+      url: joinFunc(baseUrl, 'bounding_boxes.png')
+    },
+    {
+      type: PlotsType.IMAGE,
+      revisions: ['exp-83425'],
+      url: joinFunc(baseUrl, 'bounding_boxes.png')
+    }
+  ]
 })
 
 export const getOutput = (baseUrl: string): PlotsOutput => ({
@@ -908,22 +946,86 @@ const getIndFromComparisonMultiImgPath = (path: string) => {
   return Number((pathIndMatches as string[])[1])
 }
 
+const colors = [
+  '#ff3838',
+  '#ff9d97',
+  '#ff701f',
+  '#ffb21d',
+  '#cfd231',
+  '#48f90a',
+  '#92cc17',
+  '#3ddb86',
+  '#1a9334',
+  '#00d4bb',
+  '#2c99a8',
+  '#00c2ff',
+  '#344593',
+  '#6473ff',
+  '#0018ec',
+  '#8438ff',
+  '#520085',
+  '#cb38ff',
+  '#ff95c8',
+  '#ff37c7'
+]
+
+const boundingBoxImgLabels: ComparisonBoundingBoxLabels = {
+  'traffic light': { selected: true, color: colors[0] },
+  car: { selected: true, color: colors[1] },
+  sign: { selected: false, color: colors[2] }
+}
+
+const boundingBoxImgCoords: { [rev: string]: ComparisonPlotBoundingBoxes } = {
+  workspace: [
+    { label: 'traffic light', boxes: [{ h: 90, w: 80, x: 120, y: 120 }] },
+    {
+      label: 'car',
+      boxes: [
+        { h: 30, w: 30, x: 190, y: 310 },
+        { h: 50, w: 60, x: 300, y: 320 }
+      ]
+    }
+  ],
+  main: [
+    { label: 'traffic light', boxes: [{ h: 100, w: 100, x: 100, y: 100 }] },
+    { label: 'car', boxes: [{ h: 30, w: 30, x: 190, y: 310 }] }
+  ],
+  'exp-e7a67': [
+    { label: 'traffic light', boxes: [{ h: 110, w: 100, x: 90, y: 100 }] },
+    { label: 'car', boxes: [{ h: 30, w: 30, x: 190, y: 310 }] }
+  ],
+  'test-branch': [
+    { label: 'traffic light', boxes: [{ h: 100, w: 90, x: 100, y: 110 }] },
+    { label: 'car', boxes: [{ h: 30, w: 30, x: 190, y: 310 }] }
+  ],
+  'exp-83425': [
+    { label: 'traffic light', boxes: [{ h: 75, w: 100, x: 100, y: 100 }] },
+    { label: 'car', boxes: [{ h: 30, w: 30, x: 190, y: 310 }] }
+  ]
+}
+
 export const getComparisonWebviewMessage = (
   baseUrl: string,
   joinFunc: (...args: string[]) => string = join
 ): PlotsComparisonData => {
   const plotAcc: {
-    [path: string]: { path: string; revisions: ComparisonRevisionData }
+    [path: string]: {
+      path: string
+      revisions: ComparisonRevisionData
+      boundingBoxLabels: ComparisonBoundingBoxLabels
+    }
   } = {}
 
   for (const [path, plots] of Object.entries(getImageData(baseUrl, joinFunc))) {
     const isMulti = path.includes('image')
+    const isBoundingBox = path.includes('bounding_boxes.png')
     const pathLabel = isMulti ? join('plots', 'image') : path
 
     if (!plotAcc[pathLabel]) {
       plotAcc[pathLabel] = {
         path: pathLabel,
-        revisions: {}
+        revisions: {},
+        boundingBoxLabels: isBoundingBox ? boundingBoxImgLabels : {}
       }
     }
 
@@ -948,6 +1050,10 @@ export const getComparisonWebviewMessage = (
 
       if (isMulti) {
         img.ind = getIndFromComparisonMultiImgPath(path)
+      }
+
+      if (isBoundingBox) {
+        img.boundingBoxes = boundingBoxImgCoords[id]
       }
 
       plotAcc[pathLabel].revisions[id].imgs.push(img)

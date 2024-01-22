@@ -1,4 +1,7 @@
-import { ComparisonPlot } from 'dvc/src/plots/webview/contract'
+import {
+  ComparisonBoundingBoxLabels,
+  ComparisonPlot
+} from 'dvc/src/plots/webview/contract'
 import React, {
   useState,
   useEffect,
@@ -32,6 +35,7 @@ export interface ComparisonTableRowProps {
   onLayoutChange: () => void
   setOrder: (order: string[]) => void
   order: string[]
+  boundingBoxLabels?: ComparisonBoundingBoxLabels
   bodyRef?: RefObject<HTMLTableSectionElement>
 }
 
@@ -43,6 +47,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
   onLayoutChange,
   setOrder,
   order,
+  boundingBoxLabels = {},
   bodyRef
 }) => {
   const plotsRowRef = useRef<HTMLTableRowElement>(null)
@@ -67,6 +72,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
     type: <tbody />,
     vertical: true
   })
+  const boundingBoxLabelsArr = Object.entries(boundingBoxLabels)
 
   useLayoutEffect(() => {
     onLayoutChange?.()
@@ -128,21 +134,40 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
             className={cx({ [styles.pinnedColumnCell]: pinnedColumn })}
             colSpan={pinnedColumn ? 1 : nbColumns}
           >
-            <div className={styles.rowPath}>
-              <button
-                className={styles.rowToggler}
-                onClick={toggleIsShownState}
-              >
-                <Icon icon={isShown ? ChevronDown : ChevronRight} />
-                <Tooltip
-                  content={path}
-                  placement="bottom-start"
-                  delay={NORMAL_TOOLTIP_DELAY}
+            <div className={styles.rowHeader}>
+              <div className={styles.rowHeaderPath}>
+                <button
+                  className={styles.rowToggler}
+                  onClick={toggleIsShownState}
                 >
-                  <span className={styles.pathText}>{path}</span>
-                </Tooltip>
-              </button>
-              <CopyButton value={path} className={styles.copyButton} />
+                  <Icon icon={isShown ? ChevronDown : ChevronRight} />
+                  <Tooltip
+                    content={path}
+                    placement="bottom-start"
+                    delay={NORMAL_TOOLTIP_DELAY}
+                  >
+                    <span className={styles.pathText}>{path}</span>
+                  </Tooltip>
+                </button>
+                <CopyButton value={path} className={styles.copyButton} />
+              </div>
+              {boundingBoxLabelsArr.length > 0 && (
+                <div className={styles.boundingBoxLabels}>
+                  <p className={styles.boundingBoxLabel}>Labels</p>
+                  {boundingBoxLabelsArr.map(([label, { color, selected }]) => (
+                    <button
+                      className={cx(
+                        styles.boundingBoxLabelButton,
+                        selected && styles.selected
+                      )}
+                      key={label}
+                      style={{ background: color }}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </td>
           {nbColumns > 1 && pinnedColumn && <td colSpan={nbColumns - 1}></td>}
@@ -162,9 +187,17 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
                 className={cx(styles.cell, { [styles.cellHidden]: !isShown })}
               >
                 {plot.imgs.length > 1 ? (
-                  <ComparisonTableMultiCell plot={plot} path={path} />
+                  <ComparisonTableMultiCell
+                    boundingBoxLabels={boundingBoxLabels}
+                    plot={plot}
+                    path={path}
+                  />
                 ) : (
-                  <ComparisonTableCell plot={plot} path={path} />
+                  <ComparisonTableCell
+                    boundingBoxLabels={boundingBoxLabels}
+                    plot={plot}
+                    path={path}
+                  />
                 )}
               </div>
             </td>
