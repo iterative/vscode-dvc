@@ -30,6 +30,7 @@ export const ComparisonTableBoundingBoxImg: React.FC<{
       className={styles.image}
       viewBox={`0 0 ${naturalWidth} ${naturalHeight}`}
       aria-label={alt}
+      role="img"
     >
       {Object.entries(labels).map(([label, { color }]) => (
         <ComparisonTableBoundingBoxColorFilter key={label} color={color} />

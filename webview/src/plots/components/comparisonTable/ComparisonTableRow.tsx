@@ -134,7 +134,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
             className={cx({ [styles.pinnedColumnCell]: pinnedColumn })}
             colSpan={pinnedColumn ? 1 : nbColumns}
           >
-            <div className={styles.rowHeader}>
+            <div className={styles.rowHeader} data-testid="row-header">
               <div className={styles.rowHeaderPath}>
                 <button
                   className={styles.rowToggler}
@@ -153,18 +153,25 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
               </div>
               {boundingBoxLabelsArr.length > 0 && (
                 <div className={styles.boundingBoxLabels}>
-                  <p className={styles.boundingBoxLabel}>Labels</p>
+                  <p className={styles.boundingBoxLabelsTitle}>Labels</p>
                   {boundingBoxLabelsArr.map(([label, { color, selected }]) => (
-                    <button
-                      className={cx(
-                        styles.boundingBoxLabelButton,
-                        selected && styles.selected
-                      )}
-                      key={label}
-                      style={{ background: color }}
-                    >
-                      {label}
-                    </button>
+                    <React.Fragment key={label}>
+                      <input
+                        type="checkbox"
+                        id={color.slice(1)}
+                        name="labels"
+                        value={label}
+                        defaultChecked={selected}
+                        className={styles.hiddenInput}
+                      />
+                      <label
+                        className={styles.boundingBoxLabelsButton}
+                        style={{ background: color }}
+                        htmlFor={color.slice(1)}
+                      >
+                        {label}
+                      </label>
+                    </React.Fragment>
                   ))}
                 </div>
               )}

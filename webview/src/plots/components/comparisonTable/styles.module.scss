@@ -171,14 +171,25 @@ $gap: 4px;
   margin-left: 5px;
 }
 
-.boundingBoxLabel {
+.boundingBoxLabelsTitle {
   font-size: 0.6rem;
   margin-right: 10px;
   color: $fg-color;
   font-weight: 600;
 }
 
-.boundingBoxLabelButton {
+.hiddenInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.boundingBoxLabelsButton {
   white-space: nowrap;
   border: none;
   border-radius: 2px;
@@ -187,13 +198,10 @@ $gap: 4px;
   color: #fff;
   cursor: pointer;
   opacity: 0.5;
+  font-size: 0.8rem;
 
-  &.selected {
+  input:checked + & {
     opacity: 1;
-  }
-
-  &:hover {
-    opacity: 0.8;
   }
 }
 
