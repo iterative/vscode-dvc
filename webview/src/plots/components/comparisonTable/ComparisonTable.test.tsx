@@ -775,7 +775,7 @@ describe('ComparisonTable', () => {
       renderTable(plotsWithBoundingBoxes)
 
       const boundingBoxPlotImage = screen.getByLabelText(
-        'Plot of plots/bounding_boxes.png (workspace)'
+        /bounding_boxes.png \(workspace\)/
       )
       expect(boundingBoxPlotImage).toHaveAttribute('viewBox')
       expect(
