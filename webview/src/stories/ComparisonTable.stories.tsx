@@ -118,10 +118,13 @@ const removeImages = (
 
 export const WithMissingData = Template.bind({})
 WithMissingData.args = {
-  plots: comparisonTableFixture.plots.map(({ path, revisions }) => ({
-    path,
-    revisions: removeImages(path, revisions)
-  })),
+  plots: comparisonTableFixture.plots.map(
+    ({ boundingBoxLabels, path, revisions }) => ({
+      boundingBoxLabels,
+      path,
+      revisions: removeImages(path, revisions)
+    })
+  ),
   revisions: comparisonTableFixture.revisions.map(revision => {
     if (revision.id === EXPERIMENT_WORKSPACE_ID) {
       return { ...revision, fetched: false }
@@ -132,10 +135,13 @@ WithMissingData.args = {
 
 export const WithOnlyMissingData = Template.bind({})
 WithOnlyMissingData.args = {
-  plots: comparisonTableFixture.plots.map(({ path, revisions }) => ({
-    path,
-    revisions: removeImages(path, revisions)
-  })),
+  plots: comparisonTableFixture.plots.map(
+    ({ boundingBoxLabels, path, revisions }) => ({
+      boundingBoxLabels,
+      path,
+      revisions: removeImages(path, revisions)
+    })
+  ),
   revisions: comparisonTableFixture.revisions
     .map(revision => {
       if (revision.id === EXPERIMENT_WORKSPACE_ID) {
