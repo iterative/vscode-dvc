@@ -22,6 +22,7 @@ import { Plots } from '../plots/components/Plots'
 
 import { feedStore } from '../plots/components/App'
 import { plotsReducers } from '../plots/store'
+import { addBoundingBoxes } from '../test/boundingBoxesFixture'
 
 const smallCustomPlotsFixture = {
   ...customPlotsFixture,
@@ -347,4 +348,12 @@ ScrolledWithManyRevisions.play = async ({ canvasElement }) => {
 }
 ScrolledWithManyRevisions.parameters = {
   chromatic: { delay: 2500 }
+}
+
+export const WithBoundingBoxes = Template.bind({})
+WithBoundingBoxes.args = {
+  data: {
+    ...defaultPlotsData,
+    comparison: addBoundingBoxes(comparisonPlotsFixture)
+  }
 }

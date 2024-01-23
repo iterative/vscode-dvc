@@ -19,7 +19,6 @@ import {
   DEFAULT_NB_ITEMS_PER_ROW,
   DEFAULT_PLOT_WIDTH,
   ComparisonPlotImg,
-  ComparisonPlotBoundingBoxes,
   ComparisonBoundingBoxLabels
 } from '../../../plots/webview/contract'
 import { join } from '../../util/path'
@@ -946,64 +945,6 @@ const getIndFromComparisonMultiImgPath = (path: string) => {
   return Number((pathIndMatches as string[])[1])
 }
 
-const colors = [
-  '#ff3838',
-  '#ff9d97',
-  '#ff701f',
-  '#ffb21d',
-  '#cfd231',
-  '#48f90a',
-  '#92cc17',
-  '#3ddb86',
-  '#1a9334',
-  '#00d4bb',
-  '#2c99a8',
-  '#00c2ff',
-  '#344593',
-  '#6473ff',
-  '#0018ec',
-  '#8438ff',
-  '#520085',
-  '#cb38ff',
-  '#ff95c8',
-  '#ff37c7'
-]
-
-const boundingBoxImgLabels: ComparisonBoundingBoxLabels = {
-  'traffic light': { selected: true, color: colors[0] },
-  car: { selected: true, color: colors[1] },
-  sign: { selected: false, color: colors[2] }
-}
-
-const boundingBoxImgCoords: { [rev: string]: ComparisonPlotBoundingBoxes } = {
-  workspace: [
-    { label: 'traffic light', boxes: [{ h: 90, w: 80, x: 120, y: 120 }] },
-    {
-      label: 'car',
-      boxes: [
-        { h: 30, w: 30, x: 190, y: 310 },
-        { h: 50, w: 60, x: 300, y: 320 }
-      ]
-    }
-  ],
-  main: [
-    { label: 'traffic light', boxes: [{ h: 100, w: 100, x: 100, y: 100 }] },
-    { label: 'car', boxes: [{ h: 30, w: 30, x: 190, y: 310 }] }
-  ],
-  'exp-e7a67': [
-    { label: 'traffic light', boxes: [{ h: 110, w: 100, x: 90, y: 100 }] },
-    { label: 'car', boxes: [{ h: 30, w: 30, x: 190, y: 310 }] }
-  ],
-  'test-branch': [
-    { label: 'traffic light', boxes: [{ h: 100, w: 90, x: 100, y: 110 }] },
-    { label: 'car', boxes: [{ h: 30, w: 30, x: 190, y: 310 }] }
-  ],
-  'exp-83425': [
-    { label: 'traffic light', boxes: [{ h: 75, w: 100, x: 100, y: 100 }] },
-    { label: 'car', boxes: [{ h: 30, w: 30, x: 190, y: 310 }] }
-  ]
-}
-
 export const getComparisonWebviewMessage = (
   baseUrl: string,
   joinFunc: (...args: string[]) => string = join
@@ -1025,7 +966,7 @@ export const getComparisonWebviewMessage = (
       plotAcc[pathLabel] = {
         path: pathLabel,
         revisions: {},
-        boundingBoxLabels: isBoundingBox ? boundingBoxImgLabels : {}
+        boundingBoxLabels: {}
       }
     }
 
@@ -1050,10 +991,6 @@ export const getComparisonWebviewMessage = (
 
       if (isMulti) {
         img.ind = getIndFromComparisonMultiImgPath(path)
-      }
-
-      if (isBoundingBox) {
-        img.boundingBoxes = boundingBoxImgCoords[id]
       }
 
       plotAcc[pathLabel].revisions[id].imgs.push(img)

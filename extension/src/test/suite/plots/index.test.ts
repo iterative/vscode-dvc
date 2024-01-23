@@ -402,7 +402,8 @@ suite('Plots Test Suite', () => {
         join('plots', 'acc.png'),
         join('plots', 'heatmap.png'),
         join('plots', 'loss.png'),
-        join('plots', 'image')
+        join('plots', 'image'),
+        join('plots', 'bounding_boxes.png')
       ]
 
       messageSpy.resetHistory()
