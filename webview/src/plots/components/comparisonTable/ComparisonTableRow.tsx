@@ -35,7 +35,7 @@ export interface ComparisonTableRowProps {
   onLayoutChange: () => void
   setOrder: (order: string[]) => void
   order: string[]
-  boundingBoxLabels?: ComparisonBoundingBoxLabels
+  boundingBoxLabels: ComparisonBoundingBoxLabels
   bodyRef?: RefObject<HTMLTableSectionElement>
 }
 
@@ -47,7 +47,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
   onLayoutChange,
   setOrder,
   order,
-  boundingBoxLabels = {},
+  boundingBoxLabels,
   bodyRef
 }) => {
   const plotsRowRef = useRef<HTMLTableRowElement>(null)

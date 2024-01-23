@@ -12,8 +12,8 @@ import { zoomPlot } from '../../../util/messages'
 export const ComparisonTableCell: React.FC<{
   path: string
   plot: ComparisonPlot
-  imgAlt?: string
   boundingBoxLabels: ComparisonBoundingBoxLabels
+  imgAlt?: string
 }> = ({ path, plot, imgAlt, boundingBoxLabels }) => {
   const plotImg = plot.imgs[0]
 

@@ -748,7 +748,7 @@ describe('ComparisonTable', () => {
   describe('Plots With Bounding Boxes', () => {
     const plotsWithBoundingBoxes = addBoundingBoxes(comparisonTableFixture)
 
-    it('should show toggable labels in plot row', () => {
+    it('should show toggable labels in the plot row', () => {
       renderTable(plotsWithBoundingBoxes)
 
       const rowHeaders = screen.getAllByTestId('row-header')
@@ -771,7 +771,7 @@ describe('ComparisonTable', () => {
       expect(uncheckedLabel).not.toHaveAttribute('checked')
     })
 
-    it('should render svgs with bounding boxes instead of images', () => {
+    it('should show svgs with bounding boxes instead of images', () => {
       renderTable(plotsWithBoundingBoxes)
 
       const boundingBoxPlotImage = screen.getByLabelText(

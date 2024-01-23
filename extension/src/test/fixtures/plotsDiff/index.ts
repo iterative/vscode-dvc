@@ -539,16 +539,7 @@ const getMultiImageData = (
   return data
 }
 
-const getImageData = (
-  baseUrl: string,
-  joinFunc = join
-): {
-  [path: string]: {
-    type: PlotsType
-    revisions: string[]
-    url: string
-  }[]
-} => ({
+const getImageData = (baseUrl: string, joinFunc = join) => ({
   [join('plots', 'acc.png')]: [
     {
       type: PlotsType.IMAGE,

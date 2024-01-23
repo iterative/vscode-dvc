@@ -20,6 +20,7 @@ jest.mock('../../../shared/api')
 
 describe('ComparisonTableRow', () => {
   const basicProps: ComparisonTableRowProps = {
+    boundingBoxLabels: {},
     nbColumns: 3,
     onLayoutChange: jest.fn(),
     order: ['path/to/the-file/image.png'],
