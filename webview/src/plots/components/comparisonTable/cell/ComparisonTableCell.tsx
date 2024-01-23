@@ -32,7 +32,7 @@ export const ComparisonTableCell: React.FC<{
   return (
     <button
       className={styles.imageWrapper}
-      onClick={() => zoomPlot(plotImg.url)} // zoomed in plot will need to be updated if we want it to include bounding boxes
+      onClick={() => zoomPlot(plotImg.url)}
       data-testid="image-plot-button"
     >
       {plotImg.url && plotImg.boundingBoxes ? (

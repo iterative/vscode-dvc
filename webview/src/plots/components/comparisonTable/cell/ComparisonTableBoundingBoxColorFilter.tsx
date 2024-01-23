@@ -1,6 +1,6 @@
 import React from 'react'
 
-export const BoundingBoxColorFilter: React.FC<{
+export const ComparisonTableBoundingBoxColorFilter: React.FC<{
   color: string
 }> = ({ color }) => {
   return (

@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import cx from 'classnames'
 import {
   ComparisonBoundingBoxLabels,
   ComparisonPlotBoundingBoxes
 } from 'dvc/src/plots/webview/contract'
-import { BoundingBoxColorFilter } from './BoundingBoxColorFilter'
+import { ComparisonTableBoundingBoxColorFilter } from './ComparisonTableBoundingBoxColorFilter'
 import styles from '../styles.module.scss'
 
 export const ComparisonTableBoundingBoxImg: React.FC<{
@@ -28,22 +27,24 @@ export const ComparisonTableBoundingBoxImg: React.FC<{
 
   return (
     <svg
-      className={cx(styles.image, styles.boundingBoxImg)}
+      className={styles.image}
       viewBox={`0 0 ${naturalWidth} ${naturalHeight}`}
       aria-label={alt}
     >
       {Object.entries(labels).map(([label, { color }]) => (
-        <BoundingBoxColorFilter key={label} color={color} />
+        <ComparisonTableBoundingBoxColorFilter key={label} color={color} />
       ))}
       <image href={src} width={naturalWidth} height={naturalHeight} />
       {boxCoords.map(({ label, boxes }) => {
+        const labelColor = labels[label].color
         return boxes.map(({ h, w, x, y }) => (
           <React.Fragment key={label + h + w + x + y}>
             <text
-              filter={`url(#c${labels[label].color.slice(1)})`}
+              filter={`url(#c${labelColor.slice(1)})`}
               x={x - 1}
               y={y - 4}
               fill="#fff"
+              className={styles.imageBoundingBoxText}
             >
               {label}
             </text>
@@ -52,11 +53,9 @@ export const ComparisonTableBoundingBoxImg: React.FC<{
               height={h}
               x={x}
               y={y}
-              style={{
-                fill: 'transparent',
-                stroke: labels[label].color, // only the stroke needs to be here
-                strokeWidth: '3px'
-              }}
+              fill="transparent"
+              strokeWidth="3px"
+              stroke={labelColor}
             />
           </React.Fragment>
         ))

@@ -2,6 +2,7 @@
 import {
   ComparisonBoundingBoxLabels,
   ComparisonPlotBoundingBoxes,
+  ComparisonRevisionData,
   PlotsComparisonData
 } from 'dvc/src/plots/webview/contract'
 
@@ -75,16 +76,24 @@ export const addBoundingBoxes = (
         return plot
       }
 
-      const plotWithBoundingBoxes = {
-        ...plot,
-        boundingBoxLabels: boundingBoxImgLabels
+      const plotWithBoundingBoxes: {
+        path: string
+        boundingBoxLabels: ComparisonBoundingBoxLabels
+        revisions: ComparisonRevisionData
+      } = {
+        boundingBoxLabels: boundingBoxImgLabels,
+        path: plot.path,
+        revisions: {}
       }
 
       for (const [rev, imgPlot] of Object.entries(plot.revisions)) {
-        plotWithBoundingBoxes.revisions[rev].imgs = imgPlot.imgs.map(img => ({
-          ...img,
-          boundingBoxes: boundingBoxImgCoords[rev]
-        }))
+        plotWithBoundingBoxes.revisions[rev] = {
+          ...imgPlot,
+          imgs: imgPlot.imgs.map(img => ({
+            ...img,
+            boundingBoxes: boundingBoxImgCoords[rev]
+          }))
+        }
       }
 
       return plotWithBoundingBoxes
