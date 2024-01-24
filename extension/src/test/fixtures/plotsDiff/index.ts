@@ -19,7 +19,7 @@ import {
   DEFAULT_NB_ITEMS_PER_ROW,
   DEFAULT_PLOT_WIDTH,
   ComparisonPlotImg,
-  ComparisonBoundingBoxLabels
+  ComparisonBoundingBoxClasses
 } from '../../../plots/webview/contract'
 import { join } from '../../util/path'
 import { copyOriginalColors } from '../../../experiments/model/status/colors'
@@ -944,20 +944,19 @@ export const getComparisonWebviewMessage = (
     [path: string]: {
       path: string
       revisions: ComparisonRevisionData
-      boundingBoxLabels: ComparisonBoundingBoxLabels
+      boundingBoxClasses: ComparisonBoundingBoxClasses
     }
   } = {}
 
   for (const [path, plots] of Object.entries(getImageData(baseUrl, joinFunc))) {
     const isMulti = path.includes('image')
-    const isBoundingBox = path.includes('bounding_boxes.png')
     const pathLabel = isMulti ? join('plots', 'image') : path
 
     if (!plotAcc[pathLabel]) {
       plotAcc[pathLabel] = {
         path: pathLabel,
         revisions: {},
-        boundingBoxLabels: {}
+        boundingBoxClasses: {}
       }
     }
 

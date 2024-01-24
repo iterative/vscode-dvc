@@ -1,5 +1,5 @@
 import {
-  ComparisonBoundingBoxLabels,
+  ComparisonBoundingBoxClasses,
   ComparisonPlot
 } from 'dvc/src/plots/webview/contract'
 import React, {
@@ -35,7 +35,7 @@ export interface ComparisonTableRowProps {
   onLayoutChange: () => void
   setOrder: (order: string[]) => void
   order: string[]
-  boundingBoxLabels: ComparisonBoundingBoxLabels
+  boundingBoxClasses: ComparisonBoundingBoxClasses
   bodyRef?: RefObject<HTMLTableSectionElement>
 }
 
@@ -47,7 +47,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
   onLayoutChange,
   setOrder,
   order,
-  boundingBoxLabels,
+  boundingBoxClasses,
   bodyRef
 }) => {
   const plotsRowRef = useRef<HTMLTableRowElement>(null)
@@ -72,7 +72,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
     type: <tbody />,
     vertical: true
   })
-  const boundingBoxLabelsArr = Object.entries(boundingBoxLabels)
+  const boundingBoxClassesArr = Object.entries(boundingBoxClasses)
 
   useLayoutEffect(() => {
     onLayoutChange?.()
@@ -151,10 +151,10 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
                 </button>
                 <CopyButton value={path} className={styles.copyButton} />
               </div>
-              {boundingBoxLabelsArr.length > 0 && (
-                <div className={styles.boundingBoxLabels}>
-                  <p className={styles.boundingBoxLabelsTitle}>Labels</p>
-                  {boundingBoxLabelsArr.map(([label, { color, selected }]) => (
+              {boundingBoxClassesArr.length > 0 && (
+                <div className={styles.boundingBoxClasses}>
+                  <p className={styles.boundingBoxClassesTitle}>Classes</p>
+                  {boundingBoxClassesArr.map(([label, { color, selected }]) => (
                     <React.Fragment key={label}>
                       <input
                         type="checkbox"
@@ -165,7 +165,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
                         className={styles.hiddenInput}
                       />
                       <label
-                        className={styles.boundingBoxLabelsButton}
+                        className={styles.boundingBoxClassesButton}
                         style={{ background: color }}
                         htmlFor={color.slice(1)}
                       >
@@ -195,13 +195,13 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
               >
                 {plot.imgs.length > 1 ? (
                   <ComparisonTableMultiCell
-                    boundingBoxLabels={boundingBoxLabels}
+                    boundingBoxClasses={boundingBoxClasses}
                     plot={plot}
                     path={path}
                   />
                 ) : (
                   <ComparisonTableCell
-                    boundingBoxLabels={boundingBoxLabels}
+                    boundingBoxClasses={boundingBoxClasses}
                     plot={plot}
                     path={path}
                   />

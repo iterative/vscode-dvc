@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import {
-  ComparisonBoundingBoxLabels,
+  ComparisonBoundingBoxClasses,
   ComparisonPlotBoundingBoxes,
   ComparisonRevisionData,
   PlotsComparisonData
@@ -29,7 +29,7 @@ const boxColors = [
   '#ff37c7'
 ]
 
-const boundingBoxImgLabels: ComparisonBoundingBoxLabels = {
+const boundingBoxImgClasses: ComparisonBoundingBoxClasses = {
   car: { color: boxColors[1], selected: true },
   sign: { color: boxColors[2], selected: false },
   'traffic light': { color: boxColors[3], selected: true }
@@ -78,10 +78,10 @@ export const addBoundingBoxes = (
 
       const plotWithBoundingBoxes: {
         path: string
-        boundingBoxLabels: ComparisonBoundingBoxLabels
+        boundingBoxClasses: ComparisonBoundingBoxClasses
         revisions: ComparisonRevisionData
       } = {
-        boundingBoxLabels: boundingBoxImgLabels,
+        boundingBoxClasses: boundingBoxImgClasses,
         path: plot.path,
         revisions: {}
       }

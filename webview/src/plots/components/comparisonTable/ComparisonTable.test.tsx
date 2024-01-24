@@ -756,7 +756,7 @@ describe('ComparisonTable', () => {
       const boundingBoxPlotHeader = rowHeaders[4]
 
       expect(
-        within(boundingBoxPlotHeader).getByText('Labels')
+        within(boundingBoxPlotHeader).getByText('Classes')
       ).toBeInTheDocument()
 
       const checkedLabel = within(boundingBoxPlotHeader).getByLabelText(

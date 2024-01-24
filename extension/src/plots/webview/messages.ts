@@ -407,7 +407,7 @@ export class WebviewMessages {
       multiPlotValues: this.plots.getComparisonMultiPlotValues(),
       plots: comparison.map(({ path, revisions }) => {
         return {
-          boundingBoxLabels: {},
+          boundingBoxClasses: {},
           path,
           revisions: this.getRevisionsWithCorrectUrls(revisions)
         }

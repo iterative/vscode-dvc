@@ -50,13 +50,13 @@ export type SectionCollapsed = typeof DEFAULT_SECTION_COLLAPSED
 
 export type ComparisonRevisionData = { [revision: string]: ComparisonPlot }
 
-export type ComparisonBoundingBoxLabels = {
+export type ComparisonBoundingBoxClasses = {
   [label: string]: { selected: boolean; color: string }
 }
 
 export type ComparisonPlots = {
   path: string
-  boundingBoxLabels: ComparisonBoundingBoxLabels
+  boundingBoxClasses: ComparisonBoundingBoxClasses
   revisions: ComparisonRevisionData
 }[]
 

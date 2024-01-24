@@ -228,7 +228,7 @@ describe('App', () => {
         multiPlotValues: {},
         plots: [
           {
-            boundingBoxLabels: {},
+            boundingBoxClasses: {},
             path: 'training/plots/images/misclassified.jpg',
             revisions: {
               ad2b5ec: {
@@ -284,7 +284,7 @@ describe('App', () => {
         multiPlotValues: {},
         plots: [
           {
-            boundingBoxLabels: {},
+            boundingBoxClasses: {},
             path: 'training/plots/images/image',
             revisions: {
               ad2b5ec: {

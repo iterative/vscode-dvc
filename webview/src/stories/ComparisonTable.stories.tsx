@@ -119,8 +119,8 @@ const removeImages = (
 export const WithMissingData = Template.bind({})
 WithMissingData.args = {
   plots: comparisonTableFixture.plots.map(
-    ({ boundingBoxLabels, path, revisions }) => ({
-      boundingBoxLabels,
+    ({ boundingBoxClasses, path, revisions }) => ({
+      boundingBoxClasses,
       path,
       revisions: removeImages(path, revisions)
     })
@@ -136,8 +136,8 @@ WithMissingData.args = {
 export const WithOnlyMissingData = Template.bind({})
 WithOnlyMissingData.args = {
   plots: comparisonTableFixture.plots.map(
-    ({ boundingBoxLabels, path, revisions }) => ({
-      boundingBoxLabels,
+    ({ boundingBoxClasses, path, revisions }) => ({
+      boundingBoxClasses,
       path,
       revisions: removeImages(path, revisions)
     })

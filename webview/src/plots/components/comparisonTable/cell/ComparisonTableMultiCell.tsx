@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
-  ComparisonBoundingBoxLabels,
+  ComparisonBoundingBoxClasses,
   ComparisonPlot,
   ComparisonPlotImg
 } from 'dvc/src/plots/webview/contract'
@@ -14,8 +14,8 @@ import { PlotsState } from '../../../store'
 export const ComparisonTableMultiCell: React.FC<{
   path: string
   plot: ComparisonPlot
-  boundingBoxLabels: ComparisonBoundingBoxLabels
-}> = ({ path, plot, boundingBoxLabels }) => {
+  boundingBoxClasses: ComparisonBoundingBoxClasses
+}> = ({ path, plot, boundingBoxClasses }) => {
   const values = useSelector(
     (state: PlotsState) => state.comparison.multiPlotValues
   )
@@ -60,7 +60,7 @@ export const ComparisonTableMultiCell: React.FC<{
           imgs: [selectedImg]
         }}
         imgAlt={`${selectedImg.ind} of ${path} (${plot.id})`}
-        boundingBoxLabels={boundingBoxLabels}
+        boundingBoxClasses={boundingBoxClasses}
       />
       <div
         className={styles.multiImageSlider}
