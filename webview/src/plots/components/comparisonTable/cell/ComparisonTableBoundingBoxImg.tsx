@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import {
   ComparisonBoundingBoxClasses,
-  ComparisonPlotBoundingBoxes
+  ComparisonPlotBoundingBox
 } from 'dvc/src/plots/webview/contract'
 import { ComparisonTableBoundingBoxColorFilter } from './ComparisonTableBoundingBoxColorFilter'
 import styles from '../styles.module.scss'
 
 export const ComparisonTableBoundingBoxImg: React.FC<{
   src: string
-  boxCoords: ComparisonPlotBoundingBoxes
+  boxCoords: ComparisonPlotBoundingBox[]
   classes: ComparisonBoundingBoxClasses
   alt: string
 }> = ({ alt, src, boxCoords, classes }) => {

@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import {
   ComparisonBoundingBoxClasses,
-  ComparisonPlotBoundingBoxes,
+  ComparisonPlotBoundingBox,
   ComparisonRevisionData,
   PlotsComparisonData
 } from 'dvc/src/plots/webview/contract'
@@ -35,7 +35,7 @@ const boundingBoxImgClasses: ComparisonBoundingBoxClasses = {
   'traffic light': { color: boxColors[3], selected: true }
 }
 
-const boundingBoxImgCoords: { [rev: string]: ComparisonPlotBoundingBoxes } = {
+const boundingBoxImgCoords: { [rev: string]: ComparisonPlotBoundingBox[] } = {
   'exp-83425': [
     { boxes: [{ h: 75, w: 100, x: 100, y: 100 }], label: 'traffic light' },
     { boxes: [{ h: 30, w: 30, x: 190, y: 310 }], label: 'car' }

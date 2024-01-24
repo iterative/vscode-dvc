@@ -156,7 +156,7 @@ export interface TemplatePlotsData {
   smoothPlotValues: SmoothPlotValues
 }
 
-export type ComparisonPlotBoundingBoxes = {
+export type ComparisonPlotBoundingBox = {
   label: string
   boxes: {
     h: number
@@ -164,14 +164,14 @@ export type ComparisonPlotBoundingBoxes = {
     x: number
     y: number
   }[]
-}[]
+}
 
 export type ComparisonPlotImg = {
   url: string | undefined
   errors: string[] | undefined
   loading: boolean
   ind?: number
-  boundingBoxes?: ComparisonPlotBoundingBoxes
+  boundingBoxes?: ComparisonPlotBoundingBox[]
 }
 
 export type ComparisonPlot = {
