@@ -81,12 +81,27 @@ export type ComparisonMultiPlotValues = {
   [revision: string]: { [path: string]: number }
 }
 
+export type ComparisonPlotBoundingBox = {
+  label: string
+  boxes: {
+    h: number
+    w: number
+    x: number
+    y: number
+  }[]
+}
+
+export type ComparisonBoundingBoxPlotCoords = {
+  [revision: string]: { [path: string]: ComparisonPlotBoundingBox[] }
+}
+
 export interface PlotsComparisonData {
   plots: ComparisonPlots
   width: number
   height: PlotHeight
   revisions: Revision[]
   multiPlotValues: ComparisonMultiPlotValues
+  boundingBoxPlotCoords: ComparisonBoundingBoxPlotCoords
 }
 
 export type CustomPlotValues = {
@@ -156,22 +171,11 @@ export interface TemplatePlotsData {
   smoothPlotValues: SmoothPlotValues
 }
 
-export type ComparisonPlotBoundingBox = {
-  label: string
-  boxes: {
-    h: number
-    w: number
-    x: number
-    y: number
-  }[]
-}
-
 export type ComparisonPlotImg = {
   url: string | undefined
   errors: string[] | undefined
   loading: boolean
   ind?: number
-  boundingBoxes?: ComparisonPlotBoundingBox[]
 }
 
 export type ComparisonPlot = {

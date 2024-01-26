@@ -224,6 +224,7 @@ describe('App', () => {
   it('should render loading section states when given a single revision which has not been fetched', async () => {
     renderAppWithOptionalData({
       comparison: {
+        boundingBoxPlotCoords: {},
         height: DEFAULT_PLOT_HEIGHT,
         multiPlotValues: {},
         plots: [
@@ -280,6 +281,7 @@ describe('App', () => {
   it('should render loading section states with multi image plots when given a single revision which has not been fetched', async () => {
     renderAppWithOptionalData({
       comparison: {
+        boundingBoxPlotCoords: {},
         height: DEFAULT_PLOT_HEIGHT,
         multiPlotValues: {},
         plots: [

@@ -19,6 +19,7 @@ export interface ComparisonTableState extends PlotsComparisonData {
 export const DEFAULT_ROW_HEIGHT = 200
 
 export const comparisonTableInitialState: ComparisonTableState = {
+  boundingBoxPlotCoords: {},
   disabledDragPlotIds: [],
   hasData: false,
   height: DEFAULT_HEIGHT[PlotsSection.COMPARISON_TABLE],

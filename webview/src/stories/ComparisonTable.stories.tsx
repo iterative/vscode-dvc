@@ -38,7 +38,11 @@ export default {
   title: 'Comparison Table'
 } as Meta
 
-const Template: StoryFn = ({ plots, revisions }) => {
+const Template: StoryFn = ({
+  plots,
+  revisions,
+  boundingBoxPlotCoords = {}
+}) => {
   const store = configureStore({
     reducer: plotsReducers
   })
@@ -47,6 +51,7 @@ const Template: StoryFn = ({ plots, revisions }) => {
     <Provider store={store}>
       <MockedState
         data={{
+          boundingBoxPlotCoords,
           height: DEFAULT_PLOT_HEIGHT,
           multiPlotValues: {},
           plots,
@@ -151,7 +156,9 @@ WithOnlyMissingData.args = {
     .filter(Boolean)
 }
 
+const fixtureWithBoundingBoxes = addBoundingBoxes(comparisonTableFixture)
 export const WithBoundingBoxes = Template.bind({})
 WithBoundingBoxes.args = {
-  plots: addBoundingBoxes(comparisonTableFixture).plots
+  boundingBoxPlotCoords: fixtureWithBoundingBoxes.boundingBoxPlotCoords,
+  plots: fixtureWithBoundingBoxes.plots
 }

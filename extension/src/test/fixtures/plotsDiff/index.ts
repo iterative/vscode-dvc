@@ -988,6 +988,7 @@ export const getComparisonWebviewMessage = (
   }
 
   return {
+    boundingBoxPlotCoords: {},
     revisions: getRevisions(),
     multiPlotValues: {},
     plots: Object.values(plotAcc),
