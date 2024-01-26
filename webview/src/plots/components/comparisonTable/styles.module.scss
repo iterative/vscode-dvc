@@ -122,26 +122,9 @@ $gap: 4px;
   z-index: 3;
 }
 
-.rowHeader {
-  display: flex;
+.pinnedColumnContent {
   position: sticky;
   left: 0;
-  width: min-content;
-}
-
-.rowHeaderPath {
-  display: flex;
-  align-items: center;
-
-  .copyButton {
-    display: inline;
-    opacity: 0;
-    margin: 0;
-  }
-
-  &:hover .copyButton {
-    opacity: 1;
-  }
 }
 
 .rowToggler {
@@ -150,10 +133,23 @@ $gap: 4px;
   color: $fg-color;
   display: flex;
   user-select: text;
+  max-width: calc(100% - 20px);
 
   svg {
     fill: $fg-color;
     min-width: fit-content;
+  }
+}
+
+.rowPath {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+
+  &:hover .copyButton {
+    display: inline;
+    font-size: 0.8125rem;
   }
 }
 
@@ -164,10 +160,22 @@ $gap: 4px;
   white-space: nowrap;
 }
 
+.cell {
+  overflow: hidden;
+  max-height: 100vh;
+  width: 100%;
+  transform: scaleY(1);
+  transform-origin: top;
+  transition: max-height 0.3s;
+}
+
+.cellHidden {
+  max-height: 0;
+}
+
 .boundingBoxClasses {
   display: flex;
   align-items: center;
-  margin-left: 5px;
 }
 
 .boundingBoxClassesTitle {
@@ -195,20 +203,6 @@ $gap: 4px;
   input:checked + & {
     opacity: 1;
   }
-}
-
-.cell {
-  max-height: 100vh;
-  width: 100%;
-  overflow: hidden;
-  transform: scaleY(1);
-  transform-origin: top;
-  transition: max-height 0.3s;
-  text-align: center;
-}
-
-.cellHidden {
-  max-height: 0;
 }
 
 .image {

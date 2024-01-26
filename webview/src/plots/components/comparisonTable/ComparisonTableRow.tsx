@@ -15,6 +15,7 @@ import { useSelector } from 'react-redux'
 import styles from './styles.module.scss'
 import { ComparisonTableCell } from './cell/ComparisonTableCell'
 import { ComparisonTableMultiCell } from './cell/ComparisonTableMultiCell'
+import { ComparisonTablePinnedContentRow } from './ComparisonTablePinnedContentRow'
 import { RowDropTarget } from './RowDropTarget'
 import { Icon } from '../../../shared/components/Icon'
 import { ChevronDown, ChevronRight } from '../../../shared/components/icons'
@@ -73,6 +74,9 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
     vertical: true
   })
   const boundingBoxClassesArr = Object.entries(boundingBoxClasses)
+  const cellClasses = cx(styles.cell, {
+    [styles.cellHidden]: !isShown
+  })
 
   useLayoutEffect(() => {
     onLayoutChange?.()
@@ -129,56 +133,56 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
         id={path}
         ref={bodyRef}
       >
-        <tr>
-          <td
-            className={cx({ [styles.pinnedColumnCell]: pinnedColumn })}
-            colSpan={pinnedColumn ? 1 : nbColumns}
+        <ComparisonTablePinnedContentRow
+          pinnedColumn={pinnedColumn}
+          nbColumns={nbColumns}
+        >
+          <div className={styles.rowPath}>
+            <button className={styles.rowToggler} onClick={toggleIsShownState}>
+              <Icon icon={isShown ? ChevronDown : ChevronRight} />
+              <Tooltip
+                content={path}
+                placement="bottom-start"
+                delay={NORMAL_TOOLTIP_DELAY}
+              >
+                <span className={styles.pathText}>{path}</span>
+              </Tooltip>
+            </button>
+            <CopyButton value={path} className={styles.copyButton} />
+          </div>
+        </ComparisonTablePinnedContentRow>
+        {boundingBoxClassesArr.length > 0 && (
+          <ComparisonTablePinnedContentRow
+            pinnedColumn={pinnedColumn}
+            nbColumns={nbColumns}
           >
-            <div className={styles.rowHeader} data-testid="row-header">
-              <div className={styles.rowHeaderPath}>
-                <button
-                  className={styles.rowToggler}
-                  onClick={toggleIsShownState}
-                >
-                  <Icon icon={isShown ? ChevronDown : ChevronRight} />
-                  <Tooltip
-                    content={path}
-                    placement="bottom-start"
-                    delay={NORMAL_TOOLTIP_DELAY}
+            <div
+              data-testid="row-bounding-box-classes"
+              className={cx(styles.boundingBoxClasses, cellClasses)}
+            >
+              <p className={styles.boundingBoxClassesTitle}>Classes</p>
+              {boundingBoxClassesArr.map(([label, { color, selected }]) => (
+                <React.Fragment key={label}>
+                  <input
+                    type="checkbox"
+                    id={color.slice(1)}
+                    name="labels"
+                    value={label}
+                    defaultChecked={selected}
+                    className={styles.hiddenInput}
+                  />
+                  <label
+                    className={styles.boundingBoxClassesButton}
+                    style={{ background: color }}
+                    htmlFor={color.slice(1)}
                   >
-                    <span className={styles.pathText}>{path}</span>
-                  </Tooltip>
-                </button>
-                <CopyButton value={path} className={styles.copyButton} />
-              </div>
-              {boundingBoxClassesArr.length > 0 && (
-                <div className={styles.boundingBoxClasses}>
-                  <p className={styles.boundingBoxClassesTitle}>Classes</p>
-                  {boundingBoxClassesArr.map(([label, { color, selected }]) => (
-                    <React.Fragment key={label}>
-                      <input
-                        type="checkbox"
-                        id={color.slice(1)}
-                        name="labels"
-                        value={label}
-                        defaultChecked={selected}
-                        className={styles.hiddenInput}
-                      />
-                      <label
-                        className={styles.boundingBoxClassesButton}
-                        style={{ background: color }}
-                        htmlFor={color.slice(1)}
-                      >
-                        {label}
-                      </label>
-                    </React.Fragment>
-                  ))}
-                </div>
-              )}
+                    {label}
+                  </label>
+                </React.Fragment>
+              ))}
             </div>
-          </td>
-          {nbColumns > 1 && pinnedColumn && <td colSpan={nbColumns - 1}></td>}
-        </tr>
+          </ComparisonTablePinnedContentRow>
+        )}
         <tr ref={plotsRowRef}>
           {plots.map(plot => (
             <td
@@ -189,10 +193,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
                   isInDragAndDropMode && draggedId === plot.id
               })}
             >
-              <div
-                data-testid="row-images"
-                className={cx(styles.cell, { [styles.cellHidden]: !isShown })}
-              >
+              <div data-testid="row-images" className={cellClasses}>
                 {plot.imgs.length > 1 ? (
                   <ComparisonTableMultiCell
                     boundingBoxClasses={boundingBoxClasses}
