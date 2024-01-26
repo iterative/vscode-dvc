@@ -751,20 +751,20 @@ describe('ComparisonTable', () => {
     it('should show toggable labels in the plot row', () => {
       renderTable(plotsWithBoundingBoxes)
 
-      const rowHeaders = screen.getAllByTestId('row-header')
-
-      const boundingBoxPlotHeader = rowHeaders[4]
+      const boundingBoxPlotClasses = screen.getByTestId(
+        'row-bounding-box-classes'
+      )
 
       expect(
-        within(boundingBoxPlotHeader).getByText('Classes')
+        within(boundingBoxPlotClasses).getByText('Classes')
       ).toBeInTheDocument()
 
-      const checkedLabel = within(boundingBoxPlotHeader).getByLabelText(
+      const checkedLabel = within(boundingBoxPlotClasses).getByLabelText(
         'traffic light'
       )
       expect(checkedLabel).toBeInTheDocument()
       expect(checkedLabel).toHaveAttribute('checked')
-      const uncheckedLabel = within(boundingBoxPlotHeader).getByLabelText(
+      const uncheckedLabel = within(boundingBoxPlotClasses).getByLabelText(
         'sign'
       )
       expect(uncheckedLabel).toBeInTheDocument()

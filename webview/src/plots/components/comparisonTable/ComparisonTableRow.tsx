@@ -74,8 +74,8 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
     vertical: true
   })
   const boundingBoxClassesArr = Object.entries(boundingBoxClasses)
-  const rowContentClasses = cx(styles.rowContent, {
-    [styles.rowContentCollapsed]: !isShown
+  const cellClasses = cx(styles.cell, {
+    [styles.cellHidden]: !isShown
   })
 
   useLayoutEffect(() => {
@@ -156,7 +156,10 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
             pinnedColumn={pinnedColumn}
             nbColumns={nbColumns}
           >
-            <div className={cx(styles.boundingBoxClasses, rowContentClasses)}>
+            <div
+              data-testid="row-bounding-box-classes"
+              className={cx(styles.boundingBoxClasses, cellClasses)}
+            >
               <p className={styles.boundingBoxClassesTitle}>Classes</p>
               {boundingBoxClassesArr.map(([label, { color, selected }]) => (
                 <React.Fragment key={label}>
@@ -190,7 +193,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
                   isInDragAndDropMode && draggedId === plot.id
               })}
             >
-              <div data-testid="row-images" className={rowContentClasses}>
+              <div data-testid="row-images" className={cellClasses}>
                 {plot.imgs.length > 1 ? (
                   <ComparisonTableMultiCell
                     boundingBoxClasses={boundingBoxClasses}

@@ -160,7 +160,7 @@ $gap: 4px;
   white-space: nowrap;
 }
 
-.rowContent {
+.cell {
   overflow: hidden;
   max-height: 100vh;
   width: 100%;
@@ -169,7 +169,7 @@ $gap: 4px;
   transition: max-height 0.3s;
 }
 
-.rowContentCollapsed {
+.cellHidden {
   max-height: 0;
 }
 
