@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.7] - 2024-01-30
+
+### 🔨 Maintenance
+
+- Remove the rename command from the DVC tracked tree [#5221](https://github.com/iterative/vscode-dvc/pull/5221) by [@mattseddon](https://github.com/mattseddon)
+- Update demo project and latest tested CLI version (3.41.0) [#5228](https://github.com/iterative/vscode-dvc/pull/5228) by [@mattseddon](https://github.com/mattseddon)
+- Update demo to latest commit and update version (3.42.0) [#5233](https://github.com/iterative/vscode-dvc/pull/5233) by [@julieg18](https://github.com/julieg18)
+
 ## [1.2.6] - 2024-01-18
 
 ### 🔨 Maintenance
