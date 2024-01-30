@@ -197,8 +197,8 @@ describe('ComparisonTable', () => {
     const rows = screen.getAllByRole('row')
 
     expect(rows.length).toBe(
-      Object.entries(comparisonTableFixture.plots).length * 2 + 1
-    ) // 1 header row and 2 rows per plot
+      Object.entries(comparisonTableFixture.plots).length * 2 + 2
+    ) // 1 header row, 1 bounding box classes row, and 2 rows per plot
   })
 
   it('should display the plots in the rows in the same order as the columns', () => {

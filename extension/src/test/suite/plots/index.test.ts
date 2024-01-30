@@ -27,8 +27,7 @@ import {
   DEFAULT_SECTION_COLLAPSED,
   PlotsData as TPlotsData,
   PlotsSection,
-  TemplatePlotGroup,
-  ImagePlot
+  TemplatePlotGroup
 } from '../../../plots/webview/contract'
 import { TEMP_PLOTS_DIR } from '../../../cli/dvc/constants'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
@@ -46,7 +45,8 @@ import {
   EXPERIMENT_WORKSPACE_ID,
   ExpShowOutput,
   TemplatePlotOutput,
-  experimentHasError
+  experimentHasError,
+  ImagePlotOutput
 } from '../../../cli/dvc/contract'
 import { Experiment } from '../../../experiments/webview/contract'
 import { COMMITS_SEPARATOR } from '../../../cli/git/constants'
@@ -1037,7 +1037,7 @@ suite('Plots Test Suite', () => {
       const accPngPath = join('plots', 'acc.png')
       const accPng = [
         ...plotsDiffFixture.data[join('plots', 'acc.png')]
-      ] as ImagePlot[]
+      ] as ImagePlotOutput[]
       const lossTsvPath = join('logs', 'loss.tsv')
       const lossTsv = [
         ...plotsDiffFixture.data[lossTsvPath]
@@ -1109,7 +1109,7 @@ suite('Plots Test Suite', () => {
       const accPngPath = join('plots', 'acc.png')
       const accPng = [
         ...plotsDiffFixture.data[join('plots', 'acc.png')]
-      ] as ImagePlot[]
+      ] as ImagePlotOutput[]
       const lossTsvPath = join('logs', 'loss.tsv')
       const lossTsv = [
         ...plotsDiffFixture.data[lossTsvPath]

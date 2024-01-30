@@ -114,13 +114,14 @@ describe('collectData', () => {
     ])
 
     const heatmapPlot = join('plots', 'heatmap.png')
+    const boundingBoxPlot = join('plots', 'bounding_boxes.png')
 
     expect(Object.keys(comparisonData.main)).toStrictEqual([
       join('plots', 'acc.png'),
       heatmapPlot,
       join('plots', 'loss.png'),
       join('plots', 'image'),
-      join('plots', 'bounding_boxes.png')
+      boundingBoxPlot
     ])
 
     const testBranchHeatmap = comparisonData['test-branch'][heatmapPlot]
@@ -131,6 +132,15 @@ describe('collectData', () => {
         sameContents(revisions, ['test-branch'])
       )
     ])
+
+    const workspaceBoundingBoxData = comparisonData.workspace[boundingBoxPlot]
+
+    expect(workspaceBoundingBoxData[0]).toMatchObject({
+      boundingBoxes: {
+        car: [{ x_max: 190, x_min: 90, y_max: 130, y_min: 100 }],
+        'traffic light': [{ x_max: 175, x_min: 100, y_max: 200, y_min: 100 }]
+      }
+    })
   })
 })
 

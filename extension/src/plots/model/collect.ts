@@ -14,7 +14,9 @@ import {
   CustomPlotData,
   CustomPlotValues,
   ComparisonRevisionData,
-  ComparisonPlotImg
+  ComparisonPlotImg,
+  ComparisonBoundingBoxClasses,
+  ComparisonBoundingBoxPlotCoords
 } from '../webview/contract'
 import {
   AnchorDefinitions,
@@ -23,7 +25,9 @@ import {
   PlotOutput,
   PlotsOutput,
   PlotsType,
-  TemplatePlotOutput
+  TemplatePlotOutput,
+  ImagePlotOutput,
+  BoundingBox
 } from '../../cli/dvc/contract'
 import { splitColumnPath } from '../../experiments/columns/paths'
 import { ColumnType, Experiment } from '../../experiments/webview/contract'
@@ -205,10 +209,26 @@ const getMultiImageInd = (path: string) => {
   return Number(fileName)
 }
 
+const collectImageBoundingBoxes = (
+  boundingBoxes: { label: string; box: BoundingBox }[]
+): { [label: string]: BoundingBox[] } => {
+  const acc: { [label: string]: BoundingBox[] } = {}
+
+  for (const { label, box } of boundingBoxes) {
+    if (!acc[label]) {
+      acc[label] = []
+    }
+
+    acc[label].push(box)
+  }
+
+  return acc
+}
+
 const collectImageData = (
   acc: ComparisonData,
   path: string,
-  plot: ImagePlot
+  plot: ImagePlotOutput
 ) => {
   const isMultiImgPlot = MULTI_IMAGE_PATH_REG.test(path)
   const pathLabel = isMultiImgPlot ? getMultiImagePath(path) : path
@@ -226,10 +246,18 @@ const collectImageData = (
     acc[id][pathLabel] = []
   }
 
-  const imgPlot: ImagePlot = { ...plot }
+  const imgPlot: ImagePlot = {
+    revisions: plot.revisions,
+    type: plot.type,
+    url: plot.url
+  }
 
   if (isMultiImgPlot) {
     imgPlot.ind = getMultiImageInd(path)
+  }
+
+  if (plot.boundingBoxes) {
+    imgPlot.boundingBoxes = collectImageBoundingBoxes(plot.boundingBoxes)
   }
 
   acc[id][pathLabel].push(imgPlot)
@@ -312,13 +340,61 @@ export const collectData = (output: PlotsOutput): DataAccumulator => {
   return acc
 }
 
-type ComparisonPlotsAcc = { path: string; revisions: ComparisonRevisionData }[]
+type ComparisonPlotsAcc = {
+  boundingBoxClasses: ComparisonBoundingBoxClasses
+  path: string
+  revisions: ComparisonRevisionData
+}[]
 
 type GetComparisonPlotImg = (
   img: ImagePlot,
   id: string,
   path: string
 ) => ComparisonPlotImg
+
+export const boundingBoxColors = [
+  '#ff3838',
+  '#ff9d97',
+  '#ff701f',
+  '#ffb21d',
+  '#cfd231',
+  '#48f90a',
+  '#92cc17',
+  '#3ddb86',
+  '#1a9334',
+  '#00d4bb',
+  '#2c99a8',
+  '#00c2ff',
+  '#344593',
+  '#6473ff',
+  '#0018ec',
+  '#8438ff',
+  '#520085',
+  '#cb38ff',
+  '#ff95c8',
+  '#ff37c7'
+]
+
+const collectComparisonPlotImgs = (
+  boundingBoxClassLabels: Set<string>,
+  imgs: ImagePlot[],
+  getComparisonPlotImg: GetComparisonPlotImg,
+  id: string,
+  path: string
+) => {
+  const plotImgs = []
+  for (const img of imgs) {
+    plotImgs.push(getComparisonPlotImg(img, id, path))
+
+    if (img.boundingBoxes) {
+      for (const label of Object.keys(img.boundingBoxes)) {
+        boundingBoxClassLabels.add(label)
+      }
+    }
+  }
+
+  return plotImgs
+}
 
 const collectSelectedPathComparisonPlots = ({
   acc,
@@ -333,20 +409,37 @@ const collectSelectedPathComparisonPlots = ({
   selectedRevisionIds: string[]
   getComparisonPlotImg: GetComparisonPlotImg
 }) => {
+  const boundingBoxClassLabels = new Set<string>()
   const pathRevisions = {
+    boundingBoxClasses: {} as ComparisonBoundingBoxClasses,
     path,
     revisions: {} as ComparisonRevisionData
   }
 
   for (const id of selectedRevisionIds) {
-    const imgs = comparisonData[id]?.[path]
+    const imgs: ImagePlot[] | undefined = comparisonData[id]?.[path]
+
     pathRevisions.revisions[id] = {
       id,
       imgs: imgs
-        ? imgs.map(img => getComparisonPlotImg(img, id, path))
+        ? collectComparisonPlotImgs(
+            boundingBoxClassLabels,
+            imgs,
+            getComparisonPlotImg,
+            id,
+            path
+          )
         : [{ errors: undefined, loading: false, url: undefined }]
     }
   }
+
+  for (const [ind, label] of [...boundingBoxClassLabels].entries()) {
+    pathRevisions.boundingBoxClasses[label] = {
+      color: boundingBoxColors[ind % boundingBoxColors.length],
+      selected: true // we will need to check the saved state to see if we should set selected
+    }
+  }
+
   acc.push(pathRevisions)
 }
 
@@ -360,7 +453,7 @@ export const collectSelectedComparisonPlots = ({
   paths: string[]
   selectedRevisionIds: string[]
   getComparisonPlotImg: GetComparisonPlotImg
-}) => {
+}): ComparisonPlotsAcc => {
   const acc: ComparisonPlotsAcc = []
 
   for (const path of paths) {
@@ -371,6 +464,57 @@ export const collectSelectedComparisonPlots = ({
       path,
       selectedRevisionIds
     })
+  }
+
+  return acc
+}
+
+const collectSelectedImgComparisonBoundingBoxPlotCoords = (
+  acc: ComparisonBoundingBoxPlotCoords,
+  img: ImagePlot,
+  path: string,
+  id: string
+) => {
+  if (!img.boundingBoxes) {
+    return
+  }
+
+  if (!acc[id]) {
+    acc[id] = {}
+  }
+
+  if (!acc[id][path]) {
+    acc[id][path] = []
+  }
+
+  acc[id][path] = Object.entries(img.boundingBoxes).map(([label, boxes]) => ({
+    boxes: boxes.map(({ x_min, x_max, y_min, y_max }) => ({
+      h: y_max - y_min,
+      w: x_max - x_min,
+      x: x_min,
+      y: y_min
+    })),
+    label
+  }))
+}
+
+export const collectSelectedComparisonBoundingBoxPlotCoords = ({
+  comparisonData,
+  paths,
+  selectedRevisionIds
+}: {
+  comparisonData: ComparisonData
+  paths: string[]
+  selectedRevisionIds: string[]
+}) => {
+  const acc: ComparisonBoundingBoxPlotCoords = {}
+
+  for (const path of paths) {
+    for (const id of selectedRevisionIds) {
+      for (const img of comparisonData[id][path]) {
+        collectSelectedImgComparisonBoundingBoxPlotCoords(acc, img, path, id)
+      }
+    }
   }
 
   return acc

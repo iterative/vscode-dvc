@@ -2,6 +2,7 @@ import type { TopLevelSpec } from 'vega-lite'
 import { Color } from '../../experiments/model/status/colors'
 import {
   AnchorDefinitions,
+  BoundingBox,
   ImagePlotOutput,
   PlotsType,
   TemplatePlotOutput
@@ -134,8 +135,11 @@ export type CustomPlotsData = {
 export const isVegaPlot = (plot: Plot): plot is TemplatePlot =>
   plot.type === PlotsType.VEGA
 
-export type ImagePlot = ImagePlotOutput & {
+export type ImagePlot = Omit<ImagePlotOutput, 'boundingBoxes'> & {
   ind?: number
+  boundingBoxes?: {
+    [label: string]: BoundingBox[]
+  }
 }
 
 export const isImagePlot = (plot: { type: PlotsType }): plot is ImagePlot =>
