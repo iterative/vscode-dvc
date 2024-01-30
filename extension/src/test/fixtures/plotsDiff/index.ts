@@ -641,9 +641,16 @@ const getImageData = (
       boundingBoxes: [
         {
           label: 'traffic light',
-          box: { x_min: 100, x_max: 175, y_min: 100, y_max: 200 }
+          box: { x_min: 120, x_max: 195, y_min: 120, y_max: 210 }
         },
-        { label: 'car', box: { x_min: 90, x_max: 190, y_min: 100, y_max: 130 } }
+        {
+          label: 'car',
+          box: { x_min: 150, x_max: 180, y_min: 320, y_max: 350 }
+        },
+        {
+          label: 'car',
+          box: { x_min: 200, x_max: 230, y_min: 310, y_max: 340 }
+        }
       ]
     },
     {
@@ -653,9 +660,16 @@ const getImageData = (
       boundingBoxes: [
         {
           label: 'traffic light',
-          box: { x_min: 100, x_max: 175, y_min: 100, y_max: 200 }
+          box: { x_min: 120, x_max: 195, y_min: 120, y_max: 210 }
         },
-        { label: 'car', box: { x_min: 90, x_max: 190, y_min: 100, y_max: 130 } }
+        {
+          label: 'sign',
+          box: { x_min: 300, x_max: 475, y_min: 170, y_max: 220 }
+        },
+        {
+          label: 'car',
+          box: { x_min: 150, x_max: 180, y_min: 320, y_max: 350 }
+        }
       ]
     },
     {
@@ -665,9 +679,12 @@ const getImageData = (
       boundingBoxes: [
         {
           label: 'traffic light',
-          box: { x_min: 100, x_max: 175, y_min: 100, y_max: 200 }
+          box: { x_min: 120, x_max: 195, y_min: 120, y_max: 210 }
         },
-        { label: 'car', box: { x_min: 90, x_max: 190, y_min: 100, y_max: 130 } }
+        {
+          label: 'car',
+          box: { x_min: 150, x_max: 180, y_min: 320, y_max: 350 }
+        }
       ]
     },
     {
@@ -677,9 +694,12 @@ const getImageData = (
       boundingBoxes: [
         {
           label: 'traffic light',
-          box: { x_min: 100, x_max: 175, y_min: 100, y_max: 200 }
+          box: { x_min: 120, x_max: 195, y_min: 120, y_max: 210 }
         },
-        { label: 'car', box: { x_min: 90, x_max: 190, y_min: 100, y_max: 130 } }
+        {
+          label: 'car',
+          box: { x_min: 150, x_max: 180, y_min: 320, y_max: 350 }
+        }
       ]
     },
     {
@@ -689,9 +709,12 @@ const getImageData = (
       boundingBoxes: [
         {
           label: 'traffic light',
-          box: { x_min: 100, x_max: 175, y_min: 100, y_max: 200 }
+          box: { x_min: 120, x_max: 195, y_min: 120, y_max: 210 }
         },
-        { label: 'car', box: { x_min: 90, x_max: 190, y_min: 100, y_max: 130 } }
+        {
+          label: 'car',
+          box: { x_min: 150, x_max: 180, y_min: 320, y_max: 350 }
+        }
       ]
     }
   ]
@@ -1067,7 +1090,7 @@ export const getComparisonWebviewMessage = (
 
     for (const [ind, label] of [...boundingBoxClassLabels].entries()) {
       plotAcc[pathLabel].boundingBoxClasses[label] = {
-        selected: true,
+        selected: label !== 'sign',
         color: boundingBoxColors[ind]
       }
     }

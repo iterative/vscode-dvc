@@ -30,7 +30,6 @@ import { plotsReducers, plotsStore } from '../../store'
 import { webviewInitialState } from '../webviewSlice'
 import { getThemeValue, hexToRGB, ThemeProperty } from '../../../util/styles'
 import * as EventCurrentTargetDistances from '../../../shared/components/dragDrop/currentTarget'
-import { addBoundingBoxes } from '../../../test/boundingBoxesFixture'
 
 const getHeaders = (): HTMLElement[] => screen.getAllByRole('columnheader')
 
@@ -746,10 +745,8 @@ describe('ComparisonTable', () => {
   })
 
   describe('Plots With Bounding Boxes', () => {
-    const plotsWithBoundingBoxes = addBoundingBoxes(comparisonTableFixture)
-
     it('should show toggable labels in the plot row', () => {
-      renderTable(plotsWithBoundingBoxes)
+      renderTable()
 
       const boundingBoxPlotClasses = screen.getByTestId(
         'row-bounding-box-classes'
@@ -772,7 +769,7 @@ describe('ComparisonTable', () => {
     })
 
     it('should show svgs with bounding boxes instead of images', () => {
-      renderTable(plotsWithBoundingBoxes)
+      renderTable()
 
       const boundingBoxPlotImage = screen.getByLabelText(
         /bounding_boxes.png \(workspace\)/

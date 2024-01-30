@@ -137,8 +137,11 @@ describe('collectData', () => {
 
     expect(workspaceBoundingBoxData[0]).toMatchObject({
       boundingBoxes: {
-        car: [{ x_max: 190, x_min: 90, y_max: 130, y_min: 100 }],
-        'traffic light': [{ x_max: 175, x_min: 100, y_max: 200, y_min: 100 }]
+        car: [
+          { x_max: 180, x_min: 150, y_max: 350, y_min: 320 },
+          { x_max: 230, x_min: 200, y_max: 340, y_min: 310 }
+        ],
+        'traffic light': [{ x_max: 195, x_min: 120, y_max: 210, y_min: 120 }]
       }
     })
   })
