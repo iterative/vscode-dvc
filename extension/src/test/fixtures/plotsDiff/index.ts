@@ -1067,6 +1067,11 @@ export const getComparisonWebviewMessage = (
 
         for (const { label, box } of boundingBoxes) {
           boundingBoxClassLabels.add(label)
+
+          if (label === 'sign') {
+            continue
+          }
+
           if (!boundingBoxAcc[label]) {
             boundingBoxAcc[label] = { label, boxes: [] }
           }
