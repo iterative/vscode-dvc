@@ -761,11 +761,6 @@ describe('ComparisonTable', () => {
       )
       expect(checkedLabel).toBeInTheDocument()
       expect(checkedLabel).toHaveAttribute('checked')
-      const uncheckedLabel = within(boundingBoxPlotClasses).getByLabelText(
-        'sign'
-      )
-      expect(uncheckedLabel).toBeInTheDocument()
-      expect(uncheckedLabel).not.toHaveAttribute('checked')
     })
 
     it('should show svgs with bounding boxes instead of images', () => {

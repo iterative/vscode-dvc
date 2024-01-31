@@ -1068,10 +1068,6 @@ export const getComparisonWebviewMessage = (
         for (const { label, box } of boundingBoxes) {
           boundingBoxClassLabels.add(label)
 
-          if (label === 'sign') {
-            continue
-          }
-
           if (!boundingBoxAcc[label]) {
             boundingBoxAcc[label] = { label, boxes: [] }
           }
@@ -1095,7 +1091,7 @@ export const getComparisonWebviewMessage = (
 
     for (const [ind, label] of [...boundingBoxClassLabels].entries()) {
       plotAcc[pathLabel].boundingBoxClasses[label] = {
-        selected: label !== 'sign',
+        selected: true,
         color: boundingBoxColors[ind]
       }
     }
