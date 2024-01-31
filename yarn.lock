@@ -4902,17 +4902,7 @@
     "@microsoft/applicationinsights-web-basic" "^3.0.2"
     applicationinsights "^2.7.1"
 
-"@vscode/test-electron@2.3.8":
-  version "2.3.8"
-  resolved "https://registry.yarnpkg.com/@vscode/test-electron/-/test-electron-2.3.8.tgz#06a7c50b38cfac0ede833905e088d55c61cd12d3"
-  integrity sha512-b4aZZsBKtMGdDljAsOPObnAi7+VWIaYl3ylCz1jTs+oV6BZ4TNHcVNC3xUn0azPeszBmwSBDQYfFESIaUQnrOg==
-  dependencies:
-    http-proxy-agent "^4.0.1"
-    https-proxy-agent "^5.0.0"
-    jszip "^3.10.1"
-    semver "^7.5.2"
-
-"@vscode/test-electron@^2.3.8":
+"@vscode/test-electron@2.3.9", "@vscode/test-electron@^2.3.8":
   version "2.3.9"
   resolved "https://registry.yarnpkg.com/@vscode/test-electron/-/test-electron-2.3.9.tgz#f61181392634b408411e4302aef6e1cd2dd41474"
   integrity sha512-z3eiChaCQXMqBnk2aHHSEkobmC2VRalFQN0ApOAtydL172zXGxTwGrRtviT5HnUB+Q+G3vtEYFtuQkYqBzYgMA==
