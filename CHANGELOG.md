@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.8] - 2024-01-31
+
+### 🐛 Bug Fixes
+
+- Do not brick the extension when trying to get user_id for telemetry [#5251](https://github.com/iterative/vscode-dvc/pull/5251) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.2.7] - 2024-01-30
 
 ### 🔨 Maintenance
