@@ -2,10 +2,10 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { createSelector } from '@reduxjs/toolkit'
 import {
-  ComparisonBoundingBoxClasses,
-  ComparisonBoundingBoxPlotCoords,
+  ComparisonClassDetails,
+  ComparisonPlotClasses,
   ComparisonPlot,
-  ComparisonPlotBoundingBox
+  ComparisonPlotClass
 } from 'dvc/src/plots/webview/contract'
 import { ComparisonTableLoadingCell } from './ComparisonTableLoadingCell'
 import { ComparisonTableMissingCell } from './ComparisonTableMissingCell'
@@ -17,21 +17,20 @@ import { PlotsState } from '../../../store'
 export const ComparisonTableCell: React.FC<{
   path: string
   plot: ComparisonPlot
-  boundingBoxClasses: ComparisonBoundingBoxClasses
+  classDetails: ComparisonClassDetails
   imgAlt?: string
-}> = ({ path, plot, imgAlt, boundingBoxClasses }) => {
+}> = ({ path, plot, imgAlt, classDetails }) => {
   const plotImg = plot.imgs[0]
 
-  const boundingBoxCoords = useSelector(
-    (state: PlotsState) => state.comparison.boundingBoxPlotCoords
+  const plotClasses = useSelector(
+    (state: PlotsState) => state.comparison.plotClasses
   )
-  const getCellBoundingBoxCoords = createSelector(
-    (bbPlotCoords: ComparisonBoundingBoxPlotCoords) => bbPlotCoords[plot.id],
-    (bbCoords: { [path: string]: ComparisonPlotBoundingBox[] } | undefined) =>
-      bbCoords?.[path]
+  const getCellClasses = createSelector(
+    (classes: ComparisonPlotClasses) => classes[plot.id],
+    (classesByPath: { [path: string]: ComparisonPlotClass[] } | undefined) =>
+      classesByPath?.[path]
   )
-  const cellBoundingBoxCoords: ComparisonPlotBoundingBox[] | undefined =
-    getCellBoundingBoxCoords(boundingBoxCoords)
+  const classes: ComparisonPlotClass[] | undefined = getCellClasses(plotClasses)
 
   const loading = plotImg.loading
   const missing = !loading && !plotImg.url
@@ -51,11 +50,11 @@ export const ComparisonTableCell: React.FC<{
       onClick={() => zoomPlot(plotImg.url)}
       data-testid="image-plot-button"
     >
-      {plotImg.url && cellBoundingBoxCoords ? (
+      {plotImg.url && classes ? (
         <ComparisonTableBoundingBoxImg
           src={plotImg.url}
-          boxCoords={cellBoundingBoxCoords}
-          classes={boundingBoxClasses}
+          classes={classes}
+          classDetails={classDetails}
           alt={alt}
         />
       ) : (

@@ -20,8 +20,8 @@ import {
   DEFAULT_NB_ITEMS_PER_ROW,
   DEFAULT_PLOT_WIDTH,
   ComparisonPlotImg,
-  ComparisonBoundingBoxClasses,
-  ComparisonBoundingBoxPlotCoords
+  ComparisonClassDetails,
+  ComparisonPlotClasses
 } from '../../../plots/webview/contract'
 import { join } from '../../util/path'
 import { copyOriginalColors } from '../../../experiments/model/status/colors'
@@ -1005,13 +1005,13 @@ export const getComparisonWebviewMessage = (
   baseUrl: string,
   joinFunc: (...args: string[]) => string = join
 ): PlotsComparisonData => {
-  const boundingBoxPlotCoords: ComparisonBoundingBoxPlotCoords = {}
+  const plotClasses: ComparisonPlotClasses = {}
 
   const plotAcc: {
     [path: string]: {
       path: string
       revisions: ComparisonRevisionData
-      boundingBoxClasses: ComparisonBoundingBoxClasses
+      classDetails: ComparisonClassDetails
     }
   } = {}
 
@@ -1024,7 +1024,7 @@ export const getComparisonWebviewMessage = (
       plotAcc[pathLabel] = {
         path: pathLabel,
         revisions: {},
-        boundingBoxClasses: {}
+        classDetails: {}
       }
     }
 
@@ -1052,7 +1052,6 @@ export const getComparisonWebviewMessage = (
       }
       // should probably move this chunk into another function
       if (boundingBoxes) {
-        console.log(1)
         const boundingBoxAcc: {
           [label: string]: {
             label: string
@@ -1080,17 +1079,17 @@ export const getComparisonWebviewMessage = (
           })
         }
 
-        if (!boundingBoxPlotCoords[id]) {
-          boundingBoxPlotCoords[id] = {}
+        if (!plotClasses[id]) {
+          plotClasses[id] = {}
         }
-        boundingBoxPlotCoords[id][path] = Object.values(boundingBoxAcc)
+        plotClasses[id][path] = Object.values(boundingBoxAcc)
       }
 
       plotAcc[pathLabel].revisions[id].imgs.push(img)
     }
 
     for (const [ind, label] of [...boundingBoxClassLabels].entries()) {
-      plotAcc[pathLabel].boundingBoxClasses[label] = {
+      plotAcc[pathLabel].classDetails[label] = {
         selected: true,
         color: boundingBoxColors[ind]
       }
@@ -1098,7 +1097,7 @@ export const getComparisonWebviewMessage = (
   }
 
   return {
-    boundingBoxPlotCoords,
+    plotClasses,
     revisions: getRevisions(),
     multiPlotValues: {},
     plots: Object.values(plotAcc),

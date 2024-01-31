@@ -14,7 +14,7 @@ import {
   collectSelectedTemplatePlotRawData,
   collectCustomPlotRawData,
   collectSelectedComparisonPlots,
-  collectSelectedComparisonBoundingBoxPlotCoords
+  collectSelectedComparisonPlotClasses
 } from './collect'
 import { getRevisionSummaryColumns } from './util'
 import { cleanupOldOrderValue, CustomPlotsOrderValue } from './custom'
@@ -267,13 +267,13 @@ export class PlotsModel extends ModelWithPersistence {
     return this.getSelectedComparisonPlots(paths, selectedRevisionIds)
   }
 
-  public getComparisonBoundingBoxCoords(paths: string[]) {
+  public getComparisonPlotClasses(paths: string[]) {
     const selectedRevisionIds = this.getSelectedRevisionIds()
     if (!definedAndNonEmpty(selectedRevisionIds)) {
       return {}
     }
 
-    return collectSelectedComparisonBoundingBoxPlotCoords({
+    return collectSelectedComparisonPlotClasses({
       comparisonData: this.comparisonData,
       paths,
       selectedRevisionIds

@@ -15,8 +15,8 @@ import {
   CustomPlotValues,
   ComparisonRevisionData,
   ComparisonPlotImg,
-  ComparisonBoundingBoxClasses,
-  ComparisonBoundingBoxPlotCoords
+  ComparisonClassDetails,
+  ComparisonPlotClasses
 } from '../webview/contract'
 import {
   AnchorDefinitions,
@@ -341,7 +341,7 @@ export const collectData = (output: PlotsOutput): DataAccumulator => {
 }
 
 type ComparisonPlotsAcc = {
-  boundingBoxClasses: ComparisonBoundingBoxClasses
+  classDetails: ComparisonClassDetails
   path: string
   revisions: ComparisonRevisionData
 }[]
@@ -411,7 +411,7 @@ const collectSelectedPathComparisonPlots = ({
 }) => {
   const boundingBoxClassLabels = new Set<string>()
   const pathRevisions = {
-    boundingBoxClasses: {} as ComparisonBoundingBoxClasses,
+    classDetails: {} as ComparisonClassDetails,
     path,
     revisions: {} as ComparisonRevisionData
   }
@@ -434,7 +434,7 @@ const collectSelectedPathComparisonPlots = ({
   }
 
   for (const [ind, label] of [...boundingBoxClassLabels].entries()) {
-    pathRevisions.boundingBoxClasses[label] = {
+    pathRevisions.classDetails[label] = {
       color: boundingBoxColors[ind % boundingBoxColors.length],
       selected: true // we will need to check the saved state to see if we should set selected
     }
@@ -469,8 +469,8 @@ export const collectSelectedComparisonPlots = ({
   return acc
 }
 
-const collectSelectedImgComparisonBoundingBoxPlotCoords = (
-  acc: ComparisonBoundingBoxPlotCoords,
+const collectSelectedImgComparisonPlotClasses = (
+  acc: ComparisonPlotClasses,
   img: ImagePlot,
   path: string,
   id: string
@@ -498,7 +498,7 @@ const collectSelectedImgComparisonBoundingBoxPlotCoords = (
   }))
 }
 
-export const collectSelectedComparisonBoundingBoxPlotCoords = ({
+export const collectSelectedComparisonPlotClasses = ({
   comparisonData,
   paths,
   selectedRevisionIds
@@ -507,12 +507,12 @@ export const collectSelectedComparisonBoundingBoxPlotCoords = ({
   paths: string[]
   selectedRevisionIds: string[]
 }) => {
-  const acc: ComparisonBoundingBoxPlotCoords = {}
+  const acc: ComparisonPlotClasses = {}
 
   for (const path of paths) {
     for (const id of selectedRevisionIds) {
       for (const img of comparisonData[id][path]) {
-        collectSelectedImgComparisonBoundingBoxPlotCoords(acc, img, path, id)
+        collectSelectedImgComparisonPlotClasses(acc, img, path, id)
       }
     }
   }

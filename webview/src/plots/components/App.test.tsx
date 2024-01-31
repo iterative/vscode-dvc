@@ -224,12 +224,12 @@ describe('App', () => {
   it('should render loading section states when given a single revision which has not been fetched', async () => {
     renderAppWithOptionalData({
       comparison: {
-        boundingBoxPlotCoords: {},
         height: DEFAULT_PLOT_HEIGHT,
         multiPlotValues: {},
+        plotClasses: {},
         plots: [
           {
-            boundingBoxClasses: {},
+            classDetails: {},
             path: 'training/plots/images/misclassified.jpg',
             revisions: {
               ad2b5ec: {
@@ -281,12 +281,12 @@ describe('App', () => {
   it('should render loading section states with multi image plots when given a single revision which has not been fetched', async () => {
     renderAppWithOptionalData({
       comparison: {
-        boundingBoxPlotCoords: {},
         height: DEFAULT_PLOT_HEIGHT,
         multiPlotValues: {},
+        plotClasses: {},
         plots: [
           {
-            boundingBoxClasses: {},
+            classDetails: {},
             path: 'training/plots/images/image',
             revisions: {
               ad2b5ec: {
