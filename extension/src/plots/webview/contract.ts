@@ -50,13 +50,13 @@ export type SectionCollapsed = typeof DEFAULT_SECTION_COLLAPSED
 
 export type ComparisonRevisionData = { [revision: string]: ComparisonPlot }
 
-export type ComparisonBoundingBoxClasses = {
+export type ComparisonClassDetails = {
   [label: string]: { selected: boolean; color: string }
 }
 
 export type ComparisonPlots = {
   path: string
-  boundingBoxClasses: ComparisonBoundingBoxClasses
+  classDetails: ComparisonClassDetails
   revisions: ComparisonRevisionData
 }[]
 
@@ -81,7 +81,7 @@ export type ComparisonMultiPlotValues = {
   [revision: string]: { [path: string]: number }
 }
 
-export type ComparisonPlotBoundingBox = {
+export type ComparisonPlotClass = {
   label: string
   boxes: {
     h: number
@@ -91,8 +91,8 @@ export type ComparisonPlotBoundingBox = {
   }[]
 }
 
-export type ComparisonBoundingBoxPlotCoords = {
-  [revision: string]: { [path: string]: ComparisonPlotBoundingBox[] }
+export type ComparisonPlotClasses = {
+  [revision: string]: { [path: string]: ComparisonPlotClass[] }
 }
 
 export interface PlotsComparisonData {
@@ -101,7 +101,7 @@ export interface PlotsComparisonData {
   height: PlotHeight
   revisions: Revision[]
   multiPlotValues: ComparisonMultiPlotValues
-  boundingBoxPlotCoords: ComparisonBoundingBoxPlotCoords
+  plotClasses: ComparisonPlotClasses
 }
 
 export type CustomPlotValues = {

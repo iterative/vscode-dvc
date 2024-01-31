@@ -1,8 +1,8 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import {
-  ComparisonBoundingBoxClasses,
-  ComparisonBoundingBoxPlotCoords,
-  ComparisonPlotBoundingBox,
+  ComparisonClassDetails,
+  ComparisonPlotClasses,
+  ComparisonPlotClass,
   PlotsComparisonData
 } from 'dvc/src/plots/webview/contract'
 
@@ -29,45 +29,45 @@ const boxColors = [
   '#ff37c7'
 ]
 
-const boundingBoxImgClasses: ComparisonBoundingBoxClasses = {
+const boundingBoxImgClasses: ComparisonClassDetails = {
   car: { color: boxColors[1], selected: true },
   sign: { color: boxColors[2], selected: false },
   'traffic light': { color: boxColors[3], selected: true }
 }
-const boundingBoxPlotCoordsArr: {
+const classesArr: {
   rev: string
-  coords: ComparisonPlotBoundingBox[]
+  classes: ComparisonPlotClass[]
 }[] = [
   {
-    coords: [
+    classes: [
       { boxes: [{ h: 75, w: 100, x: 100, y: 100 }], label: 'traffic light' },
       { boxes: [{ h: 30, w: 30, x: 190, y: 310 }], label: 'car' }
     ],
     rev: 'exp-83425'
   },
   {
-    coords: [
+    classes: [
       { boxes: [{ h: 110, w: 100, x: 90, y: 100 }], label: 'traffic light' },
       { boxes: [{ h: 30, w: 30, x: 190, y: 310 }], label: 'car' }
     ],
     rev: 'exp-e7a67'
   },
   {
-    coords: [
+    classes: [
       { boxes: [{ h: 100, w: 100, x: 100, y: 100 }], label: 'traffic light' },
       { boxes: [{ h: 30, w: 30, x: 190, y: 310 }], label: 'car' }
     ],
     rev: 'main'
   },
   {
-    coords: [
+    classes: [
       { boxes: [{ h: 100, w: 90, x: 100, y: 110 }], label: 'traffic light' },
       { boxes: [{ h: 30, w: 30, x: 190, y: 310 }], label: 'car' }
     ],
     rev: 'test-branch'
   },
   {
-    coords: [
+    classes: [
       { boxes: [{ h: 90, w: 80, x: 120, y: 120 }], label: 'traffic light' },
       {
         boxes: [
@@ -87,15 +87,15 @@ export const addBoundingBoxes = (
   const boundingBoxPlotPath =
     fixture.plots.find(({ path }) => path.includes('bounding_boxes.png'))
       ?.path || ''
-  const boundingBoxPlotCoords: ComparisonBoundingBoxPlotCoords = {}
+  const plotClasses: ComparisonPlotClasses = {}
 
-  for (const { rev, coords } of boundingBoxPlotCoordsArr) {
-    boundingBoxPlotCoords[rev] = { [boundingBoxPlotPath]: coords }
+  for (const { rev, classes } of classesArr) {
+    plotClasses[rev] = { [boundingBoxPlotPath]: classes }
   }
 
   return {
     ...fixture,
-    boundingBoxPlotCoords,
+    plotClasses,
     plots: fixture.plots.map(plot => {
       const isBoundingBoxImg = plot.path.includes('bounding_boxes.png')
 
@@ -105,7 +105,7 @@ export const addBoundingBoxes = (
 
       return {
         ...plot,
-        boundingBoxClasses: boundingBoxImgClasses
+        classDetails: boundingBoxImgClasses
       }
     })
   }

@@ -403,12 +403,12 @@ export class WebviewMessages {
     }
 
     return {
-      boundingBoxPlotCoords: {},
       height: this.plots.getHeight(PlotsSection.COMPARISON_TABLE),
       multiPlotValues: this.plots.getComparisonMultiPlotValues(),
+      plotClasses: {},
       plots: comparison.map(({ path, revisions }) => {
         return {
-          boundingBoxClasses: {},
+          classDetails: {},
           path,
           revisions: this.getRevisionsWithCorrectUrls(revisions)
         }

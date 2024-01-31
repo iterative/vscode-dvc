@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react'
 import {
-  ComparisonBoundingBoxClasses,
-  ComparisonPlotBoundingBox
+  ComparisonClassDetails,
+  ComparisonPlotClass
 } from 'dvc/src/plots/webview/contract'
 import { ComparisonTableBoundingBoxColorFilter } from './ComparisonTableBoundingBoxColorFilter'
 import styles from '../styles.module.scss'
 
 export const ComparisonTableBoundingBoxImg: React.FC<{
   src: string
-  boxCoords: ComparisonPlotBoundingBox[]
-  classes: ComparisonBoundingBoxClasses
+  classes: ComparisonPlotClass[]
+  classDetails: ComparisonClassDetails
   alt: string
-}> = ({ alt, src, boxCoords, classes }) => {
+}> = ({ alt, src, classes, classDetails }) => {
   const [naturalWidth, setNaturalWidth] = useState(0)
   const [naturalHeight, setNaturalHeight] = useState(0)
 
@@ -32,15 +32,20 @@ export const ComparisonTableBoundingBoxImg: React.FC<{
       aria-label={alt}
       role="img"
     >
-      {Object.entries(classes).map(
+      {Object.entries(classDetails).map(
         ([label, { color, selected }]) =>
           selected && (
             <ComparisonTableBoundingBoxColorFilter key={label} color={color} />
           )
       )}
       <image href={src} width={naturalWidth} height={naturalHeight} />
-      {boxCoords.map(({ label, boxes }) => {
-        const labelColor = classes[label].color
+      {classes.map(({ label, boxes }) => {
+        const labelColor = classDetails[label]?.color
+
+        if (!labelColor) {
+          return
+        }
+
         return boxes.map(({ h, w, x, y }) => (
           <React.Fragment key={label + h + w + x + y}>
             <text

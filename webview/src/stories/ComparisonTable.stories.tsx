@@ -38,11 +38,7 @@ export default {
   title: 'Comparison Table'
 } as Meta
 
-const Template: StoryFn = ({
-  plots,
-  revisions,
-  boundingBoxPlotCoords = {}
-}) => {
+const Template: StoryFn = ({ plots, revisions, plotClasses = {} }) => {
   const store = configureStore({
     reducer: plotsReducers
   })
@@ -51,9 +47,9 @@ const Template: StoryFn = ({
     <Provider store={store}>
       <MockedState
         data={{
-          boundingBoxPlotCoords,
           height: DEFAULT_PLOT_HEIGHT,
           multiPlotValues: {},
+          plotClasses,
           plots,
           revisions,
           width: DEFAULT_NB_ITEMS_PER_ROW
@@ -124,8 +120,8 @@ const removeImages = (
 export const WithMissingData = Template.bind({})
 WithMissingData.args = {
   plots: comparisonTableFixture.plots.map(
-    ({ boundingBoxClasses, path, revisions }) => ({
-      boundingBoxClasses,
+    ({ classDetails, path, revisions }) => ({
+      classDetails,
       path,
       revisions: removeImages(path, revisions)
     })
@@ -141,8 +137,8 @@ WithMissingData.args = {
 export const WithOnlyMissingData = Template.bind({})
 WithOnlyMissingData.args = {
   plots: comparisonTableFixture.plots.map(
-    ({ boundingBoxClasses, path, revisions }) => ({
-      boundingBoxClasses,
+    ({ classDetails, path, revisions }) => ({
+      classDetails,
       path,
       revisions: removeImages(path, revisions)
     })
@@ -159,6 +155,6 @@ WithOnlyMissingData.args = {
 const fixtureWithBoundingBoxes = addBoundingBoxes(comparisonTableFixture)
 export const WithBoundingBoxes = Template.bind({})
 WithBoundingBoxes.args = {
-  boundingBoxPlotCoords: fixtureWithBoundingBoxes.boundingBoxPlotCoords,
+  plotClasses: fixtureWithBoundingBoxes.plotClasses,
   plots: fixtureWithBoundingBoxes.plots
 }

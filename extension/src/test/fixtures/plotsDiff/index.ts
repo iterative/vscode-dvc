@@ -19,7 +19,7 @@ import {
   DEFAULT_NB_ITEMS_PER_ROW,
   DEFAULT_PLOT_WIDTH,
   ComparisonPlotImg,
-  ComparisonBoundingBoxClasses
+  ComparisonClassDetails
 } from '../../../plots/webview/contract'
 import { join } from '../../util/path'
 import { copyOriginalColors } from '../../../experiments/model/status/colors'
@@ -944,7 +944,7 @@ export const getComparisonWebviewMessage = (
     [path: string]: {
       path: string
       revisions: ComparisonRevisionData
-      boundingBoxClasses: ComparisonBoundingBoxClasses
+      classDetails: ComparisonClassDetails
     }
   } = {}
 
@@ -956,7 +956,7 @@ export const getComparisonWebviewMessage = (
       plotAcc[pathLabel] = {
         path: pathLabel,
         revisions: {},
-        boundingBoxClasses: {}
+        classDetails: {}
       }
     }
 
@@ -988,7 +988,7 @@ export const getComparisonWebviewMessage = (
   }
 
   return {
-    boundingBoxPlotCoords: {},
+    plotClasses: {},
     revisions: getRevisions(),
     multiPlotValues: {},
     plots: Object.values(plotAcc),

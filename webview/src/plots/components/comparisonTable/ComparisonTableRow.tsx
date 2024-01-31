@@ -1,5 +1,5 @@
 import {
-  ComparisonBoundingBoxClasses,
+  ComparisonClassDetails,
   ComparisonPlot
 } from 'dvc/src/plots/webview/contract'
 import React, {
@@ -36,7 +36,7 @@ export interface ComparisonTableRowProps {
   onLayoutChange: () => void
   setOrder: (order: string[]) => void
   order: string[]
-  boundingBoxClasses: ComparisonBoundingBoxClasses
+  classDetails: ComparisonClassDetails
   bodyRef?: RefObject<HTMLTableSectionElement>
 }
 
@@ -48,7 +48,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
   onLayoutChange,
   setOrder,
   order,
-  boundingBoxClasses,
+  classDetails,
   bodyRef
 }) => {
   const plotsRowRef = useRef<HTMLTableRowElement>(null)
@@ -73,7 +73,8 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
     type: <tbody />,
     vertical: true
   })
-  const boundingBoxClassesArr = Object.entries(boundingBoxClasses)
+
+  const classDetailsArr = Object.entries(classDetails)
   const cellClasses = cx(styles.cell, {
     [styles.cellHidden]: !isShown
   })
@@ -151,17 +152,17 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
             <CopyButton value={path} className={styles.copyButton} />
           </div>
         </ComparisonTablePinnedContentRow>
-        {boundingBoxClassesArr.length > 0 && (
+        {classDetailsArr.length > 0 && (
           <ComparisonTablePinnedContentRow
             pinnedColumn={pinnedColumn}
             nbColumns={nbColumns}
           >
             <div
               data-testid="row-bounding-box-classes"
-              className={cx(styles.boundingBoxClasses, cellClasses)}
+              className={cx(styles.classes, cellClasses)}
             >
-              <p className={styles.boundingBoxClassesTitle}>Classes</p>
-              {boundingBoxClassesArr.map(([label, { color, selected }]) => (
+              <p className={styles.classesTitle}>Classes</p>
+              {classDetailsArr.map(([label, { color, selected }]) => (
                 <React.Fragment key={label}>
                   <input
                     type="checkbox"
@@ -172,7 +173,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
                     className={styles.hiddenInput}
                   />
                   <label
-                    className={styles.boundingBoxClassesButton}
+                    className={styles.classButton}
                     style={{ background: color }}
                     htmlFor={color.slice(1)}
                   >
@@ -196,13 +197,13 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
               <div data-testid="row-images" className={cellClasses}>
                 {plot.imgs.length > 1 ? (
                   <ComparisonTableMultiCell
-                    boundingBoxClasses={boundingBoxClasses}
+                    classDetails={classDetails}
                     plot={plot}
                     path={path}
                   />
                 ) : (
                   <ComparisonTableCell
-                    boundingBoxClasses={boundingBoxClasses}
+                    classDetails={classDetails}
                     plot={plot}
                     path={path}
                   />
