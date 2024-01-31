@@ -1,6 +1,6 @@
 import React from 'react'
 import {
-  ComparisonBoundingBoxClasses,
+  ComparisonClassDetails,
   ComparisonPlot
 } from 'dvc/src/plots/webview/contract'
 import { ComparisonTableLoadingCell } from './ComparisonTableLoadingCell'
@@ -12,9 +12,9 @@ import { zoomPlot } from '../../../util/messages'
 export const ComparisonTableCell: React.FC<{
   path: string
   plot: ComparisonPlot
-  boundingBoxClasses: ComparisonBoundingBoxClasses
+  classDetails: ComparisonClassDetails
   imgAlt?: string
-}> = ({ path, plot, imgAlt, boundingBoxClasses }) => {
+}> = ({ path, plot, imgAlt, classDetails }) => {
   const plotImg = plot.imgs[0]
 
   const loading = plotImg.loading
@@ -35,11 +35,11 @@ export const ComparisonTableCell: React.FC<{
       onClick={() => zoomPlot(plotImg.url)}
       data-testid="image-plot-button"
     >
-      {plotImg.url && plotImg.boundingBoxes ? (
+      {plotImg.url && plotImg.classes ? (
         <ComparisonTableBoundingBoxImg
           src={plotImg.url}
-          boxCoords={plotImg.boundingBoxes}
-          classes={boundingBoxClasses}
+          classes={plotImg.classes}
+          classDetails={classDetails}
           alt={alt}
         />
       ) : (

@@ -173,12 +173,12 @@ $gap: 4px;
   max-height: 0;
 }
 
-.boundingBoxClasses {
+.classes {
   display: flex;
   align-items: center;
 }
 
-.boundingBoxClassesTitle {
+.classesTitle {
   font-size: 0.6rem;
   margin-right: 10px;
   color: $fg-color;
@@ -189,7 +189,7 @@ $gap: 4px;
   display: none;
 }
 
-.boundingBoxClassesButton {
+.classButton {
   white-space: nowrap;
   border: none;
   border-radius: 2px;

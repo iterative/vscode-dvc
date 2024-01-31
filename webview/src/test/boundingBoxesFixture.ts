@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import {
-  ComparisonBoundingBoxClasses,
-  ComparisonPlotBoundingBox,
+  ComparisonClassDetails,
+  ComparisonPlotClass,
   ComparisonRevisionData,
   PlotsComparisonData
 } from 'dvc/src/plots/webview/contract'
@@ -29,13 +29,13 @@ const boxColors = [
   '#ff37c7'
 ]
 
-const boundingBoxImgClasses: ComparisonBoundingBoxClasses = {
+const boundingBoxImgClasses: ComparisonClassDetails = {
   car: { color: boxColors[1], selected: true },
   sign: { color: boxColors[2], selected: false },
   'traffic light': { color: boxColors[3], selected: true }
 }
 
-const boundingBoxImgCoords: { [rev: string]: ComparisonPlotBoundingBox[] } = {
+const boundingBoxImgCoords: { [rev: string]: ComparisonPlotClass[] } = {
   'exp-83425': [
     { boxes: [{ h: 75, w: 100, x: 100, y: 100 }], label: 'traffic light' },
     { boxes: [{ h: 30, w: 30, x: 190, y: 310 }], label: 'car' }
@@ -78,10 +78,10 @@ export const addBoundingBoxes = (
 
       const plotWithBoundingBoxes: {
         path: string
-        boundingBoxClasses: ComparisonBoundingBoxClasses
+        classDetails: ComparisonClassDetails
         revisions: ComparisonRevisionData
       } = {
-        boundingBoxClasses: boundingBoxImgClasses,
+        classDetails: boundingBoxImgClasses,
         path: plot.path,
         revisions: {}
       }
@@ -91,7 +91,7 @@ export const addBoundingBoxes = (
           ...imgPlot,
           imgs: imgPlot.imgs.map(img => ({
             ...img,
-            boundingBoxes: boundingBoxImgCoords[rev]
+            classes: boundingBoxImgCoords[rev]
           }))
         }
       }
