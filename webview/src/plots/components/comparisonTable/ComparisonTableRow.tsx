@@ -73,7 +73,6 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
     type: <tbody />,
     vertical: true
   })
-
   const classDetailsArr = Object.entries(classDetails)
   const cellClasses = cx(styles.cell, {
     [styles.cellHidden]: !isShown
