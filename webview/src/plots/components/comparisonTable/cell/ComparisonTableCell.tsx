@@ -4,8 +4,7 @@ import { createSelector } from '@reduxjs/toolkit'
 import {
   ComparisonClassDetails,
   ComparisonPlotClasses,
-  ComparisonPlot,
-  ComparisonPlotClass
+  ComparisonPlot
 } from 'dvc/src/plots/webview/contract'
 import { ComparisonTableLoadingCell } from './ComparisonTableLoadingCell'
 import { ComparisonTableMissingCell } from './ComparisonTableMissingCell'
@@ -14,6 +13,13 @@ import styles from '../styles.module.scss'
 import { zoomPlot } from '../../../util/messages'
 import { PlotsState } from '../../../store'
 
+const selectPlotClasses = (state: PlotsState) => state.comparison.plotClasses
+const selectClasses = createSelector(
+  [selectPlotClasses, (_, id: string) => id, (_, id, path: string) => path],
+  (plotClasses: ComparisonPlotClasses, id: string, path: string) =>
+    plotClasses[id]?.[path]
+)
+
 export const ComparisonTableCell: React.FC<{
   path: string
   plot: ComparisonPlot
@@ -21,16 +27,9 @@ export const ComparisonTableCell: React.FC<{
   imgAlt?: string
 }> = ({ path, plot, imgAlt, classDetails }) => {
   const plotImg = plot.imgs[0]
-
-  const plotClasses = useSelector(
-    (state: PlotsState) => state.comparison.plotClasses
+  const classes = useSelector((state: PlotsState) =>
+    selectClasses(state, plot.id, path)
   )
-  const getCellClasses = createSelector(
-    (classes: ComparisonPlotClasses) => classes[plot.id],
-    (classesByPath: { [path: string]: ComparisonPlotClass[] } | undefined) =>
-      classesByPath?.[path]
-  )
-  const classes: ComparisonPlotClass[] | undefined = getCellClasses(plotClasses)
 
   const loading = plotImg.loading
   const missing = !loading && !plotImg.url
