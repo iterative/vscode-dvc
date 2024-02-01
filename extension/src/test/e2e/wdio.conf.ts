@@ -47,14 +47,13 @@ export const config: Options.Testrunner = {
   capabilities: [
     {
       browserName: 'vscode',
-      browserVersion: 'insiders',
+      browserVersion: '1.85.0',
       'wdio:vscodeOptions': {
         extensionPath,
         userSettings: {
           'dvc.pythonPath': getVenvBinPath(dvcDemoPath, '.env', 'python'),
           'window.commandCenter': false
         },
-        verboseLogging: false,
         workspacePath: dvcDemoPath
       }
     }
