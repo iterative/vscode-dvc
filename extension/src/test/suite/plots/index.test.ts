@@ -1345,7 +1345,7 @@ suite('Plots Test Suite', () => {
       })
       expect(mockSendTelemetryEvent).to.be.called
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
-        EventName.VIEWS_PLOTS_SET_COMPARISON_MULTI_PLOT_VALUE,
+        EventName.VIEWS_PLOTS_TOGGLE_COMPARISON_CLASS,
         undefined,
         undefined
       )

@@ -1,6 +1,7 @@
 import type { TopLevelSpec } from 'vega-lite'
 import { isMultiViewPlot } from '../../../plots/vega/util'
 import {
+  BoundingBox,
   EXPERIMENT_WORKSPACE_ID,
   ImagePlotOutput,
   PLOT_ANCHORS,
@@ -1001,6 +1002,52 @@ const getIndFromComparisonMultiImgPath = (path: string) => {
 
 const boundingBoxColors = ['#ff3838', '#ff9d97', '#ff701f']
 
+export const collectPlotClasses = ({
+  plotClasses,
+  classLabels,
+  boundingBoxes,
+  id,
+  path
+}: {
+  plotClasses: ComparisonPlotClasses
+  classLabels: Set<string>
+  boundingBoxes: { label: string; box: BoundingBox }[]
+  id: string
+  path: string
+}) => {
+  const classAcc: {
+    [label: string]: {
+      label: string
+      boxes: {
+        h: number
+        w: number
+        x: number
+        y: number
+      }[]
+    }
+  } = {}
+
+  for (const { label, box } of boundingBoxes) {
+    classLabels.add(label)
+
+    if (!classAcc[label]) {
+      classAcc[label] = { label, boxes: [] }
+    }
+
+    classAcc[label].boxes.push({
+      x: box.x_min,
+      y: box.y_min,
+      w: box.x_max - box.x_min,
+      h: box.y_max - box.y_min
+    })
+  }
+
+  if (!plotClasses[id]) {
+    plotClasses[id] = {}
+  }
+  plotClasses[id][path] = Object.values(classAcc)
+}
+
 export const getComparisonWebviewMessage = (
   baseUrl: string,
   joinFunc: (...args: string[]) => string = join
@@ -1018,7 +1065,7 @@ export const getComparisonWebviewMessage = (
   for (const [path, plots] of Object.entries(getImageData(baseUrl, joinFunc))) {
     const isMulti = path.includes('image')
     const pathLabel = isMulti ? join('plots', 'image') : path
-    const boundingBoxClassLabels = new Set<string>()
+    const classLabels = new Set<string>()
 
     if (!plotAcc[pathLabel]) {
       plotAcc[pathLabel] = {
@@ -1050,45 +1097,21 @@ export const getComparisonWebviewMessage = (
       if (isMulti) {
         img.ind = getIndFromComparisonMultiImgPath(path)
       }
-      // should probably move this chunk into another function
+
       if (boundingBoxes) {
-        const boundingBoxAcc: {
-          [label: string]: {
-            label: string
-            boxes: {
-              h: number
-              w: number
-              x: number
-              y: number
-            }[]
-          }
-        } = {}
-
-        for (const { label, box } of boundingBoxes) {
-          boundingBoxClassLabels.add(label)
-
-          if (!boundingBoxAcc[label]) {
-            boundingBoxAcc[label] = { label, boxes: [] }
-          }
-
-          boundingBoxAcc[label].boxes.push({
-            x: box.x_min,
-            y: box.y_min,
-            w: box.x_max - box.x_min,
-            h: box.y_max - box.y_min
-          })
-        }
-
-        if (!plotClasses[id]) {
-          plotClasses[id] = {}
-        }
-        plotClasses[id][path] = Object.values(boundingBoxAcc)
+        collectPlotClasses({
+          boundingBoxes: boundingBoxes,
+          plotClasses,
+          classLabels,
+          id,
+          path
+        })
       }
 
       plotAcc[pathLabel].revisions[id].imgs.push(img)
     }
 
-    for (const [ind, label] of [...boundingBoxClassLabels].entries()) {
+    for (const [ind, label] of [...classLabels].entries()) {
       plotAcc[pathLabel].classDetails[label] = {
         selected: true,
         color: boundingBoxColors[ind]

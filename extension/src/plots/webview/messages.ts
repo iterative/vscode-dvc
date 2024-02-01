@@ -297,7 +297,7 @@ export class WebviewMessages {
     this.plots.toggleComparisonClass(path, label, selected)
     this.sendComparisonPlots()
     sendTelemetryEvent(
-      EventName.VIEWS_PLOTS_SET_COMPARISON_MULTI_PLOT_VALUE,
+      EventName.VIEWS_PLOTS_TOGGLE_COMPARISON_CLASS,
       undefined,
       undefined
     )
