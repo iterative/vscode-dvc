@@ -54,6 +54,7 @@ export const config: Options.Testrunner = {
           'dvc.pythonPath': getVenvBinPath(dvcDemoPath, '.env', 'python'),
           'window.commandCenter': false
         },
+        verboseLogging: false,
         workspacePath: dvcDemoPath
       }
     }
