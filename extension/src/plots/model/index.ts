@@ -31,7 +31,8 @@ import {
   SmoothPlotValues,
   ImagePlot,
   ComparisonMultiPlotValues,
-  ComparisonPlotImg
+  ComparisonPlotImg,
+  ComparisonClassesSelected
 } from '../webview/contract'
 import {
   EXPERIMENT_WORKSPACE_ID,
@@ -77,6 +78,8 @@ export class PlotsModel extends ModelWithPersistence {
   private comparisonData: ComparisonData = {}
   private comparisonOrder: string[]
   private comparisonMultiPlotValues: ComparisonMultiPlotValues = {}
+  private comparisonClassesSelected: ComparisonClassesSelected = {}
+
   private smoothPlotValues: SmoothPlotValues = {}
 
   private revisionData: RevisionData = {}
@@ -111,6 +114,10 @@ export class PlotsModel extends ModelWithPersistence {
     )
     this.comparisonMultiPlotValues = this.revive(
       PersistenceKey.PLOTS_COMPARISON_MULTI_PLOT_VALUES,
+      {}
+    )
+    this.comparisonClassesSelected = this.revive(
+      PersistenceKey.PLOTS_COMPARISON_CLASSES_SELECTED,
       {}
     )
 
@@ -274,6 +281,7 @@ export class PlotsModel extends ModelWithPersistence {
     }
 
     return collectSelectedComparisonPlotClasses({
+      comparisonClassesSelected: this.getComparisonClassesSelected(),
       comparisonData: this.comparisonData,
       paths,
       selectedRevisionIds
@@ -324,8 +332,24 @@ export class PlotsModel extends ModelWithPersistence {
     )
   }
 
+  public toggleComparisonClass(path: string, label: string, selected: boolean) {
+    if (!this.comparisonClassesSelected[path]) {
+      this.comparisonClassesSelected[path] = {}
+    }
+
+    this.comparisonClassesSelected[path][label] = selected
+    this.persist(
+      PersistenceKey.PLOTS_COMPARISON_MULTI_PLOT_VALUES,
+      this.comparisonClassesSelected
+    )
+  }
+
   public getComparisonMultiPlotValues() {
     return this.comparisonMultiPlotValues
+  }
+
+  public getComparisonClassesSelected() {
+    return this.comparisonClassesSelected
   }
 
   public getSelectedRevisionIds() {
@@ -446,6 +470,7 @@ export class PlotsModel extends ModelWithPersistence {
     selectedRevisionIds: string[]
   ) {
     return collectSelectedComparisonPlots({
+      comparisonClassesSelected: this.getComparisonClassesSelected(),
       comparisonData: this.comparisonData,
       getComparisonPlotImg: (image: ImagePlot, id: string, path: string) => {
         const errors = this.errors.getImageErrors(path, id)

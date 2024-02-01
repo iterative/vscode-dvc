@@ -82,6 +82,10 @@ export type ComparisonMultiPlotValues = {
   [revision: string]: { [path: string]: number }
 }
 
+export type ComparisonClassesSelected = {
+  [path: string]: { [label: string]: boolean }
+}
+
 export type ComparisonPlotClass = {
   label: string
   boxes: {

@@ -16,7 +16,9 @@ import {
   ComparisonRevisionData,
   ComparisonPlotImg,
   ComparisonClassDetails,
-  ComparisonPlotClasses
+  ComparisonPlotClasses,
+  ComparisonClassesSelected,
+  ComparisonPlotClass
 } from '../webview/contract'
 import {
   AnchorDefinitions,
@@ -399,12 +401,14 @@ const collectComparisonPlotImgs = (
 const collectSelectedPathComparisonPlots = ({
   acc,
   comparisonData,
+  comparisonClassesSelected,
   path,
   selectedRevisionIds,
   getComparisonPlotImg
 }: {
   acc: ComparisonPlotsAcc
   comparisonData: ComparisonData
+  comparisonClassesSelected: ComparisonClassesSelected
   path: string
   selectedRevisionIds: string[]
   getComparisonPlotImg: GetComparisonPlotImg
@@ -434,9 +438,10 @@ const collectSelectedPathComparisonPlots = ({
   }
 
   for (const [ind, label] of [...boundingBoxClassLabels].entries()) {
+    const selectedState = comparisonClassesSelected[path]?.[label]
     pathRevisions.classDetails[label] = {
       color: boundingBoxColors[ind % boundingBoxColors.length],
-      selected: true // we will need to check the saved state to see if we should set selected
+      selected: selectedState === undefined ? true : selectedState
     }
   }
 
@@ -445,11 +450,13 @@ const collectSelectedPathComparisonPlots = ({
 
 export const collectSelectedComparisonPlots = ({
   comparisonData,
+  comparisonClassesSelected,
   paths,
   selectedRevisionIds,
   getComparisonPlotImg
 }: {
   comparisonData: ComparisonData
+  comparisonClassesSelected: ComparisonClassesSelected
   paths: string[]
   selectedRevisionIds: string[]
   getComparisonPlotImg: GetComparisonPlotImg
@@ -459,6 +466,7 @@ export const collectSelectedComparisonPlots = ({
   for (const path of paths) {
     collectSelectedPathComparisonPlots({
       acc,
+      comparisonClassesSelected,
       comparisonData,
       getComparisonPlotImg,
       path,
@@ -469,13 +477,40 @@ export const collectSelectedComparisonPlots = ({
   return acc
 }
 
-const collectSelectedImgComparisonPlotClasses = (
-  acc: ComparisonPlotClasses,
-  img: ImagePlot,
-  path: string,
+const collectSelectedImgComparisonPlotClasses = ({
+  comparisonClassesSelected,
+  acc,
+  img,
+  id,
+  path
+}: {
+  comparisonClassesSelected: ComparisonClassesSelected
+  acc: ComparisonPlotClasses
+  img: ImagePlot
   id: string
-) => {
-  if (!img.boundingBoxes) {
+  path: string
+}) => {
+  const imgClasses: ComparisonPlotClass[] = []
+
+  for (const [label, boxes] of Object.entries(img.boundingBoxes || {})) {
+    const selectedState = comparisonClassesSelected[path]?.[label]
+
+    if (selectedState === false) {
+      continue
+    }
+
+    imgClasses.push({
+      boxes: boxes.map(({ x_min, x_max, y_min, y_max }) => ({
+        h: y_max - y_min,
+        w: x_max - x_min,
+        x: x_min,
+        y: y_min
+      })),
+      label
+    })
+  }
+
+  if (imgClasses.length === 0) {
     return
   }
 
@@ -483,26 +518,16 @@ const collectSelectedImgComparisonPlotClasses = (
     acc[id] = {}
   }
 
-  if (!acc[id][path]) {
-    acc[id][path] = []
-  }
-
-  acc[id][path] = Object.entries(img.boundingBoxes).map(([label, boxes]) => ({
-    boxes: boxes.map(({ x_min, x_max, y_min, y_max }) => ({
-      h: y_max - y_min,
-      w: x_max - x_min,
-      x: x_min,
-      y: y_min
-    })),
-    label
-  }))
+  acc[id][path] = imgClasses
 }
 
 export const collectSelectedComparisonPlotClasses = ({
+  comparisonClassesSelected,
   comparisonData,
   paths,
   selectedRevisionIds
 }: {
+  comparisonClassesSelected: ComparisonClassesSelected
   comparisonData: ComparisonData
   paths: string[]
   selectedRevisionIds: string[]
@@ -512,7 +537,13 @@ export const collectSelectedComparisonPlotClasses = ({
   for (const path of paths) {
     for (const id of selectedRevisionIds) {
       for (const img of comparisonData[id][path]) {
-        collectSelectedImgComparisonPlotClasses(acc, img, path, id)
+        collectSelectedImgComparisonPlotClasses({
+          acc,
+          comparisonClassesSelected,
+          id,
+          img,
+          path
+        })
       }
     }
   }

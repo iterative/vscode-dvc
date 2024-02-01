@@ -27,6 +27,7 @@ import Tooltip, {
 } from '../../../shared/components/tooltip/Tooltip'
 import { useDragAndDrop } from '../../../shared/hooks/useDragAndDrop'
 import { DragDropItemWithTarget } from '../../../shared/components/dragDrop/DragDropItemWithTarget'
+import { toggleComparisonClass } from '../../util/messages'
 
 export interface ComparisonTableRowProps {
   path: string
@@ -170,6 +171,9 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
                     value={label}
                     defaultChecked={selected}
                     className={styles.hiddenInput}
+                    onChange={event =>
+                      toggleComparisonClass(path, label, event.target.checked)
+                    }
                   />
                   <label
                     className={styles.classButton}

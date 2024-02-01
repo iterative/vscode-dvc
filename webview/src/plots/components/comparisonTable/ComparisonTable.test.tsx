@@ -756,11 +756,22 @@ describe('ComparisonTable', () => {
         within(boundingBoxPlotClasses).getByText('Classes')
       ).toBeInTheDocument()
 
-      const checkedLabel = within(boundingBoxPlotClasses).getByLabelText(
+      const labelInput = within(boundingBoxPlotClasses).getByLabelText(
         'traffic light'
       )
-      expect(checkedLabel).toBeInTheDocument()
-      expect(checkedLabel).toHaveAttribute('checked')
+      const plotPath = comparisonTableFixture.plots[4].path
+
+      expect(labelInput).toBeInTheDocument()
+      expect(labelInput).toBeChecked()
+
+      fireEvent.click(within(boundingBoxPlotClasses).getByText('traffic light'))
+
+      expect(labelInput).not.toBeChecked()
+      expect(mockPostMessage).toHaveBeenCalledTimes(1)
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        payload: { label: 'traffic light', path: plotPath, selected: false },
+        type: MessageFromWebviewType.TOGGLE_COMPARISON_CLASS
+      })
     })
 
     it('should show svgs with bounding boxes instead of images', () => {

@@ -117,6 +117,12 @@ export class WebviewMessages {
           message.payload.path,
           message.payload.value
         )
+      case MessageFromWebviewType.TOGGLE_COMPARISON_CLASS:
+        return this.toggleComparisonClass(
+          message.payload.path,
+          message.payload.label,
+          message.payload.selected
+        )
       case MessageFromWebviewType.REMOVE_CUSTOM_PLOTS:
         return commands.executeCommand(
           RegisteredCommands.PLOTS_CUSTOM_REMOVE,
@@ -275,6 +281,20 @@ export class WebviewMessages {
     value: number
   ) {
     this.plots.setComparisonMultiPlotValue(revision, path, value)
+    this.sendComparisonPlots()
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_SET_COMPARISON_MULTI_PLOT_VALUE,
+      undefined,
+      undefined
+    )
+  }
+
+  private toggleComparisonClass(
+    path: string,
+    label: string,
+    selected: boolean
+  ) {
+    this.plots.toggleComparisonClass(path, label, selected)
     this.sendComparisonPlots()
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_SET_COMPARISON_MULTI_PLOT_VALUE,

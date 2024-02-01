@@ -27,7 +27,8 @@ import {
   DEFAULT_SECTION_COLLAPSED,
   PlotsData as TPlotsData,
   PlotsSection,
-  TemplatePlotGroup
+  TemplatePlotGroup,
+  ComparisonPlotClasses
 } from '../../../plots/webview/contract'
 import { TEMP_PLOTS_DIR } from '../../../cli/dvc/constants'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
@@ -1274,6 +1275,79 @@ suite('Plots Test Suite', () => {
         'main',
         multiImg.path,
         5
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle an toggle comparison class message from the webview', async () => {
+      const { messageSpy, mockMessageReceived, plotsModel } =
+        await buildPlotsWebview({
+          disposer: disposable,
+          plotsDiff: plotsDiffFixture
+        })
+      const toggledLabel = 'car'
+      const boundingBoxPlot = comparisonPlotsFixture.plots[4]
+
+      const filteredPlotsClasses: ComparisonPlotClasses = {}
+      for (const [id, classesByPath] of Object.entries(
+        comparisonPlotsFixture.plotClasses
+      )) {
+        const classes = classesByPath[boundingBoxPlot.path]
+        filteredPlotsClasses[id] = {
+          [boundingBoxPlot.path]: classes.filter(
+            ({ label }) => label !== toggledLabel
+          )
+        }
+      }
+
+      const filteredPlots = comparisonPlotsFixture.plots.map(plot => {
+        if (plot.path !== boundingBoxPlot.path) {
+          return plot
+        }
+
+        const { color } = plot.classDetails[toggledLabel]
+        return {
+          ...plot,
+          classDetails: {
+            ...plot.classDetails,
+            [toggledLabel]: { color, selected: false }
+          }
+        }
+      })
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const toggleComparisonClassSpy = spy(plotsModel, 'toggleComparisonClass')
+
+      messageSpy.resetHistory()
+      mockMessageReceived.fire({
+        payload: {
+          label: toggledLabel,
+          path: boundingBoxPlot.path,
+          selected: false
+        },
+        type: MessageFromWebviewType.TOGGLE_COMPARISON_CLASS
+      })
+
+      expect(toggleComparisonClassSpy).to.be.called
+      expect(toggleComparisonClassSpy).to.be.calledWithExactly(
+        boundingBoxPlot.path,
+        'car',
+        false
+      )
+      expect(
+        messageSpy,
+        "should update the webview's comparison classes"
+      ).to.be.calledWithExactly({
+        comparison: {
+          ...comparisonPlotsFixture,
+          plotClasses: filteredPlotsClasses,
+          plots: filteredPlots
+        }
+      })
+      expect(mockSendTelemetryEvent).to.be.called
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_PLOTS_SET_COMPARISON_MULTI_PLOT_VALUE,
+        undefined,
+        undefined
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 

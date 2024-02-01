@@ -114,6 +114,17 @@ export const setComparisonMultiPlotValue = (
   })
 }
 
+export const toggleComparisonClass = (
+  path: string,
+  label: string,
+  selected: boolean
+) => {
+  sendMessage({
+    payload: { label, path, selected },
+    type: MessageFromWebviewType.TOGGLE_COMPARISON_CLASS
+  })
+}
+
 export const togglePlotsSection = (
   sectionKey: PlotsSection,
   sectionCollapsed: boolean
