@@ -405,6 +405,7 @@ export class WebviewMessages {
     return {
       height: this.plots.getHeight(PlotsSection.COMPARISON_TABLE),
       multiPlotValues: this.plots.getComparisonMultiPlotValues(),
+      plotClasses: {},
       plots: comparison.map(({ path, revisions }) => {
         return {
           classDetails: {},

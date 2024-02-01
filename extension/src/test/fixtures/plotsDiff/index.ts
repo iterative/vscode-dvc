@@ -988,6 +988,7 @@ export const getComparisonWebviewMessage = (
   }
 
   return {
+    plotClasses: {},
     revisions: getRevisions(),
     multiPlotValues: {},
     plots: Object.values(plotAcc),

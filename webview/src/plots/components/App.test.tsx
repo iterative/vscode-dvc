@@ -226,6 +226,7 @@ describe('App', () => {
       comparison: {
         height: DEFAULT_PLOT_HEIGHT,
         multiPlotValues: {},
+        plotClasses: {},
         plots: [
           {
             classDetails: {},
@@ -282,6 +283,7 @@ describe('App', () => {
       comparison: {
         height: DEFAULT_PLOT_HEIGHT,
         multiPlotValues: {},
+        plotClasses: {},
         plots: [
           {
             classDetails: {},

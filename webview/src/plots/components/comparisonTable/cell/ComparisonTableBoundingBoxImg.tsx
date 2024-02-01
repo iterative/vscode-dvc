@@ -1,17 +1,31 @@
 import React, { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
+import { createSelector } from '@reduxjs/toolkit'
 import {
   ComparisonClassDetails,
-  ComparisonPlotClass
+  ComparisonPlotClasses
 } from 'dvc/src/plots/webview/contract'
 import { ComparisonTableBoundingBoxColorFilter } from './ComparisonTableBoundingBoxColorFilter'
 import styles from '../styles.module.scss'
+import { PlotsState } from '../../../store'
+
+const plotClassesSelector = (state: PlotsState) => state.comparison.plotClasses
+const classesSelector = createSelector(
+  [plotClassesSelector, (_, id: string) => id, (_, id, path: string) => path],
+  (plotClasses: ComparisonPlotClasses, id: string, path: string) =>
+    plotClasses[id]?.[path] || []
+)
 
 export const ComparisonTableBoundingBoxImg: React.FC<{
+  id: string
   src: string
-  classes: ComparisonPlotClass[]
+  path: string
   classDetails: ComparisonClassDetails
   alt: string
-}> = ({ alt, src, classes, classDetails }) => {
+}> = ({ alt, classDetails, id, src, path }) => {
+  const classes = useSelector((state: PlotsState) =>
+    classesSelector(state, id, path)
+  )
   const [naturalWidth, setNaturalWidth] = useState(0)
   const [naturalHeight, setNaturalHeight] = useState(0)
 

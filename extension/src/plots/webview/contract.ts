@@ -81,12 +81,27 @@ export type ComparisonMultiPlotValues = {
   [revision: string]: { [path: string]: number }
 }
 
+export type ComparisonPlotClass = {
+  label: string
+  boxes: {
+    h: number
+    w: number
+    x: number
+    y: number
+  }[]
+}
+
+export type ComparisonPlotClasses = {
+  [revision: string]: { [path: string]: ComparisonPlotClass[] }
+}
+
 export interface PlotsComparisonData {
   plots: ComparisonPlots
   width: number
   height: PlotHeight
   revisions: Revision[]
   multiPlotValues: ComparisonMultiPlotValues
+  plotClasses: ComparisonPlotClasses
 }
 
 export type CustomPlotValues = {
@@ -156,22 +171,11 @@ export interface TemplatePlotsData {
   smoothPlotValues: SmoothPlotValues
 }
 
-export type ComparisonPlotClass = {
-  label: string
-  boxes: {
-    h: number
-    w: number
-    x: number
-    y: number
-  }[]
-}
-
 export type ComparisonPlotImg = {
   url: string | undefined
   errors: string[] | undefined
   loading: boolean
   ind?: number
-  classes?: ComparisonPlotClass[]
 }
 
 export type ComparisonPlot = {

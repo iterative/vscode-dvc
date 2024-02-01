@@ -1,8 +1,8 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import {
   ComparisonClassDetails,
+  ComparisonPlotClasses,
   ComparisonPlotClass,
-  ComparisonRevisionData,
   PlotsComparisonData
 } from 'dvc/src/plots/webview/contract'
 
@@ -34,41 +34,68 @@ const boundingBoxImgClasses: ComparisonClassDetails = {
   sign: { color: boxColors[2], selected: false },
   'traffic light': { color: boxColors[3], selected: true }
 }
-
-const boundingBoxImgCoords: { [rev: string]: ComparisonPlotClass[] } = {
-  'exp-83425': [
-    { boxes: [{ h: 75, w: 100, x: 100, y: 100 }], label: 'traffic light' },
-    { boxes: [{ h: 30, w: 30, x: 190, y: 310 }], label: 'car' }
-  ],
-  'exp-e7a67': [
-    { boxes: [{ h: 110, w: 100, x: 90, y: 100 }], label: 'traffic light' },
-    { boxes: [{ h: 30, w: 30, x: 190, y: 310 }], label: 'car' }
-  ],
-  main: [
-    { boxes: [{ h: 100, w: 100, x: 100, y: 100 }], label: 'traffic light' },
-    { boxes: [{ h: 30, w: 30, x: 190, y: 310 }], label: 'car' }
-  ],
-  'test-branch': [
-    { boxes: [{ h: 100, w: 90, x: 100, y: 110 }], label: 'traffic light' },
-    { boxes: [{ h: 30, w: 30, x: 190, y: 310 }], label: 'car' }
-  ],
-  workspace: [
-    { boxes: [{ h: 90, w: 80, x: 120, y: 120 }], label: 'traffic light' },
-    {
-      boxes: [
-        { h: 30, w: 30, x: 190, y: 310 },
-        { h: 50, w: 60, x: 300, y: 320 }
-      ],
-      label: 'car'
-    }
-  ]
-}
+const classesArr: {
+  rev: string
+  classes: ComparisonPlotClass[]
+}[] = [
+  {
+    classes: [
+      { boxes: [{ h: 75, w: 100, x: 100, y: 100 }], label: 'traffic light' },
+      { boxes: [{ h: 30, w: 30, x: 190, y: 310 }], label: 'car' }
+    ],
+    rev: 'exp-83425'
+  },
+  {
+    classes: [
+      { boxes: [{ h: 110, w: 100, x: 90, y: 100 }], label: 'traffic light' },
+      { boxes: [{ h: 30, w: 30, x: 190, y: 310 }], label: 'car' }
+    ],
+    rev: 'exp-e7a67'
+  },
+  {
+    classes: [
+      { boxes: [{ h: 100, w: 100, x: 100, y: 100 }], label: 'traffic light' },
+      { boxes: [{ h: 30, w: 30, x: 190, y: 310 }], label: 'car' }
+    ],
+    rev: 'main'
+  },
+  {
+    classes: [
+      { boxes: [{ h: 100, w: 90, x: 100, y: 110 }], label: 'traffic light' },
+      { boxes: [{ h: 30, w: 30, x: 190, y: 310 }], label: 'car' }
+    ],
+    rev: 'test-branch'
+  },
+  {
+    classes: [
+      { boxes: [{ h: 90, w: 80, x: 120, y: 120 }], label: 'traffic light' },
+      {
+        boxes: [
+          { h: 30, w: 30, x: 190, y: 310 },
+          { h: 50, w: 60, x: 300, y: 320 }
+        ],
+        label: 'car'
+      }
+    ],
+    rev: 'workspace'
+  }
+]
 
 export const addBoundingBoxes = (
   fixture: PlotsComparisonData
 ): PlotsComparisonData => {
+  const boundingBoxPlotPath =
+    fixture.plots.find(({ path }) => path.includes('bounding_boxes.png'))
+      ?.path || ''
+  const plotClasses: ComparisonPlotClasses = {}
+
+  for (const { rev, classes } of classesArr) {
+    plotClasses[rev] = { [boundingBoxPlotPath]: classes }
+  }
+
   return {
     ...fixture,
+    plotClasses,
     plots: fixture.plots.map(plot => {
       const isBoundingBoxImg = plot.path.includes('bounding_boxes.png')
 
@@ -76,27 +103,10 @@ export const addBoundingBoxes = (
         return plot
       }
 
-      const plotWithBoundingBoxes: {
-        path: string
-        classDetails: ComparisonClassDetails
-        revisions: ComparisonRevisionData
-      } = {
-        classDetails: boundingBoxImgClasses,
-        path: plot.path,
-        revisions: {}
+      return {
+        ...plot,
+        classDetails: boundingBoxImgClasses
       }
-
-      for (const [rev, imgPlot] of Object.entries(plot.revisions)) {
-        plotWithBoundingBoxes.revisions[rev] = {
-          ...imgPlot,
-          imgs: imgPlot.imgs.map(img => ({
-            ...img,
-            classes: boundingBoxImgCoords[rev]
-          }))
-        }
-      }
-
-      return plotWithBoundingBoxes
     })
   }
 }

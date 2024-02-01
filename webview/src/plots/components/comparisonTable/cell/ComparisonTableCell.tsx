@@ -35,10 +35,11 @@ export const ComparisonTableCell: React.FC<{
       onClick={() => zoomPlot(plotImg.url)}
       data-testid="image-plot-button"
     >
-      {plotImg.url && plotImg.classes ? (
+      {plotImg.url && Object.keys(classDetails).length > 0 ? (
         <ComparisonTableBoundingBoxImg
           src={plotImg.url}
-          classes={plotImg.classes}
+          id={plot.id}
+          path={path}
           classDetails={classDetails}
           alt={alt}
         />

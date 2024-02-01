@@ -25,6 +25,7 @@ export const comparisonTableInitialState: ComparisonTableState = {
   isCollapsed: DEFAULT_SECTION_COLLAPSED[PlotsSection.COMPARISON_TABLE],
   isInDragAndDropMode: false,
   multiPlotValues: {},
+  plotClasses: {},
   plots: [],
   revisions: [],
   rowHeight: DEFAULT_ROW_HEIGHT,
