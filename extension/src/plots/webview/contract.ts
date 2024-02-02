@@ -88,12 +88,7 @@ export type ComparisonClassesSelected = {
 
 export type ComparisonPlotClass = {
   label: string
-  boxes: {
-    h: number
-    w: number
-    x: number
-    y: number
-  }[]
+  boxes: BoundingBox[]
 }
 
 export type ComparisonPlotClasses = {

@@ -60,22 +60,22 @@ export const ComparisonTableBoundingBoxImg: React.FC<{
           return
         }
 
-        return boxes.map(({ h, w, x, y }) => (
-          <React.Fragment key={label + h + w + x + y}>
+        return boxes.map(({ bottom, top, right, left }) => (
+          <React.Fragment key={label + top + right + left + bottom}>
             <text
               filter={`url(#c${labelColor.slice(1)})`}
-              x={x - 1}
-              y={y - 4}
+              x={left - 1}
+              y={top - 4}
               fill="#fff"
               className={styles.imageBoundingBoxText}
             >
               {label}
             </text>
             <rect
-              width={w}
-              height={h}
-              x={x}
-              y={y}
+              width={right - left}
+              height={bottom - top}
+              x={left}
+              y={top}
               fill="transparent"
               strokeWidth="3px"
               stroke={labelColor}

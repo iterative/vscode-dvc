@@ -1022,12 +1022,7 @@ export const collectPlotClasses = ({
   const classAcc: {
     [label: string]: {
       label: string
-      boxes: {
-        h: number
-        w: number
-        x: number
-        y: number
-      }[]
+      boxes: BoundingBox[]
     }
   } = {}
 
@@ -1038,12 +1033,7 @@ export const collectPlotClasses = ({
       classAcc[label] = { label, boxes: [] }
     }
 
-    classAcc[label].boxes.push({
-      x: box.left,
-      y: box.top,
-      w: box.right - box.left,
-      h: box.bottom - box.top
-    })
+    classAcc[label].boxes.push(box)
   }
 
   if (!plotClasses[id]) {

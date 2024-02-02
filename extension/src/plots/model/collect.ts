@@ -377,25 +377,19 @@ export const boundingBoxColors = [
   '#ff37c7'
 ]
 
-const collectComparisonPlotImgs = (
+const collectSelectedPlotImgClassLabels = (
   boundingBoxClassLabels: Set<string>,
-  imgs: ImagePlot[],
-  getComparisonPlotImg: GetComparisonPlotImg,
-  id: string,
-  path: string
+  imgs: ImagePlot[] = []
 ) => {
-  const plotImgs = []
   for (const img of imgs) {
-    plotImgs.push(getComparisonPlotImg(img, id, path))
+    if (!img.boundingBoxes) {
+      continue
+    }
 
-    if (img.boundingBoxes) {
-      for (const label of Object.keys(img.boundingBoxes)) {
-        boundingBoxClassLabels.add(label)
-      }
+    for (const label of Object.keys(img.boundingBoxes)) {
+      boundingBoxClassLabels.add(label)
     }
   }
-
-  return plotImgs
 }
 
 const collectSelectedPathComparisonPlots = ({
@@ -426,15 +420,10 @@ const collectSelectedPathComparisonPlots = ({
     pathRevisions.revisions[id] = {
       id,
       imgs: imgs
-        ? collectComparisonPlotImgs(
-            boundingBoxClassLabels,
-            imgs,
-            getComparisonPlotImg,
-            id,
-            path
-          )
+        ? imgs.map(img => getComparisonPlotImg(img, id, path))
         : [{ errors: undefined, loading: false, url: undefined }]
     }
+    collectSelectedPlotImgClassLabels(boundingBoxClassLabels, imgs)
   }
 
   for (const [ind, label] of [...boundingBoxClassLabels].entries()) {
@@ -477,17 +466,13 @@ export const collectSelectedComparisonPlots = ({
   return acc
 }
 
-const collectSelectedImgComparisonPlotClasses = ({
+const getSelectedImgComparisonPlotClasses = ({
   comparisonClassesSelected,
-  acc,
   img,
-  id,
   path
 }: {
   comparisonClassesSelected: ComparisonClassesSelected
-  acc: ComparisonPlotClasses
   img: ImagePlot
-  id: string
   path: string
 }) => {
   const imgClasses: ComparisonPlotClass[] = []
@@ -500,25 +485,44 @@ const collectSelectedImgComparisonPlotClasses = ({
     }
 
     imgClasses.push({
-      boxes: boxes.map(({ right, left, top, bottom }) => ({
-        h: bottom - top,
-        w: right - left,
-        x: left,
-        y: top
-      })),
+      boxes,
       label
     })
   }
 
-  if (imgClasses.length === 0) {
-    return
-  }
+  return imgClasses
+}
 
-  if (!acc[id]) {
-    acc[id] = {}
-  }
+const collectedSelectedPathComparisonPlotClasses = ({
+  acc,
+  comparisonClassesSelected,
+  id,
+  comparisonData,
+  path
+}: {
+  comparisonClassesSelected: ComparisonClassesSelected
+  acc: ComparisonPlotClasses
+  comparisonData: ComparisonData
+  path: string
+  id: string
+}) => {
+  for (const img of comparisonData[id][path]) {
+    const imgClasses = getSelectedImgComparisonPlotClasses({
+      comparisonClassesSelected,
+      img,
+      path
+    })
 
-  acc[id][path] = imgClasses
+    if (imgClasses.length === 0) {
+      return
+    }
+
+    if (!acc[id]) {
+      acc[id] = {}
+    }
+
+    acc[id][path] = imgClasses
+  }
 }
 
 export const collectSelectedComparisonPlotClasses = ({
@@ -534,17 +538,15 @@ export const collectSelectedComparisonPlotClasses = ({
 }) => {
   const acc: ComparisonPlotClasses = {}
 
-  for (const path of paths) {
-    for (const id of selectedRevisionIds) {
-      for (const img of comparisonData[id][path]) {
-        collectSelectedImgComparisonPlotClasses({
-          acc,
-          comparisonClassesSelected,
-          id,
-          img,
-          path
-        })
-      }
+  for (const id of selectedRevisionIds) {
+    for (const path of paths) {
+      collectedSelectedPathComparisonPlotClasses({
+        acc,
+        comparisonClassesSelected,
+        comparisonData,
+        id,
+        path
+      })
     }
   }
 
