@@ -500,11 +500,11 @@ const collectSelectedImgComparisonPlotClasses = ({
     }
 
     imgClasses.push({
-      boxes: boxes.map(({ x_min, x_max, y_min, y_max }) => ({
-        h: y_max - y_min,
-        w: x_max - x_min,
-        x: x_min,
-        y: y_min
+      boxes: boxes.map(({ right, left, top, bottom }) => ({
+        h: bottom - top,
+        w: right - left,
+        x: left,
+        y: top
       })),
       label
     })

@@ -234,10 +234,10 @@ export type TemplatePlotOutput = {
 }
 
 export type BoundingBox = {
-  x_min: number
-  x_max: number
-  y_min: number
-  y_max: number
+  top: number
+  bottom: number
+  left: number
+  right: number
 }
 
 export type ImagePlotOutput = {
