@@ -4912,15 +4912,16 @@
     jszip "^3.10.1"
     semver "^7.5.2"
 
-"@vscode/vsce@2.22.0":
-  version "2.22.0"
-  resolved "https://registry.yarnpkg.com/@vscode/vsce/-/vsce-2.22.0.tgz#1eb3ebc6b89581a150bb44dd7d731a064019b617"
-  integrity sha512-8df4uJiM3C6GZ2Sx/KilSKVxsetrTBBIUb3c0W4B1EWHcddioVs5mkyDKtMNP0khP/xBILVSzlXxhV+nm2rC9A==
+"@vscode/vsce@2.23.0":
+  version "2.23.0"
+  resolved "https://registry.yarnpkg.com/@vscode/vsce/-/vsce-2.23.0.tgz#280ce82356c59efda97d3ba14bcdd9e3e22ddb7f"
+  integrity sha512-Wf9yN8feZf4XmUW/erXyKQvCL577u72AQv4AI4Cwt5o5NyE49C5mpfw3pN78BJYYG3qnSIxwRo7JPvEurkQuNA==
   dependencies:
     azure-devops-node-api "^11.0.1"
     chalk "^2.4.2"
     cheerio "^1.0.0-rc.9"
     commander "^6.2.1"
+    find-yarn-workspace-root "^2.0.0"
     glob "^7.0.6"
     hosted-git-info "^4.0.2"
     jsonc-parser "^3.2.0"
@@ -9804,6 +9805,13 @@ find-up@^6.3.0:
   dependencies:
     locate-path "^7.1.0"
     path-exists "^5.0.0"
+
+find-yarn-workspace-root@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/find-yarn-workspace-root/-/find-yarn-workspace-root-2.0.0.tgz#f47fb8d239c900eb78179aa81b66673eac88f7bd"
+  integrity sha512-1IMnbjt4KzsQfnhnzNd8wUEgXZ44IzZaZmnLYx7D5FZlaHt2gW20Cri8Q+E/t5tIj4+epTBub+2Zxu/vNILzqQ==
+  dependencies:
+    micromatch "^4.0.2"
 
 flat-cache@^3.0.4:
   version "3.0.4"
