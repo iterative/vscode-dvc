@@ -5,8 +5,8 @@ import { PLOT_ANCHORS } from '../../cli/dvc/contract'
 import { FILE_SEPARATOR } from '../../experiments/columns/constants'
 
 export type CustomPlotsOrderValue = {
-  metric: string
-  param: string
+  xValue: string
+  yValue: string
 }
 
 export const removeColumnTypeFromPath = (columnPath: string, type: string) =>
@@ -23,18 +23,6 @@ export const cleanupOldOrderValue = (
   metric: removeColumnTypeFromPath(value.metric, ColumnType.METRICS),
   param: removeColumnTypeFromPath(value.param, ColumnType.PARAMS)
 })
-
-export const getCustomPlotIds = (
-  customPlotVals: CustomPlotsOrderValue[]
-): Set<string> => {
-  const plotIds: Set<string> = new Set()
-
-  for (const { metric, param } of customPlotVals) {
-    plotIds.add(getCustomPlotId(metric, param))
-  }
-
-  return plotIds
-}
 
 export const getCustomPlotPathsFromColumns = (
   columns: Column[]

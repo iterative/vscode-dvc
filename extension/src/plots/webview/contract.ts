@@ -94,8 +94,8 @@ export type ColorScale = { domain: string[]; range: Color[] }
 
 export type CustomPlot = {
   id: string
-  metric: string
-  param: string
+  xValue: string
+  yValue: string
 }
 
 export type CustomPlotData = CustomPlot & {

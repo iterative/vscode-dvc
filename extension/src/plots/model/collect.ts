@@ -121,12 +121,10 @@ const getCustomPlotData = (
   experiments: Experiment[],
   colorScale: ColorScale | undefined
 ): CustomPlotData => {
-  const { metric, param } = orderValue
-  const metricPath = getFullValuePath(ColumnType.METRICS, metric)
-  const paramPath = getFullValuePath(ColumnType.PARAMS, param)
+  const { xValue, yValue } = orderValue
 
   const renderLastIds = new Set(colorScale?.domain)
-  const values = getValues(experiments, metricPath, paramPath, renderLastIds)
+  const values = getValues(experiments, xValue, yValue, renderLastIds)
   const valueIds = new Set(values.map(({ id }) => id))
   const completeColorScale = fillColorScale(experiments, colorScale, valueIds)
 
@@ -141,8 +139,8 @@ const getCustomPlotData = (
       [PLOT_ANCHORS.DATA]: values,
       [PLOT_ANCHORS.METRIC_TYPE]: getDataType(typeof metricVal),
       [PLOT_ANCHORS.PARAM_TYPE]: getDataType(typeof paramVal),
-      [PLOT_ANCHORS.X_LABEL]: param,
-      [PLOT_ANCHORS.Y_LABEL]: metric,
+      [PLOT_ANCHORS.X_LABEL]: xValue,
+      [PLOT_ANCHORS.Y_LABEL]: yValue,
       [PLOT_ANCHORS.ZOOM_AND_PAN]: {
         bind: 'scales',
         name: 'grid',
@@ -150,9 +148,9 @@ const getCustomPlotData = (
       }
     },
     content: getContent(),
-    id: getCustomPlotId(metric, param),
-    metric,
-    param
+    id: getCustomPlotId(xValue, yValue),
+    xValue,
+    yValue
   }
 }
 

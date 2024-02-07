@@ -103,7 +103,7 @@ export class PlotsModel extends ModelWithPersistence {
       DEFAULT_SECTION_COLLAPSED
     )
     this.comparisonOrder = this.revive(PersistenceKey.PLOT_COMPARISON_ORDER, [])
-    this.customPlotsOrder = this.revive(PersistenceKey.PLOTS_CUSTOM_ORDER, [])
+    this.customPlotsOrder = this.revive(PersistenceKey.PLOTS_CUSTOM_ORDER, []) // TODO: make sure that we don't forget to migrate the old type to this new one
     this.smoothPlotValues = this.revive(
       PersistenceKey.PLOTS_SMOOTH_PLOT_VALUES,
       {}
