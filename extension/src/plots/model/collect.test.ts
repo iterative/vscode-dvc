@@ -132,18 +132,6 @@ describe('collectData', () => {
         sameContents(revisions, ['test-branch'])
       )
     ])
-
-    const workspaceBoundingBoxData = comparisonData.workspace[boundingBoxPlot]
-
-    expect(workspaceBoundingBoxData[0]).toMatchObject({
-      boundingBoxes: {
-        car: [
-          { bottom: 350, left: 150, right: 180, top: 320 },
-          { bottom: 340, left: 200, right: 230, top: 310 }
-        ],
-        'traffic light': [{ bottom: 210, left: 120, right: 195, top: 120 }]
-      }
-    })
   })
 })
 

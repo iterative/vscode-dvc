@@ -234,17 +234,15 @@ export type TemplatePlotOutput = {
 }
 
 export type BoundingBox = {
-  top: number
-  bottom: number
-  left: number
-  right: number
+  box: { left: number; right: number; top: number; bottom: number }
+  score: number
 }
 
 export type ImagePlotOutput = {
   revisions: string[]
   type: PlotsType
   url: string
-  boundingBoxes?: { label: string; box: BoundingBox }[]
+  boxes?: { [label: string]: BoundingBox[] }
 }
 
 export type PlotOutput = TemplatePlotOutput | ImagePlotOutput

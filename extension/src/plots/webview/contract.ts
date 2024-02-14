@@ -134,11 +134,8 @@ export type CustomPlotsData = {
 export const isVegaPlot = (plot: Plot): plot is TemplatePlot =>
   plot.type === PlotsType.VEGA
 
-export type ImagePlot = Omit<ImagePlotOutput, 'boundingBoxes'> & {
+export type ImagePlot = ImagePlotOutput & {
   ind?: number
-  boundingBoxes?: {
-    [label: string]: BoundingBox[]
-  }
 }
 
 export const isImagePlot = (plot: { type: PlotsType }): plot is ImagePlot =>

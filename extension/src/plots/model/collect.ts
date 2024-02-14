@@ -28,8 +28,7 @@ import {
   PlotsOutput,
   PlotsType,
   TemplatePlotOutput,
-  ImagePlotOutput,
-  BoundingBox
+  ImagePlotOutput
 } from '../../cli/dvc/contract'
 import { splitColumnPath } from '../../experiments/columns/paths'
 import { ColumnType, Experiment } from '../../experiments/webview/contract'
@@ -211,22 +210,6 @@ const getMultiImageInd = (path: string) => {
   return Number(fileName)
 }
 
-const collectImageBoundingBoxes = (
-  boundingBoxes: { label: string; box: BoundingBox }[]
-): { [label: string]: BoundingBox[] } => {
-  const acc: { [label: string]: BoundingBox[] } = {}
-
-  for (const { label, box } of boundingBoxes) {
-    if (!acc[label]) {
-      acc[label] = []
-    }
-
-    acc[label].push(box)
-  }
-
-  return acc
-}
-
 const collectImageData = (
   acc: ComparisonData,
   path: string,
@@ -258,8 +241,8 @@ const collectImageData = (
     imgPlot.ind = getMultiImageInd(path)
   }
 
-  if (plot.boundingBoxes) {
-    imgPlot.boundingBoxes = collectImageBoundingBoxes(plot.boundingBoxes)
+  if (plot.boxes) {
+    imgPlot.boxes = plot.boxes
   }
 
   acc[id][pathLabel].push(imgPlot)
@@ -382,11 +365,11 @@ const collectSelectedPlotImgClassLabels = (
   imgs: ImagePlot[] = []
 ) => {
   for (const img of imgs) {
-    if (!img.boundingBoxes) {
+    if (!img.boxes) {
       continue
     }
 
-    for (const label of Object.keys(img.boundingBoxes)) {
+    for (const label of Object.keys(img.boxes)) {
       boundingBoxClassLabels.add(label)
     }
   }
@@ -477,7 +460,7 @@ const getSelectedImgComparisonPlotClasses = ({
 }) => {
   const imgClasses: ComparisonPlotClass[] = []
 
-  for (const [label, boxes] of Object.entries(img.boundingBoxes || {})) {
+  for (const [label, boxes] of Object.entries(img.boxes || {})) {
     const selectedState = comparisonClassesSelected[path]?.[label]
 
     if (selectedState === false) {

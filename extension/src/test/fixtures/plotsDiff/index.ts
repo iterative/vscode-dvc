@@ -639,88 +639,88 @@ const getImageData = (
       type: PlotsType.IMAGE,
       revisions: [EXPERIMENT_WORKSPACE_ID],
       url: joinFunc(baseUrl, 'bounding_boxes.png'),
-      boundingBoxes: [
-        {
-          label: 'traffic light',
-          box: { left: 120, right: 195, top: 120, bottom: 210 }
-        },
-        {
-          label: 'sign',
-          box: { left: 300, right: 450, top: 170, bottom: 220 }
-        },
-        {
-          label: 'car',
-          box: { left: 150, right: 180, top: 320, bottom: 350 }
-        },
-        {
-          label: 'car',
-          box: { left: 200, right: 230, top: 310, bottom: 340 }
-        }
-      ]
+      boxes: {
+        'traffic light': [
+          { box: { left: 120, right: 195, top: 120, bottom: 210 }, score: 0.99 }
+        ],
+        car: [
+          { box: { left: 150, right: 180, top: 320, bottom: 350 }, score: 0.5 },
+          {
+            box: { left: 200, right: 230, top: 310, bottom: 340 },
+            score: 0.354
+          }
+        ],
+        sign: [
+          { box: { left: 300, right: 450, top: 170, bottom: 220 }, score: 0.87 }
+        ]
+      }
     },
     {
       type: PlotsType.IMAGE,
       revisions: ['main'],
       url: joinFunc(baseUrl, 'bounding_boxes.png'),
-      boundingBoxes: [
-        {
-          label: 'traffic light',
-          box: { left: 120, right: 195, top: 120, bottom: 210 }
-        },
-        {
-          label: 'sign',
-          box: { left: 300, right: 450, top: 170, bottom: 220 }
-        },
-        {
-          label: 'car',
-          box: { left: 150, right: 180, top: 320, bottom: 350 }
-        }
-      ]
+      boxes: {
+        'traffic light': [
+          { box: { left: 120, right: 195, top: 120, bottom: 210 }, score: 0.99 }
+        ],
+        car: [
+          { box: { left: 150, right: 180, top: 320, bottom: 350 }, score: 0.5 }
+        ],
+        sign: [
+          { box: { left: 300, right: 450, top: 170, bottom: 220 }, score: 0.87 }
+        ]
+      }
     },
     {
       type: PlotsType.IMAGE,
       revisions: ['exp-e7a67'],
       url: joinFunc(baseUrl, 'bounding_boxes.png'),
-      boundingBoxes: [
-        {
-          label: 'traffic light',
-          box: { left: 120, right: 195, top: 120, bottom: 210 }
-        },
-        {
-          label: 'car',
-          box: { left: 150, right: 180, top: 320, bottom: 350 }
-        }
-      ]
+      boxes: {
+        'traffic light': [
+          { box: { left: 120, right: 195, top: 120, bottom: 210 }, score: 0.99 }
+        ],
+        car: [
+          { box: { left: 150, right: 180, top: 320, bottom: 350 }, score: 0.5 }
+        ]
+      }
     },
     {
       type: PlotsType.IMAGE,
       revisions: ['test-branch'],
       url: joinFunc(baseUrl, 'bounding_boxes.png'),
-      boundingBoxes: [
-        {
-          label: 'traffic light',
-          box: { left: 120, right: 195, top: 120, bottom: 210 }
-        },
-        {
-          label: 'car',
-          box: { left: 150, right: 180, top: 320, bottom: 350 }
-        }
-      ]
+      boxes: {
+        'traffic light': [
+          {
+            box: { left: 120, right: 195, top: 120, bottom: 210 },
+            score: 0.764
+          }
+        ],
+        car: [
+          {
+            box: { left: 150, right: 180, top: 320, bottom: 350 },
+            score: 0.984
+          }
+        ]
+      }
     },
     {
       type: PlotsType.IMAGE,
       revisions: ['exp-83425'],
       url: joinFunc(baseUrl, 'bounding_boxes.png'),
-      boundingBoxes: [
-        {
-          label: 'traffic light',
-          box: { left: 120, right: 195, top: 120, bottom: 210 }
-        },
-        {
-          label: 'car',
-          box: { left: 150, right: 180, top: 320, bottom: 350 }
-        }
-      ]
+      boxes: {
+        'traffic light': [
+          {
+            box: { left: 120, right: 195, top: 120, bottom: 210 },
+            score: 0.984
+          }
+        ],
+        car: [
+          {
+            box: { left: 150, right: 180, top: 320, bottom: 350 },
+            score: 0.984
+          }
+        ]
+      }
     }
   ]
 })
@@ -1008,38 +1008,37 @@ const boundingBoxColors = ['#ff3838', '#ff9d97', '#ff701f']
 
 export const collectPlotClasses = ({
   plotClasses,
-  classLabels,
-  boundingBoxes,
+  imgLabels,
+  imgBoxes,
   id,
   path
 }: {
   plotClasses: ComparisonPlotClasses
-  classLabels: Set<string>
-  boundingBoxes: { label: string; box: BoundingBox }[]
+  imgLabels: string[]
+  imgBoxes: { [label: string]: BoundingBox[] }
   id: string
   path: string
 }) => {
-  const classAcc: {
-    [label: string]: {
-      label: string
-      boxes: BoundingBox[]
-    }
-  } = {}
+  const classAcc = []
 
-  for (const { label, box } of boundingBoxes) {
-    classLabels.add(label)
-
-    if (!classAcc[label]) {
-      classAcc[label] = { label, boxes: [] }
-    }
-
-    classAcc[label].boxes.push(box)
+  for (const label of imgLabels) {
+    classAcc.push({ boxes: imgBoxes[label], label })
   }
 
   if (!plotClasses[id]) {
     plotClasses[id] = {}
   }
+
   plotClasses[id][path] = Object.values(classAcc)
+}
+
+export const collectClassLabels = (
+  imgLabels: string[],
+  plotClasses: Set<string>
+) => {
+  for (const label of imgLabels) {
+    plotClasses.add(label)
+  }
 }
 
 export const getComparisonWebviewMessage = (
@@ -1069,7 +1068,7 @@ export const getComparisonWebviewMessage = (
       }
     }
 
-    for (const { url, revisions, boundingBoxes } of plots) {
+    for (const { url, revisions, boxes } of plots) {
       const id = revisions?.[0]
       if (!id) {
         continue
@@ -1092,14 +1091,16 @@ export const getComparisonWebviewMessage = (
         img.ind = getIndFromComparisonMultiImgPath(path)
       }
 
-      if (boundingBoxes) {
+      if (boxes) {
+        const imgLabels = Object.keys(boxes)
         collectPlotClasses({
-          boundingBoxes: boundingBoxes,
           plotClasses,
-          classLabels,
+          imgBoxes: boxes,
+          imgLabels,
           id,
           path
         })
+        collectClassLabels(imgLabels, classLabels)
       }
 
       plotAcc[pathLabel].revisions[id].imgs.push(img)

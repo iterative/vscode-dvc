@@ -780,11 +780,14 @@ describe('ComparisonTable', () => {
       const boundingBoxPlotImage = screen.getByLabelText(
         /bounding_boxes.png \(workspace\)/
       )
+      const getBoxTextReg = (label: string) => new RegExp(`${label} 0\\.\\d+`)
       expect(boundingBoxPlotImage).toHaveAttribute('viewBox')
       expect(
-        within(boundingBoxPlotImage).getByText('traffic light')
+        within(boundingBoxPlotImage).getByText(getBoxTextReg('traffic light'))
       ).toBeInTheDocument()
-      expect(within(boundingBoxPlotImage).getAllByText('car')).toHaveLength(2)
+      expect(
+        within(boundingBoxPlotImage).getAllByText(getBoxTextReg('car'))
+      ).toHaveLength(2)
     })
   })
 })
