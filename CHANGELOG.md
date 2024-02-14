@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.9] - 2024-02-14
+
+### 🔨 Maintenance
+
+- Pin version of VS Code tested against to 1.85.2 for e2e tests [#5265](https://github.com/iterative/vscode-dvc/pull/5265) by [@mattseddon](https://github.com/mattseddon)
+- Update demo to latest commit and update version (3.43.1) [#5259](https://github.com/iterative/vscode-dvc/pull/5259) by [@julieg18](https://github.com/julieg18)
+- Update demo project and latest tested CLI version (3.44.0) [#5301](https://github.com/iterative/vscode-dvc/pull/5301) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.2.8] - 2024-01-31
 
 ### 🐛 Bug Fixes
