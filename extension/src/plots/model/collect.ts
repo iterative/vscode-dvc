@@ -449,20 +449,16 @@ export const collectSelectedComparisonPlots = ({
 }
 
 const getSelectedImgComparisonPlotClasses = ({
-  classDetails,
+  selectedClassLabels,
   img
 }: {
-  classDetails: ComparisonClassDetails
+  selectedClassLabels: string[]
   img: ImagePlot
   path: string
 }) => {
   const imgClasses: ComparisonPlotClass[] = []
 
-  for (const [label, { selected }] of Object.entries(classDetails)) {
-    if (!selected) {
-      continue
-    }
-
+  for (const label of selectedClassLabels) {
     const boxes = img?.boxes?.[label]
 
     if (boxes) {
@@ -478,22 +474,22 @@ const getSelectedImgComparisonPlotClasses = ({
 
 const collectedSelectedPathComparisonPlotClasses = ({
   acc,
-  classDetails,
   id,
   comparisonData,
-  path
+  path,
+  selectedClassLabels
 }: {
   acc: ComparisonPlotClasses
-  classDetails: ComparisonClassDetails
+  selectedClassLabels: string[]
   comparisonData: ComparisonData
   path: string
   id: string
 }) => {
   for (const img of comparisonData[id][path]) {
     const imgClasses = getSelectedImgComparisonPlotClasses({
-      classDetails,
       img,
-      path
+      path,
+      selectedClassLabels
     })
 
     if (imgClasses.length === 0) {
@@ -520,17 +516,20 @@ export const collectSelectedComparisonPlotClasses = ({
   const acc: ComparisonPlotClasses = {}
 
   for (const { path, classDetails } of plots) {
-    if (isEmpty(classDetails)) {
+    const selectedClassLabels = Object.keys(classDetails).filter(
+      (label: string) => classDetails[label].selected
+    )
+    if (isEmpty(classDetails) || isEmpty(selectedClassLabels)) {
       continue
     }
 
     for (const id of selectedRevisionIds) {
       collectedSelectedPathComparisonPlotClasses({
         acc,
-        classDetails,
         comparisonData,
         id,
-        path
+        path,
+        selectedClassLabels
       })
     }
   }
