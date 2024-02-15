@@ -402,14 +402,6 @@ const collectSelectedPathComparisonPlots = ({
     collectSelectedPlotImgClassLabels(boundingBoxClassLabels, imgs)
   }
 
-  for (const [ind, label] of [...boundingBoxClassLabels].entries()) {
-    const selectedState = comparisonClassesSelected[path]?.[label]
-    pathRevisions.classDetails[label] = {
-      color: getBoundingBoxColor(ind),
-      selected: selectedState === undefined ? true : selectedState
-    }
-  }
-
   pathRevisions.classDetails = getSelectedPathComparisonPlotClassDetails(
     boundingBoxClassLabels,
     comparisonClassesSelected,
@@ -456,10 +448,14 @@ const getSelectedImgComparisonPlotClasses = ({
   img: ImagePlot
   path: string
 }) => {
+  const imgBoxes = img.boxes
+  if (!imgBoxes) {
+    return []
+  }
   const imgClasses: ComparisonPlotClass[] = []
 
   for (const label of selectedClassLabels) {
-    const boxes = img?.boxes?.[label]
+    const boxes = imgBoxes[label]
 
     if (boxes) {
       imgClasses.push({
