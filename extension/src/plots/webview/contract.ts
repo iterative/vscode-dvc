@@ -1,5 +1,5 @@
 import type { TopLevelSpec } from 'vega-lite'
-import { Color } from '../../experiments/model/status/colors'
+import { BoundingBoxColor, Color } from '../../common/colors'
 import {
   AnchorDefinitions,
   BoundingBox,
@@ -52,7 +52,7 @@ export type SectionCollapsed = typeof DEFAULT_SECTION_COLLAPSED
 export type ComparisonRevisionData = { [revision: string]: ComparisonPlot }
 
 export type ComparisonClassDetails = {
-  [label: string]: { selected: boolean; color: string }
+  [label: string]: { selected: boolean; color: BoundingBoxColor }
 }
 
 export type ComparisonPlots = {

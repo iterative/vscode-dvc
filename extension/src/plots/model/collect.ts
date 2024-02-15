@@ -41,7 +41,7 @@ import {
   getParent,
   getPathArray
 } from '../../fileSystem/util'
-import { Color } from '../../experiments/model/status/colors'
+import { Color, getBoundingBoxColor } from '../../common/colors'
 
 export const getCustomPlotId = (metric: string, param: string) =>
   `custom-${metric}-${param}`
@@ -337,29 +337,6 @@ type GetComparisonPlotImg = (
   path: string
 ) => ComparisonPlotImg
 
-export const boundingBoxColors = [
-  '#ff3838',
-  '#ff9d97',
-  '#ff701f',
-  '#ffb21d',
-  '#cfd231',
-  '#48f90a',
-  '#92cc17',
-  '#3ddb86',
-  '#1a9334',
-  '#00d4bb',
-  '#2c99a8',
-  '#00c2ff',
-  '#344593',
-  '#6473ff',
-  '#0018ec',
-  '#8438ff',
-  '#520085',
-  '#cb38ff',
-  '#ff95c8',
-  '#ff37c7'
-]
-
 const collectSelectedPlotImgClassLabels = (
   boundingBoxClassLabels: Set<string>,
   imgs: ImagePlot[] = []
@@ -373,6 +350,26 @@ const collectSelectedPlotImgClassLabels = (
       boundingBoxClassLabels.add(label)
     }
   }
+}
+
+const getSelectedPathComparisonPlotClassDetails = (
+  boundingBoxClassLabels: Set<string>,
+  comparisonClassesSelected: ComparisonClassesSelected,
+  path: string
+) => {
+  const classDetails: ComparisonClassDetails = {}
+
+  let classLabelInd = 0
+  for (const label of boundingBoxClassLabels) {
+    const selectedState = comparisonClassesSelected[path]?.[label]
+    classDetails[label] = {
+      color: getBoundingBoxColor(classLabelInd),
+      selected: selectedState === undefined ? true : selectedState
+    }
+    classLabelInd++
+  }
+
+  return classDetails
 }
 
 const collectSelectedPathComparisonPlots = ({
@@ -412,10 +409,16 @@ const collectSelectedPathComparisonPlots = ({
   for (const [ind, label] of [...boundingBoxClassLabels].entries()) {
     const selectedState = comparisonClassesSelected[path]?.[label]
     pathRevisions.classDetails[label] = {
-      color: boundingBoxColors[ind % boundingBoxColors.length],
+      color: getBoundingBoxColor(ind),
       selected: selectedState === undefined ? true : selectedState
     }
   }
+
+  pathRevisions.classDetails = getSelectedPathComparisonPlotClassDetails(
+    boundingBoxClassLabels,
+    comparisonClassesSelected,
+    path
+  )
 
   acc.push(pathRevisions)
 }

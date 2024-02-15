@@ -25,7 +25,7 @@ import {
   ComparisonPlotClasses
 } from '../../../plots/webview/contract'
 import { join } from '../../util/path'
-import { copyOriginalColors } from '../../../experiments/model/status/colors'
+import { copyOriginalColors, getBoundingBoxColor } from '../../../common/colors'
 import { ColumnType } from '../../../experiments/webview/contract'
 
 const basicVega = {
@@ -1004,8 +1004,6 @@ const getIndFromComparisonMultiImgPath = (path: string) => {
   return Number((pathIndMatches as string[])[1])
 }
 
-const boundingBoxColors = ['#ff3838', '#ff9d97', '#ff701f']
-
 export const collectPlotClasses = ({
   plotClasses,
   imgLabels,
@@ -1109,7 +1107,7 @@ export const getComparisonWebviewMessage = (
     for (const [ind, label] of [...classLabels].entries()) {
       plotAcc[pathLabel].classDetails[label] = {
         selected: true,
-        color: boundingBoxColors[ind]
+        color: getBoundingBoxColor(ind)
       }
     }
   }

@@ -1,5 +1,5 @@
 import { canSelect, limitToMaxSelected } from '.'
-import { copyOriginalColors } from './colors'
+import { copyOriginalColors } from '../../../common/colors'
 import { Experiment } from '../../webview/contract'
 import { ExecutorStatus } from '../../../cli/dvc/contract'
 

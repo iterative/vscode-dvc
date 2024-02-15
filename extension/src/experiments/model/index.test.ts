@@ -2,7 +2,7 @@
 import { join } from 'path'
 import { commands } from 'vscode'
 import { ExperimentsModel } from '.'
-import { copyOriginalColors } from './status/colors'
+import { copyOriginalColors } from '../../common/colors'
 import gitLogFixture from '../../test/fixtures/expShow/base/gitLog'
 import rowOrderFixture from '../../test/fixtures/expShow/base/rowOrder'
 import outputFixture from '../../test/fixtures/expShow/base/output'

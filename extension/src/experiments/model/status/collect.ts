@@ -5,7 +5,7 @@ import {
   tooManySelected,
   UNSELECTED
 } from '.'
-import { Color, copyOriginalColors } from './colors'
+import { Color, copyOriginalColors } from '../../../common/colors'
 import { hasKey } from '../../../util/object'
 import { Experiment, isQueued, RunningExperiment } from '../../webview/contract'
 import { definedAndNonEmpty, reorderListSubset } from '../../../util/array'

@@ -5,7 +5,7 @@ import {
   StudioLinkType,
   WORKSPACE_BRANCH
 } from '../../../../experiments/webview/contract'
-import { copyOriginalColors } from '../../../../experiments/model/status/colors'
+import { copyOriginalColors } from '../../../../common/colors'
 import { shortenForLabel } from '../../../../util/string'
 import {
   ExecutorStatus,

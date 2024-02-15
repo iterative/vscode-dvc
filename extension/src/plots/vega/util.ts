@@ -14,7 +14,7 @@ import {
 } from 'vega-lite/build/src/spec/repeat'
 import { TopLevelUnitSpec } from 'vega-lite/build/src/spec/unit'
 import { ColorScale } from '../webview/contract'
-import { Color } from '../../experiments/model/status/colors'
+import { Color } from '../../common/colors'
 import {
   AnchorDefinitions,
   PLOT_ANCHORS,

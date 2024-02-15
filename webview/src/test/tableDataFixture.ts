@@ -1,4 +1,4 @@
-import { copyOriginalColors } from 'dvc/src/experiments/model/status/colors'
+import { copyOriginalColors } from 'dvc/src/common/colors'
 import { Commit } from 'dvc/src/experiments/webview/contract'
 import { TableDataState } from '../experiments/state/tableDataSlice'
 
