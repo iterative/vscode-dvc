@@ -32,7 +32,8 @@ import {
   ImagePlot,
   ComparisonMultiPlotValues,
   ComparisonPlotImg,
-  ComparisonClassesSelected
+  ComparisonClassesSelected,
+  ComparisonPlotRow
 } from '../webview/contract'
 import {
   EXPERIMENT_WORKSPACE_ID,
@@ -274,16 +275,15 @@ export class PlotsModel extends ModelWithPersistence {
     return this.getSelectedComparisonPlots(paths, selectedRevisionIds)
   }
 
-  public getComparisonPlotClasses(paths: string[]) {
+  public getComparisonPlotClasses(plots: ComparisonPlotRow[]) {
     const selectedRevisionIds = this.getSelectedRevisionIds()
     if (!definedAndNonEmpty(selectedRevisionIds)) {
       return {}
     }
 
     return collectSelectedComparisonPlotClasses({
-      comparisonClassesSelected: this.getComparisonClassesSelected(),
       comparisonData: this.comparisonData,
-      paths,
+      plots,
       selectedRevisionIds
     })
   }

@@ -55,11 +55,13 @@ export type ComparisonClassDetails = {
   [label: string]: { selected: boolean; color: BoundingBoxColor }
 }
 
-export type ComparisonPlots = {
-  path: string
+export type ComparisonPlotRow = {
   classDetails: ComparisonClassDetails
+  path: string
   revisions: ComparisonRevisionData
-}[]
+}
+
+export type ComparisonPlots = ComparisonPlotRow[]
 
 export type RevisionSummaryColumns = Array<{
   path: string

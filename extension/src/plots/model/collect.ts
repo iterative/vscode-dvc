@@ -1,5 +1,6 @@
 import get from 'lodash.get'
 import type { TopLevelSpec } from 'vega-lite'
+import isEmpty from 'lodash.isempty'
 import {
   getContent,
   CustomPlotsOrderValue,
@@ -18,7 +19,8 @@ import {
   ComparisonClassDetails,
   ComparisonPlotClasses,
   ComparisonClassesSelected,
-  ComparisonPlotClass
+  ComparisonPlotClass,
+  ComparisonPlotRow
 } from '../webview/contract'
 import {
   AnchorDefinitions,
@@ -325,12 +327,6 @@ export const collectData = (output: PlotsOutput): DataAccumulator => {
   return acc
 }
 
-type ComparisonPlotsAcc = {
-  classDetails: ComparisonClassDetails
-  path: string
-  revisions: ComparisonRevisionData
-}[]
-
 type GetComparisonPlotImg = (
   img: ImagePlot,
   id: string,
@@ -380,7 +376,7 @@ const collectSelectedPathComparisonPlots = ({
   selectedRevisionIds,
   getComparisonPlotImg
 }: {
-  acc: ComparisonPlotsAcc
+  acc: ComparisonPlotRow[]
   comparisonData: ComparisonData
   comparisonClassesSelected: ComparisonClassesSelected
   path: string
@@ -435,8 +431,8 @@ export const collectSelectedComparisonPlots = ({
   paths: string[]
   selectedRevisionIds: string[]
   getComparisonPlotImg: GetComparisonPlotImg
-}): ComparisonPlotsAcc => {
-  const acc: ComparisonPlotsAcc = []
+}): ComparisonPlotRow[] => {
+  const acc: ComparisonPlotRow[] = []
 
   for (const path of paths) {
     collectSelectedPathComparisonPlots({
@@ -453,27 +449,28 @@ export const collectSelectedComparisonPlots = ({
 }
 
 const getSelectedImgComparisonPlotClasses = ({
-  comparisonClassesSelected,
-  img,
-  path
+  classDetails,
+  img
 }: {
-  comparisonClassesSelected: ComparisonClassesSelected
+  classDetails: ComparisonClassDetails
   img: ImagePlot
   path: string
 }) => {
   const imgClasses: ComparisonPlotClass[] = []
 
-  for (const [label, boxes] of Object.entries(img.boxes || {})) {
-    const selectedState = comparisonClassesSelected[path]?.[label]
-
-    if (selectedState === false) {
+  for (const [label, { selected }] of Object.entries(classDetails)) {
+    if (!selected) {
       continue
     }
 
-    imgClasses.push({
-      boxes,
-      label
-    })
+    const boxes = img?.boxes?.[label]
+
+    if (boxes) {
+      imgClasses.push({
+        boxes,
+        label
+      })
+    }
   }
 
   return imgClasses
@@ -481,20 +478,20 @@ const getSelectedImgComparisonPlotClasses = ({
 
 const collectedSelectedPathComparisonPlotClasses = ({
   acc,
-  comparisonClassesSelected,
+  classDetails,
   id,
   comparisonData,
   path
 }: {
-  comparisonClassesSelected: ComparisonClassesSelected
   acc: ComparisonPlotClasses
+  classDetails: ComparisonClassDetails
   comparisonData: ComparisonData
   path: string
   id: string
 }) => {
   for (const img of comparisonData[id][path]) {
     const imgClasses = getSelectedImgComparisonPlotClasses({
-      comparisonClassesSelected,
+      classDetails,
       img,
       path
     })
@@ -512,23 +509,25 @@ const collectedSelectedPathComparisonPlotClasses = ({
 }
 
 export const collectSelectedComparisonPlotClasses = ({
-  comparisonClassesSelected,
   comparisonData,
-  paths,
+  plots,
   selectedRevisionIds
 }: {
-  comparisonClassesSelected: ComparisonClassesSelected
   comparisonData: ComparisonData
-  paths: string[]
+  plots: ComparisonPlotRow[]
   selectedRevisionIds: string[]
-}) => {
+}): ComparisonPlotClasses => {
   const acc: ComparisonPlotClasses = {}
 
-  for (const id of selectedRevisionIds) {
-    for (const path of paths) {
+  for (const { path, classDetails } of plots) {
+    if (isEmpty(classDetails)) {
+      continue
+    }
+
+    for (const id of selectedRevisionIds) {
       collectedSelectedPathComparisonPlotClasses({
         acc,
-        comparisonClassesSelected,
+        classDetails,
         comparisonData,
         id,
         path
