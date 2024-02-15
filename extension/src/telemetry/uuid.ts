@@ -40,30 +40,31 @@ const writeMissingConfigs = (
 }
 
 const readOrCreateConfig = (): string | undefined => {
-  const dvcAppDir = getDVCAppDir()
-  const iterativeAppDir = getIterativeAppDir()
+  try {
+    const dvcAppDir = getDVCAppDir()
+    const iterativeAppDir = getIterativeAppDir()
 
-  const legacyDirectory = join(dvcAppDir, 'user_id')
+    const legacyDirectory = join(dvcAppDir, 'user_id')
 
-  const legacyConfigPath = legacyDirectory
-  const legacyConfig = loadConfig(legacyConfigPath)
+    const legacyConfigPath = legacyDirectory
+    const legacyConfig = loadConfig(legacyConfigPath)
 
-  const configPath = join(iterativeAppDir, 'telemetry')
-  const config = loadConfig(configPath)
+    const configPath = join(iterativeAppDir, 'telemetry')
+    const config = loadConfig(configPath)
 
-  const user_id = legacyConfig.user_id || config.user_id || v4()
+    const user_id = legacyConfig.user_id || config.user_id || v4()
 
-  if (legacyConfig.user_id !== user_id || config.user_id !== user_id) {
-    writeMissingConfigs(
-      user_id,
-      legacyConfig,
-      legacyConfigPath,
-      config,
-      configPath
-    )
-  }
-
-  return user_id
+    if (legacyConfig.user_id !== user_id || config.user_id !== user_id) {
+      writeMissingConfigs(
+        user_id,
+        legacyConfig,
+        legacyConfigPath,
+        config,
+        configPath
+      )
+    }
+    return user_id
+  } catch {}
 }
 
 export const readOrCreateUserId = () => {
