@@ -191,17 +191,19 @@ $gap: 4px;
 
 .classButton {
   white-space: nowrap;
-  border: none;
   border-radius: 2px;
-  padding: 4px;
+  padding: 3px;
   margin-right: 4px;
   color: #fff;
   cursor: pointer;
-  opacity: 0.5;
   font-size: 0.8rem;
+  border: 1px solid var(--class-color);
+  background: var(--class-color);
 
-  input:checked + & {
-    opacity: 1;
+  &.classButtonSelected {
+    color: $fg-color;
+    border-color: $fg-color;
+    background: none;
   }
 }
 
