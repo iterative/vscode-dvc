@@ -54,27 +54,29 @@ export const ComparisonTableRowClasses: React.FC<{
         <div className={cx(styles.classButtons, styles.tableRowClassButtons)}>
           {labelElements.slice(0, 3)}
         </div>
-        <Tooltip
-          appendTo={document.body}
-          content={
-            <div
-              className={cx(styles.classButtons, styles.tooltipClassButtons)}
-            >
-              {hiddenLabelElements}
-            </div>
-          }
-          trigger="click"
-          interactive
-          placement="bottom-start"
-        >
-          <span className={styles.showMoreButtonWrapper}>
-            <Button
-              appearance="secondary"
-              onClick={() => {}}
-              text={`Show more (${hiddenLabelElements.length})`}
-            />
-          </span>
-        </Tooltip>
+        {hiddenLabelElements.length > 0 && (
+          <Tooltip
+            appendTo={document.body}
+            content={
+              <div
+                className={cx(styles.classButtons, styles.tooltipClassButtons)}
+              >
+                {hiddenLabelElements}
+              </div>
+            }
+            trigger="click"
+            interactive
+            placement="bottom-start"
+          >
+            <span className={styles.showMoreButtonWrapper}>
+              <Button
+                appearance="secondary"
+                onClick={() => {}}
+                text={`Show more (${hiddenLabelElements.length})`}
+              />
+            </span>
+          </Tooltip>
+        )}
       </div>
     </ComparisonTablePinnedContentRow>
   )
