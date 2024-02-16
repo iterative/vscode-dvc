@@ -189,22 +189,46 @@ $gap: 4px;
   display: none;
 }
 
+.classButtons {
+  font-family: $font;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tableRowClassButtons {
+  max-width: calc(100% - 180px);
+}
+
+.tooltipClassButtons {
+  padding: 4px;
+  flex-wrap: wrap;
+}
+
 .classButton {
-  white-space: nowrap;
   border-radius: 2px;
-  padding: 3px;
-  margin-right: 4px;
-  color: #fff;
+  padding: 4px;
   cursor: pointer;
   font-size: 0.8rem;
-  border: 1px solid var(--class-color);
-  background: var(--class-color);
+  border: 1px solid $fg-color;
+  color: $fg-color;
+  background: none;
+  overflow: hidden;
+  display: inline-block;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 30px;
 
   &.classButtonSelected {
-    color: $fg-color;
-    border-color: $fg-color;
-    background: none;
+    border-color: var(--class-color);
+    color: #fff;
+    background: var(--class-color);
   }
+}
+
+.showMoreButtonWrapper {
+  display: flex;
+  margin-left: 6px;
 }
 
 .image {

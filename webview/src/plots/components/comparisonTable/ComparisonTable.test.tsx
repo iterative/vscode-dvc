@@ -773,6 +773,22 @@ describe('ComparisonTable', () => {
       })
     })
 
+    it('should show a max of three labels, placing the rest in a dropdown', async () => {
+      renderTable()
+
+      expect(screen.getAllByRole('checkbox')).toHaveLength(3)
+
+      const showMoreButton = screen.getByText('Show more (1)')
+
+      expect(showMoreButton).toBeInTheDocument()
+
+      fireEvent.click(showMoreButton)
+
+      const classes = await screen.findAllByRole('checkbox')
+
+      expect(classes).toHaveLength(4)
+    })
+
     it('should show svgs with bounding boxes instead of images', () => {
       renderTable()
 

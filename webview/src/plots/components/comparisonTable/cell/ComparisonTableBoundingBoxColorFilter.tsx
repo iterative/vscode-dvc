@@ -1,7 +1,7 @@
 import React from 'react'
 
 export const getColorFilterId = (imgAlt: string, color: string) =>
-  `${imgAlt.replace(/\s/g, '-')}-${color.slice(1)}`
+  `${imgAlt.replace(/[\s()]/g, '-')}-${color.slice(1)}`
 
 export const ComparisonTableBoundingBoxColorFilter: React.FC<{
   color: string

@@ -4,6 +4,8 @@ import cx from 'classnames'
 import styles from './styles.module.scss'
 import { ComparisonTablePinnedContentRow } from './ComparisonTablePinnedContentRow'
 import { toggleComparisonClass } from '../../util/messages'
+import Tooltip from '../../../shared/components/tooltip/Tooltip'
+import { Button } from '../../../shared/components/button/Button'
 
 export const ComparisonTableRowClasses: React.FC<{
   classDetails: ComparisonClassDetails
@@ -18,6 +20,27 @@ export const ComparisonTableRowClasses: React.FC<{
     return
   }
 
+  const labelElements = classDetailsArr.map(([label, { color, selected }]) => (
+    <label
+      key={label}
+      className={cx(styles.classButton, selected && styles.classButtonSelected)}
+      style={{ '--class-color': color } as React.CSSProperties}
+    >
+      <input
+        type="checkbox"
+        name="labels"
+        value={label}
+        onChange={event =>
+          toggleComparisonClass(path, label, event.target.checked)
+        }
+        checked={selected}
+        className={styles.hiddenInput}
+      />
+      {label}
+    </label>
+  ))
+  const hiddenLabelElements = labelElements.slice(4)
+
   return (
     <ComparisonTablePinnedContentRow
       pinnedColumn={pinnedColumn}
@@ -28,25 +51,30 @@ export const ComparisonTableRowClasses: React.FC<{
         className={cx(styles.classes, cellClasses)}
       >
         <p className={styles.classesTitle}>Classes</p>
-        {classDetailsArr.map(([label, { color, selected }]) => (
-          <label
-            key={label}
-            className={styles.classButton}
-            style={{ '--class-color': color } as React.CSSProperties}
-          >
-            <input
-              type="checkbox"
-              name="labels"
-              value={label}
-              onChange={event =>
-                toggleComparisonClass(path, label, event.target.checked)
-              }
-              checked={selected}
-              className={styles.hiddenInput}
+        <div className={cx(styles.classButtons, styles.tableRowClassButtons)}>
+          {labelElements.slice(0, 3)}
+        </div>
+        <Tooltip
+          appendTo={document.body}
+          content={
+            <div
+              className={cx(styles.classButtons, styles.tooltipClassButtons)}
+            >
+              {hiddenLabelElements}
+            </div>
+          }
+          trigger="click"
+          interactive
+          placement="bottom-start"
+        >
+          <span className={styles.showMoreButtonWrapper}>
+            <Button
+              appearance="secondary"
+              onClick={() => {}}
+              text={`Show more (${hiddenLabelElements.length})`}
             />
-            {label}
-          </label>
-        ))}
+          </span>
+        </Tooltip>
       </div>
     </ComparisonTablePinnedContentRow>
   )

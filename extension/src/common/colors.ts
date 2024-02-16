@@ -18,7 +18,6 @@ const boundingBoxColorsList = [
   '#ff701f',
   '#ffb21d',
   '#cfd231',
-  '#48f90a',
   '#92cc17',
   '#3ddb86',
   '#1a9334',
