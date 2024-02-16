@@ -1,7 +1,8 @@
 import type { TopLevelSpec } from 'vega-lite'
-import { Color } from '../../experiments/model/status/colors'
+import { BoundingBoxColor, Color } from '../../common/colors'
 import {
   AnchorDefinitions,
+  BoundingBox,
   ImagePlotOutput,
   PlotsType,
   TemplatePlotOutput
@@ -51,14 +52,16 @@ export type SectionCollapsed = typeof DEFAULT_SECTION_COLLAPSED
 export type ComparisonRevisionData = { [revision: string]: ComparisonPlot }
 
 export type ComparisonClassDetails = {
-  [label: string]: { selected: boolean; color: string }
+  [label: string]: { selected: boolean; color: BoundingBoxColor }
 }
 
-export type ComparisonPlots = {
-  path: string
+export type ComparisonPlotRow = {
   classDetails: ComparisonClassDetails
+  path: string
   revisions: ComparisonRevisionData
-}[]
+}
+
+export type ComparisonPlots = ComparisonPlotRow[]
 
 export type RevisionSummaryColumns = Array<{
   path: string
@@ -81,14 +84,13 @@ export type ComparisonMultiPlotValues = {
   [revision: string]: { [path: string]: number }
 }
 
+export type ComparisonClassesSelected = {
+  [path: string]: { [label: string]: boolean }
+}
+
 export type ComparisonPlotClass = {
   label: string
-  boxes: {
-    h: number
-    w: number
-    x: number
-    y: number
-  }[]
+  boxes: BoundingBox[]
 }
 
 export type ComparisonPlotClasses = {

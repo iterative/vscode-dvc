@@ -3,13 +3,15 @@ import { ComparisonClassDetails } from 'dvc/src/plots/webview/contract'
 import cx from 'classnames'
 import styles from './styles.module.scss'
 import { ComparisonTablePinnedContentRow } from './ComparisonTablePinnedContentRow'
+import { toggleComparisonClass } from '../../util/messages'
 
 export const ComparisonTableRowClasses: React.FC<{
   classDetails: ComparisonClassDetails
   pinnedColumn: string
   nbColumns: number
   cellClasses: string
-}> = ({ classDetails, pinnedColumn, nbColumns, cellClasses }) => {
+  path: string
+}> = ({ classDetails, pinnedColumn, nbColumns, cellClasses, path }) => {
   const classDetailsArr = Object.entries(classDetails)
 
   if (classDetailsArr.length === 0) {
@@ -36,7 +38,10 @@ export const ComparisonTableRowClasses: React.FC<{
               type="checkbox"
               name="labels"
               value={label}
-              defaultChecked={selected}
+              onChange={event =>
+                toggleComparisonClass(path, label, event.target.checked)
+              }
+              checked={selected}
               className={styles.hiddenInput}
             />
             {label}

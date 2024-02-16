@@ -19,7 +19,6 @@ import { WebviewWrapper } from '../shared/components/webviewWrapper/WebviewWrapp
 import { update } from '../plots/components/comparisonTable/comparisonTableSlice'
 import { update as ribbonUpdate } from '../plots/components/ribbon/ribbonSlice'
 import { plotsReducers } from '../plots/store'
-import { addBoundingBoxes } from '../test/boundingBoxesFixture'
 
 const MockedState: React.FC<{
   data: PlotsComparisonData
@@ -150,11 +149,4 @@ WithOnlyMissingData.args = {
       }
     })
     .filter(Boolean)
-}
-
-const fixtureWithBoundingBoxes = addBoundingBoxes(comparisonTableFixture)
-export const WithBoundingBoxes = Template.bind({})
-WithBoundingBoxes.args = {
-  plotClasses: fixtureWithBoundingBoxes.plotClasses,
-  plots: fixtureWithBoundingBoxes.plots
 }

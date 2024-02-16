@@ -1,5 +1,6 @@
 import get from 'lodash.get'
 import type { TopLevelSpec } from 'vega-lite'
+import isEmpty from 'lodash.isempty'
 import {
   getContent,
   CustomPlotsOrderValue,
@@ -14,7 +15,12 @@ import {
   CustomPlotData,
   CustomPlotValues,
   ComparisonRevisionData,
-  ComparisonPlotImg
+  ComparisonPlotImg,
+  ComparisonClassDetails,
+  ComparisonPlotClasses,
+  ComparisonClassesSelected,
+  ComparisonPlotClass,
+  ComparisonPlotRow
 } from '../webview/contract'
 import {
   AnchorDefinitions,
@@ -23,7 +29,8 @@ import {
   PlotOutput,
   PlotsOutput,
   PlotsType,
-  TemplatePlotOutput
+  TemplatePlotOutput,
+  ImagePlotOutput
 } from '../../cli/dvc/contract'
 import { splitColumnPath } from '../../experiments/columns/paths'
 import { ColumnType, Experiment } from '../../experiments/webview/contract'
@@ -36,7 +43,7 @@ import {
   getParent,
   getPathArray
 } from '../../fileSystem/util'
-import { Color } from '../../experiments/model/status/colors'
+import { Color, getBoundingBoxColor } from '../../common/colors'
 
 export const getCustomPlotId = (metric: string, param: string) =>
   `custom-${metric}-${param}`
@@ -208,7 +215,7 @@ const getMultiImageInd = (path: string) => {
 const collectImageData = (
   acc: ComparisonData,
   path: string,
-  plot: ImagePlot
+  plot: ImagePlotOutput
 ) => {
   const isMultiImgPlot = MULTI_IMAGE_PATH_REG.test(path)
   const pathLabel = isMultiImgPlot ? getMultiImagePath(path) : path
@@ -226,10 +233,18 @@ const collectImageData = (
     acc[id][pathLabel] = []
   }
 
-  const imgPlot: ImagePlot = { ...plot }
+  const imgPlot: ImagePlot = {
+    revisions: plot.revisions,
+    type: plot.type,
+    url: plot.url
+  }
 
   if (isMultiImgPlot) {
     imgPlot.ind = getMultiImageInd(path)
+  }
+
+  if (plot.boxes) {
+    imgPlot.boxes = plot.boxes
   }
 
   acc[id][pathLabel].push(imgPlot)
@@ -312,65 +327,207 @@ export const collectData = (output: PlotsOutput): DataAccumulator => {
   return acc
 }
 
-type ComparisonPlotsAcc = { path: string; revisions: ComparisonRevisionData }[]
-
 type GetComparisonPlotImg = (
   img: ImagePlot,
   id: string,
   path: string
 ) => ComparisonPlotImg
 
+const collectSelectedPlotImgClassLabels = (
+  boundingBoxClassLabels: Set<string>,
+  imgs: ImagePlot[] = []
+) => {
+  for (const img of imgs) {
+    if (!img.boxes) {
+      continue
+    }
+
+    for (const label of Object.keys(img.boxes)) {
+      boundingBoxClassLabels.add(label)
+    }
+  }
+}
+
+const getSelectedPathComparisonPlotClassDetails = (
+  boundingBoxClassLabels: Set<string>,
+  comparisonClassesSelected: ComparisonClassesSelected,
+  path: string
+) => {
+  const classDetails: ComparisonClassDetails = {}
+
+  let classLabelInd = 0
+  for (const label of boundingBoxClassLabels) {
+    const selectedState = comparisonClassesSelected[path]?.[label]
+    classDetails[label] = {
+      color: getBoundingBoxColor(classLabelInd),
+      selected: selectedState === undefined ? true : selectedState
+    }
+    classLabelInd++
+  }
+
+  return classDetails
+}
+
 const collectSelectedPathComparisonPlots = ({
   acc,
   comparisonData,
+  comparisonClassesSelected,
   path,
   selectedRevisionIds,
   getComparisonPlotImg
 }: {
-  acc: ComparisonPlotsAcc
+  acc: ComparisonPlotRow[]
   comparisonData: ComparisonData
+  comparisonClassesSelected: ComparisonClassesSelected
   path: string
   selectedRevisionIds: string[]
   getComparisonPlotImg: GetComparisonPlotImg
 }) => {
+  const boundingBoxClassLabels = new Set<string>()
   const pathRevisions = {
+    classDetails: {} as ComparisonClassDetails,
     path,
     revisions: {} as ComparisonRevisionData
   }
 
   for (const id of selectedRevisionIds) {
-    const imgs = comparisonData[id]?.[path]
+    const imgs: ImagePlot[] | undefined = comparisonData[id]?.[path]
+
     pathRevisions.revisions[id] = {
       id,
       imgs: imgs
         ? imgs.map(img => getComparisonPlotImg(img, id, path))
         : [{ errors: undefined, loading: false, url: undefined }]
     }
+    collectSelectedPlotImgClassLabels(boundingBoxClassLabels, imgs)
   }
+
+  pathRevisions.classDetails = getSelectedPathComparisonPlotClassDetails(
+    boundingBoxClassLabels,
+    comparisonClassesSelected,
+    path
+  )
+
   acc.push(pathRevisions)
 }
 
 export const collectSelectedComparisonPlots = ({
   comparisonData,
+  comparisonClassesSelected,
   paths,
   selectedRevisionIds,
   getComparisonPlotImg
 }: {
   comparisonData: ComparisonData
+  comparisonClassesSelected: ComparisonClassesSelected
   paths: string[]
   selectedRevisionIds: string[]
   getComparisonPlotImg: GetComparisonPlotImg
-}) => {
-  const acc: ComparisonPlotsAcc = []
+}): ComparisonPlotRow[] => {
+  const acc: ComparisonPlotRow[] = []
 
   for (const path of paths) {
     collectSelectedPathComparisonPlots({
       acc,
+      comparisonClassesSelected,
       comparisonData,
       getComparisonPlotImg,
       path,
       selectedRevisionIds
     })
+  }
+
+  return acc
+}
+
+const getSelectedImgComparisonPlotClasses = ({
+  selectedClassLabels,
+  img
+}: {
+  selectedClassLabels: string[]
+  img: ImagePlot
+  path: string
+}) => {
+  const imgBoxes = img.boxes
+  if (!imgBoxes) {
+    return []
+  }
+  const imgClasses: ComparisonPlotClass[] = []
+
+  for (const label of selectedClassLabels) {
+    const boxes = imgBoxes[label]
+
+    if (boxes) {
+      imgClasses.push({
+        boxes,
+        label
+      })
+    }
+  }
+
+  return imgClasses
+}
+
+const collectedSelectedPathComparisonPlotClasses = ({
+  acc,
+  id,
+  comparisonData,
+  path,
+  selectedClassLabels
+}: {
+  acc: ComparisonPlotClasses
+  selectedClassLabels: string[]
+  comparisonData: ComparisonData
+  path: string
+  id: string
+}) => {
+  for (const img of comparisonData[id][path]) {
+    const imgClasses = getSelectedImgComparisonPlotClasses({
+      img,
+      path,
+      selectedClassLabels
+    })
+
+    if (imgClasses.length === 0) {
+      return
+    }
+
+    if (!acc[id]) {
+      acc[id] = {}
+    }
+
+    acc[id][path] = imgClasses
+  }
+}
+
+export const collectSelectedComparisonPlotClasses = ({
+  comparisonData,
+  plots,
+  selectedRevisionIds
+}: {
+  comparisonData: ComparisonData
+  plots: ComparisonPlotRow[]
+  selectedRevisionIds: string[]
+}): ComparisonPlotClasses => {
+  const acc: ComparisonPlotClasses = {}
+
+  for (const { path, classDetails } of plots) {
+    const selectedClassLabels = Object.keys(classDetails).filter(
+      (label: string) => classDetails[label].selected
+    )
+    if (isEmpty(classDetails) || isEmpty(selectedClassLabels)) {
+      continue
+    }
+
+    for (const id of selectedRevisionIds) {
+      collectedSelectedPathComparisonPlotClasses({
+        acc,
+        comparisonData,
+        id,
+        path,
+        selectedClassLabels
+      })
+    }
   }
 
   return acc

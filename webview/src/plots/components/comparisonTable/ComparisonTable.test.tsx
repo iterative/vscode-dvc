@@ -30,7 +30,6 @@ import { plotsReducers, plotsStore } from '../../store'
 import { webviewInitialState } from '../webviewSlice'
 import { getThemeValue, hexToRGB, ThemeProperty } from '../../../util/styles'
 import * as EventCurrentTargetDistances from '../../../shared/components/dragDrop/currentTarget'
-import { addBoundingBoxes } from '../../../test/boundingBoxesFixture'
 
 const getHeaders = (): HTMLElement[] => screen.getAllByRole('columnheader')
 
@@ -197,8 +196,8 @@ describe('ComparisonTable', () => {
     const rows = screen.getAllByRole('row')
 
     expect(rows.length).toBe(
-      Object.entries(comparisonTableFixture.plots).length * 2 + 1
-    ) // 1 header row and 2 rows per plot
+      Object.entries(comparisonTableFixture.plots).length * 2 + 2
+    ) // 1 header row, 1 bounding box classes row, and 2 rows per plot
   })
 
   it('should display the plots in the rows in the same order as the columns', () => {
@@ -746,10 +745,8 @@ describe('ComparisonTable', () => {
   })
 
   describe('Plots With Bounding Boxes', () => {
-    const plotsWithBoundingBoxes = addBoundingBoxes(comparisonTableFixture)
-
     it('should show toggable labels in the plot row', () => {
-      renderTable(plotsWithBoundingBoxes)
+      renderTable()
 
       const boundingBoxPlotClasses = screen.getByTestId(
         'row-bounding-box-classes'
@@ -759,29 +756,37 @@ describe('ComparisonTable', () => {
         within(boundingBoxPlotClasses).getByText('Classes')
       ).toBeInTheDocument()
 
-      const checkedLabel = within(boundingBoxPlotClasses).getByLabelText(
+      const labelInput = within(boundingBoxPlotClasses).getByLabelText(
         'traffic light'
       )
-      expect(checkedLabel).toBeInTheDocument()
-      expect(checkedLabel).toHaveAttribute('checked')
-      const uncheckedLabel = within(boundingBoxPlotClasses).getByLabelText(
-        'sign'
-      )
-      expect(uncheckedLabel).toBeInTheDocument()
-      expect(uncheckedLabel).not.toHaveAttribute('checked')
+      const plotPath = comparisonTableFixture.plots[4].path
+
+      expect(labelInput).toBeInTheDocument()
+      expect(labelInput).toBeChecked()
+
+      fireEvent.click(within(boundingBoxPlotClasses).getByText('traffic light'))
+
+      expect(mockPostMessage).toHaveBeenCalledTimes(1)
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        payload: { label: 'traffic light', path: plotPath, selected: false },
+        type: MessageFromWebviewType.TOGGLE_COMPARISON_CLASS
+      })
     })
 
     it('should show svgs with bounding boxes instead of images', () => {
-      renderTable(plotsWithBoundingBoxes)
+      renderTable()
 
       const boundingBoxPlotImage = screen.getByLabelText(
         /bounding_boxes.png \(workspace\)/
       )
+      const getBoxTextReg = (label: string) => new RegExp(`${label} 0\\.\\d+`)
       expect(boundingBoxPlotImage).toHaveAttribute('viewBox')
       expect(
-        within(boundingBoxPlotImage).getByText('traffic light')
+        within(boundingBoxPlotImage).getByText(getBoxTextReg('traffic light'))
       ).toBeInTheDocument()
-      expect(within(boundingBoxPlotImage).getAllByText('car')).toHaveLength(2)
+      expect(
+        within(boundingBoxPlotImage).getAllByText(getBoxTextReg('car'))
+      ).toHaveLength(2)
     })
   })
 })

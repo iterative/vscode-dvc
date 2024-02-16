@@ -41,7 +41,7 @@ import { DvcExecutor } from '../../../../cli/dvc/executor'
 import { Param } from '../../../../experiments/model/modify/collect'
 import { WorkspaceExperiments } from '../../../../experiments/workspace'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
-import { copyOriginalColors } from '../../../../experiments/model/status/colors'
+import { copyOriginalColors } from '../../../../common/colors'
 import { Revision } from '../../../../plots/webview/contract'
 
 suite('Experiments Tree Test Suite', () => {

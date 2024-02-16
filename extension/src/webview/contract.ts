@@ -49,6 +49,7 @@ export enum MessageFromWebviewType {
   SAVE_STUDIO_TOKEN = 'save-studio-token',
   SAVE_STUDIO_URL = 'save-studio-url',
   SET_COMPARISON_MULTI_PLOT_VALUE = 'update-comparison-multi-plot-value',
+  TOGGLE_COMPARISON_CLASS = 'toggle-comparison-class',
   SET_SMOOTH_PLOT_VALUE = 'update-smooth-plot-value',
   SHOW_EXPERIMENT_LOGS = 'show-experiment-logs',
   SHOW_WALKTHROUGH = 'show-walkthrough',
@@ -235,6 +236,10 @@ export type MessageFromWebview =
   | {
       type: MessageFromWebviewType.SET_COMPARISON_MULTI_PLOT_VALUE
       payload: { path: string; revision: string; value: number }
+    }
+  | {
+      type: MessageFromWebviewType.TOGGLE_COMPARISON_CLASS
+      payload: { path: string; label: string; selected: boolean }
     }
   | {
       type: MessageFromWebviewType.REORDER_PLOTS_CUSTOM

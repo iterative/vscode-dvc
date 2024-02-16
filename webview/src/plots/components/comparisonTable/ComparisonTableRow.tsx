@@ -156,6 +156,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
           nbColumns={nbColumns}
           classDetails={classDetails}
           cellClasses={cellClasses}
+          path={path}
         />
         <tr ref={plotsRowRef}>
           {plots.map(plot => (

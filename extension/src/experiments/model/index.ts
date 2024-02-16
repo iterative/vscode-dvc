@@ -16,9 +16,9 @@ import {
   collectSelectedColors,
   collectStartedRunningExperiments
 } from './status/collect'
-import { Color, copyOriginalColors } from './status/colors'
 import { canSelect, ColoredStatus, UNSELECTED } from './status'
 import { collectFlatExperimentParams } from './modify/collect'
+import { Color, copyOriginalColors } from '../../common/colors'
 import {
   Commit,
   Experiment,
