@@ -15,8 +15,8 @@ import {
 import { isDvcError } from '../../cli/dvc/reader'
 
 suite('plots diff -o <TEMP_DIR> --split --show-json', () => {
-  // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('Demo Repository', () => {
+    // eslint-disable-next-line sonarjs/cognitive-complexity
     it('should return the expected output', async () => {
       await initializeDemoRepo()
       const revisionsRequiredForSubmodule = [EXPERIMENT_WORKSPACE_ID, 'HEAD']
