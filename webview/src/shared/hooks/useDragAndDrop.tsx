@@ -119,6 +119,7 @@ export const useDragAndDrop = ({
     dispatch(changeRef(undefined))
   }, [immediateDragLeave, dispatch])
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   const handleDragStart = (e: DragEvent<HTMLElement>) => {
     const defaultDragEnterDirection = vertical
       ? DragEnterDirection.TOP
