@@ -60,6 +60,7 @@ export const ComparisonTableMultiCell: React.FC<{
           imgs: [selectedImg]
         }}
         imgAlt={`${selectedImg.ind} of ${path} (${plot.id})`}
+        imgInd={selectedImg.ind}
         classDetails={classDetails}
       />
       <div

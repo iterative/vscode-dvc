@@ -1009,11 +1009,13 @@ export const collectPlotClasses = ({
   imgLabels,
   imgBoxes,
   id,
-  path
+  path,
+  imgInd
 }: {
   plotClasses: ComparisonPlotClasses
   imgLabels: string[]
   imgBoxes: { [label: string]: BoundingBox[] }
+  imgInd: number
   id: string
   path: string
 }) => {
@@ -1027,7 +1029,11 @@ export const collectPlotClasses = ({
     plotClasses[id] = {}
   }
 
-  plotClasses[id][path] = Object.values(classAcc)
+  if (!plotClasses[id][path]) {
+    plotClasses[id][path] = {}
+  }
+
+  plotClasses[id][path][imgInd] = Object.values(classAcc)
 }
 
 export const collectClassLabels = (
@@ -1095,6 +1101,7 @@ export const getComparisonWebviewMessage = (
           plotClasses,
           imgBoxes: boxes,
           imgLabels,
+          imgInd: img.ind || 0,
           id,
           path
         })

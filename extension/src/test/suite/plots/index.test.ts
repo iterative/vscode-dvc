@@ -259,6 +259,55 @@ suite('Plots Test Suite', () => {
       })
     })
 
+    it('should handle a plots diff output with a comparison multi plot containing bounding boxes', async () => {
+      const multiImgPath = join('plots', 'image', '5.jpg')
+      const mockBoxes = {
+        car: [{ box: { bottom: 0, left: 0, right: 0, top: 0 }, score: 0.5 }]
+      }
+      const imgDataWithBoundingBoxes = plotsDiffFixture.data[multiImgPath].map(
+        img => {
+          const [rev] = img.revisions
+          if (rev === 'main' || rev === 'exp-e7a67') {
+            return {
+              ...img,
+              boxes: mockBoxes
+            }
+          }
+
+          return img
+        }
+      )
+      const { messageSpy } = await buildPlotsWebview({
+        disposer: disposable,
+        plotsDiff: {
+          ...plotsDiffFixture,
+          data: {
+            ...plotsDiffFixture.data,
+            [multiImgPath]: imgDataWithBoundingBoxes
+          }
+        }
+      })
+
+      const comparisonPlotClasses =
+        messageSpy.lastCall.firstArg.comparison.plotClasses
+
+      expect(comparisonPlotClasses).deep.equal({
+        ...comparisonPlotsFixture.plotClasses,
+        'exp-e7a67': {
+          ...comparisonPlotsFixture.plotClasses['exp-e7a67'],
+          [join('plots', 'image')]: {
+            '5': [{ boxes: mockBoxes.car, label: 'car' }]
+          }
+        },
+        main: {
+          ...comparisonPlotsFixture.plotClasses.main,
+          [join('plots', 'image')]: {
+            '5': [{ boxes: mockBoxes.car, label: 'car' }]
+          }
+        }
+      })
+    })
+
     it('should handle a section resized message from the webview', async () => {
       const { mockMessageReceived, plotsModel } = await buildPlotsWebview({
         disposer: disposable
@@ -1292,8 +1341,8 @@ suite('Plots Test Suite', () => {
         comparisonPlotsFixture.plotClasses
       )) {
         const classes = classesByPath[boundingBoxPlot.path]
-        filteredPlotsClasses[id] = {
-          [boundingBoxPlot.path]: classes.filter(
+        filteredPlotsClasses[id][0] = {
+          [boundingBoxPlot.path]: classes[0].filter(
             ({ label }) => label !== toggledLabel
           )
         }

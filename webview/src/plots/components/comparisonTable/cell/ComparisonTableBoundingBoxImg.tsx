@@ -11,9 +11,14 @@ import { PlotsState } from '../../../store'
 
 const plotClassesSelector = (state: PlotsState) => state.comparison.plotClasses
 const classesSelector = createSelector(
-  [plotClassesSelector, (_, id: string) => id, (_, id, path: string) => path],
-  (plotClasses: ComparisonPlotClasses, id: string, path: string) =>
-    plotClasses[id]?.[path] || []
+  [
+    plotClassesSelector,
+    (_, id: string) => id,
+    (_, id, path: string) => path,
+    (_, id, path, ind: number) => ind
+  ],
+  (plotClasses: ComparisonPlotClasses, id: string, path: string, ind: number) =>
+    plotClasses[id]?.[path]?.[ind] || []
 )
 
 export const ComparisonTableBoundingBoxImg: React.FC<{
@@ -22,9 +27,10 @@ export const ComparisonTableBoundingBoxImg: React.FC<{
   path: string
   classDetails: ComparisonClassDetails
   alt: string
-}> = ({ alt, classDetails, id, src, path }) => {
+  ind?: number
+}> = ({ alt, classDetails, id, src, path, ind = 0 }) => {
   const classes = useSelector((state: PlotsState) =>
-    classesSelector(state, id, path)
+    classesSelector(state, id, path, ind)
   )
   const [naturalWidth, setNaturalWidth] = useState(0)
   const [naturalHeight, setNaturalHeight] = useState(0)

@@ -14,7 +14,8 @@ export const ComparisonTableCell: React.FC<{
   plot: ComparisonPlot
   classDetails: ComparisonClassDetails
   imgAlt?: string
-}> = ({ path, plot, imgAlt, classDetails }) => {
+  imgInd?: number
+}> = ({ path, plot, imgAlt, classDetails, imgInd }) => {
   const plotImg = plot.imgs[0]
 
   const loading = plotImg.loading
@@ -42,6 +43,7 @@ export const ComparisonTableCell: React.FC<{
           path={path}
           classDetails={classDetails}
           alt={alt}
+          ind={imgInd}
         />
       ) : (
         <img

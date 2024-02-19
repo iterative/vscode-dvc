@@ -94,7 +94,9 @@ export type ComparisonPlotClass = {
 }
 
 export type ComparisonPlotClasses = {
-  [revision: string]: { [path: string]: ComparisonPlotClass[] }
+  [revision: string]: {
+    [path: string]: { [imgInd: number]: ComparisonPlotClass[] }
+  }
 }
 
 export interface PlotsComparisonData {
