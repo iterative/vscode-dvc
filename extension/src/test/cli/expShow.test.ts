@@ -12,8 +12,8 @@ import {
 import { ExperimentFlag } from '../../cli/dvc/constants'
 
 suite('exp show --show-json', () => {
-  // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('Demo Repository', () => {
+    // eslint-disable-next-line sonarjs/cognitive-complexity
     it('should return the expected output', async () => {
       await initializeDemoRepo()
       const output = await dvcReader.expShow(
