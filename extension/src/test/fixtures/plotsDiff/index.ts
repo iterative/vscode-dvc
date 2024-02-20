@@ -639,7 +639,7 @@ const getImageData = (
       type: PlotsType.IMAGE,
       revisions: [EXPERIMENT_WORKSPACE_ID],
       url: joinFunc(baseUrl, 'bounding_boxes.png'),
-      boxes: {
+      annotations: {
         'traffic light': [
           { box: { left: 120, right: 195, top: 120, bottom: 210 }, score: 0.99 }
         ],
@@ -671,7 +671,7 @@ const getImageData = (
       type: PlotsType.IMAGE,
       revisions: ['main'],
       url: joinFunc(baseUrl, 'bounding_boxes.png'),
-      boxes: {
+      annotations: {
         'traffic light': [
           { box: { left: 120, right: 195, top: 120, bottom: 210 }, score: 0.99 }
         ],
@@ -687,7 +687,7 @@ const getImageData = (
       type: PlotsType.IMAGE,
       revisions: ['exp-e7a67'],
       url: joinFunc(baseUrl, 'bounding_boxes.png'),
-      boxes: {
+      annotations: {
         'traffic light': [
           { box: { left: 120, right: 195, top: 120, bottom: 210 }, score: 0.99 }
         ],
@@ -712,7 +712,7 @@ const getImageData = (
       type: PlotsType.IMAGE,
       revisions: ['test-branch'],
       url: joinFunc(baseUrl, 'bounding_boxes.png'),
-      boxes: {
+      annotations: {
         'traffic light': [
           {
             box: { left: 120, right: 195, top: 120, bottom: 210 },
@@ -731,7 +731,7 @@ const getImageData = (
       type: PlotsType.IMAGE,
       revisions: ['exp-83425'],
       url: joinFunc(baseUrl, 'bounding_boxes.png'),
-      boxes: {
+      annotations: {
         'traffic light': [
           {
             box: { left: 120, right: 195, top: 120, bottom: 210 },
@@ -1037,20 +1037,20 @@ const getIndFromComparisonMultiImgPath = (path: string) => {
 export const collectPlotClasses = ({
   plotClasses,
   imgLabels,
-  imgBoxes,
+  imgAnnotations,
   id,
   path
 }: {
   plotClasses: ComparisonPlotClasses
   imgLabels: string[]
-  imgBoxes: { [label: string]: BoundingBox[] }
+  imgAnnotations: { [label: string]: BoundingBox[] }
   id: string
   path: string
 }) => {
   const classAcc = []
 
   for (const label of imgLabels) {
-    classAcc.push({ boxes: imgBoxes[label], label })
+    classAcc.push({ boxes: imgAnnotations[label], label })
   }
 
   if (!plotClasses[id]) {
@@ -1096,7 +1096,7 @@ export const getComparisonWebviewMessage = (
       }
     }
 
-    for (const { url, revisions, boxes } of plots) {
+    for (const { url, revisions, annotations } of plots) {
       const id = revisions?.[0]
       if (!id) {
         continue
@@ -1119,11 +1119,11 @@ export const getComparisonWebviewMessage = (
         img.ind = getIndFromComparisonMultiImgPath(path)
       }
 
-      if (boxes) {
-        const imgLabels = Object.keys(boxes)
+      if (annotations) {
+        const imgLabels = Object.keys(annotations)
         collectPlotClasses({
           plotClasses,
-          imgBoxes: boxes,
+          imgAnnotations: annotations,
           imgLabels,
           id,
           path

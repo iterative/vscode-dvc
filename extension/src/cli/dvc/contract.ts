@@ -242,7 +242,7 @@ export type ImagePlotOutput = {
   revisions: string[]
   type: PlotsType
   url: string
-  boxes?: { [label: string]: BoundingBox[] }
+  annotations?: { [label: string]: BoundingBox[] }
 }
 
 export type PlotOutput = TemplatePlotOutput | ImagePlotOutput
