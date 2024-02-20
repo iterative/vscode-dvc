@@ -100,6 +100,7 @@ export const EventName = Object.assign(
     VIEWS_PLOTS_SET_COMPARISON_MULTI_PLOT_VALUE:
       'view.plots.setComparisonMultiPlotValue',
     VIEWS_PLOTS_SET_SMOOTH_PLOT_VALUE: 'view.plots.setSmoothPlotValues',
+    VIEWS_PLOTS_TOGGLE_COMPARISON_CLASS: 'view.plots.toggleComparisonClass',
     VIEWS_PLOTS_ZOOM_PLOT: 'views.plots.zoomPlot',
     VIEWS_REORDER_PLOTS_CUSTOM: 'views.plots.customReordered',
     VIEWS_REORDER_PLOTS_TEMPLATES: 'views.plots.templatesReordered',
@@ -305,6 +306,7 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_REORDER_PLOTS_TEMPLATES]: undefined
   [EventName.VIEWS_PLOTS_SET_COMPARISON_MULTI_PLOT_VALUE]: undefined
   [EventName.VIEWS_PLOTS_SET_SMOOTH_PLOT_VALUE]: undefined
+  [EventName.VIEWS_PLOTS_TOGGLE_COMPARISON_CLASS]: undefined
 
   [EventName.VIEWS_PLOTS_PATH_TREE_OPENED]: DvcRootCount
 

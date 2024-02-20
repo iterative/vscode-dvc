@@ -1,6 +1,6 @@
 import { UNSELECTED } from '.'
 import { collectColoredStatus } from './collect'
-import { copyOriginalColors } from './colors'
+import { copyOriginalColors } from '../../../common/colors'
 import { Experiment } from '../../webview/contract'
 import {
   ExecutorStatus,

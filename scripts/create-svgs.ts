@@ -1,5 +1,5 @@
 import { readFileSync, writeFileSync } from 'fs'
-import { copyOriginalColors } from 'dvc/src/experiments/model/status/colors'
+import { copyOriginalColors } from 'dvc/src/common/colors'
 
 const colors = copyOriginalColors()
 

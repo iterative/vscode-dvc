@@ -1,7 +1,9 @@
 import type { TopLevelSpec } from 'vega-lite'
 import { isMultiViewPlot } from '../../../plots/vega/util'
 import {
+  BoundingBox,
   EXPERIMENT_WORKSPACE_ID,
+  ImagePlotOutput,
   PLOT_ANCHORS,
   PlotsOutput,
   PlotsType,
@@ -19,10 +21,11 @@ import {
   DEFAULT_NB_ITEMS_PER_ROW,
   DEFAULT_PLOT_WIDTH,
   ComparisonPlotImg,
-  ComparisonClassDetails
+  ComparisonClassDetails,
+  ComparisonPlotClasses
 } from '../../../plots/webview/contract'
 import { join } from '../../util/path'
-import { copyOriginalColors } from '../../../experiments/model/status/colors'
+import { copyOriginalColors, getBoundingBoxColor } from '../../../common/colors'
 import { ColumnType } from '../../../experiments/webview/contract'
 
 const basicVega = {
@@ -539,7 +542,10 @@ const getMultiImageData = (
   return data
 }
 
-const getImageData = (baseUrl: string, joinFunc = join) => ({
+const getImageData = (
+  baseUrl: string,
+  joinFunc = join
+): { [path: string]: ImagePlotOutput[] } => ({
   [join('plots', 'acc.png')]: [
     {
       type: PlotsType.IMAGE,
@@ -632,27 +638,89 @@ const getImageData = (baseUrl: string, joinFunc = join) => ({
     {
       type: PlotsType.IMAGE,
       revisions: [EXPERIMENT_WORKSPACE_ID],
-      url: joinFunc(baseUrl, 'bounding_boxes.png')
+      url: joinFunc(baseUrl, 'bounding_boxes.png'),
+      boxes: {
+        'traffic light': [
+          { box: { left: 120, right: 195, top: 120, bottom: 210 }, score: 0.99 }
+        ],
+        car: [
+          { box: { left: 150, right: 180, top: 320, bottom: 350 }, score: 0.5 },
+          {
+            box: { left: 200, right: 230, top: 310, bottom: 340 },
+            score: 0.354
+          }
+        ],
+        sign: [
+          { box: { left: 300, right: 450, top: 170, bottom: 220 }, score: 0.87 }
+        ]
+      }
     },
     {
       type: PlotsType.IMAGE,
       revisions: ['main'],
-      url: joinFunc(baseUrl, 'bounding_boxes.png')
+      url: joinFunc(baseUrl, 'bounding_boxes.png'),
+      boxes: {
+        'traffic light': [
+          { box: { left: 120, right: 195, top: 120, bottom: 210 }, score: 0.99 }
+        ],
+        car: [
+          { box: { left: 150, right: 180, top: 320, bottom: 350 }, score: 0.5 }
+        ],
+        sign: [
+          { box: { left: 300, right: 450, top: 170, bottom: 220 }, score: 0.87 }
+        ]
+      }
     },
     {
       type: PlotsType.IMAGE,
       revisions: ['exp-e7a67'],
-      url: joinFunc(baseUrl, 'bounding_boxes.png')
+      url: joinFunc(baseUrl, 'bounding_boxes.png'),
+      boxes: {
+        'traffic light': [
+          { box: { left: 120, right: 195, top: 120, bottom: 210 }, score: 0.99 }
+        ],
+        car: [
+          { box: { left: 150, right: 180, top: 320, bottom: 350 }, score: 0.5 }
+        ]
+      }
     },
     {
       type: PlotsType.IMAGE,
       revisions: ['test-branch'],
-      url: joinFunc(baseUrl, 'bounding_boxes.png')
+      url: joinFunc(baseUrl, 'bounding_boxes.png'),
+      boxes: {
+        'traffic light': [
+          {
+            box: { left: 120, right: 195, top: 120, bottom: 210 },
+            score: 0.764
+          }
+        ],
+        car: [
+          {
+            box: { left: 150, right: 180, top: 320, bottom: 350 },
+            score: 0.984
+          }
+        ]
+      }
     },
     {
       type: PlotsType.IMAGE,
       revisions: ['exp-83425'],
-      url: joinFunc(baseUrl, 'bounding_boxes.png')
+      url: joinFunc(baseUrl, 'bounding_boxes.png'),
+      boxes: {
+        'traffic light': [
+          {
+            box: { left: 120, right: 195, top: 120, bottom: 210 },
+            score: 0.984
+          }
+        ],
+        car: [
+          {
+            box: { left: 150, right: 180, top: 320, bottom: 350 },
+            score: 0.984
+          }
+        ]
+      }
     }
   ]
 })
@@ -936,10 +1004,47 @@ const getIndFromComparisonMultiImgPath = (path: string) => {
   return Number((pathIndMatches as string[])[1])
 }
 
+export const collectPlotClasses = ({
+  plotClasses,
+  imgLabels,
+  imgBoxes,
+  id,
+  path
+}: {
+  plotClasses: ComparisonPlotClasses
+  imgLabels: string[]
+  imgBoxes: { [label: string]: BoundingBox[] }
+  id: string
+  path: string
+}) => {
+  const classAcc = []
+
+  for (const label of imgLabels) {
+    classAcc.push({ boxes: imgBoxes[label], label })
+  }
+
+  if (!plotClasses[id]) {
+    plotClasses[id] = {}
+  }
+
+  plotClasses[id][path] = Object.values(classAcc)
+}
+
+export const collectClassLabels = (
+  imgLabels: string[],
+  plotClasses: Set<string>
+) => {
+  for (const label of imgLabels) {
+    plotClasses.add(label)
+  }
+}
+
 export const getComparisonWebviewMessage = (
   baseUrl: string,
   joinFunc: (...args: string[]) => string = join
 ): PlotsComparisonData => {
+  const plotClasses: ComparisonPlotClasses = {}
+
   const plotAcc: {
     [path: string]: {
       path: string
@@ -951,6 +1056,7 @@ export const getComparisonWebviewMessage = (
   for (const [path, plots] of Object.entries(getImageData(baseUrl, joinFunc))) {
     const isMulti = path.includes('image')
     const pathLabel = isMulti ? join('plots', 'image') : path
+    const classLabels = new Set<string>()
 
     if (!plotAcc[pathLabel]) {
       plotAcc[pathLabel] = {
@@ -960,7 +1066,7 @@ export const getComparisonWebviewMessage = (
       }
     }
 
-    for (const { url, revisions } of plots) {
+    for (const { url, revisions, boxes } of plots) {
       const id = revisions?.[0]
       if (!id) {
         continue
@@ -983,12 +1089,31 @@ export const getComparisonWebviewMessage = (
         img.ind = getIndFromComparisonMultiImgPath(path)
       }
 
+      if (boxes) {
+        const imgLabels = Object.keys(boxes)
+        collectPlotClasses({
+          plotClasses,
+          imgBoxes: boxes,
+          imgLabels,
+          id,
+          path
+        })
+        collectClassLabels(imgLabels, classLabels)
+      }
+
       plotAcc[pathLabel].revisions[id].imgs.push(img)
+    }
+
+    for (const [ind, label] of [...classLabels].entries()) {
+      plotAcc[pathLabel].classDetails[label] = {
+        selected: true,
+        color: getBoundingBoxColor(ind)
+      }
     }
   }
 
   return {
-    plotClasses: {},
+    plotClasses,
     revisions: getRevisions(),
     multiPlotValues: {},
     plots: Object.values(plotAcc),

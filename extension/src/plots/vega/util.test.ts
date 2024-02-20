@@ -12,7 +12,7 @@ import confusionNormalizedTemplate from '../../test/fixtures/plotsDiff/templates
 import linearTemplate from '../../test/fixtures/plotsDiff/templates/linear'
 import scatterTemplate from '../../test/fixtures/plotsDiff/templates/scatter'
 import smoothTemplate from '../../test/fixtures/plotsDiff/templates/smooth'
-import { copyOriginalColors } from '../../experiments/model/status/colors'
+import { copyOriginalColors } from '../../common/colors'
 import { EXPERIMENT_WORKSPACE_ID, PLOT_ANCHORS } from '../../cli/dvc/contract'
 
 describe('isMultiViewPlot', () => {

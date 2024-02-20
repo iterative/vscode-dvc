@@ -117,6 +117,12 @@ export class WebviewMessages {
           message.payload.path,
           message.payload.value
         )
+      case MessageFromWebviewType.TOGGLE_COMPARISON_CLASS:
+        return this.toggleComparisonClass(
+          message.payload.path,
+          message.payload.label,
+          message.payload.selected
+        )
       case MessageFromWebviewType.REMOVE_CUSTOM_PLOTS:
         return commands.executeCommand(
           RegisteredCommands.PLOTS_CUSTOM_REMOVE,
@@ -283,6 +289,20 @@ export class WebviewMessages {
     )
   }
 
+  private toggleComparisonClass(
+    path: string,
+    label: string,
+    selected: boolean
+  ) {
+    this.plots.toggleComparisonClass(path, label, selected)
+    this.sendComparisonPlots()
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_TOGGLE_COMPARISON_CLASS,
+      undefined,
+      undefined
+    )
+  }
+
   private setTemplateOrder(order: PlotsTemplatesReordered) {
     this.paths.setTemplateOrder(order)
     this.sendTemplatePlots()
@@ -405,10 +425,10 @@ export class WebviewMessages {
     return {
       height: this.plots.getHeight(PlotsSection.COMPARISON_TABLE),
       multiPlotValues: this.plots.getComparisonMultiPlotValues(),
-      plotClasses: {},
-      plots: comparison.map(({ path, revisions }) => {
+      plotClasses: this.plots.getComparisonPlotClasses(comparison),
+      plots: comparison.map(({ classDetails, path, revisions }) => {
         return {
-          classDetails: {},
+          classDetails,
           path,
           revisions: this.getRevisionsWithCorrectUrls(revisions)
         }

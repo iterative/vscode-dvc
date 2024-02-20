@@ -20,6 +20,7 @@ export enum PersistenceKey {
   PLOT_SELECTED_METRICS = 'plotSelectedMetrics:',
   PLOTS_SMOOTH_PLOT_VALUES = 'plotSmoothPlotValues:',
   PLOTS_COMPARISON_MULTI_PLOT_VALUES = 'plotComparisonMultiPlotValues:',
+  PLOTS_COMPARISON_CLASSES_SELECTED = 'plotComparisonClassesSelected:',
   PLOT_TEMPLATE_ORDER = 'plotTemplateOrder:',
   SHOW_ONLY_CHANGED = 'columnsShowOnlyChanged:'
 }

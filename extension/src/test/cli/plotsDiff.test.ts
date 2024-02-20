@@ -3,14 +3,14 @@ import { expect } from 'chai'
 import { TEMP_DIR } from './constants'
 import { dvcReader, initializeDemoRepo, initializeEmptyRepo } from './util'
 import { dvcDemoPath } from '../util'
-import { ImagePlot } from '../../plots/webview/contract'
 import {
   PLOT_ANCHORS,
   EXPERIMENT_WORKSPACE_ID,
   PlotsOutput,
   PlotsType,
   TemplatePlotOutput,
-  isImagePlotOutput
+  isImagePlotOutput,
+  ImagePlotOutput
 } from '../../cli/dvc/contract'
 import { isDvcError } from '../../cli/dvc/reader'
 
@@ -43,7 +43,7 @@ suite('plots diff -o <TEMP_DIR> --split --show-json', () => {
         ).to.have.lengthOf.greaterThanOrEqual(1)
 
         // each plot
-        const expectImage = (plot: ImagePlot) => {
+        const expectImage = (plot: ImagePlotOutput) => {
           expect(plot.url).to.be.a('string')
           expect(plot.revisions, 'should have one revision').to.have.lengthOf(1)
         }
