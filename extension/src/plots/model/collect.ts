@@ -243,8 +243,8 @@ const collectImageData = (
     imgPlot.ind = getMultiImageInd(path)
   }
 
-  if (plot.boxes) {
-    imgPlot.boxes = plot.boxes
+  if (plot.annotations) {
+    imgPlot.annotations = plot.annotations
   }
 
   acc[id][pathLabel].push(imgPlot)
@@ -338,11 +338,11 @@ const collectSelectedPlotImgClassLabels = (
   imgs: ImagePlot[] = []
 ) => {
   for (const img of imgs) {
-    if (!img.boxes) {
+    if (!img.annotations) {
       continue
     }
 
-    for (const label of Object.keys(img.boxes)) {
+    for (const label of Object.keys(img.annotations)) {
       boundingBoxClassLabels.add(label)
     }
   }
@@ -448,14 +448,14 @@ const getSelectedImgComparisonPlotClasses = ({
   img: ImagePlot
   path: string
 }) => {
-  const imgBoxes = img.boxes
-  if (!imgBoxes) {
+  const imgAnnotations = img.annotations
+  if (!imgAnnotations) {
     return []
   }
   const imgClasses: ComparisonPlotClass[] = []
 
   for (const label of selectedClassLabels) {
-    const boxes = imgBoxes[label]
+    const boxes = imgAnnotations[label]
 
     if (boxes) {
       imgClasses.push({
