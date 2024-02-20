@@ -652,6 +652,18 @@ const getImageData = (
         ],
         sign: [
           { box: { left: 300, right: 450, top: 170, bottom: 220 }, score: 0.87 }
+        ],
+        bus: [
+          {
+            box: { bottom: 365, left: 310, right: 360, top: 320 },
+            score: 0.9877903784856079
+          }
+        ],
+        person: [
+          {
+            box: { bottom: 370, left: 370, right: 390, top: 343 },
+            score: 0.987
+          }
         ]
       }
     },
@@ -681,6 +693,18 @@ const getImageData = (
         ],
         car: [
           { box: { left: 150, right: 180, top: 320, bottom: 350 }, score: 0.5 }
+        ],
+        bus: [
+          {
+            box: { bottom: 365, left: 310, right: 360, top: 320 },
+            score: 0.9877903784856079
+          }
+        ],
+        person: [
+          {
+            box: { bottom: 370, left: 370, right: 390, top: 343 },
+            score: 0.987
+          }
         ]
       }
     },
@@ -718,6 +742,12 @@ const getImageData = (
           {
             box: { left: 150, right: 180, top: 320, bottom: 350 },
             score: 0.984
+          }
+        ],
+        person: [
+          {
+            box: { bottom: 370, left: 370, right: 390, top: 343 },
+            score: 0.987
           }
         ]
       }

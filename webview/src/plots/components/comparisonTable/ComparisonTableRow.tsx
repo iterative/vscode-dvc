@@ -13,6 +13,7 @@ import React, {
 import cx from 'classnames'
 import { useSelector } from 'react-redux'
 import styles from './styles.module.scss'
+import { ComparisonTableRowClasses } from './ComparisonTableRowClasses'
 import { ComparisonTableCell } from './cell/ComparisonTableCell'
 import { ComparisonTableMultiCell } from './cell/ComparisonTableMultiCell'
 import { ComparisonTablePinnedContentRow } from './ComparisonTablePinnedContentRow'
@@ -27,7 +28,6 @@ import Tooltip, {
 } from '../../../shared/components/tooltip/Tooltip'
 import { useDragAndDrop } from '../../../shared/hooks/useDragAndDrop'
 import { DragDropItemWithTarget } from '../../../shared/components/dragDrop/DragDropItemWithTarget'
-import { toggleComparisonClass } from '../../util/messages'
 
 export interface ComparisonTableRowProps {
   path: string
@@ -74,7 +74,6 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
     type: <tbody />,
     vertical: true
   })
-  const classDetailsArr = Object.entries(classDetails)
   const cellClasses = cx(styles.cell, {
     [styles.cellHidden]: !isShown
   })
@@ -152,41 +151,13 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
             <CopyButton value={path} className={styles.copyButton} />
           </div>
         </ComparisonTablePinnedContentRow>
-        {classDetailsArr.length > 0 && (
-          <ComparisonTablePinnedContentRow
-            pinnedColumn={pinnedColumn}
-            nbColumns={nbColumns}
-          >
-            <div
-              data-testid="row-bounding-box-classes"
-              className={cx(styles.classes, cellClasses)}
-            >
-              <p className={styles.classesTitle}>Classes</p>
-              {classDetailsArr.map(([label, { color, selected }]) => (
-                <React.Fragment key={label}>
-                  <input
-                    type="checkbox"
-                    id={color.slice(1)}
-                    name="labels"
-                    value={label}
-                    defaultChecked={selected}
-                    className={styles.hiddenInput}
-                    onChange={event =>
-                      toggleComparisonClass(path, label, event.target.checked)
-                    }
-                  />
-                  <label
-                    className={styles.classButton}
-                    style={{ background: color }}
-                    htmlFor={color.slice(1)}
-                  >
-                    {label}
-                  </label>
-                </React.Fragment>
-              ))}
-            </div>
-          </ComparisonTablePinnedContentRow>
-        )}
+        <ComparisonTableRowClasses
+          pinnedColumn={pinnedColumn}
+          nbColumns={nbColumns}
+          classDetails={classDetails}
+          cellClasses={cellClasses}
+          path={path}
+        />
         <tr ref={plotsRowRef}>
           {plots.map(plot => (
             <td

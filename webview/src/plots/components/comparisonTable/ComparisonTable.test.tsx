@@ -766,12 +766,27 @@ describe('ComparisonTable', () => {
 
       fireEvent.click(within(boundingBoxPlotClasses).getByText('traffic light'))
 
-      expect(labelInput).not.toBeChecked()
       expect(mockPostMessage).toHaveBeenCalledTimes(1)
       expect(mockPostMessage).toHaveBeenCalledWith({
         payload: { label: 'traffic light', path: plotPath, selected: false },
         type: MessageFromWebviewType.TOGGLE_COMPARISON_CLASS
       })
+    })
+
+    it('should show a max of three labels, placing the rest in a dropdown', async () => {
+      renderTable()
+
+      expect(screen.getAllByRole('checkbox')).toHaveLength(3)
+
+      const showMoreButton = screen.getByText('Show more (1)')
+
+      expect(showMoreButton).toBeInTheDocument()
+
+      fireEvent.click(showMoreButton)
+
+      const classes = await screen.findAllByRole('checkbox')
+
+      expect(classes).toHaveLength(4)
     })
 
     it('should show svgs with bounding boxes instead of images', () => {

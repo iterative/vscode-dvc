@@ -5,7 +5,10 @@ import {
   ComparisonClassDetails,
   ComparisonPlotClasses
 } from 'dvc/src/plots/webview/contract'
-import { ComparisonTableBoundingBoxColorFilter } from './ComparisonTableBoundingBoxColorFilter'
+import {
+  ComparisonTableBoundingBoxColorFilter,
+  getColorFilterId
+} from './ComparisonTableBoundingBoxColorFilter'
 import styles from '../styles.module.scss'
 import { PlotsState } from '../../../store'
 
@@ -55,7 +58,11 @@ export const ComparisonTableBoundingBoxImg: React.FC<{
       {Object.entries(classDetails).map(
         ([label, { color, selected }]) =>
           selected && (
-            <ComparisonTableBoundingBoxColorFilter key={label} color={color} />
+            <ComparisonTableBoundingBoxColorFilter
+              imgAlt={alt}
+              key={label}
+              color={color}
+            />
           )
       )}
       <image href={src} width={naturalWidth} height={naturalHeight} />
@@ -69,7 +76,7 @@ export const ComparisonTableBoundingBoxImg: React.FC<{
         return boxes.map(({ box: { bottom, top, right, left }, score }) => (
           <React.Fragment key={label + top + right + left + bottom}>
             <text
-              filter={`url(#c${labelColor.slice(1)})`}
+              filter={`url(#${getColorFilterId(alt, labelColor)})`}
               x={left - 1}
               y={top - 4}
               fill="#fff"

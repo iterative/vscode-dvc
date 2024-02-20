@@ -189,20 +189,46 @@ $gap: 4px;
   display: none;
 }
 
+.classButtons {
+  font-family: $font;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tableRowClassButtons {
+  max-width: calc(100% - 180px);
+}
+
+.tooltipClassButtons {
+  padding: 4px;
+  flex-wrap: wrap;
+}
+
 .classButton {
-  white-space: nowrap;
-  border: none;
   border-radius: 2px;
   padding: 4px;
-  margin-right: 4px;
-  color: #fff;
   cursor: pointer;
-  opacity: 0.5;
   font-size: 0.8rem;
+  border: 1px solid $fg-color;
+  color: $fg-color;
+  background: none;
+  overflow: hidden;
+  display: inline-block;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 30px;
 
-  input:checked + & {
-    opacity: 1;
+  &.classButtonSelected {
+    border-color: var(--class-color);
+    color: #fff;
+    background: var(--class-color);
   }
+}
+
+.showMoreButtonWrapper {
+  display: flex;
+  margin-left: 6px;
 }
 
 .image {

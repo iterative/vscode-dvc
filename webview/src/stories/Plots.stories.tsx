@@ -14,6 +14,7 @@ import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template'
 import manyTemplatePlots from 'dvc/src/test/fixtures/plotsDiff/template/virtualization'
 import comparisonPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
+import { getBoundingBoxColor } from 'dvc/src/common/colors'
 import {
   CHROMATIC_VIEWPORTS_WITH_DELAY,
   DISABLE_CHROMATIC_SNAPSHOTS
@@ -52,7 +53,23 @@ const MockedState: React.FC<{ data: PlotsData; children: React.ReactNode }> = ({
 
 const defaultPlotsData = {
   cliError: null,
-  comparison: comparisonPlotsFixture,
+  comparison: {
+    ...comparisonPlotsFixture,
+    plots: comparisonPlotsFixture.plots.map(plot => {
+      const classDetailsArr = Object.entries(plot.classDetails)
+
+      if (classDetailsArr.length === 0) {
+        return plot
+      }
+
+      classDetailsArr.unshift([
+        'tree',
+        { color: getBoundingBoxColor(classDetailsArr.length), selected: false }
+      ])
+
+      return { ...plot, classDetails: Object.fromEntries(classDetailsArr) }
+    })
+  },
   custom: customPlotsFixture,
   hasPlots: true,
   hasUnselectedPlots: false,
