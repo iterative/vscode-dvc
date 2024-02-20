@@ -39,7 +39,7 @@ export const ComparisonTableRowClasses: React.FC<{
       {label}
     </label>
   ))
-  const hiddenLabelElements = labelElements.slice(4)
+  const hiddenLabelElements = labelElements.slice(3)
 
   return (
     <ComparisonTablePinnedContentRow
