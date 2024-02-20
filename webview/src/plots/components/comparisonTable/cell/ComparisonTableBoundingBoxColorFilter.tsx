@@ -1,7 +1,5 @@
 import React from 'react'
-
-export const getColorFilterId = (imgAlt: string, color: string) =>
-  `${imgAlt.replace(/[\s()]/g, '-')}-${color.slice(1)}`
+import { getIdFromTextAndColor } from '../../../../util/ids'
 
 export const ComparisonTableBoundingBoxColorFilter: React.FC<{
   color: string
@@ -13,7 +11,7 @@ export const ComparisonTableBoundingBoxColorFilter: React.FC<{
       y="0"
       width="1"
       height="1"
-      id={getColorFilterId(imgAlt, color)}
+      id={getIdFromTextAndColor(imgAlt, color)}
     >
       <feFlood floodColor={color} result="bg" />
       <feMerge>

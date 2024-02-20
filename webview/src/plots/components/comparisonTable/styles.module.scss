@@ -196,8 +196,10 @@ $gap: 4px;
   gap: 6px;
 }
 
+$class-title-and-show-more-btn-width: 180px;
+
 .tableRowClassButtons {
-  max-width: calc(100% - 180px);
+  max-width: calc(100% - $class-title-and-show-more-btn-width);
 }
 
 .tooltipClassButtons {
@@ -217,7 +219,7 @@ $gap: 4px;
   display: inline-block;
   text-overflow: ellipsis;
   white-space: nowrap;
-  min-width: 30px;
+  min-width: 40px;
 
   &.classButtonSelected {
     border-color: var(--class-color);

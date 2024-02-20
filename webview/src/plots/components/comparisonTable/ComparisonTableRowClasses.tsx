@@ -71,7 +71,6 @@ export const ComparisonTableRowClasses: React.FC<{
             <span className={styles.showMoreButtonWrapper}>
               <Button
                 appearance="secondary"
-                onClick={() => {}}
                 text={`Show more (${hiddenLabelElements.length})`}
               />
             </span>

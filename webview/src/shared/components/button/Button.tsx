@@ -4,7 +4,7 @@ import styles from './styles.module.scss'
 
 export type ButtonProps = {
   appearance?: 'primary' | 'secondary'
-  onClick: () => void
+  onClick?: () => void
   text: string
   isNested?: boolean
   children?: React.ReactNode
