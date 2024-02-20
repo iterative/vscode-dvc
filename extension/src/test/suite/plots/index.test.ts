@@ -259,7 +259,7 @@ suite('Plots Test Suite', () => {
       })
     })
 
-    it('should handle a plots diff output with a comparison multi plot containing bounding boxes', async () => {
+    it('should handle a plots diff output with a comparison multi plot containing classes', async () => {
       const multiImgPath = join('plots', 'image', '5.jpg')
       const mockBoxes = {
         car: [{ box: { bottom: 0, left: 0, right: 0, top: 0 }, score: 0.5 }]
@@ -1341,10 +1341,10 @@ suite('Plots Test Suite', () => {
         comparisonPlotsFixture.plotClasses
       )) {
         const classes = classesByPath[boundingBoxPlot.path]
-        filteredPlotsClasses[id][0] = {
-          [boundingBoxPlot.path]: classes[0].filter(
-            ({ label }) => label !== toggledLabel
-          )
+        filteredPlotsClasses[id] = {
+          [boundingBoxPlot.path]: {
+            0: classes[0].filter(({ label }) => label !== toggledLabel)
+          }
         }
       }
 
@@ -1367,6 +1367,9 @@ suite('Plots Test Suite', () => {
       const toggleComparisonClassSpy = spy(plotsModel, 'toggleComparisonClass')
 
       messageSpy.resetHistory()
+
+      const messageSent = waitForSpyCall(messageSpy, messageSpy.callCount)
+
       mockMessageReceived.fire({
         payload: {
           label: toggledLabel,
@@ -1375,6 +1378,8 @@ suite('Plots Test Suite', () => {
         },
         type: MessageFromWebviewType.TOGGLE_COMPARISON_CLASS
       })
+
+      await messageSent
 
       expect(toggleComparisonClassSpy).to.be.called
       expect(toggleComparisonClassSpy).to.be.calledWithExactly(
