@@ -138,8 +138,20 @@ WithMissingData.args = {
   })
 }
 
-export const WithManyClasses = Template.bind({})
-WithManyClasses.args = {
+export const ScrolledWithManyClasses = Template.bind({})
+ScrolledWithManyClasses.play = async ({ canvasElement }) => {
+  await new Promise(resolve => setTimeout(resolve, 1000))
+  const showMoreBtn = await within(canvasElement).findByText('Show more (22)')
+
+  window.scrollTo({
+    top: showMoreBtn.getBoundingClientRect().top
+  })
+  return userEvent.click(showMoreBtn)
+}
+ScrolledWithManyClasses.parameters = {
+  chromatic: { delay: 2500 }
+}
+ScrolledWithManyClasses.args = {
   plots: comparisonTableFixture.plots.map(plot => {
     const classDetailsArr = Object.entries(plot.classDetails)
 
