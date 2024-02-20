@@ -11,6 +11,7 @@ import {
   DEFAULT_PLOT_HEIGHT,
   PlotsComparisonData
 } from 'dvc/src/plots/webview/contract'
+import { getBoundingBoxColor } from 'dvc/src/common/colors'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import { DISABLE_CHROMATIC_SNAPSHOTS } from './util'
@@ -37,7 +38,11 @@ export default {
   title: 'Comparison Table'
 } as Meta
 
-const Template: StoryFn = ({ plots, revisions, plotClasses = {} }) => {
+const Template: StoryFn = ({
+  plots,
+  revisions,
+  plotClasses = comparisonTableFixture.plotClasses
+}) => {
   const store = configureStore({
     reducer: plotsReducers
   })
@@ -133,20 +138,26 @@ WithMissingData.args = {
   })
 }
 
-export const WithOnlyMissingData = Template.bind({})
-WithOnlyMissingData.args = {
-  plots: comparisonTableFixture.plots.map(
-    ({ classDetails, path, revisions }) => ({
-      classDetails,
-      path,
-      revisions: removeImages(path, revisions)
-    })
-  ),
-  revisions: comparisonTableFixture.revisions
-    .map(revision => {
-      if (revision.id === EXPERIMENT_WORKSPACE_ID) {
-        return { ...revision, fetched: false }
+export const WithManyClasses = Template.bind({})
+WithManyClasses.args = {
+  plots: comparisonTableFixture.plots.map(plot => {
+    const classDetailsArr = Object.entries(plot.classDetails)
+
+    if (classDetailsArr.length === 0) {
+      return plot
+    }
+
+    const extraClasses = Array.from({ length: 20 }, (_, ind) => [
+      `class-${ind}`,
+      {
+        color: getBoundingBoxColor(classDetailsArr.length + ind),
+        selected: ind % 3 === 0
       }
-    })
-    .filter(Boolean)
+    ])
+
+    return {
+      ...plot,
+      classDetails: Object.fromEntries([...classDetailsArr, ...extraClasses])
+    }
+  })
 }

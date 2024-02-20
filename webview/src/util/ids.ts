@@ -13,3 +13,6 @@ export const getIDWithoutIndex = (id?: string) => id?.split(ID_SEPARATOR)[0]
 
 export const getIDIndex = (id: string) =>
   Number.parseInt(id.split(ID_SEPARATOR).slice(-1)[0], 10)
+
+export const getIdFromTextAndColor = (text: string, color: string) =>
+  `${text.replace(/[\s()]/g, '-')}-${color.slice(1)}`
