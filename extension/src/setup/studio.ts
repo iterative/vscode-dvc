@@ -14,7 +14,9 @@ export const isStudioAccessToken = (text?: string): boolean => {
   if (!text) {
     return false
   }
-  return text.startsWith('isat_') && text.length >= 53
+  return (
+    (text.startsWith('isat_') || text.startsWith('dsat_')) && text.length >= 53
+  )
 }
 
 export class Studio extends Disposable {
