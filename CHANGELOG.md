@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.11] - 2024-02-21
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (3.47.0) [#5320](https://github.com/iterative/vscode-dvc/pull/5320) by [@mattseddon](https://github.com/mattseddon)
+- Fix Studio token validation [#5322](https://github.com/iterative/vscode-dvc/pull/5322) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.2.10] - 2024-02-19
 
 ### 🔨 Maintenance
