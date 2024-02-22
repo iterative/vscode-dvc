@@ -264,7 +264,7 @@ suite('Plots Test Suite', () => {
       it('should handle image by step plots with bounding boxes', async () => {
         const multiImgDirPath = join('plots', 'image')
         const multiImgPath = join('plots', 'image', '5.jpg')
-        const mockBoxes = {
+        const mockAnnotations = {
           car: [{ box: { bottom: 0, left: 0, right: 0, top: 0 }, score: 0.5 }]
         }
         const imgDataWithBoundingBoxes = plotsDiffFixture.data[
@@ -274,7 +274,7 @@ suite('Plots Test Suite', () => {
           if (rev === 'main' || rev === 'exp-e7a67') {
             return {
               ...img,
-              boxes: mockBoxes
+              annotations: mockAnnotations
             }
           }
 
@@ -310,13 +310,13 @@ suite('Plots Test Suite', () => {
           'exp-e7a67': {
             ...comparisonPlotsFixture.plotClasses['exp-e7a67'],
             [multiImgDirPath]: {
-              '5': [{ boxes: mockBoxes.car, label: 'car' }]
+              '5': [{ boxes: mockAnnotations.car, label: 'car' }]
             }
           },
           main: {
             ...comparisonPlotsFixture.plotClasses.main,
             [multiImgDirPath]: {
-              '5': [{ boxes: mockBoxes.car, label: 'car' }]
+              '5': [{ boxes: mockAnnotations.car, label: 'car' }]
             }
           }
         }
