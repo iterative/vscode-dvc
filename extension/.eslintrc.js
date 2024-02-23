@@ -6,7 +6,7 @@ module.exports = {
   ignorePatterns: [
     ...config.ignorePatterns,
     'src/test/fixtures/**',
-    'src/test/e2e/wdio.conf.ts',
+    'src/test/e2e/**',
     '**/__mocks__/**'
   ],
   parser: '@typescript-eslint/parser',

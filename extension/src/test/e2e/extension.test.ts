@@ -1,5 +1,6 @@
 import { join } from 'path'
 import { browser } from '@wdio/globals'
+import { Key } from 'webdriverio'
 import {
   closeAllEditors,
   createCustomPlot,
@@ -142,7 +143,7 @@ describe('Plots Webview', function () {
     this.timeout(60000)
     const workbench = await browser.getWorkbench()
     await workbench.openCommandPrompt()
-    await browser.keys([...'DVC: Show Plots', 'ArrowDown', 'Enter'])
+    await browser.keys([...'DVC: Show Plots', Key.ArrowDown, Key.Enter])
 
     await waitForDvcToFinish()
     await webview.focus()
@@ -160,7 +161,6 @@ describe('Plots Webview', function () {
     this.timeout(60000)
     await createCustomPlot()
     const workbench = await browser.getWorkbench()
-    await workbench.openCommandPrompt()
     await workbench.executeCommand('DVC: Show Plots')
 
     await waitForDvcToFinish()
