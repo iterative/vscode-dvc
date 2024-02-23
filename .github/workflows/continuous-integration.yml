@@ -61,7 +61,7 @@ jobs:
 
       - name: Publish to Chromatic
         if: '!github.event.pull_request.head.repo.fork'
-        uses: chromaui/action@v10
+        uses: chromaui/action@v11
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
