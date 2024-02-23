@@ -3,10 +3,6 @@
     "@types/node",
     "@types/vscode",
     "@vscode/extension-telemetry",
-    "@wdio/cli",
-    "@wdio/local-runner",
-    "@wdio/mocha-framework",
-    "@wdio/spec-reporter",
     "execa",
     "process-exists",
     "webdriverio"

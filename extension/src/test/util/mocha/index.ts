@@ -1,6 +1,6 @@
 import { resolve as resolvePath } from 'path'
 import Mocha from 'mocha'
-import glob from 'glob'
+import { glob } from 'glob'
 import chai from 'chai'
 import sinonChai from 'sinon-chai'
 import chaiAsPromised from 'chai-as-promised'
@@ -29,28 +29,27 @@ export const runMocha = async (
   try {
     // eslint-disable-next-line sonarjs/cognitive-complexity
     await new Promise<void>((resolve, reject) => {
-      glob(`**/**.test.${ext}`, { cwd }, (err, files) => {
-        if (err) {
-          return reject(err)
-        }
+      glob(`**/**.test.${ext}`, { cwd }).then(
+        files => {
+          for (const f of files) {
+            mocha.addFile(resolvePath(cwd, f))
+          }
 
-        for (const f of files) {
-          mocha.addFile(resolvePath(cwd, f))
-        }
-
-        try {
-          mocha.run(failures => {
-            if (failures > 0) {
-              reject(new Error(`${failures} tests failed.`))
-            } else {
-              resolve()
-            }
-          })
-        } catch (error: unknown) {
-          Logger.error((error as Error).toString())
-          throw error
-        }
-      })
+          try {
+            mocha.run(failures => {
+              if (failures > 0) {
+                reject(new Error(`${failures} tests failed.`))
+              } else {
+                resolve()
+              }
+            })
+          } catch (error: unknown) {
+            Logger.error((error as Error).toString())
+            throw error
+          }
+        },
+        error => reject(error)
+      )
     })
   } finally {
     await teardown()
