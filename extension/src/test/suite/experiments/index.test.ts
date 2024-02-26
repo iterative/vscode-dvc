@@ -1,6 +1,6 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
 import { join, resolve } from 'path'
-import { after, afterEach, beforeEach, describe, it, suite } from 'mocha'
+import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore, SinonStub } from 'sinon'
 import {
@@ -291,7 +291,7 @@ suite('Experiments Test Suite', () => {
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('handleMessageFromWebview', () => {
-    after(() =>
+    afterEach(() =>
       workspace
         .getConfiguration()
         .update(ConfigKey.EXP_TABLE_HEAD_MAX_HEIGHT, undefined, false)
