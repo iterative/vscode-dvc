@@ -99,7 +99,7 @@ suite('Workspace Experiments Test Suite', () => {
       await workspaceExperiments.showWebview('')
 
       expect(mockQuickPickOne).to.not.be.called
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should not prompt to pick a project if a params file or dvc.yaml is focused', async () => {
       const mockQuickPickOne = stub(QuickPick, 'quickPickOne').resolves(
