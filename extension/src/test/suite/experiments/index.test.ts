@@ -2036,8 +2036,8 @@ suite('Experiments Test Suite', () => {
         ['main', 'other-branch']
       ])
       expect(sorts).to.deep.equal([{ descending: true, path: paramPath }])
-    })
-  }).timeout(WEBVIEW_TEST_TIMEOUT)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+  })
 
   describe('persisted state', () => {
     const firstSortDefinition = {
