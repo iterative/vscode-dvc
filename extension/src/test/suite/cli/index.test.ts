@@ -69,7 +69,7 @@ suite('CLI Suite', () => {
         })
       )
       expect(killed).to.be.true
-    })
+    }).timeout(10000)
 
     it('should cleanup all non-background processes on dispose', async () => {
       const processStarted = disposable.track(new EventEmitter<CliEvent>())

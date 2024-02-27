@@ -152,8 +152,8 @@ suite('Workspace Experiments Test Suite', () => {
 
       await testFile('params.yaml')
       await testFile('dvc.yaml')
-    })
-  }).timeout(WEBVIEW_TEST_TIMEOUT)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+  })
 
   describe('dvc.modifyWorkspaceParamsAndQueue', () => {
     it('should be able to queue an experiment using an existing one as a base', async () => {
