@@ -107,7 +107,12 @@ suite('Experiments Test Suite', () => {
 
   afterEach(() => {
     disposable.dispose()
-    return closeAllEditors()
+    return Promise.all([
+      closeAllEditors(),
+      workspace
+        .getConfiguration()
+        .update(ConfigKey.EXP_TABLE_HEAD_MAX_HEIGHT, undefined, false)
+    ])
   })
 
   describe('getExperiments', () => {
@@ -291,12 +296,6 @@ suite('Experiments Test Suite', () => {
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('handleMessageFromWebview', () => {
-    afterEach(() =>
-      workspace
-        .getConfiguration()
-        .update(ConfigKey.EXP_TABLE_HEAD_MAX_HEIGHT, undefined, false)
-    )
-
     it('should handle a column reordered message from the webview', async () => {
       const { mockMessageReceived } = await buildExperimentsWebview({
         disposer: disposable
