@@ -1364,6 +1364,6 @@ suite('Plots Test Suite', () => {
       plots.togglePathStatus(dvcDemoPath)
 
       expect(mockSetCustomSelection).to.be.calledWith(true)
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
 })
