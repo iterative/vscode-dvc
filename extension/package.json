@@ -1671,7 +1671,7 @@
     "sinon-chai": "3.7.0",
     "ts-loader": "9.5.1",
     "vscode-uri": "3.0.8",
-    "wdio-vscode-service": "6.0.1",
+    "wdio-vscode-service": "6.0.2",
     "webdriverio": "8.16.7",
     "webpack": "5.90.3",
     "webpack-cli": "5.1.4"
