@@ -1,6 +1,6 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
 import { join, resolve } from 'path'
-import { after, afterEach, beforeEach, describe, it, suite } from 'mocha'
+import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore, SinonStub } from 'sinon'
 import {
@@ -107,7 +107,12 @@ suite('Experiments Test Suite', () => {
 
   afterEach(() => {
     disposable.dispose()
-    return closeAllEditors()
+    return Promise.all([
+      closeAllEditors(),
+      workspace
+        .getConfiguration()
+        .update(ConfigKey.EXP_TABLE_HEAD_MAX_HEIGHT, undefined, false)
+    ])
   })
 
   describe('getExperiments', () => {
@@ -291,12 +296,6 @@ suite('Experiments Test Suite', () => {
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('handleMessageFromWebview', () => {
-    after(() =>
-      workspace
-        .getConfiguration()
-        .update(ConfigKey.EXP_TABLE_HEAD_MAX_HEIGHT, undefined, false)
-    )
-
     it('should handle a column reordered message from the webview', async () => {
       const { mockMessageReceived } = await buildExperimentsWebview({
         disposer: disposable
@@ -2036,8 +2035,8 @@ suite('Experiments Test Suite', () => {
         ['main', 'other-branch']
       ])
       expect(sorts).to.deep.equal([{ descending: true, path: paramPath }])
-    })
-  }).timeout(WEBVIEW_TEST_TIMEOUT)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+  })
 
   describe('persisted state', () => {
     const firstSortDefinition = {

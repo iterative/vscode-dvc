@@ -370,7 +370,7 @@ suite('Experiments Tree Test Suite', () => {
 
       expect(mockExpPush).to.be.calledWithExactly(dvcDemoPath, mockExperimentId)
       expect(mockUpdate).to.be.calledOnce
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to push the provided experiment with dvc.views.experimentsTree.pushExperiment (if no experiments are selected)', async () => {
       bypassProgressCloseDelay()

@@ -321,146 +321,146 @@ suite('Pipeline Test Suite', () => {
       expect(mockQuickPickOneOrInput).to.be.calledOnce
       expect(mockFindOrCreateDvcYamlFile).not.to.be.called
     })
-  })
 
-  it('should add a data series plot when a dvc.yaml file exists', async () => {
-    const { pipeline } = buildPipeline({
-      disposer: disposable
-    })
-    const mockPickPlotConfiguration = stub(
-      PipelineQuickPick,
-      'pickPlotConfiguration'
-    )
-    const mockAddPlotToDvcFile = stub(FileSystem, 'addPlotToDvcYamlFile')
+    it('should add a data series plot when a dvc.yaml file exists', async () => {
+      const { pipeline } = buildPipeline({
+        disposer: disposable
+      })
+      const mockPickPlotConfiguration = stub(
+        PipelineQuickPick,
+        'pickPlotConfiguration'
+      )
+      const mockAddPlotToDvcFile = stub(FileSystem, 'addPlotToDvcYamlFile')
 
-    await pipeline.isReady()
+      await pipeline.isReady()
 
-    mockPickPlotConfiguration.onFirstCall().resolves(undefined)
+      mockPickPlotConfiguration.onFirstCall().resolves(undefined)
 
-    await pipeline.addDataSeriesPlot()
+      await pipeline.addDataSeriesPlot()
 
-    expect(mockPickPlotConfiguration).to.be.calledOnceWithExactly(dvcDemoPath)
-    expect(mockAddPlotToDvcFile).not.to.be.called
+      expect(mockPickPlotConfiguration).to.be.calledOnceWithExactly(dvcDemoPath)
+      expect(mockAddPlotToDvcFile).not.to.be.called
 
-    const mockPlotConfig: PipelineQuickPick.PlotConfigData = {
-      template: 'simple',
-      title: 'Great Plot Name',
-      x: { 'results.json': ['step'] },
-      y: { 'results.json': ['acc'] }
-    }
+      const mockPlotConfig: PipelineQuickPick.PlotConfigData = {
+        template: 'simple',
+        title: 'Great Plot Name',
+        x: { 'results.json': ['step'] },
+        y: { 'results.json': ['acc'] }
+      }
 
-    mockPickPlotConfiguration.onSecondCall().resolves(mockPlotConfig)
+      mockPickPlotConfiguration.onSecondCall().resolves(mockPlotConfig)
 
-    await pipeline.addDataSeriesPlot()
+      await pipeline.addDataSeriesPlot()
 
-    expect(mockPickPlotConfiguration).to.be.calledWithExactly(dvcDemoPath)
-    expect(mockAddPlotToDvcFile).to.be.calledOnceWithExactly(
-      dvcDemoPath,
-      mockPlotConfig
-    )
-  })
-
-  it('should add a data series plot without trying to add a missing dvc.yaml file or stage', async () => {
-    const { pipeline } = buildPipeline({
-      disposer: disposable,
-      dvcYamls: []
-    })
-    const mockPickPlotConfiguration = stub(
-      PipelineQuickPick,
-      'pickPlotConfiguration'
-    )
-    const mockAddPlotToDvcFile = stub(FileSystem, 'addPlotToDvcYamlFile')
-    const mockCheckOrAddPipeline = stub(pipeline, 'checkOrAddPipeline')
-    const mockPlotConfig: PipelineQuickPick.PlotConfigData = {
-      template: 'simple',
-      title: 'Great Plot Name',
-      x: { 'results.json': ['step'] },
-      y: { 'results.json': ['acc'] }
-    }
-
-    mockPickPlotConfiguration.onFirstCall().resolves(mockPlotConfig)
-
-    await pipeline.isReady()
-    await pipeline.addDataSeriesPlot()
-
-    expect(mockCheckOrAddPipeline, 'should not check for a pipeline stage').not
-      .to.be.called
-    expect(mockPickPlotConfiguration).to.be.calledOnceWithExactly(dvcDemoPath)
-    expect(mockAddPlotToDvcFile).to.be.calledOnceWithExactly(
-      dvcDemoPath,
-      mockPlotConfig
-    )
-  })
-
-  it('should set the appropriate context value when a dvc.yaml is open in the active editor', async () => {
-    const dvcYaml = Uri.file(join(dvcDemoPath, 'dvc.yaml'))
-    await window.showTextDocument(dvcYaml)
-
-    const mockContext: { [key: string]: unknown } = {
-      'dvc.pipeline.file.active': false
-    }
-
-    const mockSetContextValue = stub(VscodeContext, 'setContextValue')
-    mockSetContextValue.callsFake((key: string, value: unknown) => {
-      mockContext[key] = value
-      return Promise.resolve(undefined)
+      expect(mockPickPlotConfiguration).to.be.calledWithExactly(dvcDemoPath)
+      expect(mockAddPlotToDvcFile).to.be.calledOnceWithExactly(
+        dvcDemoPath,
+        mockPlotConfig
+      )
     })
 
-    const { pipeline } = buildPipeline({ disposer: disposable })
-    await pipeline.isReady()
+    it('should add a data series plot without trying to add a missing dvc.yaml file or stage', async () => {
+      const { pipeline } = buildPipeline({
+        disposer: disposable,
+        dvcYamls: []
+      })
+      const mockPickPlotConfiguration = stub(
+        PipelineQuickPick,
+        'pickPlotConfiguration'
+      )
+      const mockAddPlotToDvcFile = stub(FileSystem, 'addPlotToDvcYamlFile')
+      const mockCheckOrAddPipeline = stub(pipeline, 'checkOrAddPipeline')
+      const mockPlotConfig: PipelineQuickPick.PlotConfigData = {
+        template: 'simple',
+        title: 'Great Plot Name',
+        x: { 'results.json': ['step'] },
+        y: { 'results.json': ['acc'] }
+      }
 
-    expect(
-      mockContext['dvc.pipeline.file.active'],
-      'should set dvc.pipeline.file.active to true when a dvc.yaml is open and the extension starts'
-    ).to.be.true
+      mockPickPlotConfiguration.onFirstCall().resolves(mockPlotConfig)
 
-    mockSetContextValue.resetHistory()
+      await pipeline.isReady()
+      await pipeline.addDataSeriesPlot()
 
-    const startupEditorClosed = getActiveEditorUpdatedEvent(disposable)
+      expect(mockCheckOrAddPipeline, 'should not check for a pipeline stage')
+        .not.to.be.called
+      expect(mockPickPlotConfiguration).to.be.calledOnceWithExactly(dvcDemoPath)
+      expect(mockAddPlotToDvcFile).to.be.calledOnceWithExactly(
+        dvcDemoPath,
+        mockPlotConfig
+      )
+    })
 
-    await closeAllEditors()
-    await startupEditorClosed
+    it('should set the appropriate context value when a dvc.yaml is open in the active editor', async () => {
+      const dvcYaml = Uri.file(join(dvcDemoPath, 'dvc.yaml'))
+      await window.showTextDocument(dvcYaml)
 
-    expect(
-      mockContext['dvc.pipeline.file.active'],
-      'should set dvc.pipeline.file.active to false when the dvc.yaml in the active editor is closed'
-    ).to.be.false
+      const mockContext: { [key: string]: unknown } = {
+        'dvc.pipeline.file.active': false
+      }
 
-    mockSetContextValue.resetHistory()
+      const mockSetContextValue = stub(VscodeContext, 'setContextValue')
+      mockSetContextValue.callsFake((key: string, value: unknown) => {
+        mockContext[key] = value
+        return Promise.resolve(undefined)
+      })
 
-    const activeEditorUpdated = getActiveEditorUpdatedEvent(disposable)
+      const { pipeline } = buildPipeline({ disposer: disposable })
+      await pipeline.isReady()
 
-    await window.showTextDocument(dvcYaml)
-    await activeEditorUpdated
+      expect(
+        mockContext['dvc.pipeline.file.active'],
+        'should set dvc.pipeline.file.active to true when a dvc.yaml is open and the extension starts'
+      ).to.be.true
 
-    const activeEditorClosed = getActiveEditorUpdatedEvent(disposable)
+      mockSetContextValue.resetHistory()
 
-    expect(
-      mockContext['dvc.pipeline.file.active'],
-      'should set dvc.pipeline.file.active to true when a dvc.yaml file is in the active editor'
-    ).to.be.true
+      const startupEditorClosed = getActiveEditorUpdatedEvent(disposable)
 
-    await closeAllEditors()
-    await activeEditorClosed
+      await closeAllEditors()
+      await startupEditorClosed
 
-    expect(
-      mockContext['dvc.pipeline.file.active'],
-      'should set dvc.pipeline.file.active to false when the dvc.yaml in the active editor is closed again'
-    ).to.be.false
-  })
+      expect(
+        mockContext['dvc.pipeline.file.active'],
+        'should set dvc.pipeline.file.active to false when the dvc.yaml in the active editor is closed'
+      ).to.be.false
 
-  it('should set dvc.pipeline.file.active to false when a dvc.yaml is not open and the extension starts', async () => {
-    const nonDvcYaml = Uri.file(join(dvcDemoPath, '.gitignore'))
-    await window.showTextDocument(nonDvcYaml)
+      mockSetContextValue.resetHistory()
 
-    const setContextValueSpy = spy(VscodeContext, 'setContextValue')
+      const activeEditorUpdated = getActiveEditorUpdatedEvent(disposable)
 
-    const { pipeline } = buildPipeline({ disposer: disposable })
-    await pipeline.isReady()
+      await window.showTextDocument(dvcYaml)
+      await activeEditorUpdated
 
-    expect(setContextValueSpy).to.be.calledWith(
-      'dvc.pipeline.file.active',
-      false
-    )
+      const activeEditorClosed = getActiveEditorUpdatedEvent(disposable)
+
+      expect(
+        mockContext['dvc.pipeline.file.active'],
+        'should set dvc.pipeline.file.active to true when a dvc.yaml file is in the active editor'
+      ).to.be.true
+
+      await closeAllEditors()
+      await activeEditorClosed
+
+      expect(
+        mockContext['dvc.pipeline.file.active'],
+        'should set dvc.pipeline.file.active to false when the dvc.yaml in the active editor is closed again'
+      ).to.be.false
+    })
+
+    it('should set dvc.pipeline.file.active to false when a dvc.yaml is not open and the extension starts', async () => {
+      const nonDvcYaml = Uri.file(join(dvcDemoPath, '.gitignore'))
+      await window.showTextDocument(nonDvcYaml)
+
+      const setContextValueSpy = spy(VscodeContext, 'setContextValue')
+
+      const { pipeline } = buildPipeline({ disposer: disposable })
+      await pipeline.isReady()
+
+      expect(setContextValueSpy).to.be.calledWith(
+        'dvc.pipeline.file.active',
+        false
+      )
+    })
   })
 })

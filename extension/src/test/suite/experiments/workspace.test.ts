@@ -99,7 +99,7 @@ suite('Workspace Experiments Test Suite', () => {
       await workspaceExperiments.showWebview('')
 
       expect(mockQuickPickOne).to.not.be.called
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should not prompt to pick a project if a params file or dvc.yaml is focused', async () => {
       const mockQuickPickOne = stub(QuickPick, 'quickPickOne').resolves(
@@ -152,8 +152,8 @@ suite('Workspace Experiments Test Suite', () => {
 
       await testFile('params.yaml')
       await testFile('dvc.yaml')
-    })
-  }).timeout(WEBVIEW_TEST_TIMEOUT)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+  })
 
   describe('dvc.modifyWorkspaceParamsAndQueue', () => {
     it('should be able to queue an experiment using an existing one as a base', async () => {

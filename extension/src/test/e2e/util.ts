@@ -78,9 +78,9 @@ const runDeleteCommand = async (
     .up(Key.Shift)
     .perform()
 
-  await browser.keys('Space')
+  await browser.keys(Key.Space)
 
-  return browser.keys('Enter')
+  return browser.keys(Key.Enter)
 }
 
 export const waitForDvcToFinish = async (timeout = 60000): Promise<void> => {
@@ -173,7 +173,7 @@ export const runModifiedExperiment = async () => {
 
   const nonCachedParam = `0.00${Date.now()}`
 
-  await browser.keys([...nonCachedParam, 'Enter'])
+  await browser.keys([...nonCachedParam, Key.Enter])
   return workbench.executeCommand('DVC: Show Experiments')
 }
 
@@ -187,11 +187,11 @@ export const createCustomPlot = async (): Promise<void> => {
   const workbench = await browser.getWorkbench()
   const addCustomPlot = await workbench.executeCommand('DVC: Add Plot')
   await browser.waitUntil(() => addCustomPlot.elem.isDisplayed())
-  await browser.keys(['ArrowDown', 'Enter'])
+  await browser.keys([Key.ArrowDown, Key.Enter])
   await browser.waitUntil(() => addCustomPlot.elem.isDisplayed())
-  await browser.keys('Enter')
+  await browser.keys(Key.Enter)
   await browser.waitUntil(() => addCustomPlot.elem.isDisplayed())
-  return browser.keys('Enter')
+  return browser.keys(Key.Enter)
 }
 
 export const deleteCustomPlots = (): Promise<void> =>
@@ -238,7 +238,7 @@ export const findScmTreeItems = async (openView: boolean) => {
   }
 
   for (let i = 0; i < 30; i++) {
-    await browser.keys('ArrowDown')
+    await browser.keys(Key.ArrowDown)
   }
 
   return findCurrentTreeItems()

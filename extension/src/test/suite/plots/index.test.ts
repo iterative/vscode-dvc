@@ -180,81 +180,79 @@ suite('Plots Test Suite', () => {
       )
     })
 
-    describe('Custom Plots Creation', () => {
-      it('should only use unfiltered experiments and commits in custom plots', async () => {
-        const { plots, plotsModel, experimentsModel } = await buildPlots({
-          disposer: disposable,
-          plotsDiff: plotsDiffFixture
-        })
+    it('should only use unfiltered experiments and commits in custom plots', async () => {
+      const { plots, plotsModel, experimentsModel } = await buildPlots({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
 
-        const plotsCustomPlotsSpy = spy(PlotsCollectUtils, 'collectCustomPlots')
+      const plotsCustomPlotsSpy = spy(PlotsCollectUtils, 'collectCustomPlots')
 
-        await plots.isReady()
+      await plots.isReady()
 
-        stub(experimentsModel, 'getFilters')
-          .onFirstCall()
-          .returns([
-            {
-              operator: Operator.EQUAL,
-              path: 'params:params.yaml:epochs',
-              value: 2
-            }
-          ])
+      stub(experimentsModel, 'getFilters')
+        .onFirstCall()
+        .returns([
+          {
+            operator: Operator.EQUAL,
+            path: 'params:params.yaml:epochs',
+            value: 2
+          }
+        ])
 
-        plotsModel.getCustomPlots()
+      plotsModel.getCustomPlots()
 
-        const allExperiments: Experiment[] =
-          experimentsModel.getWorkspaceCommitsAndExperiments()
+      const allExperiments: Experiment[] =
+        experimentsModel.getWorkspaceCommitsAndExperiments()
 
-        const { experiments } = plotsCustomPlotsSpy.firstCall.args[0]
+      const { experiments } = plotsCustomPlotsSpy.firstCall.args[0]
 
-        expect(experiments).to.deep.equal(
-          allExperiments.filter(
-            ({ id, params }) =>
-              id !== EXPERIMENT_WORKSPACE_ID &&
-              params?.['params.yaml']?.epochs === 2
-          )
+      expect(experiments).to.deep.equal(
+        allExperiments.filter(
+          ({ id, params }) =>
+            id !== EXPERIMENT_WORKSPACE_ID &&
+            params?.['params.yaml']?.epochs === 2
         )
+      )
+    })
+
+    it('should handle sending custom plots when all experiments/commits being filtered', async () => {
+      const { plots, plotsModel, experimentsModel } = await buildPlots({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
       })
 
-      it('should handle all experiments/commits being filtered', async () => {
-        const { plots, plotsModel, experimentsModel } = await buildPlots({
-          disposer: disposable,
-          plotsDiff: plotsDiffFixture
-        })
+      await plots.isReady()
 
-        await plots.isReady()
+      stub(experimentsModel, 'getUnfilteredCommitsAndExperiments')
+        .onFirstCall()
+        .returns([])
 
-        stub(experimentsModel, 'getUnfilteredCommitsAndExperiments')
-          .onFirstCall()
-          .returns([])
+      const customPlots = plotsModel.getCustomPlots()
 
-        const customPlots = plotsModel.getCustomPlots()
+      expect(customPlots).to.deep.equal({
+        ...customPlotsFixture,
+        hasUnfilteredExperiments: false,
+        plots: []
+      })
+    })
 
-        expect(customPlots).to.deep.equal({
-          ...customPlotsFixture,
-          hasUnfilteredExperiments: false,
-          plots: []
-        })
+    it('should handle sending custom plots when no plots have been added yet', async () => {
+      const { plots, plotsModel } = await buildPlots({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
       })
 
-      it('should handle no plots being added yet', async () => {
-        const { plots, plotsModel } = await buildPlots({
-          disposer: disposable,
-          plotsDiff: plotsDiffFixture
-        })
+      await plots.isReady()
 
-        await plots.isReady()
+      stub(plotsModel, 'getCustomPlotsOrder').onFirstCall().returns([])
 
-        stub(plotsModel, 'getCustomPlotsOrder').onFirstCall().returns([])
+      const customPlots = plotsModel.getCustomPlots()
 
-        const customPlots = plotsModel.getCustomPlots()
-
-        expect(customPlots).to.deep.equal({
-          ...customPlotsFixture,
-          hasAddedPlots: false,
-          plots: []
-        })
+      expect(customPlots).to.deep.equal({
+        ...customPlotsFixture,
+        hasAddedPlots: false,
+        plots: []
       })
     })
 
@@ -1366,6 +1364,6 @@ suite('Plots Test Suite', () => {
       plots.togglePathStatus(dvcDemoPath)
 
       expect(mockSetCustomSelection).to.be.calledWith(true)
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
 })

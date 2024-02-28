@@ -65,23 +65,23 @@ suite('Pipeline Data Test Suite', () => {
       listener(nestedDvcYaml)
       expect(mockMangedUpdate).to.be.calledOnce
     })
-  })
 
-  it('should not call managedUpdate for a dvc.yaml in a sub-project', async () => {
-    const dvcYaml = join(dvcDemoPath, 'dvc.yaml')
-    const subProject = join(dvcDemoPath, 'data')
-    const nestedDvcYaml = join(subProject, 'dvc.yaml')
+    it('should not call managedUpdate for a dvc.yaml in a sub-project', async () => {
+      const dvcYaml = join(dvcDemoPath, 'dvc.yaml')
+      const subProject = join(dvcDemoPath, 'data')
+      const nestedDvcYaml = join(subProject, 'dvc.yaml')
 
-    const { listener, mockMangedUpdate } = await buildPipelineData(
-      [dvcYaml, nestedDvcYaml],
-      [subProject]
-    )
+      const { listener, mockMangedUpdate } = await buildPipelineData(
+        [dvcYaml, nestedDvcYaml],
+        [subProject]
+      )
 
-    listener(dvcYaml)
-    expect(mockMangedUpdate).to.be.calledOnce
-    mockMangedUpdate.resetHistory()
+      listener(dvcYaml)
+      expect(mockMangedUpdate).to.be.calledOnce
+      mockMangedUpdate.resetHistory()
 
-    listener(nestedDvcYaml)
-    expect(mockMangedUpdate).not.to.be.calledOnce
+      listener(nestedDvcYaml)
+      expect(mockMangedUpdate).not.to.be.calledOnce
+    })
   })
 })

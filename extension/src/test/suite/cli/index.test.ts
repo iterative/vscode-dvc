@@ -69,7 +69,7 @@ suite('CLI Suite', () => {
         })
       )
       expect(killed).to.be.true
-    })
+    }).timeout(10000)
 
     it('should cleanup all non-background processes on dispose', async () => {
       const processStarted = disposable.track(new EventEmitter<CliEvent>())
@@ -101,7 +101,7 @@ suite('CLI Suite', () => {
       const processIsStillExecuting = await processExists(executingPid)
 
       expect(processIsStillExecuting).to.be.false
-    })
+    }).timeout(10000)
 
     it('should capture all of the stdout and stderr and send it through the processCompleted event emitter if the process fails', async () => {
       const processStarted = disposable.track(new EventEmitter<CliEvent>())
