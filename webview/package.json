@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "2.2.1",
-    "@tanstack/react-table": "8.12.0",
+    "@tanstack/react-table": "8.13.0",
     "@tippyjs/react": "4.2.6",
     "@vscode/webview-ui-toolkit": "1.4.0",
     "classnames": "2.5.1",
