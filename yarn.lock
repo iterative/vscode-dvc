@@ -4873,7 +4873,7 @@
     "@microsoft/applicationinsights-web-basic" "^3.0.2"
     applicationinsights "^2.7.1"
 
-"@vscode/test-electron@2.3.9", "@vscode/test-electron@^2.3.8":
+"@vscode/test-electron@2.3.9", "@vscode/test-electron@^2.3.9":
   version "2.3.9"
   resolved "https://registry.yarnpkg.com/@vscode/test-electron/-/test-electron-2.3.9.tgz#f61181392634b408411e4302aef6e1cd2dd41474"
   integrity sha512-z3eiChaCQXMqBnk2aHHSEkobmC2VRalFQN0ApOAtydL172zXGxTwGrRtviT5HnUB+Q+G3vtEYFtuQkYqBzYgMA==
@@ -17825,15 +17825,15 @@ wcwidth@^1.0.1:
   dependencies:
     defaults "^1.0.3"
 
-wdio-vscode-service@6.0.2:
-  version "6.0.2"
-  resolved "https://registry.yarnpkg.com/wdio-vscode-service/-/wdio-vscode-service-6.0.2.tgz#32356d5f623a9dcdaafe88ca179d7c13b3ace41d"
-  integrity sha512-cROpOWfAhudlL+ok9VAsmNTrqQDK6CJwdiQoNy8KoRyC/p4HZ+rcLiSOVjmO6OEJru1YoO3PlS8SPDERrrobPw==
+wdio-vscode-service@6.0.3:
+  version "6.0.3"
+  resolved "https://registry.yarnpkg.com/wdio-vscode-service/-/wdio-vscode-service-6.0.3.tgz#46857d0d4296b1d4528da8508332ef5f8a757502"
+  integrity sha512-sfX3w8UxNPcms8GmunWsQSEkiM4bQm4yHe0f4K2En6tiIGc+aWOACZbwSF3WN+laL9kQ49dBcBaWVbAxnmReJg==
   dependencies:
     "@fastify/cors" "^9.0.1"
     "@fastify/static" "^7.0.1"
     "@types/ws" "^8.5.10"
-    "@vscode/test-electron" "^2.3.8"
+    "@vscode/test-electron" "^2.3.9"
     "@wdio/logger" "^8.28.0"
     clipboardy "^3.0.0"
     decamelize "6.0.0"
