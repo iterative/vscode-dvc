@@ -78,5 +78,5 @@
     "trim-newlines": "3.0.1",
     "trim": "1.0.1"
   },
-  "packageManager": "yarn@1.22.21"
+  "packageManager": "yarn@1.22.22"
 }
