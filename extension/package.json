@@ -1632,7 +1632,7 @@
   "devDependencies": {
     "@swc/core": "1.4.8",
     "@swc/jest": "0.2.36",
-    "@types/chai": "4.3.13",
+    "@types/chai": "4.3.14",
     "@types/chai-as-promised": "7.1.8",
     "@types/copy-webpack-plugin": "10.1.0",
     "@types/fs-extra": "11.0.4",
