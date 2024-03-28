@@ -21,7 +21,7 @@
     "typescript": "*"
   },
   "dependencies": {
-    "@reduxjs/toolkit": "2.2.1",
+    "@reduxjs/toolkit": "2.2.2",
     "@tanstack/react-table": "8.14.0",
     "@tippyjs/react": "4.2.6",
     "@vscode/webview-ui-toolkit": "1.4.0",
