@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.12] - 2024-04-08
+
+### 🔨 Maintenance
+
+- Remove comparison table header stories [#5326](https://github.com/iterative/vscode-dvc/pull/5326) by [@sroy3](https://github.com/sroy3)
+- Fix repeatedly failing windows test timeouts [#5340](https://github.com/iterative/vscode-dvc/pull/5340) by [@julieg18](https://github.com/julieg18)
+- Increase VSCode CLI test timeout [#5352](https://github.com/iterative/vscode-dvc/pull/5352) by [@julieg18](https://github.com/julieg18)
+- security: use yarn resolutions to close broken dependabot PRs [#5442](https://github.com/iterative/vscode-dvc/pull/5442) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.2.11] - 2024-02-21
 
 ### 🔨 Maintenance
