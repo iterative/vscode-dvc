@@ -75,7 +75,7 @@
     "sass-loader": "13.3.3",
     "storybook": "7.6.17",
     "storybook-addon-themes": "6.1.0",
-    "style-loader": "3.3.4",
+    "style-loader": "4.0.0",
     "stylelint": "15.11.0",
     "stylelint-config-standard-scss": "11.1.0",
     "ts-loader": "9.5.1",
