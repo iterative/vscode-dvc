@@ -57,7 +57,7 @@
     "@types/node": "16.x",
     "@types/react": "18.2.75",
     "@types/react-dom": "18.2.24",
-    "@types/react-virtualized": "9.21.29",
+    "@types/react-virtualized": "9.21.30",
     "@types/vega": "3.2.0",
     "@types/webpack": "5.28.5",
     "@welldone-software/why-did-you-render": "8.0.1",
