@@ -1651,7 +1651,7 @@
     "@types/vega": "3.2.0",
     "@types/vscode": "1.75.0",
     "@vscode/test-electron": "2.3.9",
-    "@vscode/vsce": "2.24.0",
+    "@vscode/vsce": "2.25.0",
     "@wdio/cli": "8.35.1",
     "@wdio/local-runner": "8.35.1",
     "@wdio/mocha-framework": "8.35.0",
