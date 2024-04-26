@@ -44,7 +44,7 @@ jobs:
 
       - name: Run Coverage Report
         if: '!github.event.pull_request.head.repo.fork'
-        uses: paambaati/codeclimate-action@v5.0.0
+        uses: paambaati/codeclimate-action@v6.0.0
         env:
           CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
         with:
