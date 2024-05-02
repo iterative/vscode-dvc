@@ -50,7 +50,7 @@
     "eslint-plugin-prettier": "5.1.3",
     "eslint-plugin-promise": "6.1.1",
     "eslint-plugin-react": "7.34.1",
-    "eslint-plugin-react-hooks": "4.6.0",
+    "eslint-plugin-react-hooks": "4.6.1",
     "eslint-plugin-sonarjs": "0.25.1",
     "eslint-plugin-sort-keys-fix": "1.1.2",
     "eslint-plugin-testing-library": "6.2.2",
@@ -67,7 +67,7 @@
     "typescript": "5.4.5"
   },
   "resolutions": {
-    "@types/react": "18.2.79",
+    "@types/react": "18.3.0",
     "**/recursive-readdir/minimatch": "6.2.0",
     "decode-uri-component": "0.2.2",
     "express": "4.19.2",
