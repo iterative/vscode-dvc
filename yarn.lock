@@ -14762,10 +14762,10 @@ react-element-to-jsx-string@^15.0.0:
     is-plain-object "5.0.0"
     react-is "18.1.0"
 
-react-intersection-observer@9.8.2:
-  version "9.8.2"
-  resolved "https://registry.yarnpkg.com/react-intersection-observer/-/react-intersection-observer-9.8.2.tgz#a45db2441909a4d2f310de381686e151f016691d"
-  integrity sha512-901naEiiZmse3p+AmtbQ3NL9xx+gQ8TXLiGDc+8GiE3JKJkNV3vP737aGuWTAXBA+1QqxPrDDE+fIEgYpGDlrQ==
+react-intersection-observer@9.10.0:
+  version "9.10.0"
+  resolved "https://registry.yarnpkg.com/react-intersection-observer/-/react-intersection-observer-9.10.0.tgz#3193cce4048d1ae1168efa472b4c43777514b16d"
+  integrity sha512-PgdIX+RdFLl2WWtYn1p2IN86brHBE6NwzWm3hBxy1FoCl/isy7cMeq4HKjoRR4S2wRu7o3hzlJRi50/XAvVbaw==
 
 react-is@18.1.0, react-is@^18.0.0:
   version "18.1.0"
