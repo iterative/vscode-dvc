@@ -3847,10 +3847,10 @@
   dependencies:
     defer-to-connect "^2.0.1"
 
-"@tanstack/react-table@8.16.0":
-  version "8.16.0"
-  resolved "https://registry.yarnpkg.com/@tanstack/react-table/-/react-table-8.16.0.tgz#92151210ff99d6925353d7a2205735d9c31af48c"
-  integrity sha512-rKRjnt8ostqN2fercRVOIH/dq7MAmOENCMvVlKx6P9Iokhh6woBGnIZEkqsY/vEJf1jN3TqLOb34xQGLVRuhAg==
+"@tanstack/react-table@8.17.0":
+  version "8.17.0"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-table/-/react-table-8.17.0.tgz#c0a6275928a9b18573a75101a828c1e3cb2fe269"
+  integrity sha512-LSJxTDzlKGs8EN7/UHB1l3yLR9HUIxoHFkTbTjHaUUGL4kgYZFYhsQsdDJSIykG86qpIA/6gSWmtwNfy5Iprhw==
   dependencies:
     "@tanstack/table-core" "8.16.0"
 
