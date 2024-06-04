@@ -1652,7 +1652,7 @@
     "@types/vscode": "1.75.0",
     "@vscode/test-electron": "2.3.10",
     "@vscode/vsce": "2.25.0",
-    "@wdio/cli": "8.38.0",
+    "@wdio/cli": "8.38.1",
     "@wdio/local-runner": "8.38.0",
     "@wdio/mocha-framework": "8.38.0",
     "@wdio/spec-reporter": "8.38.0",
