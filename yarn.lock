@@ -5011,10 +5011,10 @@
     "@microsoft/fast-react-wrapper" "^0.3.22"
     tslib "^2.6.2"
 
-"@wdio/cli@8.38.0":
-  version "8.38.0"
-  resolved "https://registry.yarnpkg.com/@wdio/cli/-/cli-8.38.0.tgz#b67d6630d17908e61209a623d66348a8a044c4a7"
-  integrity sha512-plRVINOKeVzg4uOFJBjaEg5fBZ1vw/yxvreziL0AOxAG03HalrE1sImvu83HjDWNUDIRVcJDq+iiiFsL3khSLg==
+"@wdio/cli@8.38.1":
+  version "8.38.1"
+  resolved "https://registry.yarnpkg.com/@wdio/cli/-/cli-8.38.1.tgz#d8abf34df75eb496ab52f8cecb75b1d73907d7ee"
+  integrity sha512-xif0RvJX+saXVdzrhlEafbEdptNyeyqm0pyilT4H7OI7OMa+23rWB67r2SPoIZbBrVeFv1iqtUx9hR73RRio2A==
   dependencies:
     "@types/node" "^20.1.1"
     "@vitest/snapshot" "^1.2.1"
