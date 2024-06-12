@@ -108,9 +108,8 @@ const toggleQuickPickItem = async (
   itemsLength: number,
   quickPick: NumberQuickPick
 ) => {
-  for (let itemInd = 1; itemInd <= itemsLength; itemInd++) {
-    await commands.executeCommand('workbench.action.quickOpenSelectNext')
-
+  for (let itemInd = 1; itemInd <= itemsLength + 1; itemInd++) {
+    await commands.executeCommand('workbench.action.quickOpenNavigateNext')
     if (itemInd === number) {
       const selectionEvent = getQuickPickSelectionEvent(quickPick, numberInd)
       await commands.executeCommand('workbench.action.quickPickManyToggle')
