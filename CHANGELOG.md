@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.14] - 2024-06-19
+
+### 🐛 Bug Fixes
+
+- fix vscode integration tests - altered quickpick behaviour [#5561](https://github.com/iterative/vscode-dvc/pull/5561) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.2.13] - 2024-06-04
 
 ### 🔨 Maintenance
