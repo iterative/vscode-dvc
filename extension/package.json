@@ -1657,7 +1657,7 @@
     "@wdio/mocha-framework": "8.38.2",
     "@wdio/spec-reporter": "8.38.2",
     "chai": "4.4.1",
-    "chai-as-promised": "7.1.2",
+    "chai-as-promised": "8.0.0",
     "clean-webpack-plugin": "4.0.0",
     "copy-webpack-plugin": "11.0.0",
     "fork-ts-checker-webpack-plugin": "9.0.2",
