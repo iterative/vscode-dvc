@@ -60,7 +60,7 @@
     "@types/react-virtualized": "9.21.30",
     "@types/vega": "3.2.0",
     "@types/webpack": "5.28.5",
-    "@welldone-software/why-did-you-render": "8.0.1",
+    "@welldone-software/why-did-you-render": "8.0.3",
     "clean-webpack-plugin": "4.0.0",
     "css-loader": "6.11.0",
     "file-loader": "6.2.0",
