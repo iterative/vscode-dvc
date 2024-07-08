@@ -9217,10 +9217,10 @@ eslint-plugin-prettier@5.1.3:
     prettier-linter-helpers "^1.0.0"
     synckit "^0.8.6"
 
-eslint-plugin-promise@6.3.0:
-  version "6.3.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-promise/-/eslint-plugin-promise-6.3.0.tgz#99c1d1103a0cd140c4835eee00178c0aa8fc46bc"
-  integrity sha512-XbhIavJwFnSGaxmXwKQCVF+cT4J1BC/j9rRNE8FIg1M4ufA1LpjUnawvDFiCn+gJAmOdra1Y4B5kybHN3pjpNA==
+eslint-plugin-promise@6.4.0:
+  version "6.4.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-promise/-/eslint-plugin-promise-6.4.0.tgz#54926d53c79541efe9cea6ac1d823a58bbed1106"
+  integrity sha512-/KWWRaD3fGkVCZsdR0RU53PSthFmoHVhZl+y9+6DqeDLSikLdlUVpVEAmI6iCRR5QyOjBYBqHZV/bdv4DJ4Gtw==
 
 eslint-plugin-react-hooks@4.6.2:
   version "4.6.2"
