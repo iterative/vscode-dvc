@@ -34,4 +34,4 @@
 [blog]: https://dvc.org/blog
 [community]: https://dvc.org/community
 [dvc github repository]: https://github.com/iterative/dvc
-[dvc studio]: https://studio.iterative.ai/
+[dvc studio]: https://studio.dvc.ai/
