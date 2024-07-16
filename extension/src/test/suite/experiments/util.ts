@@ -36,7 +36,7 @@ export const DEFAULT_EXPERIMENTS_OUTPUT = {
 }
 
 export const mockBaseStudioUrl =
-  'https://studio.iterative.ai/user/olivaw/projects/vscode-dvc-demo-ynm6t3jxdx'
+  'https://studio.dvc.ai/user/olivaw/projects/vscode-dvc-demo-ynm6t3jxdx'
 
 export const buildExperiments = ({
   availableNbCommits = { main: 5 },
