@@ -80,7 +80,7 @@ Management]. For deeper learning, try our [free course]! [More resources].
 
 [experiments]: https://dvc.org/doc/start/experiments
 [data management]: https://dvc.org/doc/start/data-management
-[free course]: https://learn.iterative.ai/
+[free course]: https://learn.dvc.ai/
 [more resources]:
   https://github.com/iterative/vscode-dvc/blob/main/extension/resources/walkthrough/more-resources.md
 
@@ -178,8 +178,8 @@ more information.
   https://marketplace.visualstudio.com/items?itemName=ms-python.python
 [studio.token]:
   https://dvc.org/doc/user-guide/project-structure/configuration#studio
-[dvc studio]: https://studio.iterative.ai
-[studio]: https://studio.iterative.ai
+[dvc studio]: https://studio.dvc.ai
+[studio]: https://studio.dvc.ai
 [workspace level]:
   https://code.visualstudio.com/docs/getstarted/settings#_workspace-settings
 [python.envFile]:
