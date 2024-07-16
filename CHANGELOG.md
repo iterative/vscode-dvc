@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.15] - 2024-07-16
+
+### 🐛 Bug Fixes
+
+- rename iterative.ai to dvc.ai in Studio domain [#5626](https://github.com/iterative/vscode-dvc/pull/5626) by [@shcheklein](https://github.com/shcheklein)
+
 ## [1.2.14] - 2024-06-19
 
 ### 🐛 Bug Fixes
