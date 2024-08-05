@@ -1,7 +1,7 @@
 import type { TopLevelSpec } from 'vega-lite'
 
 export const MIN_CLI_VERSION = '3.33.3'
-export const LATEST_TESTED_CLI_VERSION = '3.52.0'
+export const LATEST_TESTED_CLI_VERSION = '3.53.0'
 
 export const PLOT_TEMPLATES = [
   'simple',
