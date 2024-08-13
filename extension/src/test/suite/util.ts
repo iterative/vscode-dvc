@@ -102,6 +102,16 @@ const getQuickPickSelectionEvent = (
     })
   )
 
+const itemsSelected = (
+  quickPick: NumberQuickPick,
+  expectedSelectedCount: number
+) =>
+  new Promise(resolve => {
+    if (quickPick.selectedItems.length === expectedSelectedCount) {
+      resolve(undefined)
+    }
+  })
+
 const toggleQuickPickItem = async (
   number: number,
   numberInd: number,
@@ -113,7 +123,10 @@ const toggleQuickPickItem = async (
     if (itemInd === number) {
       const selectionEvent = getQuickPickSelectionEvent(quickPick, numberInd)
       await commands.executeCommand('workbench.action.quickPickManyToggle')
-      await selectionEvent
+      await Promise.all([
+        selectionEvent,
+        itemsSelected(quickPick, numberInd + 1)
+      ])
     }
   }
 }
