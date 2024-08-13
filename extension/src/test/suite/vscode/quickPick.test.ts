@@ -11,6 +11,7 @@ import {
 } from '../../../vscode/quickPick'
 import { selectQuickPickItem, selectMultipleQuickPickItems } from '../util'
 import { Title } from '../../../vscode/title'
+import { sameContents } from '../../../util/array'
 
 suite('Quick Pick Test Suite', () => {
   const disposable = Disposable.fn()
@@ -213,17 +214,25 @@ suite('Quick Pick Test Suite', () => {
         maxSelectedItems
       )
 
-      await selectMultipleQuickPickItems(
-        [5, 2, 1],
-        items.length,
-        quickPick,
-        false
-      )
+      const expectedItemsSelected = new Promise<void>(resolve => {
+        quickPick.onDidChangeSelection(() => {
+          if (
+            quickPick.items.length === maxSelectedItems &&
+            sameContents(
+              quickPick.selectedItems.map(({ value }) => value),
+              quickPick.items.map(({ value }) => value)
+            )
+          ) {
+            resolve(undefined)
+          }
+        })
+      })
 
-      expect(
-        quickPick.selectedItems,
-        'the max number of items are selected'
-      ).to.have.lengthOf(maxSelectedItems)
+      await Promise.all([
+        selectMultipleQuickPickItems([5, 2, 1], items.length, quickPick, false),
+        expectedItemsSelected
+      ])
+
       expect(
         quickPick.items,
         'all items which could be selected are hidden'
