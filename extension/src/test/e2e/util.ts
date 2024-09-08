@@ -235,9 +235,10 @@ export const findScmTreeItems = async (openView: boolean) => {
       .up(Key.Tab)
       .pause(100)
       .perform()
+    return findCurrentTreeItems()
   }
 
-  for (let i = 0; i < 30; i++) {
+  for (let i = 0; i < 15; i++) {
     await browser.keys(Key.ArrowDown)
   }
 

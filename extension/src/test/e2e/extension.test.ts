@@ -213,13 +213,12 @@ describe('Source Control View', function () {
     }
 
     const expectedScmSet = new Set(expectedScmItemLabels)
-    let dvcTreeItemLabels: string[] = []
+    const dvcTreeItemLabels = new Set<string>()
 
     let openView = true
 
     await browser.waitUntil(
       async () => {
-        dvcTreeItemLabels = []
         const treeItems = await findScmTreeItems(openView)
         openView = false
         for (const treeItem of treeItems) {
@@ -227,12 +226,12 @@ describe('Source Control View', function () {
           if (!expectedScmSet.has(treeItemLabel)) {
             continue
           }
-          dvcTreeItemLabels.push(treeItemLabel)
+          dvcTreeItemLabels.add(treeItemLabel)
 
           const tooltip = await findDecorationTooltip(treeItem)
           expect(tooltip).toBeTruthy()
         }
-        return expectedScmItemLabels.length === dvcTreeItemLabels.length
+        return expectedScmItemLabels.length === dvcTreeItemLabels.size
       },
       {
         interval: 5000,
@@ -241,7 +240,8 @@ describe('Source Control View', function () {
     )
 
     expectedScmItemLabels.sort()
-    dvcTreeItemLabels.sort()
-    expect(expectedScmItemLabels).toStrictEqual(dvcTreeItemLabels)
+    const a = [...dvcTreeItemLabels]
+    a.sort()
+    expect(expectedScmItemLabels).toStrictEqual(a)
   })
 })
