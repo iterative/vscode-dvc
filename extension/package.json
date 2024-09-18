@@ -1630,7 +1630,7 @@
     "yaml": "2.5.1"
   },
   "devDependencies": {
-    "@swc/core": "1.7.24",
+    "@swc/core": "1.7.25",
     "@swc/jest": "0.2.36",
     "@types/chai": "4.3.19",
     "@types/chai-as-promised": "7.1.8",
