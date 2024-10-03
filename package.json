@@ -76,7 +76,7 @@
     "json5": "2.2.3",
     "loader-utils": "2.0.4",
     "postcss": "^8.4.31",
-    "terser": "5.33.0",
+    "terser": "5.34.0",
     "trim-newlines": "3.0.1",
     "trim": "1.0.1",
     "undici": "5.28.4"
