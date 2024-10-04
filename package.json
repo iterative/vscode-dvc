@@ -49,7 +49,7 @@
     "eslint-plugin-n": "16.6.2",
     "eslint-plugin-prettier": "5.2.1",
     "eslint-plugin-promise": "6.6.0",
-    "eslint-plugin-react": "7.36.1",
+    "eslint-plugin-react": "7.37.0",
     "eslint-plugin-react-hooks": "4.6.2",
     "eslint-plugin-sonarjs": "0.25.1",
     "eslint-plugin-sort-keys-fix": "1.1.2",
