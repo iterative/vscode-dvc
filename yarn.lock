@@ -4474,12 +4474,10 @@
   resolved "https://registry.yarnpkg.com/@types/mocha/-/mocha-10.0.1.tgz#2f4f65bb08bc368ac39c96da7b2f09140b26851b"
   integrity sha512-/fvYntiO1GeICvqbQ3doGDIP97vWmvFt83GKguJ6prmQM2iXZfFcq6YE8KteFyRtX2/h5Hf91BYvPodJKFYv5Q==
 
-"@types/mock-require@2.0.3":
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/@types/mock-require/-/mock-require-2.0.3.tgz#00470eaeebd3f933b7d7a9d992ee16b6a098ac15"
-  integrity sha512-0Hd1krmO7Dwa8haImu+eZXZ6FeCtixS8S1xvM6LWNJE5DFV5A92/zpAkQCDPOA/Z13d1xY3LqS7hpSWqlDzxrQ==
-  dependencies:
-    "@types/node" "*"
+"@types/mock-require@3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@types/mock-require/-/mock-require-3.0.0.tgz#1c7e15b2ed80f8a121398189f3964b4f5214d90c"
+  integrity sha512-TZ/s3ufaF+kEFPx9PqXKNd7OsPJoVsgOd59EA8XQLTRjJCsOdx5sEAOGhyrZ3Os78iaDKyGJWdQWyYWRg1Iyvg==
 
 "@types/node-fetch@^2.6.4":
   version "2.6.4"
