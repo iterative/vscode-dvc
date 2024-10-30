@@ -27,7 +27,7 @@
   "devDependencies": {
     "@swc/core": "1.7.36",
     "@swc/jest": "0.2.36",
-    "@types/jest": "29.5.13",
+    "@types/jest": "29.5.14",
     "clean-webpack-plugin": "4.0.0",
     "copy-webpack-plugin": "11.0.0",
     "fork-ts-checker-webpack-plugin": "9.0.2",
