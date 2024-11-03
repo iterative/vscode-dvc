@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit'
 import '@testing-library/jest-dom'
 import {
+  act,
   fireEvent,
   render,
   RenderResult,
@@ -13,7 +14,6 @@ import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
 import React from 'react'
 import { Revision } from 'dvc/src/plots/webview/contract'
-import { act } from 'react-dom/test-utils'
 import { ComparisonTable } from './ComparisonTable'
 import {
   comparisonTableInitialState,

@@ -1,4 +1,4 @@
-import { act } from 'react-dom/test-utils'
+import { act } from '@testing-library/react'
 import { DragEnterDirection } from '../shared/components/dragDrop/util'
 import { idToNode } from '../util/helpers'
 
