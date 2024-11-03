@@ -1,8 +1,8 @@
-@import '../../variables';
+@use '../../variables';
 
 .messageBand {
   width: 100%;
-  background-color: $bg-color;
+  background-color: variables.$bg-color;
   height: max-content;
   padding: 20px;
   display: flex;
@@ -13,6 +13,6 @@
 
 .messageBandIcon {
   min-width: 50px;
-  fill: $accent-color;
+  fill: variables.$accent-color;
   margin-right: 20px;
 }

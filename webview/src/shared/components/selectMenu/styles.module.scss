@@ -1,4 +1,4 @@
-@import '../../../shared/variables';
+@use '../../../shared/variables';
 
 .item {
   display: flex;
@@ -7,7 +7,7 @@
   padding: 2px 6px;
 
   &:hover {
-    background-color: $hover-background-color;
+    background-color: variables.$hover-background-color;
   }
 }
 

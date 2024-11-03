@@ -1,4 +1,4 @@
-@import '../../../../../shared/variables';
+@use '../../../../../shared/variables';
 
 .branchName {
   padding: 0 20px;
@@ -9,7 +9,7 @@
 }
 
 .icon {
-  fill: $accent-color;
+  fill: variables.$accent-color;
 }
 
 .branchActions {

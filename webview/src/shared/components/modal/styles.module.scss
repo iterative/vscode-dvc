@@ -1,7 +1,7 @@
-@import '../../variables';
+@use '../../variables';
 
 .backdrop {
-  background-color: $bg-transparency-5;
+  background-color: variables.$bg-transparency-5;
   position: fixed;
   top: 0;
   left: 0;
@@ -15,12 +15,12 @@
 }
 
 .modal {
-  background: $bg-color;
+  background: variables.$bg-color;
   position: relative;
 }
 
 .modalContent {
-  background: $fg-transparency-1;
+  background: variables.$fg-transparency-1;
   padding: 2rem;
 }
 
@@ -32,6 +32,6 @@
   background: none;
 
   svg {
-    fill: $fg-color;
+    fill: variables.$fg-color;
   }
 }

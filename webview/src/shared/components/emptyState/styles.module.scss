@@ -1,4 +1,4 @@
-@import '../../variables';
+@use '../../variables';
 
 .emptyScreen {
   width: 100vw;
@@ -15,7 +15,7 @@
   text-align: center;
   opacity: 0.8;
   letter-spacing: 0.04em;
-  color: $watermark-color;
+  color: variables.$watermark-color;
   font-family: sans-serif;
   max-width: 600px;
   line-height: 1.6;

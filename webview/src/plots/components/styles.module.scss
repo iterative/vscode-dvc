@@ -1,5 +1,5 @@
-@import '../../shared/variables';
-@import '../../shared/styles';
+@use '../../shared/variables';
+@use '../../shared/styles';
 
 $gap: 20px;
 
@@ -26,7 +26,7 @@ $gap: 20px;
 .plot {
   overflow: visible;
   position: relative;
-  background: $fg-transparency-1;
+  background: variables.$fg-transparency-1;
   border: none;
   padding-top: 5px;
 
@@ -64,7 +64,7 @@ $gap: 20px;
 .plotGripIcon {
   position: absolute;
   z-index: 2;
-  fill: $fg-color;
+  fill: variables.$fg-color;
   left: 0;
   top: 0;
   padding: 5px;
@@ -93,7 +93,7 @@ $gap: 20px;
   width: 25px;
   height: 25px;
   border-radius: 50%;
-  background-color: $fg-color;
+  background-color: variables.$fg-color;
   position: absolute;
   top: 10px;
   right: 10px;
@@ -181,7 +181,7 @@ $gap: 20px;
 .dropTarget {
   height: auto;
   opacity: 0.5;
-  border: 3px dashed $accent-color;
+  border: 3px dashed variables.$accent-color;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -194,7 +194,7 @@ $gap: 20px;
 
 .dropIcon {
   border-radius: 100%;
-  border: 3px solid $accent-color;
+  border: 3px solid variables.$accent-color;
   padding: 20px;
 }
 
@@ -212,7 +212,7 @@ $gap: 20px;
   box-sizing: content-box;
 
   path {
-    fill: $accent-color;
+    fill: variables.$accent-color;
   }
 }
 
@@ -239,7 +239,7 @@ $gap: 20px;
 .errorsModal {
   width: 80vw;
   max-height: calc(80vh - 100px);
-  color: $error-color;
+  color: variables.$error-color;
 }
 
 .errorsModalTitle {
@@ -249,7 +249,7 @@ $gap: 20px;
 .errorsModalIcon {
   margin-right: 3px;
   vertical-align: text-bottom;
-  fill: $error-color;
+  fill: variables.$error-color;
 }
 
 .errorsModalPlot {
@@ -277,7 +277,7 @@ $gap: 20px;
   top: 0;
   display: flex;
   justify-content: end;
-  background-color: $bg-color;
+  background-color: variables.$bg-color;
   z-index: 3;
   justify-self: flex-end;
 }
@@ -302,7 +302,7 @@ $gap: 20px;
 .plotTooltipLabel {
   font-weight: bold;
   min-width: 50px;
-  color: $accent-color;
+  color: variables.$accent-color;
 }
 
 /* stylelint-disable selector-class-pattern -- 3rd party selectors */
@@ -311,9 +311,9 @@ $gap: 20px;
   position: absolute;
   bottom: 0;
   width: 100%;
-  box-shadow: inset 250px 250px $fg-transparency-1;
-  background-color: $bg-color;
-  color: $fg-color;
+  box-shadow: inset 250px 250px variables.$fg-transparency-1;
+  background-color: variables.$bg-color;
+  color: variables.$fg-color;
   padding: 10px;
   display: block;
   opacity: 0;
@@ -325,7 +325,7 @@ $gap: 20px;
   }
 
   input {
-    accent-color: $accent-color;
+    accent-color: variables.$accent-color;
     outline: none;
   }
 }
@@ -371,7 +371,7 @@ $gap: 20px;
 }
 
 .pathHighlight {
-  background-color: $fg-transparency-3;
+  background-color: variables.$fg-transparency-3;
 }
 
 :global(.ReactVirtualized__Grid__innerScrollContainer),
@@ -401,20 +401,20 @@ $gap: 20px;
 
 :global(.has-actions) {
   summary {
-    background: $fg-color !important;
+    background: variables.$fg-color !important;
   }
 }
 
 :global(.vega-actions) {
-  background: $fg-color !important;
+  background: variables.$fg-color !important;
 
   &::before,
   &::after {
-    border-bottom-color: $fg-color !important;
+    border-bottom-color: variables.$fg-color !important;
   }
 
   a:hover {
-    background-color: $bg-transparency-1 !important;
+    background-color: variables.$bg-transparency-1 !important;
   }
 }
 

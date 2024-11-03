@@ -1,5 +1,5 @@
-@import '../../../shared/variables';
-@import '../../../shared/mixins';
+@use '../../../shared/variables';
+@use '../../../shared/mixins';
 
 .codeBlock {
   text-align: left;
@@ -17,7 +17,7 @@
 }
 
 .infoIcon {
-  fill: $accent-color;
+  fill: variables.$accent-color;
   margin-bottom: -3px;
 }
 

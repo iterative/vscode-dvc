@@ -1,5 +1,5 @@
-@import '../../../shared/variables';
-@import '../../../shared/mixins';
+@use '../../../shared/variables';
+@use '../../../shared/mixins';
 
 .remoteDetails {
   margin: 0 auto;
@@ -46,7 +46,7 @@
 .storageDetails {
   white-space: pre-wrap;
   background-color: transparent !important;
-  color: $watermark-color;
+  color: variables.$watermark-color;
   font-family: sans-serif;
   letter-spacing: 0.04em;
   line-height: 1.6;
@@ -56,11 +56,11 @@
 }
 
 .extensionIcon {
-  fill: $accent-color;
+  fill: variables.$accent-color;
   margin-bottom: -3px;
 }
 
 .warnIcon {
-  fill: $warn-color;
+  fill: variables.$warn-color;
   margin-bottom: -3px;
 }

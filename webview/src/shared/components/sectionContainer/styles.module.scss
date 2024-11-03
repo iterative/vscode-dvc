@@ -1,4 +1,4 @@
-@import '../../variables';
+@use '../../variables';
 
 $gap: 20px;
 
@@ -11,7 +11,7 @@ $gap: 20px;
 
   summary {
     list-style-type: none;
-    font-family: $font;
+    font-family: variables.$font;
     padding: 14px 10px;
     font-weight: bold;
     font-size: 1.25rem;
@@ -20,7 +20,7 @@ $gap: 20px;
     width: 100%;
     cursor: pointer;
     position: sticky;
-    background-color: $bg-color;
+    background-color: variables.$bg-color;
     z-index: 3;
     gap: $gap;
   }
@@ -39,7 +39,7 @@ $gap: 20px;
 }
 
 .detailsIcon {
-  fill: $fg-color;
+  fill: variables.$fg-color;
   margin-bottom: -4px;
 }
 
@@ -51,19 +51,19 @@ $gap: 20px;
 }
 
 .indicatorIcon {
-  fill: $accent-color;
+  fill: variables.$accent-color;
 }
 
 .completedIcon {
-  fill: $passed-color;
+  fill: variables.$passed-color;
 }
 
 .errorIcon {
-  fill: $error-color;
+  fill: variables.$error-color;
 }
 
 .warningIcon {
-  fill: $warn-color;
+  fill: variables.$warn-color;
 }
 
 .infoTooltip {

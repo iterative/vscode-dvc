@@ -1,12 +1,12 @@
-@import '../../variables';
+@use '../../variables';
 
 .menu {
   list-style: none;
   display: flex;
   padding: 2px;
-  border: 1px solid $fg-transparency-5;
+  border: 1px solid variables.$fg-transparency-5;
   width: max-content;
-  background-color: $bg-color;
+  background-color: variables.$bg-color;
   margin: 0;
 }
 
@@ -20,10 +20,10 @@
   border: none;
   padding: 0;
   background: inherit;
-  color: $fg-color;
+  color: variables.$fg-color;
 
   &:hover {
-    background-color: $fg-transparency-1;
+    background-color: variables.$fg-transparency-1;
   }
 
   &.clickable {
