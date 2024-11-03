@@ -3,6 +3,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import React from 'react'
 import { Provider } from 'react-redux'
 import {
+  act,
   createEvent,
   fireEvent,
   render,
@@ -31,7 +32,6 @@ import {
   MessageFromWebviewType,
   MessageToWebviewType
 } from 'dvc/src/webview/contract'
-import { act } from 'react-dom/test-utils'
 import { App } from './App'
 import { NewSectionBlock } from './templatePlots/TemplatePlots'
 import {
