@@ -2,7 +2,6 @@ import React from 'react'
 import '@testing-library/jest-dom'
 import {
   render,
-  cleanup,
   screen,
   fireEvent,
   waitForElementToBeRemoved
@@ -37,10 +36,6 @@ const item = {
 }
 const renderItem = (props: Partial<IconMenuItemProps> = {}) =>
   render(<IconMenu items={[{ ...item, ...props }]} />)
-
-afterEach(() => {
-  cleanup()
-})
 
 describe('IconMenu', () => {
   it('should display as many items as there are items from the props', () => {
