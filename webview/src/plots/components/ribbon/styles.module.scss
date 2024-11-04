@@ -1,5 +1,5 @@
-@import '../../../shared/variables';
-@import '../../../shared/mixins';
+@use '../../../shared/variables';
+@use '../../../shared/mixins';
 
 .copyButton {
   display: none;
@@ -20,15 +20,15 @@
   }
 
   &.depsKey {
-    color: $deps-color;
+    color: variables.$deps-color;
   }
 
   &.metricsKey {
-    color: $metrics-color;
+    color: variables.$metrics-color;
   }
 
   &.paramsKey {
-    color: $params-color;
+    color: variables.$params-color;
   }
 
   svg {
@@ -52,13 +52,13 @@
 
 .tooltipTableDescription {
   margin: 4px 0 0 4px;
-  color: $description-color;
+  color: variables.$description-color;
   font-size: 0.75rem;
   max-width: 250px;
 
   .infoIcon {
     margin-right: 3px;
-    color: $fg-color;
+    color: variables.$fg-color;
     vertical-align: text-top;
     min-width: 14px;
     min-height: 14px;
@@ -77,27 +77,27 @@
   &.addTopBorder {
     margin: 1em 0;
     padding-top: 1em;
-    border-top: 1px solid $tooltip-border;
+    border-top: 1px solid variables.$tooltip-border;
   }
 }
 
 .addBottomBorder {
   padding-bottom: 1em;
-  border-bottom: 1px solid $tooltip-border;
+  border-bottom: 1px solid variables.$tooltip-border;
 }
 
 .block {
   border-left-style: solid;
   border-left-width: 3px;
-  background-color: $plot-block-bg-color;
-  color: $fg-color;
+  background-color: variables.$plot-block-bg-color;
+  color: variables.$fg-color;
   display: inline-flex;
   justify-content: space-between;
   align-items: center;
   font-size: 0.8125rem;
 
   svg {
-    fill: $fg-color;
+    fill: variables.$fg-color;
     display: block;
   }
 
@@ -110,7 +110,7 @@
     margin-left: -4px;
     height: 18px;
     width: 18px;
-    color: $error-color;
+    color: variables.$error-color;
     text-align: center;
   }
 
@@ -130,7 +130,7 @@
   background-color: transparent;
   border: none;
   text-align: left;
-  color: $fg-color;
+  color: variables.$fg-color;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -147,7 +147,7 @@
 }
 
 .subtitle {
-  color: $watermark-color;
+  color: variables.$watermark-color;
   font-size: 0.5625rem;
 }
 
@@ -162,7 +162,7 @@
   }
 
   :hover {
-    background-color: $row-bg-alt-color;
+    background-color: variables.$row-bg-alt-color;
   }
 }
 
@@ -171,12 +171,12 @@
   transition: box-shadow 0.25s;
   z-index: 100;
   top: 0;
-  background-color: $bg-color;
-  border-bottom: 1px solid $border-color;
+  background-color: variables.$bg-color;
+  border-bottom: 1px solid variables.$border-color;
   padding: 10px 15px;
 
   &.withShadow {
-    box-shadow: 0 5px 8px -2px $shadow;
+    box-shadow: 0 5px 8px -2px variables.$shadow;
   }
 }
 
@@ -205,9 +205,9 @@
 
 .errors {
   margin: 10px 0 0;
-  color: $error-color;
-  border-top: 1px solid $error-color;
-  border-bottom: 1px solid $error-color;
+  color: variables.$error-color;
+  border-top: 1px solid variables.$error-color;
+  border-bottom: 1px solid variables.$error-color;
   display: flex;
   width: 100%;
 }

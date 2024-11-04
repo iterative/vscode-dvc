@@ -1,5 +1,5 @@
-@import './variables';
-@import './mixins';
+@use 'variables';
+@use 'mixins';
 
 * {
   box-sizing: border-box;
@@ -23,9 +23,9 @@ body {
   border: 0;
   margin: 0;
   padding: 0;
-  background-color: $bg-color;
-  color: $fg-color;
-  font-family: $editor-font;
+  background-color: variables.$bg-color;
+  color: variables.$fg-color;
+  font-family: variables.$editor-font;
 }
 
 .modalOpen {

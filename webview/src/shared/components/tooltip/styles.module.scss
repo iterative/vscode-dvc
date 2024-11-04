@@ -1,16 +1,16 @@
-@import '../../variables';
+@use '../../variables';
 
 /* stylelint-disable selector-class-pattern -- third party selectors */
 :global(.tippy-box) {
-  filter: $tooltip-drop-shadow;
-  font-family: $font;
+  filter: variables.$tooltip-drop-shadow;
+  font-family: variables.$font;
   max-width: max-content;
   font-size: 0.8rem;
   transition: none;
   white-space: nowrap;
 
   & > :global(.tippy-arrow) {
-    color: $tooltip-background;
+    color: variables.$tooltip-background;
     z-index: 1;
 
     ::before {
@@ -19,17 +19,17 @@
   }
 
   & > :global(.tippy-content) {
-    color: $tooltip-foreground;
+    color: variables.$tooltip-foreground;
     white-space: nowrap;
     padding: 0;
-    background-color: $tooltip-background;
+    background-color: variables.$tooltip-background;
     z-index: 2;
   }
 }
 /* stylelint-enable selector-class-pattern */
 
 .tooltipContent {
-  border: 1px solid $tooltip-border;
+  border: 1px solid variables.$tooltip-border;
   white-space: pre-wrap;
   padding: 5px;
   display: flex;

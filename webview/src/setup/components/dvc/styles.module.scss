@@ -1,9 +1,9 @@
-@import '../../../shared/variables';
-@import '../../../shared/mixins';
+@use '../../../shared/variables';
+@use '../../../shared/mixins';
 
 .inlineWarningSvg {
   vertical-align: middle;
-  fill: $warn-color;
+  fill: variables.$warn-color;
   width: 16px;
   height: 16px;
 }

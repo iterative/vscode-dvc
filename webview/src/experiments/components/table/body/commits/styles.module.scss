@@ -1,4 +1,4 @@
-@import '../../../../../shared/variables';
+@use '../../../../../shared/variables';
 
 .commitsNav {
   text-align: left;
@@ -10,7 +10,7 @@
 .commitsButton {
   background: transparent;
   border: none;
-  color: $meta-cell-color;
+  color: variables.$meta-cell-color;
   text-decoration: underline;
   cursor: pointer;
 

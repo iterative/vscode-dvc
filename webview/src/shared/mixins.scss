@@ -1,9 +1,11 @@
+@use 'variables';
+
 %link {
-  color: $link-fg-color;
+  color: variables.$link-fg-color;
 
   &:hover,
   &:active {
-    color: $link-active-color;
+    color: variables.$link-active-color;
   }
 }
 

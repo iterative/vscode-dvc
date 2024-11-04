@@ -1,4 +1,4 @@
-@import '../../../shared/variables';
+@use '../../../shared/variables';
 
 .emptyStateWrapper {
   display: flex;
@@ -15,7 +15,7 @@
   font-size: 0.8rem;
 
   svg {
-    fill: $accent-color;
+    fill: variables.$accent-color;
     vertical-align: text-bottom;
     margin-right: 4px;
   }

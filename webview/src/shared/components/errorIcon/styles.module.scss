@@ -1,6 +1,6 @@
-@import '../../variables';
-@import '../../styles';
+@use '../../variables';
+@use '../../styles';
 
 .errorIcon {
-  color: $error-color;
+  color: variables.$error-color;
 }

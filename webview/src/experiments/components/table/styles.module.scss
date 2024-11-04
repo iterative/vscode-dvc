@@ -2,11 +2,11 @@
 /* stylelint-disable selector-max-class */
 // Variables
 
-@import '../../../shared/variables';
-@import '../../../shared/mixins';
+@use '../../../shared/variables';
+@use '../../../shared/mixins';
 
 $nested-row-padding: 1.35rem;
-$row-border: 1px solid $border-color;
+$row-border: 1px solid variables.$border-color;
 $edge-padding: 0.8rem;
 $cell-padding: 0.5rem;
 $workspace-row-edge-margin: $edge-padding - $cell-padding;
@@ -20,7 +20,7 @@ $badge-size: 0.85rem;
   left: 0;
   display: inline-block;
   position: absolute;
-  border: 2px solid $icon-color;
+  border: 2px solid variables.$icon-color;
   border-top: unset;
   border-left: unset;
   transition:
@@ -93,7 +93,7 @@ $badge-size: 0.85rem;
   width: 100%;
   height: 1px;
   display: block;
-  background-color: $header-border-color;
+  background-color: variables.$header-border-color;
 }
 
 %cellContentsBase {
@@ -106,13 +106,13 @@ $badge-size: 0.85rem;
 }
 
 %iconBox {
-  background-color: $checkbox-background;
-  border-radius: $checkbox-border-radius;
-  border: $checkbox-border-width solid $checkbox-border;
+  background-color: variables.$checkbox-background;
+  border-radius: variables.$checkbox-border-radius;
+  border: variables.$checkbox-border-width solid variables.$checkbox-border;
   cursor: pointer;
   display: flex;
-  height: $checkbox-size;
-  width: $checkbox-size;
+  height: variables.$checkbox-size;
+  width: variables.$checkbox-size;
 }
 
 // Concrete selectors
@@ -175,7 +175,7 @@ $badge-size: 0.85rem;
 
 .experimentsTable.withExpColumnShadow .experimentsTr > *:first-child {
   &::after {
-    box-shadow: 3px 0 3px $shadow;
+    box-shadow: 3px 0 3px variables.$shadow;
   }
 
   > div::after {
@@ -194,10 +194,10 @@ $badge-size: 0.85rem;
   width: 1.5rem;
   height: 1.5rem;
   cursor: pointer;
-  border-radius: $checkbox-border-radius;
+  border-radius: variables.$checkbox-border-radius;
 
   svg {
-    fill: $icon-color;
+    fill: variables.$icon-color;
   }
 
   &:disabled {
@@ -206,19 +206,19 @@ $badge-size: 0.85rem;
   }
 
   &:hover {
-    background-color: $hover-background-color;
+    background-color: variables.$hover-background-color;
   }
 }
 
 .onlyChanged {
-  background-color: $indicator-badge-background;
+  background-color: variables.$indicator-badge-background;
 
   svg {
-    fill: $indicator-badge-foreground;
+    fill: variables.$indicator-badge-foreground;
   }
 
   &:hover {
-    background-color: $indicator-badge-background !important;
+    background-color: variables.$indicator-badge-background !important;
     opacity: 0.8;
   }
 }
@@ -228,8 +228,8 @@ $badge-size: 0.85rem;
   bottom: 3px;
   right: -2px;
   font-weight: bold;
-  background-color: $indicator-badge-background;
-  color: $indicator-badge-foreground;
+  background-color: variables.$indicator-badge-background;
+  color: variables.$indicator-badge-foreground;
   border-radius: 100%;
   width: $badge-size;
   height: $badge-size;
@@ -261,7 +261,7 @@ $badge-size: 0.85rem;
 }
 
 .experimentsThead {
-  background-color: $bg-color;
+  background-color: variables.$bg-color;
   transition: 0.25s all;
   box-shadow: none;
   position: sticky;
@@ -272,12 +272,12 @@ $badge-size: 0.85rem;
 .experimentsTh {
   height: auto;
   font-size: 0.7rem;
-  background-color: $header-bg-color;
+  background-color: variables.$header-bg-color;
 
   &::before {
     @extend %cellBorderLeft;
 
-    background-color: $header-border-color;
+    background-color: variables.$header-border-color;
   }
 
   .cellContents {
@@ -290,7 +290,7 @@ $badge-size: 0.85rem;
     }
 
     span[draggable='true']:hover {
-      background-color: $hover-background-color;
+      background-color: variables.$hover-background-color;
     }
   }
 }
@@ -302,7 +302,7 @@ $badge-size: 0.85rem;
 }
 
 .headerCell {
-  color: $header-fg-color;
+  color: variables.$header-fg-color;
   text-align: center;
   font-weight: 400;
 
@@ -313,7 +313,7 @@ $badge-size: 0.85rem;
     left: 1px;
     width: 100%;
     height: 1px;
-    background-color: $header-border-color;
+    background-color: variables.$header-border-color;
   }
 
   &:first-child {
@@ -337,23 +337,23 @@ $badge-size: 0.85rem;
 .firstLevelHeaderCell {
   .paramHeaderCell,
   &.paramHeaderCell {
-    color: $params-color;
+    color: variables.$params-color;
   }
 
   .metricHeaderCell,
   &.metricHeaderCell {
-    color: $metrics-color;
+    color: variables.$metrics-color;
   }
 
   .depHeaderCell,
   &.depHeaderCell {
-    color: $deps-color;
+    color: variables.$deps-color;
   }
 }
 
 .dropTargetHeaderCell {
-  background: $header-dnd-drop-background;
-  outline: $header-dnd-outline dashed 2px;
+  background: variables.$header-dnd-drop-background;
+  outline: variables.$header-dnd-outline dashed 2px;
   outline-offset: -4px;
 
   .iconMenu ul[role='menu'] {
@@ -378,7 +378,7 @@ $badge-size: 0.85rem;
   padding-bottom: 3.5px;
 
   ul[role='menu'] {
-    background-color: $header-bg-color;
+    background-color: variables.$header-bg-color;
     padding-left: 2px;
     margin: 0 0 0 4px;
     border: none;
@@ -435,7 +435,7 @@ $badge-size: 0.85rem;
   svg {
     width: 16px;
     height: 16px;
-    fill: $accent-color;
+    fill: variables.$accent-color;
   }
 }
 
@@ -472,7 +472,7 @@ $badge-size: 0.85rem;
     left: 50%;
     width: 2px;
     height: 100%;
-    background-color: $header-resizer-color;
+    background-color: variables.$header-resizer-color;
     display: none;
   }
 
@@ -490,7 +490,7 @@ $badge-size: 0.85rem;
   &:hover {
     .experimentsTd:not(.experimentCell):hover::before,
     .experimentsTd:hover + .experimentsTd::before {
-      background-color: $border-color;
+      background-color: variables.$border-color;
     }
   }
 }
@@ -502,7 +502,7 @@ $badge-size: 0.85rem;
   z-index: 4;
 
   &.withShadow {
-    box-shadow: 0 5px 8px -2px $shadow;
+    box-shadow: 0 5px 8px -2px variables.$shadow;
 
     .experimentsTr {
       border-bottom: none;
@@ -525,11 +525,11 @@ $badge-size: 0.85rem;
 }
 
 .rowSelected {
-  border-color: $row-border-selected-color;
+  border-color: variables.$row-border-selected-color;
 
   &:hover {
     &::after {
-      box-shadow: inset 0 0 20px $shadow;
+      box-shadow: inset 0 0 20px variables.$shadow;
       content: '';
       top: 0;
       right: 0;
@@ -542,25 +542,25 @@ $badge-size: 0.85rem;
 
     .experimentsTd:not(.experimentCell):hover::before,
     .experimentsTd:hover + .experimentsTd::before {
-      background-color: $row-border-selected-color;
+      background-color: variables.$row-border-selected-color;
     }
   }
 }
 
 .lastRowGroup {
   & > .experimentsTr:last-child {
-    border-color: $row-bg-color;
+    border-color: variables.$row-bg-color;
 
     &.rowSelected {
-      border-color: $row-bg-selected-color;
+      border-color: variables.$row-bg-selected-color;
     }
   }
 
   .experimentGroup:last-child .experimentsTr:last-child {
-    border-color: $row-bg-color;
+    border-color: variables.$row-bg-color;
 
     &.rowSelected {
-      border-color: $row-bg-selected-color;
+      border-color: variables.$row-bg-selected-color;
     }
   }
 }
@@ -570,7 +570,7 @@ $badge-size: 0.85rem;
   font-size: 0.8rem;
   line-height: 2rem;
   align-items: center;
-  background-color: $row-bg-color;
+  background-color: variables.$row-bg-color;
 
   &:not(.experimentCell)::before {
     @extend %cellBorderLeft;
@@ -578,19 +578,19 @@ $badge-size: 0.85rem;
 
   .rowSelected & {
     &:not(.experimentCell) {
-      color: $row-fg-selected-color;
-      background-color: $row-bg-selected-color;
+      color: variables.$row-fg-selected-color;
+      background-color: variables.$row-bg-selected-color;
     }
 
     &.experimentCell::before {
-      background-color: $row-bg-selected-color;
+      background-color: variables.$row-bg-selected-color;
     }
   }
 
   .bodyRow:not(.rowSelected):hover & {
     &:not(.experimentCell),
     &.experimentCell::before {
-      background-color: $row-hover-background-color;
+      background-color: variables.$row-hover-background-color;
     }
   }
 
@@ -678,15 +678,15 @@ $badge-size: 0.85rem;
   cursor: pointer;
 
   svg {
-    fill: $icon-color;
+    fill: variables.$icon-color;
 
     .rowSelected & {
-      fill: $selected-icon-color;
+      fill: variables.$selected-icon-color;
     }
   }
 
   &[aria-checked='true'] svg {
-    fill: $row-action-star-checked;
+    fill: variables.$row-action-star-checked;
   }
 }
 
@@ -732,7 +732,7 @@ $badge-size: 0.85rem;
 }
 
 .queued {
-  color: $icon-color;
+  color: variables.$icon-color;
   display: flex;
   height: 16px;
   left: 2px;
@@ -761,7 +761,7 @@ $badge-size: 0.85rem;
   bottom: 2px;
 
   .rowSelected & {
-    border-color: $selected-icon-color;
+    border-color: variables.$selected-icon-color;
   }
 }
 
@@ -773,7 +773,7 @@ $badge-size: 0.85rem;
   bottom: 0;
 
   .rowSelected & {
-    border-color: $selected-icon-color;
+    border-color: variables.$selected-icon-color;
   }
 }
 
@@ -796,7 +796,7 @@ $badge-size: 0.85rem;
 }
 
 .experimentCellSecondaryName {
-  color: $meta-cell-color;
+  color: variables.$meta-cell-color;
   font-size: 0.75em;
   display: block;
 
@@ -896,7 +896,7 @@ $badge-size: 0.85rem;
   align-items: center;
 
   svg {
-    fill: $accent-color;
+    fill: variables.$accent-color;
     margin-right: 2px;
     min-width: 13px;
     min-height: 13px;
@@ -930,11 +930,11 @@ $badge-size: 0.85rem;
 
 .workspaceChangeText,
 .depChangeText {
-  color: $changed-color;
+  color: variables.$changed-color;
 }
 
 .errorText {
-  color: $error-color;
+  color: variables.$error-color;
 }
 
 // below table styles
@@ -951,6 +951,6 @@ $badge-size: 0.85rem;
 
   p {
     opacity: 0.6;
-    font-family: $font;
+    font-family: variables.$font;
   }
 }

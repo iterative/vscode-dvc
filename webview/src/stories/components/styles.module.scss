@@ -1,4 +1,4 @@
-@import '../../shared/variables';
+@use '../../shared/variables';
 
 .iconsWrapper {
   display: flex;
@@ -9,7 +9,7 @@
 
 .iconWrapper {
   padding: 5px;
-  border: 1px solid $fg-color;
+  border: 1px solid variables.$fg-color;
   border-radius: 3px;
   display: flex;
   flex-direction: column;
@@ -19,7 +19,7 @@
   height: 80px;
 
   svg {
-    fill: $fg-color;
+    fill: variables.$fg-color;
     width: 20px;
     height: 20px;
   }

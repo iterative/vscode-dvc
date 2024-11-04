@@ -1,4 +1,4 @@
-@import '../../variables';
+@use '../../variables';
 
 .button {
   flex: 0 0 0.8em;
@@ -6,7 +6,7 @@
   display: none;
   border: none;
   background: none;
-  color: $fg-color;
+  color: variables.$fg-color;
   cursor: pointer;
   width: 0.8em;
   height: 0.8em;

@@ -1,18 +1,18 @@
-@import '../../../shared/variables';
+@use '../../../shared/variables';
 
 $gap: 4px;
 
 .comparisonTableHeader {
   position: relative;
   z-index: 2;
-  background-color: $bg-color;
+  background-color: variables.$bg-color;
 }
 
 .gripIcon {
   opacity: 0;
   position: absolute;
   z-index: 2;
-  fill: $fg-color;
+  fill: variables.$fg-color;
   left: 0;
   top: 0;
   padding: 5px;
@@ -24,8 +24,8 @@ $gap: 4px;
 
 .header {
   padding: 10px 5px;
-  color: $fg-color;
-  background-color: $fg-transparency-1;
+  color: variables.$fg-color;
+  background-color: variables.$fg-transparency-1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -57,9 +57,9 @@ $gap: 4px;
 
 .bullet {
   display: block;
-  width: $bullet-size;
-  height: $bullet-size;
-  border-radius: $bullet-size;
+  width: variables.$bullet-size;
+  height: variables.$bullet-size;
+  border-radius: variables.$bullet-size;
 }
 
 .pin {
@@ -75,7 +75,7 @@ $gap: 4px;
   cursor: pointer;
 
   path {
-    fill: $fg-color;
+    fill: variables.$fg-color;
   }
 }
 
@@ -91,14 +91,14 @@ $gap: 4px;
 .rowToggler {
   border: none;
   background: none;
-  color: $fg-color;
+  color: variables.$fg-color;
   text-align: left;
   display: flex;
   user-select: text;
   max-width: calc(100% - 20px);
 
   svg {
-    fill: $fg-color;
+    fill: variables.$fg-color;
     min-width: fit-content;
   }
 }
@@ -108,7 +108,7 @@ $gap: 4px;
   position: sticky;
   left: 0;
   z-index: 1;
-  background-color: $bg-color;
+  background-color: variables.$bg-color;
 
   &::before {
     content: '';
@@ -117,7 +117,7 @@ $gap: 4px;
     position: absolute;
     right: 0;
     top: 0;
-    background-color: $bg-color;
+    background-color: variables.$bg-color;
     z-index: 5;
   }
 
@@ -128,7 +128,7 @@ $gap: 4px;
     position: absolute;
     right: 0;
     top: 0;
-    background-color: $fg-transparency-4;
+    background-color: variables.$fg-transparency-4;
     z-index: 5;
   }
 }
@@ -186,19 +186,19 @@ $gap: 4px;
   height: 40px;
   align-items: center;
   justify-content: center;
-  color: $fg-color;
-  background-color: $bg-color;
-  box-shadow: inset 40px 40px $fg-transparency-1;
+  color: variables.$fg-color;
+  background-color: variables.$bg-color;
+  box-shadow: inset 40px 40px variables.$fg-transparency-1;
 }
 
 .experimentName {
-  color: $meta-cell-color;
+  color: variables.$meta-cell-color;
 }
 
 .dropTarget {
   width: 2px;
   height: 100%;
-  border-right: 2px dashed $accent-color;
+  border-right: 2px dashed variables.$accent-color;
 }
 
 .draggedColumn {
@@ -206,9 +206,9 @@ $gap: 4px;
 }
 
 .ghostElem {
-  background-color: $accent-color;
+  background-color: variables.$accent-color;
   opacity: 1;
-  color: $bg-color;
+  color: variables.$bg-color;
 }
 
 .copyButton {

@@ -1,4 +1,4 @@
-@import '../../variables';
+@use '../../variables';
 
 .wrapper {
   display: flex;
@@ -8,10 +8,10 @@
 .label {
   font-size: 0.6rem;
   margin-right: 10px;
-  color: $fg-color;
+  color: variables.$fg-color;
 }
 
 .slider {
-  accent-color: $accent-color;
+  accent-color: variables.$accent-color;
   outline: none !important;
 }
