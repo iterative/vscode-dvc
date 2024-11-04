@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.20] - 2024-11-04
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (3.56.0) [#5809](https://github.com/iterative/vscode-dvc/pull/5809) by [@mattseddon](https://github.com/mattseddon)
+- Fix act warnings [#5811](https://github.com/iterative/vscode-dvc/pull/5811) by [@mattseddon](https://github.com/mattseddon)
+- Migrate saas import statements [#5812](https://github.com/iterative/vscode-dvc/pull/5812) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.2.19] - 2024-08-28
 
 ### 🔨 Maintenance
