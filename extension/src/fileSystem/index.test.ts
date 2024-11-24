@@ -337,6 +337,19 @@ describe('findDvcRootPaths', () => {
       new Set([dvcDemoPath, mockFirstDvcRoot, mockSecondDvcRoot])
     )
   })
+
+  it('should exclude queued experiment directories', async () => {
+    const queuedExpDir = join(dvcDemoPath, DOT_DVC, 'tmp', 'exps', 'tmp_2xr')
+
+    mockedFindFiles.mockResolvedValue([
+      convertAsFindDvcConfigFile(dvcDemoPath),
+      convertAsFindDvcConfigFile(queuedExpDir)
+    ])
+
+    const dvcRoots = await findDvcRootPaths()
+
+    expect(dvcRoots).toStrictEqual(new Set([dvcDemoPath]))
+  })
 })
 
 describe('findAbsoluteDvcRootPath', () => {
