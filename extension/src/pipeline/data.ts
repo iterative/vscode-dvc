@@ -3,6 +3,7 @@ import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { BaseData } from '../data'
 import { findFiles } from '../fileSystem/workspace'
 import { isPathInProject } from '../fileSystem'
+import { TEMP_EXP_DIR } from '../cli/dvc/constants'
 
 export class PipelineData extends BaseData<{
   dag: string
@@ -57,7 +58,8 @@ export class PipelineData extends BaseData<{
     return this.notifyChanged({ dag, stages })
   }
 
-  private findDvcYamls() {
-    return findFiles('**/dvc.yaml')
+  private async findDvcYamls() {
+    const dvcYamls = await findFiles('**/dvc.yaml')
+    return dvcYamls.filter(file => !file.includes(TEMP_EXP_DIR))
   }
 }
