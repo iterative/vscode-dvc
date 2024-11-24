@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.21] - 2024-11-24
+
+### 🐛 Bug Fixes
+
+- Exclude queued experiments from dvc root collection [#5833](https://github.com/iterative/vscode-dvc/pull/5833) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.2.20] - 2024-11-04
 
 ### 🔨 Maintenance
