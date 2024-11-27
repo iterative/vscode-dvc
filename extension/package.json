@@ -1643,7 +1643,7 @@
     "@types/lodash.isequal": "4.5.8",
     "@types/lodash.merge": "4.6.9",
     "@types/lodash.omit": "4.5.9",
-    "@types/mocha": "10.0.9",
+    "@types/mocha": "10.0.10",
     "@types/mock-require": "3.0.0",
     "@types/node": "16.x",
     "@types/sinon-chai": "3.2.12",
