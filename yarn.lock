@@ -12415,10 +12415,10 @@ jsesc@~0.5.0:
   resolved "https://registry.yarnpkg.com/jsesc/-/jsesc-0.5.0.tgz#e7dee66e35d6fc16f710fe91d5cf69f70f08911d"
   integrity sha1-597mbjXW/Bb3EP6R1c9p9w8IkR0=
 
-json-2-csv@5.5.6:
-  version "5.5.6"
-  resolved "https://registry.yarnpkg.com/json-2-csv/-/json-2-csv-5.5.6.tgz#6c1220ab063ed4e9cc33bc2f42e0e044e80e083e"
-  integrity sha512-N673XbJgHwUq9JreKpk530jSywPF/rEAQ08dV99QQpkluP/4HTwshpoP9hmDz26iSFqu7eNAPgyJfu/77HvPGA==
+json-2-csv@5.5.7:
+  version "5.5.7"
+  resolved "https://registry.yarnpkg.com/json-2-csv/-/json-2-csv-5.5.7.tgz#6e29cb551cd5e973d3851249b7c6f5ecce92b6f3"
+  integrity sha512-aZ0EOadeNnO4ifF60oXXTH8P177WeHhFLbRLqILW1Kk1gNHlgAOuvddMwEIaxbLpCzx+vXo49whK6AILdg8qLg==
   dependencies:
     deeks "3.1.0"
     doc-path "4.1.1"
