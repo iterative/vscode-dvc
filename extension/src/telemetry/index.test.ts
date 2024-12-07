@@ -1,7 +1,7 @@
 import TelemetryReporter from '@vscode/extension-telemetry'
 import { getTelemetryReporter, sendTelemetryEvent } from '.'
 import {
-  APPLICATION_INSIGHTS_KEY,
+  APPLICATION_INSIGHTS_CONNECTION_STRING,
   IEventNamePropertyMapping
 } from './constants'
 import { getUserId } from './uuid'
@@ -40,7 +40,7 @@ describe('getTelemetryReporter', () => {
     expect(telemetryReporter).toBeDefined()
     expect(mockedTelemetryReporter).toHaveBeenCalledTimes(1)
     expect(mockedTelemetryReporter).toHaveBeenCalledWith(
-      APPLICATION_INSIGHTS_KEY
+      APPLICATION_INSIGHTS_CONNECTION_STRING
     )
   })
 

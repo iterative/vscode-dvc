@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/default
 import TelemetryReporter from '@vscode/extension-telemetry'
 import {
-  APPLICATION_INSIGHTS_KEY,
+  APPLICATION_INSIGHTS_CONNECTION_STRING,
   IEventNamePropertyMapping,
   ViewOpenedEventName
 } from './constants'
@@ -18,7 +18,9 @@ export const getTelemetryReporter = (): TelemetryReporter => {
     return telemetryReporter
   }
 
-  telemetryReporter = new TelemetryReporter(APPLICATION_INSIGHTS_KEY)
+  telemetryReporter = new TelemetryReporter(
+    APPLICATION_INSIGHTS_CONNECTION_STRING
+  )
   return telemetryReporter
 }
 

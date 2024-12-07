@@ -8,7 +8,8 @@ import {
   SectionCollapsed
 } from '../plots/webview/contract'
 
-export const APPLICATION_INSIGHTS_KEY = '46e8e554-d50a-471a-a53b-4af2b1cd6594'
+export const APPLICATION_INSIGHTS_CONNECTION_STRING =
+  'InstrumentationKey=46e8e554-d50a-471a-a53b-4af2b1cd6594;IngestionEndpoint=https://westus2-2.in.applicationinsights.azure.com/;LiveEndpoint=https://westus2.livediagnostics.monitor.azure.com/;ApplicationId=f8ed111b-7a8f-4e59-94a5-9979333db978'
 
 const ViewOpenedEvent = {
   VIEWS_EXPERIMENTS_FILTER_BY_TREE_OPENED:
