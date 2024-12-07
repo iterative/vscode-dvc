@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.24] - 2024-12-07
+
+### 🐛 Bug Fixes
+
+- Upgrade extension telemetry package [#5853](https://github.com/iterative/vscode-dvc/pull/5853) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.2.23] - 2024-12-02
 
 ### 🔨 Maintenance
