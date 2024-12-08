@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.25] - 2024-12-08
+
+### 🐛 Bug Fixes
+
+- Fix editor decorations for folders/files tracked by DVC [#5856](https://github.com/iterative/vscode-dvc/pull/5856) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.2.24] - 2024-12-07
 
 ### 🐛 Bug Fixes
