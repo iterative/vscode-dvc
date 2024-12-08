@@ -108,6 +108,7 @@ export class DecorationProvider
   }
 
   private static DecorationTracked: FileDecoration = {
+    color: new ThemeColor('list.inactiveSelectionIconForeground'),
     tooltip: 'DVC Tracked'
   }
 
@@ -163,6 +164,7 @@ export class DecorationProvider
   public setState(state: ScmDecorationState) {
     const urisToUpdate = this.getUnion(this.state, state)
     this.state = state
+
     this.decorationsChanged.fire(urisToUpdate)
   }
 
