@@ -63,7 +63,7 @@ const promptToAddStudioToken = async () => {
 }
 
 const convertUrlTextToLink = (stdout: string) => {
-  const experimentAtRegex = /\sat\s+(https:\/\/studio\.dvc\.ai\/.*$)/
+  const experimentAtRegex = /\sat\s+(https:\/\/studio\.datachain\.ai\/.*$)/
   const match = stdout.match(experimentAtRegex)
   if (!(match?.[0] && match?.[1])) {
     return stdout
