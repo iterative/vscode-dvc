@@ -43,4 +43,4 @@ export const DEFAULT_SECTION_COLLAPSED = {
 
 export type SectionCollapsed = typeof DEFAULT_SECTION_COLLAPSED
 
-export const DEFAULT_STUDIO_URL = 'https://studio.dvc.ai'
+export const DEFAULT_STUDIO_URL = 'https://studio.datachain.ai'

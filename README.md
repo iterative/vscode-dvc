@@ -178,8 +178,8 @@ more information.
   https://marketplace.visualstudio.com/items?itemName=ms-python.python
 [studio.token]:
   https://dvc.org/doc/user-guide/project-structure/configuration#studio
-[dvc studio]: https://studio.dvc.ai
-[studio]: https://studio.dvc.ai
+[dvc studio]: https://studio.datachain.ai
+[studio]: https://studio.datachain.ai
 [workspace level]:
   https://code.visualstudio.com/docs/getstarted/settings#_workspace-settings
 [python.envFile]:

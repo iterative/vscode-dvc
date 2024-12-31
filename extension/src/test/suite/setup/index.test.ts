@@ -885,9 +885,9 @@ suite('Setup Test Suite', () => {
       const mockUriHandlerDispose = stub()
       const mockStudioRes = {
         device_code: 'Yi-NPd9ggvNUDBcam5bP8iivbtLhnqVgM_lSSbilqNw',
-        token_uri: 'https://studio.dvc.ai/api/device-login/token',
+        token_uri: 'https://studio.datachain.ai/api/device-login/token',
         user_code: '40DWMKNA',
-        verification_uri: 'https://studio.dvc.ai/auth/device-login'
+        verification_uri: 'https://studio.datachain.ai/auth/device-login'
       }
       const mockCallbackUrl = 'url-to-vscode'
 
@@ -1013,9 +1013,9 @@ suite('Setup Test Suite', () => {
         json: () =>
           Promise.resolve({
             device_code: 'Yi-NPd9ggvNUDBcam5bP8iivbtLhnqVgM_lSSbilqNw',
-            token_uri: 'https://studio.dvc.ai/api/device-login/token',
+            token_uri: 'https://studio.datachain.ai/api/device-login/token',
             user_code: '40DWMKNA',
-            verification_uri: 'https://studio.dvc.ai/auth/device-login'
+            verification_uri: 'https://studio.datachain.ai/auth/device-login'
           })
       } as Fetch.Response)
       const openUrlEvent = new Promise(resolve =>
@@ -1071,9 +1071,9 @@ suite('Setup Test Suite', () => {
         json: () =>
           Promise.resolve({
             device_code: 'Yi-NPd9ggvNUDBcam5bP8iivbtLhnqVgM_lSSbilqNw',
-            token_uri: 'https://studio.dvc.ai/api/device-login/token',
+            token_uri: 'https://studio.datachain.ai/api/device-login/token',
             user_code: '40DWMKNA',
-            verification_uri: 'https://studio.dvc.ai/auth/device-login'
+            verification_uri: 'https://studio.datachain.ai/auth/device-login'
           })
       } as Fetch.Response)
 
