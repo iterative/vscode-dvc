@@ -770,7 +770,7 @@ suite('Experiments Test Suite', () => {
         mockExpPush.callsFake(() => {
           resolve(undefined)
           return Promise.resolve(
-            "Experiment major-lamb is up to date on Git remote 'origin'.\nView your experiments at \nhttps://studio.dvc.ai/user/mattseddon/projects/vscode-dvc-demo-ynm6t3jxdx"
+            "Experiment major-lamb is up to date on Git remote 'origin'.\nView your experiments at \nhttps://studio.datachain.ai/user/mattseddon/projects/vscode-dvc-demo-ynm6t3jxdx"
           )
         })
       )
@@ -805,7 +805,7 @@ suite('Experiments Test Suite', () => {
       expect(mockReport).to.be.calledWithExactly({
         increment: 75,
         message:
-          "Experiment major-lamb is up to date on Git remote 'origin'.\nView your experiments in [DVC Studio](https://studio.dvc.ai/user/mattseddon/projects/vscode-dvc-demo-ynm6t3jxdx)"
+          "Experiment major-lamb is up to date on Git remote 'origin'.\nView your experiments in [DVC Studio](https://studio.datachain.ai/user/mattseddon/projects/vscode-dvc-demo-ynm6t3jxdx)"
       })
 
       messageSpy.restore()
@@ -851,7 +851,7 @@ suite('Experiments Test Suite', () => {
 
       await writeToClipboardCalled
       const link =
-        'https://studio.dvc.ai/user/olivaw/projects/vscode-dvc-demo-ynm6t3jxdx' +
+        'https://studio.datachain.ai/user/olivaw/projects/vscode-dvc-demo-ynm6t3jxdx' +
         '?showOnlySelected=1' +
         '&experimentReferences=4fb124aebddb2adf1545030907687fa9a4c80e70'
 
