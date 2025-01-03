@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.26] - 2025-01-03
+
+### 🔨 Maintenance
+
+- Switch to `studio.datachain.ai` [#5887](https://github.com/iterative/vscode-dvc/pull/5887) by [@0x2b3bfa0](https://github.com/0x2b3bfa0)
+
 ## [1.2.25] - 2024-12-08
 
 ### 🐛 Bug Fixes
