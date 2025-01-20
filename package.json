@@ -38,7 +38,7 @@
     "@typescript-eslint/parser": "7.2.0",
     "@vscode/codicons": "0.0.36",
     "eslint": "8.57.1",
-    "eslint-config-prettier": "9.1.0",
+    "eslint-config-prettier": "10.0.1",
     "eslint-config-prettier-standard": "4.0.1",
     "eslint-config-standard": "17.1.0",
     "eslint-plugin-check-file": "2.6.2",
