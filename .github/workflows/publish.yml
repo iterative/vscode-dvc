@@ -41,14 +41,14 @@ jobs:
           path: ./extension/dvc.vsix
 
       - name: Publish to Visual Studio Marketplace
-        uses: HaaLeo/publish-vscode-extension@v1
+        uses: HaaLeo/publish-vscode-extension@v2
         with:
           extensionFile: './extension/dvc.vsix'
           pat: ${{ secrets.VS_MARKETPLACE_TOKEN }}
           registryUrl: https://marketplace.visualstudio.com
 
       - name: Publish to Open VSX Registry
-        uses: HaaLeo/publish-vscode-extension@v1
+        uses: HaaLeo/publish-vscode-extension@v2
         with:
           extensionFile: './extension/dvc.vsix'
           pat: ${{ secrets.OPEN_VSX_TOKEN }}
