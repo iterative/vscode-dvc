@@ -80,7 +80,7 @@ Management]. For deeper learning, try our [free course]! [More resources].
 
 [experiments]: https://dvc.org/doc/start/experiments
 [data management]: https://dvc.org/doc/start/data-management
-[free course]: https://learn.dvc.ai/
+[free course]: https://learn.dvc.org/
 [more resources]:
   https://github.com/iterative/vscode-dvc/blob/main/extension/resources/walkthrough/more-resources.md
 

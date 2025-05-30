@@ -28,7 +28,7 @@
 [use cases]: https://dvc.org/doc/use-cases
 [`dvc` commands]: https://dvc.org/doc/command-reference
 [python api]: https://dvc.org/doc/api-reference
-[free course]: https://learn.iterative.ai/
+[free course]: https://learn.dvc.org/
 [contribute]: https://dvc.org/doc/contributing/core
 [example project]: https://github.com/iterative/example-get-started-experiments
 [blog]: https://dvc.org/blog
