@@ -23,7 +23,6 @@
   "git-submodules": {
     "enabled": true
   },
-  "enabledManagers": ["regex"],
   "customManagers": [
     {
       "customType": "regex",
