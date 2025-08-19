@@ -206,7 +206,9 @@ export const waitForAllPlotsToRender = (
 ): Promise<true | void> => {
   return browser.waitUntil(
     async () => {
-      return (await webview.vegaVisualization$$.length) === plotsAmount
+      const actual = await webview.vegaVisualization$$.length
+      console.log('expected', plotsAmount, 'got', actual)
+      return actual === plotsAmount
     },
     { timeout: 30000 }
   )
