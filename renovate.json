@@ -26,7 +26,7 @@
   "customManagers": [
     {
       "customType": "regex",
-      "managerFilePatterns": ["^extension/src/cli/dvc/contract.ts$"],
+      "managerFilePatterns": ["/^extension/src/cli/dvc/contract\\.ts$/"],
       "matchStrings": [
         "export const LATEST_TESTED_CLI_VERSION = \\'(?<currentValue>[0-9]+\\.[0-9]+\\.[0-9]+)\\'"
       ],
