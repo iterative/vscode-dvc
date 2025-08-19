@@ -166,6 +166,7 @@ describe('Plots Webview', function () {
     await waitForDvcToFinish()
     await webview.focus()
 
+    console.log('6')
     await waitForAllPlotsToRender(webview, 6)
 
     await expectAllPlotsToBeFilled(webview)
