@@ -14,6 +14,25 @@
       "matchDatasources": ["npm"],
       "prConcurrentLimit": 1,
       "stabilityDays": 7
+    },
+    {
+      "groupName": "update demo project and latest tested CLI version",
+      "matchPackageNames": ["dvc", "demo"]
+    }
+  ],
+  "git-submodules": {
+    "enabled": true
+  },
+  "enabledManagers": ["regex"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["^extension/src/cli/dvc/contract.ts$"],
+      "matchStrings": [
+        "export const LATEST_TESTED_CLI_VERSION = \\'(?<currentValue>[0-9]+\\.[0-9]+\\.[0-9]+)\\'"
+      ],
+      "depNameTemplate": "dvc",
+      "datasourceTemplate": "pypi"
     }
   ]
 }
