@@ -47,7 +47,7 @@ export const config: Options.Testrunner = {
   capabilities: [
     {
       browserName: 'vscode',
-      browserVersion: 'stable',
+      browserVersion: '1.100.3',
       'wdio:vscodeOptions': {
         extensionPath,
         userSettings: {
