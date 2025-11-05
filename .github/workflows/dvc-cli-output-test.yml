@@ -19,7 +19,7 @@ jobs:
           submodules: true
 
       - name: Setup Python environment
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.11'
           cache: 'pip'
