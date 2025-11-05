@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### 🔨 Maintenance
 
-- chore(deps): update dependency dvc to v3.63.0 [#5951](https://github.com/iterative/vscode-dvc/pull/5951) by [@renovate[bot]](https://github.com/renovate%5Bbot%5D)
+- Update demo project and latest tested CLI version (3.63.0) [#5951](https://github.com/iterative/vscode-dvc/pull/5951) by [@renovate[bot]](https://github.com/renovate%5Bbot%5D)
 
 ## [1.2.27] - 2025-01-13
 
