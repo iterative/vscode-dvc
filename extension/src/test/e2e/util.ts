@@ -76,11 +76,16 @@ const runDeleteCommand = async (
     .down(Key.Tab)
     .up(Key.Tab)
     .up(Key.Shift)
+    .pause(200)
+    .down(Key.Space)
+    .up(Key.Space)
+    .pause(200)
+    .down(Key.Tab)
+    .up(Key.Tab)
+    .pause(200)
+    .down(Key.Enter)
+    .up(Key.Enter)
     .perform()
-
-  await browser.keys(Key.Space)
-
-  return browser.keys(Key.Enter)
 }
 
 export const waitForDvcToFinish = async (timeout = 60000): Promise<void> => {
@@ -230,6 +235,9 @@ export const findScmTreeItems = async (openView: boolean) => {
       .up(Key.Control)
       .up(Key.Shift)
       .up('g')
+      .pause(100)
+      .down(Key.Tab)
+      .up(Key.Tab)
       .pause(100)
       .down(Key.Tab)
       .up(Key.Tab)

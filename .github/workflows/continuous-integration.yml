@@ -42,17 +42,7 @@ jobs:
 
       - run: yarn run lint
 
-      - name: Run Coverage Report
-        if: '!github.event.pull_request.head.repo.fork'
-        uses: paambaati/codeclimate-action@v9.0.0
-        env:
-          CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
-        with:
-          coverageCommand: xvfb-run -a yarn run cover
-          coverageLocations: ${{github.workspace}}/coverage/lcov.info:lcov
-
-      - name: Run Fork Coverage
-        if: 'github.event.pull_request.head.repo.fork'
+      - name: Run Tests
         run: xvfb-run -a yarn run cover
 
       - name: Publish to Chromatic
