@@ -23,7 +23,7 @@ jobs:
       - name: Setup Python environment
         uses: actions/setup-python@v6
         with:
-          python-version: '3.11'
+          python-version: '3.14'
 
       - name: Setup Node.js environment
         uses: actions/setup-node@v6
