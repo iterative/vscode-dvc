@@ -39,8 +39,8 @@
     "theme": "dark"
   },
   "engines": {
-    "vscode": "^1.75.0",
-    "node": ">=16.13.0"
+    "vscode": "^1.90.0",
+    "node": ">=20"
   },
   "activationEvents": [
     "onStartupFinished",
@@ -1645,11 +1645,11 @@
     "@types/lodash.omit": "4.5.9",
     "@types/mocha": "10.0.10",
     "@types/mock-require": "3.0.0",
-    "@types/node": "16.x",
+    "@types/node": "20.x",
     "@types/sinon-chai": "3.2.12",
     "@types/uuid": "10.0.0",
     "@types/vega": "3.2.0",
-    "@types/vscode": "1.75.0",
+    "@types/vscode": "1.90.0",
     "@vscode/test-electron": "2.4.1",
     "@vscode/vsce": "2.25.0",
     "@wdio/cli": "8.41.0",

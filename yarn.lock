@@ -4380,10 +4380,12 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.21.tgz#864b987c0c68d07b4345845c3e63b75edd143644"
   integrity sha512-DBZCJbhII3r90XbQxI8Y9IjjiiOGlZ0Hr32omXIZvwwZ7p4DMMXGrKXVyPfuoBOri9XNtL0UK69jYIBIsRX3QQ==
 
-"@types/node@16.x":
-  version "16.18.4"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-16.18.4.tgz#712ba61b4caf091fc6490301b1888356638c17bd"
-  integrity sha512-9qGjJ5GyShZjUfx2ArBIGM+xExdfLvvaCyQR0t6yRXKPcWCVYF/WemtX/uIU3r7FYECXRXkIiw2Vnhn6y8d+pw==
+"@types/node@20.x":
+  version "20.19.24"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.19.24.tgz#6bc35bc96cda1a251000b706c76380b5c843f30b"
+  integrity sha512-FE5u0ezmi6y9OZEzlJfg37mqqf6ZDSF2V/NLjUyGrR9uTZ7Sb9F7bLNZ03S4XVUNRWGA7Ck4c1kK+YnuWjl+DA==
+  dependencies:
+    undici-types "~6.21.0"
 
 "@types/node@^18.0.0":
   version "18.18.6"
@@ -4571,10 +4573,10 @@
   dependencies:
     vega "*"
 
-"@types/vscode@1.75.0":
-  version "1.75.0"
-  resolved "https://registry.yarnpkg.com/@types/vscode/-/vscode-1.75.0.tgz#f1892a727db9a0eb4997058a804170b8c0ba218e"
-  integrity sha512-SAr0PoOhJS6FUq5LjNr8C/StBKALZwDVm3+U4pjF/3iYkt3GioJOPV/oB1Sf1l7lROe4TgrMyL5N1yaEgTWycw==
+"@types/vscode@1.90.0":
+  version "1.90.0"
+  resolved "https://registry.yarnpkg.com/@types/vscode/-/vscode-1.90.0.tgz#c122384d51bd774cec4aa86ca443858adc9edef2"
+  integrity sha512-oT+ZJL7qHS9Z8bs0+WKf/kQ27qWYR3trsXpq46YDjFqBsMLG4ygGGjPaJ2tyrH0wJzjOEmDyg9PDJBBhWg9pkQ==
 
 "@types/webpack-env@^1.16.0":
   version "1.16.3"
@@ -17875,6 +17877,11 @@ undici-types@~6.19.2:
   version "6.19.8"
   resolved "https://registry.yarnpkg.com/undici-types/-/undici-types-6.19.8.tgz#35111c9d1437ab83a7cdc0abae2f26d88eda0a02"
   integrity sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==
+
+undici-types@~6.21.0:
+  version "6.21.0"
+  resolved "https://registry.yarnpkg.com/undici-types/-/undici-types-6.21.0.tgz#691d00af3909be93a7faa13be61b3a5b50ef12cb"
+  integrity sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==
 
 undici@5.29.0, undici@^5.28.3:
   version "5.29.0"
