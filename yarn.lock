@@ -3909,10 +3909,10 @@
     magic-string "^0.30.10"
     pathe "^1.1.2"
 
-"@vscode/codicons@0.0.36":
-  version "0.0.36"
-  resolved "https://registry.yarnpkg.com/@vscode/codicons/-/codicons-0.0.36.tgz#ccdabfaef5db596b266644ab85fc25aa701058f0"
-  integrity sha512-wsNOvNMMJ2BY8rC2N2MNBG7yOowV3ov8KlvUE/AiVUlHKTfWsw3OgAOQduX7h0Un6GssKD3aoTVH+TF3DSQwKQ==
+"@vscode/codicons@0.0.41":
+  version "0.0.41"
+  resolved "https://registry.yarnpkg.com/@vscode/codicons/-/codicons-0.0.41.tgz#9c04b00e1135e8b9936b4ba8c30a5bbe0bc54502"
+  integrity sha512-v6/8nx76zau3Joxjzi3eN/FVw+7jKBq4j7LTZY5FhFhq2g0OoFebZ3vRZbv/pUopGpbCnJJ4FOz+NzbjVsmoiw==
 
 "@vscode/extension-telemetry@0.9.8":
   version "0.9.8"
