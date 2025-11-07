@@ -33,7 +33,7 @@
     "react-dom": "18.3.1",
     "react-intersection-observer": "9.15.1",
     "react-redux": "9.2.0",
-    "react-vega": "7.6.0",
+    "react-vega": "7.7.1",
     "react-virtualized": "9.22.6",
     "vega-lite": "5.14.1",
     "vega-util": "1.17.4"
