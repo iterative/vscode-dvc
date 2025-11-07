@@ -74,9 +74,7 @@ describe('ExperimentsModel', () => {
       ],
       { main: 700 }
     )
-    expect(model.getRowData()).toStrictEqual(
-      expect.objectContaining(survivalRowsFixture)
-    )
+    expect(model.getRowData()).toMatchObject(survivalRowsFixture)
   })
 
   it('should set the workspace to running if a signal file for a DVCLive only experiment has been found', () => {
@@ -216,9 +214,7 @@ describe('ExperimentsModel', () => {
       descending: true
     })
 
-    expect(model.getRowData()).toStrictEqual(
-      expect.objectContaining(deeplyNestedRowsFixture)
-    )
+    expect(model.getRowData()).toMatchObject(deeplyNestedRowsFixture)
   })
 
   it('should return the expected rows when given the data types output fixture', () => {
@@ -230,9 +226,7 @@ describe('ExperimentsModel', () => {
       [{ branch: 'main', sha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77' }],
       { main: 10 }
     )
-    expect(model.getRowData()).toStrictEqual(
-      expect.objectContaining(dataTypesRowsFixture)
-    )
+    expect(model.getRowData()).toMatchObject(dataTypesRowsFixture)
   })
 
   it('should always limit the number of selected experiments to 7', () => {

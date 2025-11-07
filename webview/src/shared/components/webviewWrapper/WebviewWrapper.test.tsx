@@ -29,10 +29,7 @@ describe('Wrapper', () => {
     ]
 
     for (const variable of expectedVariables) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      expect((theme.style as any)._values[variable]).toStrictEqual(
-        expect.any(String)
-      )
+      expect(theme.style.getPropertyValue(variable)).toBeTruthy()
     }
   })
 })
