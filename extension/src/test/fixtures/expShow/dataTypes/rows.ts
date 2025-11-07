@@ -7,8 +7,6 @@ import {
 const data: Commit[] = [
   {
     branch: WORKSPACE_BRANCH,
-    commit: undefined,
-    description: undefined,
     displayColor: undefined,
     id: EXPERIMENT_WORKSPACE_ID,
     label: EXPERIMENT_WORKSPACE_ID,
@@ -29,8 +27,6 @@ const data: Commit[] = [
   },
   {
     branch: 'main',
-    commit: undefined,
-    description: undefined,
     displayColor: undefined,
     id: 'main',
     label: 'main',
