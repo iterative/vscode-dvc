@@ -1624,7 +1624,7 @@
     "node-fetch": "2.7.0",
     "process-exists": "4.1.0",
     "tree-kill": "1.2.2",
-    "uuid": "11.0.5",
+    "uuid": "11.1.0",
     "vega-lite": "5.14.1",
     "vscode-languageclient": "9.0.1",
     "yaml": "2.7.0"
@@ -1647,7 +1647,7 @@
     "@types/mock-require": "3.0.0",
     "@types/node": "20.x",
     "@types/sinon-chai": "3.2.12",
-    "@types/uuid": "10.0.0",
+    "@types/uuid": "11.0.0",
     "@types/vega": "3.2.0",
     "@types/vscode": "1.90.0",
     "@vscode/test-electron": "2.5.2",
