@@ -25,8 +25,8 @@
     "test": "jest --collect-coverage"
   },
   "devDependencies": {
-    "@swc/core": "1.11.5",
-    "@swc/jest": "0.2.37",
+    "@swc/core": "1.14.0",
+    "@swc/jest": "0.2.39",
     "@types/jest": "30.0.0",
     "clean-webpack-plugin": "4.0.0",
     "copy-webpack-plugin": "11.0.0",
