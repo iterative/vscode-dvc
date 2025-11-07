@@ -36,7 +36,7 @@
     "react-vega": "7.6.0",
     "react-virtualized": "9.22.6",
     "vega-lite": "5.14.1",
-    "vega-util": "1.17.4"
+    "vega-util": "2.1.0"
   },
   "devDependencies": {
     "@storybook/addons": "7.6.17",
