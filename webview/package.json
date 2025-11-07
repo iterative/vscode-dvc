@@ -50,7 +50,7 @@
     "@svgr/plugin-prettier": "^8.0.1",
     "@swc/core": "1.14.0",
     "@swc/jest": "0.2.39",
-    "@testing-library/jest-dom": "6.6.3",
+    "@testing-library/jest-dom": "6.9.1",
     "@testing-library/react": "14.3.1",
     "@types/jest": "30.0.0",
     "@types/jsdom": "27.0.0",
